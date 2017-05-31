@@ -58,6 +58,9 @@
    <osgi:reference id="echoService"
          interface="com.vmware.vic.services.EchoService" />
 
+   <osgi:reference id="rpService"
+         interface="com.vmware.vic.services.ResourcePoolService" />
+
    <osgi:reference id="sampleActionService"
          interface="com.vmware.vic.services.SampleActionService" />
 

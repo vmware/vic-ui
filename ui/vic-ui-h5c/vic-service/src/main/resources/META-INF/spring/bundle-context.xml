@@ -13,6 +13,11 @@
 
    <bean name="EchoServiceImpl" class="com.vmware.vic.services.EchoServiceImpl"/>
 
+   <bean name="ResourcePoolServiceImpl"
+         class="com.vmware.vic.services.ResourcePoolServiceImpl">
+      <constructor-arg index="0" ref="dataService"></constructor-arg>
+   </bean>
+
    <bean name="SampleActionServiceImpl"
          class="com.vmware.vic.services.SampleActionServiceImpl">
         <constructor-arg index="0" ref="vimObjectReferenceService"/>

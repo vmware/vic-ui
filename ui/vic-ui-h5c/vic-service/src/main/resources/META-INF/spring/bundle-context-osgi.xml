@@ -19,6 +19,9 @@
    <osgi:service id="EchoService" ref="EchoServiceImpl"
          interface="com.vmware.vic.services.EchoService" />
 
+   <osgi:service id="ResourcePoolService" ref="ResourcePoolServiceImpl"
+         interface="com.vmware.vic.services.ResourcePoolService" />
+
    <osgi:service id="SampleActionService" ref="SampleActionServiceImpl"
          interface="com.vmware.vic.services.SampleActionService" />
 

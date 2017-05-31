@@ -37,6 +37,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.vmware.vic.services.EchoService;
+import com.vmware.vic.services.ResourcePoolService;
 
 
 /**
@@ -50,17 +51,21 @@ public class ServicesController {
    private final static Log _logger = LogFactory.getLog(ServicesController.class);
 
    private final EchoService _echoService;
+   private final ResourcePoolService _resourcePoolService;
 
    @Autowired
    public ServicesController(
-         @Qualifier("echoService") EchoService echoService) {
+         @Qualifier("echoService") EchoService echoService,
+         @Qualifier("rpService") ResourcePoolService resourcePoolService) {
       _echoService = echoService;
+      _resourcePoolService = resourcePoolService;
    }
 
    // Empty controller to avoid compiler warnings in vic's bundle-context.xml
    // where the bean is declared
    public ServicesController() {
       _echoService = null;
+      _resourcePoolService = null;
    }
 
 
@@ -72,6 +77,16 @@ public class ServicesController {
    public String echo(@RequestParam(value = "message", required = true) String message)
          throws Exception {
       return _echoService.echo(message);
+   }
+
+   /**
+    * Check if the name for a new ResourcePool already exists
+    */
+   @RequestMapping(value = "/check-rp-uniqueness", method = RequestMethod.POST)
+   @ResponseBody
+   public boolean checkRpUniqueness(
+           @RequestParam(value = "name", required = false) String name) {
+       return _resourcePoolService.isNameUnique(name);
    }
 
    /**
