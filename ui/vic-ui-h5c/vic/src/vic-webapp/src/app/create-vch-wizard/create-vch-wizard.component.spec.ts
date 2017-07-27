@@ -25,8 +25,10 @@ import { Globals, GlobalsService } from 'app/shared';
 import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Observable } from 'rxjs/Observable';
+import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 
 describe('CreateVchWizardComponent', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
   let component: CreateVchWizardComponent;
   let fixture: ComponentFixture<CreateVchWizardComponent>;
 
