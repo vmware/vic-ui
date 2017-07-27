@@ -17,7 +17,11 @@ limitations under the License.
 */
 package com.vmware.vic.services;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.vmware.vic.model.constants.VsphereObjects;
+import com.vmware.vic.mvc.ServicesController;
 import com.vmware.vise.data.query.CompositeConstraint;
 import com.vmware.vise.data.query.Conjoiner;
 import com.vmware.vise.data.query.DataService;
@@ -33,6 +37,7 @@ import com.vmware.vise.data.query.Response;
  * operations wizard
  */
 public class ResourcePoolServiceImpl implements ResourcePoolService {
+    private final static Log _logger = LogFactory.getLog(ResourcePoolServiceImpl.class);
     private DataService _dataService;
 
     public ResourcePoolServiceImpl(DataService dataService)
@@ -45,8 +50,9 @@ public class ResourcePoolServiceImpl implements ResourcePoolService {
      * the given "name"
      * @param name
      * @return true if no object with the given name exists, otherwise false
+     * @throws Exception
      */
-    public boolean isNameUnique(String name) {
+    public boolean isNameUnique(String name) throws Exception {
         PropertyConstraint sameVappNameConstraint =
                 QueryUtil.createPropertyConstraint(
                     VsphereObjects.VirtualApp,
@@ -75,6 +81,10 @@ public class ResourcePoolServiceImpl implements ResourcePoolService {
         requestSpec.querySpec = new QuerySpec[] { querySpec };
 
         Response response = _dataService.getData(requestSpec);
+        if (response.resultSet[0].error != null) {
+            _logger.error(response.resultSet[0].error);
+            throw new Exception(response.resultSet[0].error);
+        }
         if (response.resultSet[0].totalMatchedObjectCount > 0) {
             return false;
         }
