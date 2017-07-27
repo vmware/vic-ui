@@ -17,8 +17,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpModule } from '@angular/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
+import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
 import { Globals, GlobalsService } from 'app/shared';
 
 describe('CreateVchWizardComponent', () => {
@@ -27,7 +30,13 @@ describe('CreateVchWizardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ClarityModule, BrowserAnimationsModule],
+      imports: [
+        FormsModule,
+        HttpModule,
+        ReactiveFormsModule,
+        ClarityModule,
+        BrowserAnimationsModule
+      ],
       providers: [
         {
           provide: GlobalsService, useValue: {
@@ -38,7 +47,10 @@ describe('CreateVchWizardComponent', () => {
             }
           }
         }],
-      declarations: [CreateVchWizardComponent]
+      declarations: [
+        CreateVchWizardComponent,
+        VchCreationWizardNameComponent
+      ]
     })
       .compileComponents();
   }));
@@ -64,7 +76,7 @@ describe('CreateVchWizardComponent', () => {
     const lastPage = fixture.debugElement.query(By.css('clr-wizard-page:last-of-type'));
     expect(nextBtn).toBeTruthy();
     spyOn(component, 'onCancel').and.callThrough();
-    spyOn(component, 'onCommit').and.callThrough();
+    spyOn(component, 'onCommit').and.callFake(() => { });
     spyOn(component, 'onFinish').and.callThrough();
     spyOn(component, 'goBack').and.callThrough();
 

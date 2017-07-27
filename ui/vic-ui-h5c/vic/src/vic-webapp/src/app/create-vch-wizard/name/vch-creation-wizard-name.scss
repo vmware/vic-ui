@@ -1,0 +1,9 @@
+div.form-group {
+  padding-left: 150px;
+  & label:first-child {
+    width: 150px;
+  }
+  & span.red-text {
+    color: red;
+  }
+}

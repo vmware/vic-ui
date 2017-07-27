@@ -17,6 +17,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Renderer } from '@angular/core';
 import { Wizard } from 'clarity-angular';
 import { GlobalsService } from 'app/shared';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -27,7 +28,7 @@ export class CreateVchWizardComponent implements OnInit {
   @ViewChild('wizardlg') wizard: Wizard;
   public loading = false;
   public errorFlag = false;
-  public errorMsg: string;
+  public errorMsgs: string[];
 
   // TODO: remove the following
   public testVal = 0;
@@ -80,20 +81,21 @@ export class CreateVchWizardComponent implements OnInit {
 
   /**
    * Perform validation for the current WizardPage and proceed to the next page
-   * if the data is valid. If not, display an error message
-   * @param id : ID of WizardPage
+   * if the user input is valid. If not, display all validation error messages
+   * @param asyncValidationObs : Observable containing async validation results
    */
-  onCommit(id: string) {
+  onCommit(asyncValidationObs: Observable<string[]>) {
     this.loading = true;
-    // TODO: validation model & logic
-    this.testVal = Math.random();
-    console.log('on commit', id);
-    if (this.testVal >= 0.5) {
-      this.wizard.forceNext();
-    } else {
-      this.errorFlag = true;
-      this.errorMsg = `${this.testVal} is smaller than 0.5! Try again.`;
-    }
+    asyncValidationObs.subscribe(errors => {
+      if (errors) {
+        this.loading = false;
+        this.errorFlag = true;
+        this.errorMsgs = errors;
+      } else {
+        this.errorFlag = false;
+        this.wizard.forceNext();
+      }
+    });
   }
 
   /**
@@ -109,6 +111,8 @@ export class CreateVchWizardComponent implements OnInit {
    */
   onPageLoad(id: string) {
     this.errorFlag = false;
+    this.errorMsgs = [];
+    this.loading = false;
   }
 
   /**
@@ -124,7 +128,7 @@ export class CreateVchWizardComponent implements OnInit {
     }
 
     this.errorFlag = true;
-    this.errorMsg = 'User inputs validation failed!';
+    this.errorMsgs = ['User inputs validation failed!'];
   }
 
   /**
