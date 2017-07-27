@@ -18,5 +18,5 @@ limitations under the License.
 package com.vmware.vic.services;
 
 public interface ResourcePoolService {
-    public boolean isNameUnique(String name);
+    public boolean isNameUnique(String name) throws Exception;
 }

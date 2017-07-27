@@ -81,11 +81,12 @@ public class ServicesController {
 
    /**
     * Check if the name for a new ResourcePool already exists
+ * @throws Exception
     */
    @RequestMapping(value = "/check-rp-uniqueness", method = RequestMethod.POST)
    @ResponseBody
    public boolean checkRpUniqueness(
-           @RequestParam(value = "name", required = false) String name) {
+           @RequestParam(value = "name", required = true) String name) throws Exception {
        return _resourcePoolService.isNameUnique(name);
    }
 
