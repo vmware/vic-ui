@@ -31,6 +31,7 @@ import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 
 describe('CreateVchWizardService', () => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
     let service: CreateVchWizardService;
     let connection: MockConnection;
     let backend: MockBackend;
