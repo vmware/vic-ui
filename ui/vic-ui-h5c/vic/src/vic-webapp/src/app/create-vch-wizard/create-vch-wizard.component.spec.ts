@@ -21,8 +21,10 @@ import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
-import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
 import { Globals, GlobalsService } from 'app/shared';
+import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
+import { CreateVchWizardService } from './create-vch-wizard.service';
+import { Observable } from 'rxjs/Observable';
 
 describe('CreateVchWizardComponent', () => {
   let component: CreateVchWizardComponent;
@@ -46,7 +48,16 @@ describe('CreateVchWizardComponent', () => {
               };
             }
           }
-        }],
+        },
+        {
+          provide: CreateVchWizardService, useValue: {
+            checkVchNameUniqueness: (name) => {
+              // TODO: check if this makes sense
+              return Observable.of(name === 'unique');
+            }
+          }
+        }
+      ],
       declarations: [
         CreateVchWizardComponent,
         VchCreationWizardNameComponent

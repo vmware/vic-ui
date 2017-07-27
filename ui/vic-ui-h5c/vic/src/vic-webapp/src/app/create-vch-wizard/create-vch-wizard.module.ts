@@ -21,6 +21,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
+import { CreateVchWizardService } from './create-vch-wizard.service';
 
 const routes: Routes = [
     { path: '', component: CreateVchWizardComponent },
@@ -39,6 +40,9 @@ const routes: Routes = [
     declarations: [
         CreateVchWizardComponent,
         VchCreationWizardNameComponent
+    ],
+    providers: [
+        CreateVchWizardService
     ],
     exports: [
         CreateVchWizardComponent,
