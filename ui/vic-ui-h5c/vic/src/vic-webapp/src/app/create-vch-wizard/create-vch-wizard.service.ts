@@ -21,9 +21,14 @@ import { CHECK_RP_UNIQUENESS_URL } from '../shared/constants';
 
 @Injectable()
 export class CreateVchWizardService {
+    // TODO: make a proper interface
+    private _vchManifest: any;
+
     constructor(
         private http: Http
-    ) { }
+    ) {
+        this.getWipManifest();
+    }
 
     /**
      * Validate the provided name against VC inventories in a way that
@@ -38,5 +43,16 @@ export class CreateVchWizardService {
             .catch(e => Observable.throw(e))
             .map(response => response.json())
             .catch(e => Observable.throw(e));
+    }
+
+    /**
+     * Look for the LocalStorage and get any 
+     */
+    getWipManifest() {
+
+    }
+
+    get vchManifest() {
+        return this._vchManifest;
     }
 }
