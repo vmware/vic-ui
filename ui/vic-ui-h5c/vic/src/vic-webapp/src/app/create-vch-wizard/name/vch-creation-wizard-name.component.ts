@@ -18,6 +18,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Http, URLSearchParams } from '@angular/http';
 import 'rxjs/add/observable/timer';
+import { CreateVchWizardService } from '../create-vch-wizard.service';
 
 @Component({
     selector: 'vic-vch-creation-name',
@@ -30,7 +31,8 @@ export class VchCreationWizardNameComponent implements OnInit {
 
     constructor(
         private formBuilder: FormBuilder,
-        private http: Http
+        private http: Http,
+        private createWzService: CreateVchWizardService
     ) {
         // create form
         this.form = formBuilder.group({
@@ -80,13 +82,9 @@ export class VchCreationWizardNameComponent implements OnInit {
      * @returns {Observable<string[]>}
      */
     onCommit(): Observable<string[]> {
-        // TODO: move the following into a service
-        const params = new URLSearchParams();
-        params.set('name', this.form.get('name').value);
-        return this.http.post('/ui/vic/rest/services/check-rp-uniqueness', params)
-            .catch(e => Observable.throw(e))
-            .map(response => response.json())
-            .catch(e => Observable.throw(e))
+        // TODO: unit test this
+        return this.createWzService.checkVchNameUniqueness(
+            this.form.get('name').value)
             .switchMap(isUnique => {
                 if (!isUnique) {
                     this.form.get('name').setErrors({

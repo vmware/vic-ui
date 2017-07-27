@@ -20,3 +20,4 @@ export const CREATE_VCH_WIZARD_URL =
     `/ui/vic/resources/${environment.production ? 'dist' : 'build-dev'}/index.html?view=create-vch`;
 export const WIZARD_MODAL_WIDTH = 920;
 export const WIZARD_MODAL_HEIGHT = 600;
+export const CHECK_RP_UNIQUENESS_URL = '/ui/vic/rest/services/check-rp-uniqueness';
