@@ -34,7 +34,9 @@ export class VchCreationWizardNameComponent implements OnInit {
         private http: Http,
         private createWzService: CreateVchWizardService
     ) {
-        // create form
+        // create a FormGroup instance for the 'name' field with
+        // three synchronous validations - not empty, max char length of 80
+        // and not containing any invalid characters
         this.form = formBuilder.group({
             name: [
                 '', // TODO: implement a function to load existing data
