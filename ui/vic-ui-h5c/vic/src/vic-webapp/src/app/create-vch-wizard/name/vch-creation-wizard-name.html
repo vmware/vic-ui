@@ -1,0 +1,16 @@
+<p>
+  This wizard allows you to create a virtual container host by following a few steps.
+</p>
+<form [formGroup]="form" novalidate>
+  <section class="form-block">
+    <div class="form-group">
+      <label for="nameInput">Name <span class="red-text">*</span></label>
+      <label for="nameInput" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-lg tooltip-top-left"
+        [class.invalid]="form.get('name').invalid
+                    && (form.get('name').dirty || form.get('name').touched)">
+        <input id="nameInput" size="50" type="text" placeholder="virtual-container-host" formControlName="name">
+        <span class="tooltip-content">{{ formErrMessage }}</span>
+      </label>
+    </div>
+  </section>
+</form>

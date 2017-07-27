@@ -16,8 +16,11 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HttpModule } from '@angular/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
+import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
 
 const routes: Routes = [
     { path: '', component: CreateVchWizardComponent },
@@ -27,14 +30,19 @@ const routes: Routes = [
 @NgModule({
     imports: [
         CommonModule,
+        FormsModule,
+        HttpModule,
+        ReactiveFormsModule,
         ClarityModule,
         RouterModule.forChild(routes)
     ],
     declarations: [
-        CreateVchWizardComponent
+        CreateVchWizardComponent,
+        VchCreationWizardNameComponent
     ],
     exports: [
-        CreateVchWizardComponent
+        CreateVchWizardComponent,
+        VchCreationWizardNameComponent
     ]
 })
 export class CreateVchWizardModule { }
