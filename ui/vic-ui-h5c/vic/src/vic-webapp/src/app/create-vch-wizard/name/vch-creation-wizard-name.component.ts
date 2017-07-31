@@ -53,7 +53,9 @@ export class VchCreationWizardNameComponent implements OnInit {
 
     ngOnInit() {
         // TODO: update value & validity only if there is a value already
+    }
 
+    onPageLoad() {
         // handle synchronous validations
         this.form.get('name').statusChanges
             .debounce(() => Observable.timer(250))
@@ -80,10 +82,10 @@ export class VchCreationWizardNameComponent implements OnInit {
      * Async validation for the Name section
      * This calls the VchCreationWizardService to check if the provided name
      * is unique among VirtualApps and ResourcePools on VC and then returns
-     * an observable of an array of errors
-     * @returns {Observable<string[]>}
+     * an observable of the name or any error
+     * @returns {Observable<any>}
      */
-    onCommit(): Observable<string[]> {
+    onCommit(): Observable<any> {
         // TODO: unit test this
         return this.createWzService.checkVchNameUniqueness(
             this.form.get('name').value)
@@ -94,8 +96,10 @@ export class VchCreationWizardNameComponent implements OnInit {
                     });
                     this.formErrMessage =
                         'There is already a VirtualApp or ResourcePool that exists with the same name!';
+
+                    return Observable.throw([this.formErrMessage]);
                 }
-                return Observable.of(isUnique ? null : [this.formErrMessage]);
+                return Observable.of({ name: this.form.get('name').value });
             });
     }
 }

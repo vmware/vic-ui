@@ -5,5 +5,10 @@ div.form-group {
   }
   & span.red-text {
     color: red;
+    margin: 0;
   }
+}
+
+.smaller-p-body-text {
+  font-size: 12px;
 }

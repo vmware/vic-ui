@@ -29,6 +29,7 @@ export class CreateVchWizardComponent implements OnInit {
   public loading = false;
   public errorFlag = false;
   public errorMsgs: string[];
+  private _cachedData: any = {};
 
   // TODO: remove the following
   public testVal = 0;
@@ -84,17 +85,16 @@ export class CreateVchWizardComponent implements OnInit {
    * if the user input is valid. If not, display all validation error messages
    * @param asyncValidationObs : Observable containing async validation results
    */
-  onCommit(asyncValidationObs: Observable<string[]>) {
+  onCommit(asyncValidationObs: Observable<any>) {
     this.loading = true;
-    asyncValidationObs.subscribe(errors => {
-      if (errors) {
-        this.loading = false;
-        this.errorFlag = true;
-        this.errorMsgs = errors;
-      } else {
-        this.errorFlag = false;
-        this.wizard.forceNext();
-      }
+    asyncValidationObs.subscribe(data => {
+      this.errorFlag = false;
+      Object.assign(this._cachedData, data);
+      this.wizard.forceNext();
+    }, errors => {
+      this.loading = false;
+      this.errorFlag = true;
+      this.errorMsgs = errors;
     });
   }
 
@@ -105,11 +105,15 @@ export class CreateVchWizardComponent implements OnInit {
     this.wizard.previous();
   }
 
+  get cachedData(): any {
+    return this._cachedData;
+  }
+
   /**
    * Clear the error flag (this method might be removed)
-   * @param id : ID of the current WizardPage
+   * @param fn : page-specific init function
    */
-  onPageLoad(id: string) {
+  onPageLoad(afterPageInit?: any) {
     this.errorFlag = false;
     this.errorMsgs = [];
     this.loading = false;
@@ -119,11 +123,19 @@ export class CreateVchWizardComponent implements OnInit {
    * Perform the final data validation and send the data to the
    * OVA endpoint via a POST request
    */
-  onFinish() {
+  onFinish(payloadObs: Observable<any> | null) {
     // TODO: send the results to the OVA endpoint via a POST request
-    if (!this.loading && this.areAllUserInputsValid) {
-      this.wizard.forceFinish();
-      this.onCancel();
+    if (!this.loading && payloadObs) {
+      payloadObs.subscribe(data => {
+        this.errorFlag = false;
+        // TODO: uncomment these
+        // this.wizard.forceFinish();
+        // this.onCancel();
+      }, errors => {
+        this.loading = false;
+        this.errorFlag = true;
+        this.errorMsgs = errors;
+      });
       return;
     }
 
@@ -137,14 +149,5 @@ export class CreateVchWizardComponent implements OnInit {
   onCancel() {
     const webPlatform = this.globalsService.getWebPlatform();
     webPlatform.closeDialog();
-  }
-
-  /**
-   * Readonly attribute to determine whether the wizard
-   * can be finished by validating user inputs
-   */
-  get areAllUserInputsValid(): boolean {
-    // TODO: TBI
-    return false;
   }
 }

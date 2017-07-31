@@ -1,0 +1,233 @@
+<div class="spinner" *ngIf="portgroupsLoading"></div>
+<div>
+  Specify the networks used to access this virtual container host.
+</div>
+<a class="btn btn-link" href="https://vmware.github.io/vic-product/assets/files/html/1.1/vic_vsphere_admin/networks.html"
+  target="_blank">View Network Diagram <clr-icon shape="pop-out"></clr-icon>
+</a>
+<form [formGroup]="form" novalidate>
+  <section class="form-block">
+    <div class="row form-group network-multiline-group">
+      <div class="col-xs-3">
+        <label class="network-label" for="bridge-network-selector">Bridge network <span class="red-text">*</span></label>
+      </div>
+      <div class="col-xs-3">
+        <div class="select">
+          <select id="bridge-network-selector" formControlName="bridgeNetwork">
+            <option value="" *ngIf="!portgroups || !portgroups.length">
+              Loading...
+            </option>
+            <option [value]="portgroup['text']" *ngFor="let portgroup of portgroups">
+              {{ portgroup.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-xs-3">
+        <label class="network-label" for="bridge-network-range-selector">Bridge network range</label>
+      </div>
+      <div class="col-xs-3">
+        <input class="form-control" id="bridge-network-range-selector" type="text" formControlName="bridgeNetworkRange">
+      </div>
+    </div>
+    <div class="row form-group network-multiline-group">
+      <div class="col-xs-3">
+        <label class="network-label" for="public-network-selector">Public network <span class="red-text">*</span></label>
+      </div>
+      <div class="col-xs-3">
+        <div class="select">
+          <select id="public-network-selector" formControlName="publicNetwork">
+            <option value="" *ngIf="!portgroups || !portgroups.length">
+              Loading...
+            </option>
+            <option [value]="portgroup['text']" *ngFor="let portgroup of portgroups">
+              {{ portgroup.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-xs-3 text-align-right">
+        <div class="radio-inline">
+          <input type="radio" value="dhcp" formControlName="publicNetworkType" id="pub-dhcp">
+          <label for="pub-dhcp">DHCP</label>
+        </div>
+        <div class="radio-inline">
+          <input type="radio" value="static" formControlName="publicNetworkType" id="pub-static">
+          <label for="pub-static">Static</label>
+        </div>
+      </div>
+      <div class="col-xs-3">
+        <label class="p5" for="public-network-ip" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+          [class.invalid]="form.get('publicNetworkIp').invalid && (form.get('publicNetworkIp').dirty || form.get('publicNetworkIp').touched)">
+          <input class="form-control" id="public-network-ip" type="text" formControlName="publicNetworkIp" placeholder="IP Address">
+        </label>
+      </div>
+    </div>
+    <div class="row form-group network-multiline-group">
+      <div class="col-xs-3"></div>
+      <div class="col-xs-3"></div>
+      <div class="col-xs-3 text-align-right">
+        <label class="network-label">Gateway</label>
+      </div>
+      <div class="col-xs-3">
+        <label class="p5" for="public-network-gateway" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+          [class.invalid]="form.get('publicNetworkGateway').invalid && (form.get('publicNetworkGateway').dirty || form.get('publicNetworkGateway').touched)">
+          <input class="form-control" id="public-network-gateway" type="text" formControlName="publicNetworkGateway" placeholder="IP Address">
+        </label>
+      </div>
+    </div>
+    <div class="row form-group network-multiline-group">
+      <div class="col-xs-3">
+        <label class="network-label" for="client-network-selector">Client network</label>
+      </div>
+      <div class="col-xs-3">
+        <div class="select">
+          <select id="client-network-selector" formControlName="clientNetwork">
+            <option value="">Not configured</option>
+            <option [value]="portgroup['text']" *ngFor="let portgroup of portgroups">
+              {{ portgroup.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <small>If not configured, defaults to the public network</small>
+      </div>
+    </div>
+    <div class="row form-group network-multiline-group">
+      <div class="col-xs-3">
+        <label class="network-label" for="management-network-selector">Management network</label>
+      </div>
+      <div class="col-xs-3">
+        <div class="select">
+          <select id="management-network-selector" formControlName="managementNetwork">
+            <option value="">Not configured</option>
+            <option [value]="portgroup['text']" *ngFor="let portgroup of portgroups">
+              {{ portgroup.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-xs-3 text-align-right">
+        <div class="radio-inline">
+          <input type="radio" value="dhcp" formControlName="managementNetworkType" id="mgmt-dhcp">
+          <label for="mgmt-dhcp">DHCP</label>
+        </div>
+        <div class="radio-inline">
+          <input type="radio" value="static" formControlName="managementNetworkType" id="mgmt-static">
+          <label for="mgmt-static">Static</label>
+        </div>
+      </div>
+      <div class="col-xs-3">
+        <label class="p5" for="management-network-ip" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+          [class.invalid]="form.get('managementNetworkIp').invalid && (form.get('managementNetworkIp').dirty || form.get('managementNetworkIp').touched)">
+          <input class="form-control" id="management-network-ip" type="text" formControlName="managementNetworkIp" placeholder="IP Address">
+        </label>
+      </div>
+    </div>
+    <div class="row form-group">
+      <div class="col-xs-3"></div>
+      <div class="col-xs-3"></div>
+      <div class="col-xs-3 text-align-right">
+        <label class="network-label">Gateway</label>
+      </div>
+      <div class="col-xs-3">
+        <label class="p5" for="management-network-gateway" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+          [class.invalid]="form.get('managementNetworkGateway').invalid && (form.get('managementNetworkGateway').dirty || form.get('managementNetworkGateway').touched)">
+          <input class="form-control" id="management-network-gateway" type="text" formControlName="managementNetworkGateway" placeholder="IP Address">
+        </label>
+      </div>
+    </div>
+    <div>You can use the advanced settings to add to this basic configurations.</div>
+    <a id="advanced-toggle" class="btn btn-link" (click)="toggleAdvancedMode()">{{ inAdvancedMode ? 'Basic' : 'Advanced' }} <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon></a>
+    <div *ngIf="inAdvancedMode">
+      <div formArrayName="containerNetworks" *ngFor="let containerNetwork of form.controls.containerNetworks.controls; let i=index">
+        <!-- row 1 -->
+        <div [formGroupName]="i" class="form-group row network-multiline-group" [class.p3]="i === 0">
+          <div class="col-xs-2 smaller-header-text">
+            <label class="network-label" for="container-network-selector">Container network</label>
+          </div>
+          <div class="col-xs-3">
+            <div class="select">
+              <select id="container-network-selector" formControlName="containerNetwork">
+                <option value="">Not configured</option>
+                <option [value]="portgroup['text']" *ngFor="let portgroup of portgroups">
+                  {{ portgroup.text }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="col-xs-3 text-align-right">
+            <div class="radio-inline">
+              <input (change)="toggleNetworkIpGatewayDns(false, i)" type="radio" value="dhcp" formControlName="containerNetworkType" [attr.id]="'cont-dhcp-' + i">
+              <label [attr.for]="'cont-dhcp-' + i">DHCP</label>
+            </div>
+            <div class="radio-inline">
+              <input (change)="toggleNetworkIpGatewayDns(true, i)" type="radio" value="static" formControlName="containerNetworkType" [attr.id]="'cont-static-' + i">
+              <label [attr.for]="'cont-static-' + i">Static</label>
+            </div>
+          </div>
+          <div class="col-xs-3">
+            <label class="p5" for="container-network-ip-range" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
+              [class.invalid]="form.get('containerNetworks').controls[i].controls.containerNetworkIpRange.invalid && (form.get('containerNetworks').controls[i].controls.containerNetworkIpRange.dirty || form.get('containerNetworks').controls[i].controls.containerNetworkIpRange.touched)">
+              <input class="form-control" id="container-network-ip" type="text" formControlName="containerNetworkIpRange" placeholder="IP Range">
+            </label>
+          </div>
+        </div>
+        <!-- row 2 -->
+        <div [formGroupName]="i" class="form-group row network-multiline-group">
+          <div class="col-xs-2">
+            <label class="network-label" for="container-network-dns">DNS</label>
+          </div>
+          <div class="col-xs-3">
+            <label class="p5" for="container-network-dns" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
+              [class.invalid]="form.get('containerNetworks').controls[i].controls.containerNetworkDns.invalid && (form.get('containerNetworks').controls[i].controls.containerNetworkDns.dirty || form.get('containerNetworks').controls[i].controls.containerNetworkDns.touched)">
+              <input class="form-control" id="container-network-dns" type="text" formControlName="containerNetworkDns" placeholder="IP Address">
+            </label>
+          </div>
+          <div class="col-xs-3 text-align-right">
+            <label class="network-label" for="container-network-gateway">Gateway</label>
+          </div>
+          <div class="col-xs-3">
+            <label class="p5" for="container-network-gateway" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
+              [class.invalid]="form.get('containerNetworks').controls[i].controls.containerNetworkGateway.invalid && (form.get('containerNetworks').controls[i].controls.containerNetworkGateway.dirty || form.get('containerNetworks').controls[i].controls.containerNetworkGateway.touched)">
+              <input class="form-control" id="container-network-gateway" type="text" formControlName="containerNetworkGateway" placeholder="IP Address">
+            </label>
+          </div>
+          <div class="col-xs-1 input-add-remove-container">
+            <clr-icon *ngIf="i > 0" shape="times-circle" (click)="removeContainerNetworkEntry(i)" size="12"></clr-icon>
+            <clr-icon *ngIf="i === form.controls.containerNetworks.controls.length - 1" shape="plus-circle" (click)="addNewContainerNetworkEntry()"
+              size="12"></clr-icon>
+          </div>
+        </div>
+        <!-- row 3 -->
+        <div [formGroupName]="i" class="form-group row">
+          <div class="col-xs-2">
+            <label class="network-label" for="container-network-label">Label</label>
+          </div>
+          <div class="col-xs-3">
+            <label class="p5" for="container-network-label" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
+              [class.invalid]="form.get('containerNetworks').controls[i].controls.containerNetworkLabel.invalid && (form.get('containerNetworks').controls[i].controls.containerNetworkLabel.dirty || form.get('containerNetworks').controls[i].controls.containerNetworkLabel.touched)">
+              <input class="form-control" id="container-network-label" type="text" formControlName="containerNetworkLabel" placeholder="Network label">
+            </label>
+          </div>
+        </div>
+      </div>
+      <!-- http proxy -->
+      <div class="form-group network-multiline-group">
+        <label class="network-label" for="http-proxy-selector">HTTP proxy</label>
+        <input id="http-proxy-selector" formControlName="httpProxy" placeholder="IP or FQDN" type="text">:
+        <input id="http-proxy-port-selector" formControlName="httpProxyPort" placeholder="Port" type="text">
+      </div>
+      <div class="form-group network-multiline-group">
+        <label class="network-label" for="https-proxy-selector">HTTPS proxy</label>
+        <input id="https-proxy-selector" formControlName="httpsProxy" placeholder="IP or FQDN" type="text">:
+        <input id="https-proxy-port-selector" formControlName="httpsProxyPort" placeholder="Port" type="text">
+      </div>
+      <div class="form-group network-multiline-group">
+        <label class="network-label" for="dns-server-selector">DNS server</label>
+        <input id="dns-server-selector" formControlName="dnsServer" placeholder="Common separated IP addresses" type="text" size="40">
+      </div>
+    </div>
+  </section>
+</form>

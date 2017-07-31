@@ -22,9 +22,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { Globals, GlobalsService } from 'app/shared';
-import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Observable } from 'rxjs/Observable';
+import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
+import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
+import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
+import { NetworksComponent } from './networks/networks.component';
+import { SecurityComponent } from './security/security.component';
+import { SummaryComponent } from './summary/summary.component';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 
 describe('CreateVchWizardComponent', () => {
@@ -56,13 +61,19 @@ describe('CreateVchWizardComponent', () => {
             checkVchNameUniqueness: (name) => {
               // TODO: check if this makes sense
               return Observable.of(name === 'unique');
-            }
+            },
+            getClustersList: () => Observable.of([])
           }
         }
       ],
       declarations: [
         CreateVchWizardComponent,
-        VchCreationWizardNameComponent
+        VchCreationWizardNameComponent,
+        ComputeCapacityComponent,
+        StorageCapacityComponent,
+        NetworksComponent,
+        SecurityComponent,
+        SummaryComponent
       ]
     })
       .compileComponents();
@@ -83,30 +94,4 @@ describe('CreateVchWizardComponent', () => {
     expect(component.resizeToParentFrame).toHaveBeenCalled();
   }));
 
-  it('should navigate between pages successfully', async(() => {
-    const nextBtn = fixture.debugElement.query(By.css('clr-wizard-button[ng-reflect-type="next"]'));
-    const firstPage = fixture.debugElement.query(By.css('clr-wizard-page'));
-    const lastPage = fixture.debugElement.query(By.css('clr-wizard-page:last-of-type'));
-    expect(nextBtn).toBeTruthy();
-    spyOn(component, 'onCancel').and.callThrough();
-    spyOn(component, 'onCommit').and.callFake(() => { });
-    spyOn(component, 'onFinish').and.callThrough();
-    spyOn(component, 'goBack').and.callThrough();
-
-    // click on next button
-    firstPage.triggerEventHandler('clrWizardPageOnCommit', null);
-    expect(component.onCommit).toHaveBeenCalled();
-
-    // click on finish button
-    lastPage.triggerEventHandler('clrWizardPageOnCommit', null);
-    expect(component.onFinish).toHaveBeenCalled();
-
-    // click on previous button
-    lastPage.triggerEventHandler('clrWizardPagePrevious', null);
-    expect(component.goBack).toHaveBeenCalled();
-
-    // click on cancel button
-    lastPage.triggerEventHandler('clrWizardPageOnCancel', null);
-    expect(component.onCancel).toHaveBeenCalled();
-  }));
 });

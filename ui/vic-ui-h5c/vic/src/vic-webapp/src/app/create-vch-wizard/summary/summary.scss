@@ -1,0 +1,5 @@
+div.form-group {
+  & span.red-text {
+    color: red;
+  }
+}

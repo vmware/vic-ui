@@ -1,0 +1,60 @@
+div.form-group {
+  & span.red-text {
+    color: red;
+    margin: 0;
+  }
+}
+
+a.btn-link {
+  padding-left: 0;
+}
+
+form {
+  & .fg-group {
+    padding: 10px 0;
+  }
+  & label.security-label,
+  & .radio,
+  & .radio-inline {
+    font-size: 0.85em;
+    color: black;
+  }
+  & .input-add-remove-container clr-icon {
+    float: left;
+    cursor: pointer;
+  }
+}
+
+.smaller-p-body-text {
+  font-size: 12px;
+}
+
+ul#default-security-settings-list {
+  margin-top: 15px;
+}
+
+clr-signpost {
+  height: 0;
+}
+
+.zero-margin-bottom {
+  margin: 0;
+}
+
+.margin-vertical-10 {
+  margin: 10px 0;
+}
+
+input#ops-user {
+  width: 100%
+}
+
+#server-key-tooltip {
+  position: absolute;
+  top: 27px;
+  color: #999;
+}
+
+div.text-align-right {
+  text-align: right;
+}

@@ -1,0 +1,87 @@
+<div class="spinner" *ngIf="datastoresLoading"></div>
+<label class="p1">Image Datastore</label>
+<div class="smaller-p-body-text">Select the image datastore to be used to hold container images and an optional folder.</div>
+<form [formGroup]="form" novalidate>
+  <section class="form-block">
+    <div class="form-group zero-margin-bottom">
+      <label for="image-store-selector">Datastore <span class="red-text">*</span></label>
+      <label for="image-store-selector" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-lg tooltip-top-left"
+        [class.invalid]="form.get('imageStore').invalid
+                    && (form.get('imageStore').dirty || form.get('imageStore').touched)">
+        <div class="select">
+          <select id="image-store-selector" formControlName="imageStore">
+            <option value="" *ngIf="!datastores || !datastores.length">
+              Loading...
+            </option>
+            <option [value]="datastore.text" *ngFor="let datastore of datastores">
+              {{ datastore.text }}
+            </option>
+          </select>
+        </div>
+        <span class="tooltip-content">{{ formErrMessage }}</span>
+      </label>
+    </div>
+    <div class="form-group">
+      <label for="file-folder-selector">File folder</label>
+      <input type="text" id="file-folder-selector" formControlName="fileFolder">
+    </div>
+    <a id="advanced-toggle" class="btn btn-link" (click)="toggleAdvancedMode()">{{ inAdvancedMode ? 'Basic' : 'Advanced' }} <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon></a>
+    <div *ngIf="inAdvancedMode">
+      <label>Additional Datastores</label>
+      <div class="smaller-p-body-text">Optionally map Docker volumes to selected datastores and define the volume label that Docker users will see. Optionally
+        provide a folder to be used in that datastore.</div>
+      <div class="fg-group">
+        <label class="p1">Volume datastore</label>
+        <div formArrayName="volumeStores" *ngFor="let volumeStore of form.controls.volumeStores.controls; let i=index">
+          <div [formGroupName]="i" class="form-group row zero-margin-bottom" [class.p3]="i === 0">
+            <div class="col-xs-3">
+              <div *ngIf="i === 0" class="vol-datastore-header">Datastore</div>
+              <div class="select">
+                <select formControlName="volDatastore">
+                    <option [value]="datastore.text" *ngFor="let datastore of datastores">
+                      {{ datastore.text }}
+                    </option>
+                  </select>
+              </div>
+            </div>
+            <div class="col-xs-3">
+              <div *ngIf="i === 0" class="vol-datastore-header">Folder</div>
+              <input formControlName="volFileFolder" class="form-control" type="text">
+            </div>
+            <div class="col-xs-3">
+              <div *ngIf="i === 0" class="vol-datastore-header">Docker volume name</div>
+              <label class="p5" for="docker-volname-selector" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
+                [class.invalid]="form.get('volumeStores').controls[i].invalid && (form.get('volumeStores').controls[i].dirty || form.get('volumeStores').controls[i].touched)">
+                <input id="docker-volname-selector" formControlName="dockerVolName" class="form-control" type="text">
+              </label>
+            </div>
+            <div class="col-xs-2 input-add-remove-container">
+              <clr-icon *ngIf="i > 0" shape="times-circle" (click)="removeVolumeDatastoreEntry(i)"></clr-icon>
+              <clr-icon *ngIf="i === form.controls.volumeStores.controls.length - 1" shape="plus-circle" (click)="addNewVolumeDatastoreEntry()"></clr-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fg-group">
+        <label class="p1">Base image size</label>
+        <div class="form-group row">
+          <div class="col-xs-4">
+            <label class="p5" for="base-image-size" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
+              [class.invalid]="form.get('baseImageSize').invalid && (form.get('baseImageSize').dirty || form.get('baseImageSize').touched)">
+              <input type="text" id="base-image-size" formControlName="baseImageSize">
+              <span class="tooltip-content">{{ formErrMessage }}</span>
+            </label>
+          </div>
+          <div class="col-xs-2">
+            <div class="select">
+              <select formControlName="baseImageSizeUnit">
+                <option value="MB">MB</option>
+                <option selected value="GB">GB</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</form>

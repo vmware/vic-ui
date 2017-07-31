@@ -1,0 +1,41 @@
+div.form-group {
+  & span.red-text {
+    color: red;
+    margin: 0;
+  }
+}
+
+a.btn-link {
+  padding-left: 0;
+}
+
+form {
+  & .fg-group {
+    padding: 10px 0;
+  }
+  & label.network-label,
+  & .radio,
+  & .radio-inline {
+    font-size: 0.85em;
+    color: black;
+  }
+  & .network-multiline-group {
+    margin-bottom: 0;
+  }
+  & .smaller-header-text label {
+    font-size: 0.7em;
+    letter-spacing: -0.5px;
+  }
+  & .input-add-remove-container clr-icon {
+    float: left;
+    cursor: pointer;
+  }
+}
+
+.smaller-p-body-text {
+  font-size: 12px;
+}
+
+div.text-align-right {
+  text-align: right;
+}
