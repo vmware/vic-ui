@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+
+
+/* Fixes broken position of the spinner set by .clr-wizard */
+
+#compute-resource-selector .spinner {
+  top: 2% !important;
+  left: 2% !important;
+}
+
+#vch-payload-stackview .stack-view {
+  height: 65vh !important;
+}

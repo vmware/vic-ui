@@ -1,0 +1,43 @@
+div.form-group {
+  padding-left: 200px;
+  & label:first-child {
+    width: 200px;
+  }
+  & span.red-text {
+    color: red;
+    margin: 0;
+  }
+  & #compute-resource-selector {
+    border: 1px solid #999;
+    width: 330px;
+    height: 150px;
+    overflow: auto;
+    &.invalid {
+      border-color: red;
+    }
+  }
+  & clr-tree-node button {
+    margin: 0;
+  }
+}
+
+form {
+  & a#advanced-toggle {
+    padding-left: 0;
+  }
+  & label.tooltip .maxResourceIndicator {
+    font-size: 0.8em;
+    color: #888;
+  }
+  & div.fg-group {
+    padding: 10px 0;
+  }
+}
+
+.smaller-p-body-text {
+  font-size: 12px;
+}
+
+.zero-margin-bottom {
+  margin: 0;
+}

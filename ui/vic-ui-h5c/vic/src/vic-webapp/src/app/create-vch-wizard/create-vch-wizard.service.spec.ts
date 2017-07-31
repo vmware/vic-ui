@@ -29,6 +29,7 @@ import {
 import { MockBackend, MockConnection } from '@angular/http/testing';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { CreateVchWizardService } from './create-vch-wizard.service';
+import { Globals, GlobalsService } from '../shared';
 
 describe('CreateVchWizardService', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -42,7 +43,9 @@ describe('CreateVchWizardService', () => {
                 CreateVchWizardService,
                 Http,
                 { provide: ConnectionBackend, useClass: MockBackend },
-                { provide: RequestOptions, useClass: BaseRequestOptions }
+                { provide: RequestOptions, useClass: BaseRequestOptions },
+                Globals,
+                GlobalsService
             ]
         }).compileComponents();
         service = TestBed.get(CreateVchWizardService);
