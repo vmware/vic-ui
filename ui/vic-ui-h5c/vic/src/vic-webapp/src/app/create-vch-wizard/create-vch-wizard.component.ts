@@ -58,25 +58,29 @@ export class CreateVchWizardComponent implements OnInit {
     // "context error" warning shows up during unit tests (but they still pass).
     // this can be avoided by running the logic a tick later
     setTimeout(() => {
-      const parentIframes = p.document.querySelectorAll('iframe');
-      const targetIframeEl = parentIframes[parentIframes.length - 1];
-      const activeModalContentEl = <HTMLElement>p.document.querySelector('clr-modal .modal-content');
-      const activeModalHeaderEl = <HTMLElement>p.document.querySelector('clr-modal .modal-header');
+      const clrModalEl = p.document.querySelector('clr-modal');
       // resize only if the parent modal is there. this prevents the unit tests from failing
-      if (activeModalContentEl !== null) {
-        let targetIframeHeight = activeModalContentEl.offsetHeight - 2;
-        if (activeModalHeaderEl !== null) {
-          targetIframeHeight -= activeModalHeaderEl.offsetHeight;
-          activeModalHeaderEl.remove();
-        }
-
-        this.renderer.setElementStyle(targetIframeEl, 'height', `${targetIframeHeight}px`);
-        this.renderer.setElementStyle(
-          this.elRef.nativeElement.querySelector('clr-wizard'),
-          'height',
-          `${targetIframeHeight}px`
-        );
+      if (clrModalEl === null) {
+        return;
       }
+      const targetIframeEl = <HTMLElement>clrModalEl.querySelector('iframe');
+      const modalContentEl = <HTMLElement>clrModalEl.querySelector('.modal-content');
+      const modalHeaderEl = <HTMLElement>clrModalEl.querySelector('.modal-header');
+      const modalBodyEl = <HTMLElement>clrModalEl.querySelector('.modal-body');
+      const modalDialogEl = <HTMLElement>clrModalEl.querySelector('.modal-dialog');
+
+      if (modalHeaderEl !== null) {
+        modalHeaderEl.remove();
+      }
+
+      this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
+      this.renderer.setElementStyle(modalBodyEl, 'max-height', '75vh');
+      this.renderer.setElementStyle(targetIframeEl, 'height', '75vh');
+      this.renderer.setElementStyle(
+        this.elRef.nativeElement.querySelector('clr-wizard'),
+        'height',
+        '100vh'
+      );
     });
   }
 
