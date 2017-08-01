@@ -65,10 +65,10 @@
       <div class="fg-group">
         <label class="p1">Base image size</label>
         <div class="form-group row">
-          <div class="col-xs-4">
+          <div class="col-xs-3">
             <label class="p5" for="base-image-size" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
               [class.invalid]="form.get('baseImageSize').invalid && (form.get('baseImageSize').dirty || form.get('baseImageSize').touched)">
-              <input type="text" id="base-image-size" formControlName="baseImageSize">
+              <input type="text" id="base-image-size" formControlName="baseImageSize" class="form-control">
               <span class="tooltip-content">{{ formErrMessage }}</span>
             </label>
           </div>
