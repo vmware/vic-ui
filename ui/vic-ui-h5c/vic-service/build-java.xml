@@ -36,15 +36,15 @@
          <src path="${basedir}/src/main/java"/>
          <!-- <src path="${basedir}/src/test/java"/> for future test files -->
          <classpath>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/vsphere-client-lib.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/commons-logging-1.1.1.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/com.springsource.javax.servlet-2.5.0.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/javax.servlet-api-3.0.1.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/spring-web-3.1.4.RELEASE.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/spring-beans-3.1.4.RELEASE.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/spring-context-3.1.4.RELEASE.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/gson-2.3.1.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/vim25.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/vsphere-client-lib.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/commons-logging-1.1.1.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/com.springsource.javax.servlet-2.5.0.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/javax.servlet-api-3.0.1.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-web-3.1.4.RELEASE.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-beans-3.1.4.RELEASE.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-context-3.1.4.RELEASE.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/gson-2.3.1.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/vim25.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/vsphere-ui/server/repository/usr/vlsiCore.jar"/>
          </classpath>
       </javac>
@@ -62,13 +62,13 @@
              fork="true" debug="on">
          <src path="${basedir}/src/test/java"/>
          <classpath>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/vsphere-client-lib.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/vsphere-client-lib.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/junit-4.12.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/hamcrest-core-1.3.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/mockito-all-1.10.19.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/commons-logging-1.1.1.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/gson-2.3.1.jar"/>
-            <pathelement path="${VSPHERE_SDK_HOME}/libs/vim25.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/commons-logging-1.1.1.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/gson-2.3.1.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/vim25.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/vsphere-ui/server/repository/usr/vlsiCore.jar"/>
             <pathelement path="${CLASSES}"/>
          </classpath>
