@@ -38,10 +38,11 @@
               <div *ngIf="i === 0" class="vol-datastore-header">Datastore</div>
               <div class="select">
                 <select formControlName="volDatastore">
-                    <option [value]="datastore.text" *ngFor="let datastore of datastores">
-                      {{ datastore.text }}
-                    </option>
-                  </select>
+                  <option value="">Not selected</option>
+                  <option [value]="datastore.text" *ngFor="let datastore of datastores">
+                    {{ datastore.text }}
+                  </option>
+                </select>
               </div>
             </div>
             <div class="col-xs-3">
