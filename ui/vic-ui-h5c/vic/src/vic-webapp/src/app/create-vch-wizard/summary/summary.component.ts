@@ -51,7 +51,7 @@ export class SummaryComponent implements OnInit {
 
         // transform image store entry to something vic-machine command friendly
         results['storageCapacity']['imageStore'] =
-            results['storageCapacity']['imageStore'] + results['storageCapacity']['fileFolder'];
+            results['storageCapacity']['imageStore'] + (results['storageCapacity']['fileFolder'] || '');
         delete results['storageCapacity']['fileFolder'];
 
         // transform each volume store entry to something vic-machine command friendly
