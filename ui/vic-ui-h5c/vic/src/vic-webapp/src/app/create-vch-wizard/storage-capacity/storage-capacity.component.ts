@@ -133,7 +133,7 @@ export class StorageCapacityComponent implements OnInit {
             .switchMap((dcs) => this.createWzService.getDatastores(dcs[0]['objRef']))
             .subscribe(v => {
                 this.datastores = v;
-                this.form.get('imageStore').setValue(v[0]['text']);
+                this.form.get('imageStore').setValue('');
                 this.datastoresLoading = false;
             }, err => console.error(err));
     }
