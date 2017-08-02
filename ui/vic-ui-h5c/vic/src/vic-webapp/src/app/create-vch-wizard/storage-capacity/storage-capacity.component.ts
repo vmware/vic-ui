@@ -79,7 +79,7 @@ export class StorageCapacityComponent implements OnInit {
         return this.formBuilder.group({
             volDatastore: '',
             volFileFolder: '',
-            dockerVolName: ['', Validators.required]
+            dockerVolName: [{ value: '', disabled: true }, Validators.required]
         });
     }
 
@@ -114,6 +114,20 @@ export class StorageCapacityComponent implements OnInit {
                 }
             });
 
+        this.form.get('volumeStores').valueChanges
+            .subscribe(v => {
+                v.forEach((item, index) => {
+                    const controls = this.form.get('volumeStores')['controls'][index]['controls'];
+                    const labelControl = controls['dockerVolName'];
+                    const datastoreControl = controls['volDatastore'];
+                    if (datastoreControl.value && labelControl.disabled) {
+                        labelControl.enable();
+                    } else if (!datastoreControl.value && labelControl.enabled) {
+                        labelControl.disable();
+                    }
+                });
+            });
+
         // load datastores
         this.createWzService.getDatacenter()
             .switchMap((dcs) => this.createWzService.getDatastores(dcs[0]['objRef']))
@@ -145,22 +159,19 @@ export class StorageCapacityComponent implements OnInit {
             }
             results['fileFolder'] = val;
         }
-        if (this.inAdvancedMode) {
-            results['baseImageSize'] =
-                this.form.get('baseImageSize').value + this.form.get('baseImageSizeUnit').value;
 
-            // filter ones with empty datastore
-            results['volumeStores'] = this.form.get('volumeStores').value
-                .filter(vol => vol['volDatastore']);
+        results['baseImageSize'] =
+            this.form.get('baseImageSize').value + this.form.get('baseImageSizeUnit').value;
 
-            results['volumeStores'].forEach(vol => {
-                if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
-                    vol['volFileFolder'] = '/' + vol['volFileFolder'];
-                }
-            });
-        } else {
-            results['volumeStores'] = [];
-        }
+        // filter ones with empty datastore
+        results['volumeStores'] = this.form.get('volumeStores').value
+            .filter(vol => vol['volDatastore']);
+
+        results['volumeStores'].forEach(vol => {
+            if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
+                vol['volFileFolder'] = '/' + vol['volFileFolder'];
+            }
+        });
 
         return Observable.of({ storageCapacity: results });
     }

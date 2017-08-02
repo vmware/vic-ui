@@ -85,7 +85,7 @@ export class NetworksComponent implements OnInit {
         return this.formBuilder.group({
             containerNetwork: '',
             containerNetworkIpRange: [{ value: '', disabled: true }, Validators.required],
-            containerNetworkType: 'dhcp',
+            containerNetworkType: [{value: 'dhcp', disabled: true}],
             containerNetworkDns: [{ value: '', disabled: true }, Validators.required],
             containerNetworkGateway: [{ value: '', disabled: true }, Validators.required],
             containerNetworkLabel: [{ value: '', disabled: true }, Validators.required]
@@ -126,6 +126,65 @@ export class NetworksComponent implements OnInit {
                 }
             });
 
+        this.form.get('containerNetworks').valueChanges
+            .subscribe(v => {
+                v.forEach((item, index) => {
+                    const controls = this.form.get('containerNetworks')['controls'][index]['controls'];
+                    const networkControl = controls['containerNetwork'];
+                    const networkTypeControl = controls['containerNetworkType'];
+                    const labelControl = controls['containerNetworkLabel'];
+                    const iprangeControl = controls['containerNetworkIpRange'];
+                    const gatewayControl = controls['containerNetworkGateway'];
+                    const dnsControl = controls['containerNetworkDns'];
+
+                    if (networkControl.value) {
+                        if (labelControl.disabled) {
+                            labelControl.enable();
+                        }
+                        if (networkTypeControl.disabled) {
+                            networkTypeControl.enable();
+                        }
+                        if (networkTypeControl.value === 'static') {
+                            if (iprangeControl.disabled) {
+                                iprangeControl.enable();
+                            }
+                            if (gatewayControl.disabled) {
+                                gatewayControl.enable();
+                            }
+                            if (dnsControl.disabled) {
+                                dnsControl.enable();
+                            }
+                        } else {
+                            if (iprangeControl.enabled) {
+                                iprangeControl.disable();
+                            }
+                            if (gatewayControl.enabled) {
+                                gatewayControl.disable();
+                            }
+                            if (dnsControl.enabled) {
+                                dnsControl.disable();
+                            }
+                        }
+                    } else {
+                        if (labelControl.enabled) {
+                            labelControl.disable();
+                        }
+                        if (networkTypeControl.enabled) {
+                            networkTypeControl.disable();
+                        }
+                        if (iprangeControl.enabled) {
+                                iprangeControl.disable();
+                        }
+                        if (gatewayControl.enabled) {
+                            gatewayControl.disable();
+                        }
+                        if (dnsControl.enabled) {
+                            dnsControl.disable();
+                        }
+                    }
+                });
+            });
+
         // load portgroups
         this.createWzService.getDistributedPortGroups()
             .subscribe(v => {
@@ -156,16 +215,6 @@ export class NetworksComponent implements OnInit {
         }
     }
 
-    toggleNetworkLabel(enable: boolean, index: number) {
-        const controls = this.form.get('containerNetworks')['controls'][index]['controls'];
-        if (enable) {
-            controls['containerNetworkLabel'].enable();
-        } else {
-            controls['containerNetworkLabel'].disable();
-        }
-
-    }
-
     /**
      */
     onCommit(): Observable<any> {
@@ -191,30 +240,27 @@ export class NetworksComponent implements OnInit {
                 results['managementNetworkGateway'] = this.form.get('managementNetworkGateway').value;
             }
         }
-        if (this.inAdvancedMode) {
-            results['containerNetworks'] = this.form.get('containerNetworks')
-                .value
-                .filter(entry => entry['containerNetwork']);
 
-            const httpProxyValue = this.form.get('httpProxy').value;
-            const httpProxyPortValue = this.form.get('httpProxyPort').value;
-            const httpsProxyValue = this.form.get('httpsProxy').value;
-            const httpsProxyPortValue = this.form.get('httpsProxyPort').value;
+        const httpProxyValue = this.form.get('httpProxy').value;
+        const httpProxyPortValue = this.form.get('httpProxyPort').value;
+        const httpsProxyValue = this.form.get('httpsProxy').value;
+        const httpsProxyPortValue = this.form.get('httpsProxyPort').value;
 
-            if (httpProxyValue && httpProxyPortValue) {
-                results['httpProxy'] = `http://${httpProxyValue}:${httpProxyPortValue}`;
-            }
+        results['containerNetworks'] = this.form.get('containerNetworks')
+            .value
+            .filter(entry => entry['containerNetwork']);
 
-            if (httpsProxyValue && httpsProxyPortValue) {
-                results['httpsProxy'] = `https://${httpsProxyValue}:${httpsProxyPortValue}`;
-            }
+        if (httpProxyValue && httpProxyPortValue) {
+            results['httpProxy'] = `http://${httpProxyValue}:${httpProxyPortValue}`;
+        }
 
-            const dnsServerValue = this.form.get('dnsServer').value.trim();
-            if (dnsServerValue) {
-                results['dnsServer'] = dnsServerValue;
-            }
-        } else {
-            results['containerNetworks'] = [];
+        if (httpsProxyValue && httpsProxyPortValue) {
+            results['httpsProxy'] = `https://${httpsProxyValue}:${httpsProxyPortValue}`;
+        }
+
+        const dnsServerValue = this.form.get('dnsServer').value.trim();
+        if (dnsServerValue) {
+            results['dnsServer'] = dnsServerValue;
         }
 
         return Observable.of({ networks: results });
@@ -222,16 +268,5 @@ export class NetworksComponent implements OnInit {
 
     toggleAdvancedMode() {
         this.inAdvancedMode = !this.inAdvancedMode;
-        const controls = this.form.get('containerNetworks')['controls'];
-        controls.forEach((control, i) => {
-            if (!this.inAdvancedMode) {
-                this.toggleNetworkIpGatewayDns(false, i);
-                this.toggleNetworkLabel(false, i);
-            } else {
-                const isStatic = control['controls']['containerNetworkType']['value'] === 'static';
-                this.toggleNetworkIpGatewayDns(isStatic, i);
-                this.toggleNetworkLabel(true, i);
-            }
-        });
     }
 }
