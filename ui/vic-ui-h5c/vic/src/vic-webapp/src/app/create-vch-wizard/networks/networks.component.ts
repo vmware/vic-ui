@@ -189,8 +189,8 @@ export class NetworksComponent implements OnInit {
         this.createWzService.getDistributedPortGroups()
             .subscribe(v => {
                 this.portgroups = v;
-                this.form.get('bridgeNetwork').setValue(v[0]['text']);
-                this.form.get('publicNetwork').setValue(v[0]['text']);
+                this.form.get('bridgeNetwork').setValue('');
+                this.form.get('publicNetwork').setValue('');
                 this.form.get('clientNetwork').setValue('');
                 this.form.get('managementNetwork').setValue('');
                 this.portgroupsLoading = false;

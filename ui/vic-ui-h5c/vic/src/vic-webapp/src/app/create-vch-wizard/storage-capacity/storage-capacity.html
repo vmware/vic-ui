@@ -5,21 +5,17 @@
   <section class="form-block">
     <div class="form-group zero-margin-bottom">
       <label for="image-store-selector">Datastore <span class="red-text">*</span></label>
-      <label for="image-store-selector" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-lg tooltip-top-left"
-        [class.invalid]="form.get('imageStore').invalid
-                    && (form.get('imageStore').dirty || form.get('imageStore').touched)">
-        <div class="select">
-          <select id="image-store-selector" formControlName="imageStore">
-            <option value="" *ngIf="!datastores || !datastores.length">
-              Loading...
-            </option>
-            <option [value]="datastore.text" *ngFor="let datastore of datastores">
-              {{ datastore.text }}
-            </option>
-          </select>
-        </div>
-        <span class="tooltip-content">{{ formErrMessage }}</span>
-      </label>
+      <div class="select">
+        <select id="image-store-selector" formControlName="imageStore">
+          <option value="" *ngIf="!datastores || !datastores.length">
+            Loading...
+          </option>
+          <option value="">Not selected</option>
+          <option [value]="datastore.text" *ngFor="let datastore of datastores">
+            {{ datastore.text }}
+          </option>
+        </select>
+      </div>
     </div>
     <div class="form-group">
       <label for="file-folder-selector">File folder</label>
