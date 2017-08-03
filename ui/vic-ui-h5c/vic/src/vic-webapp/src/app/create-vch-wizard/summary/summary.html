@@ -15,7 +15,7 @@
       <clr-stack-content>{{ payload.name }}</clr-stack-content>
     </clr-stack-block>
     <!-- debug (displayed when advanced mode is active) -->
-    <clr-stack-block *ngIf="payload.hasOwnProperty('debug')">
+    <clr-stack-block *ngIf="payload.computeCapacity.hasOwnProperty('debug')">
       <clr-stack-label>
         Debug
       </clr-stack-label>
