@@ -34,7 +34,7 @@
               <input size="30" type="text" id="tls-cert-path" formControlName="tlsCertPath">
               <clr-signpost [clrSignpostPosition]="'left-top'">
                 <clr-signpost-content *clrIfOpen="signpostOpenState">
-                  <span>The local directory where generated certificates are stored or searched for</span>
+                  <span>The local directory where generated certificates are stored or searched</span>
                 </clr-signpost-content>
               </clr-signpost>
             </div>
@@ -181,6 +181,9 @@
             </p>
             <div class="margin-vertical-10">
               <label>Insecure registry access</label>
+              <p class="margin-vertical-10">
+                Add registries which this VCH should not verify and access via HTTP if HTTPS fails.
+              </p>
               <div formArrayName="insecureRegistries" *ngFor="let insecureRegistry of form.controls.insecureRegistries.controls; let j=index">
                 <div [formGroupName]="j" class="form-group row zero-margin-bottom">
                   <div class="col-xs-4">

@@ -19,7 +19,7 @@
     </div>
     <div class="form-group">
       <label for="file-folder-selector">File folder</label>
-      <input type="text" id="file-folder-selector" formControlName="fileFolder">
+      <input type="text" id="file-folder-selector" placeholder="Existing or new folder name" formControlName="fileFolder">
     </div>
     <a id="advanced-toggle" class="btn btn-link" (click)="toggleAdvancedMode()">{{ inAdvancedMode ? 'Basic' : 'Advanced' }} <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon></a>
     <div *ngIf="inAdvancedMode">
@@ -43,13 +43,13 @@
             </div>
             <div class="col-xs-3">
               <div *ngIf="i === 0" class="vol-datastore-header">Folder</div>
-              <input formControlName="volFileFolder" class="form-control" type="text">
+              <input placeholder="Optional folder name" formControlName="volFileFolder" class="form-control" type="text">
             </div>
             <div class="col-xs-3">
               <div *ngIf="i === 0" class="vol-datastore-header">Docker volume name</div>
               <label class="p5" for="docker-volname-selector" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-right"
                 [class.invalid]="form.get('volumeStores').controls[i].invalid && (form.get('volumeStores').controls[i].dirty || form.get('volumeStores').controls[i].touched)">
-                <input id="docker-volname-selector" formControlName="dockerVolName" class="form-control" type="text">
+                <input id="docker-volname-selector" placeholder="Volume name" formControlName="dockerVolName" class="form-control" type="text">
               </label>
             </div>
             <div class="col-xs-2 input-add-remove-container">
