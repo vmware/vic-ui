@@ -146,7 +146,7 @@
         </label>
       </div>
     </div>
-    <div>You can use the advanced settings to add to this basic configurations.</div>
+    <div>You can use the advanced settings to add to these basic configurations.</div>
     <a id="advanced-toggle" class="btn btn-link" (click)="toggleAdvancedMode()">{{ inAdvancedMode ? 'Basic' : 'Advanced' }} <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon></a>
     <div *ngIf="inAdvancedMode">
       <div formArrayName="containerNetworks" *ngFor="let containerNetwork of form.controls.containerNetworks.controls; let i=index">
