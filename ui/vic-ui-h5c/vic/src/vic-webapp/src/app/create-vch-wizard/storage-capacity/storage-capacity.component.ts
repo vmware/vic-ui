@@ -160,18 +160,22 @@ export class StorageCapacityComponent implements OnInit {
             results['fileFolder'] = val;
         }
 
-        results['baseImageSize'] =
+        if (this.inAdvancedMode) {
+            results['baseImageSize'] =
             this.form.get('baseImageSize').value + this.form.get('baseImageSizeUnit').value;
 
-        // filter ones with empty datastore
-        results['volumeStores'] = this.form.get('volumeStores').value
-            .filter(vol => vol['volDatastore']);
+            // filter ones with empty datastore
+            results['volumeStores'] = this.form.get('volumeStores').value
+                .filter(vol => vol['volDatastore']);
 
-        results['volumeStores'].forEach(vol => {
-            if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
-                vol['volFileFolder'] = '/' + vol['volFileFolder'];
-            }
-        });
+            results['volumeStores'].forEach(vol => {
+                if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
+                    vol['volFileFolder'] = '/' + vol['volFileFolder'];
+                }
+            });
+        } else {
+            results['volumeStores'] = [];
+        }
 
         return Observable.of({ storageCapacity: results });
     }

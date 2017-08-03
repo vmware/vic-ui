@@ -23,6 +23,13 @@
     </div>
     <a id="advanced-toggle" class="btn btn-link" (click)="toggleAdvancedMode()">{{ inAdvancedMode ? 'Basic' : 'Advanced' }} <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon></a>
     <div *ngIf="inAdvancedMode">
+      <div class="alert alert-sm alert-info mb10">
+        <div class="alert-item">
+          <span class="alert-text">
+            The following options will be used for VCH creation only when the advanced mode is open.
+          </span>
+        </div>
+      </div>
       <label>Additional Datastores</label>
       <div class="smaller-p-body-text">Optionally map Docker volumes to selected datastores and define the volume label that Docker users will see. Optionally
         provide a folder to be used in that datastore.</div>

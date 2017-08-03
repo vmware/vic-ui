@@ -132,6 +132,7 @@ export class CreateVchWizardComponent implements OnInit {
     if (!this.loading && payloadObs) {
       payloadObs.subscribe(data => {
         this.errorFlag = false;
+        console.log('TODO: send this payload to api endpoint', JSON.stringify(data));
         // TODO: uncomment these
         // this.wizard.forceFinish();
         // this.onCancel();

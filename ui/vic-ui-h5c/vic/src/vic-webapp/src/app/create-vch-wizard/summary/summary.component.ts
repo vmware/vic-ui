@@ -27,8 +27,6 @@ export class SummaryComponent implements OnInit {
     public form: FormGroup;
     public formErrMessage = '';
     @Input() payload: any;
-    // TODO: remove
-    public payloadBody: string;
 
     constructor(
         private formBuilder: FormBuilder
@@ -82,10 +80,7 @@ export class SummaryComponent implements OnInit {
                         ':' + containerNetObj['containerNetworkDns']
                     };
                 }
-            })
-
-        // TODO: remove
-        this.payloadBody = JSON.stringify(results);
+            });
 
         return Observable.of(results);
     }
