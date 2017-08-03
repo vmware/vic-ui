@@ -1,12 +1,3 @@
-<div class="alert alert-info" *ngIf="payloadBody">
-  <div class="alert-item">
-    <span class="alert-text">
-      <label>For debug purpose</label>
-      <pre style="white-space: normal">{{ payloadBody }}</pre>
-    </span>
-  </div>
-</div>
-
 <clr-stack-view id="vch-payload-stackview">
   <div *ngIf="payload && payload.name && payload.computeCapacity && payload.storageCapacity && payload.networks && payload.security">
     <!-- name -->
@@ -302,7 +293,7 @@
         TLS {{ payload.security.noTls ? 'disabled ' : 'enabled' }}
       </clr-stack-content>
       <!-- cert folder -->
-      <clr-stack-block *ngIf="!payload.security.noTls">
+      <clr-stack-block *ngIf="payload.security.tlsCertPath">
         <clr-stack-label>
           Certificate folder
         </clr-stack-label>

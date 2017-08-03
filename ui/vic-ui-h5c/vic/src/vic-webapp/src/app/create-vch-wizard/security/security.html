@@ -15,6 +15,13 @@
 <form [formGroup]="form" novalidate>
   <a id="advanced-toggle" class="btn btn-link" (click)="toggleAdvancedMode()">{{ inAdvancedMode ? 'Basic' : 'Advanced' }} <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon></a>
   <div *ngIf="inAdvancedMode">
+    <div class="alert alert-sm alert-info mb10">
+      <div class="alert-item">
+        <span class="alert-text">
+          The following options will be used for VCH creation only when the advanced mode is open.
+        </span>
+      </div>
+    </div>
     <clr-tabs>
       <clr-tab-link [clrTabLinkActive]="true">Docker API Access</clr-tab-link>
       <clr-tab-link>Registry Access</clr-tab-link>

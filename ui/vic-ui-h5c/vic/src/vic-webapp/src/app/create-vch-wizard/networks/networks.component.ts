@@ -246,21 +246,25 @@ export class NetworksComponent implements OnInit {
         const httpsProxyValue = this.form.get('httpsProxy').value;
         const httpsProxyPortValue = this.form.get('httpsProxyPort').value;
 
-        results['containerNetworks'] = this.form.get('containerNetworks')
-            .value
-            .filter(entry => entry['containerNetwork']);
+        if (this.inAdvancedMode) {
+            results['containerNetworks'] = this.form.get('containerNetworks')
+                .value
+                .filter(entry => entry['containerNetwork']);
 
-        if (httpProxyValue && httpProxyPortValue) {
-            results['httpProxy'] = `http://${httpProxyValue}:${httpProxyPortValue}`;
-        }
+            if (httpProxyValue && httpProxyPortValue) {
+                results['httpProxy'] = `http://${httpProxyValue}:${httpProxyPortValue}`;
+            }
 
-        if (httpsProxyValue && httpsProxyPortValue) {
-            results['httpsProxy'] = `https://${httpsProxyValue}:${httpsProxyPortValue}`;
-        }
+            if (httpsProxyValue && httpsProxyPortValue) {
+                results['httpsProxy'] = `https://${httpsProxyValue}:${httpsProxyPortValue}`;
+            }
 
-        const dnsServerValue = this.form.get('dnsServer').value.trim();
-        if (dnsServerValue) {
-            results['dnsServer'] = dnsServerValue;
+            const dnsServerValue = this.form.get('dnsServer').value.trim();
+            if (dnsServerValue) {
+                results['dnsServer'] = dnsServerValue;
+            }
+        } else {
+            results['containerNetworks'] = [];
         }
 
         return Observable.of({ networks: results });
