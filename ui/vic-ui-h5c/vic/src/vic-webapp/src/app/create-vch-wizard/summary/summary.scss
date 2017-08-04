@@ -3,3 +3,12 @@ div.form-group {
     color: red;
   }
 }
+
+textarea#cliCommand {
+  min-height: 150px;
+  font-size: 0.9em;
+}
+
+#copyCliCommandToClipboardBtn {
+  cursor: pointer;
+}
