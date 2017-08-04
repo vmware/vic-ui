@@ -157,10 +157,6 @@ export class SecurityComponent implements OnInit {
         const useClientAuthValue = this.form.get('useClientAuth').value;
         const tlsCasValue = this.form.get('tlsCas').value;
 
-        // user id & vc thumbprint
-        results['user'] = this.createWzService.getUserId();
-        results['thumbprint'] = this.createWzService.getServerThumbprint();
-
         if (this.inAdvancedMode) {
             // Docker API Access
             if (!useTlsValue) {
@@ -230,6 +226,12 @@ export class SecurityComponent implements OnInit {
                 results['opsUser'] = opsUserValue;
             }
         }
+
+
+        // user id, vc thumbprint and target
+        results['user'] = this.createWzService.getUserId();
+        results['thumbprint'] = this.createWzService.getServerThumbprint();
+        results['target'] = this.createWzService.getVcHostname();
 
         return Observable.of({ security: results });
     }
