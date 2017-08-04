@@ -169,6 +169,7 @@ export class StorageCapacityComponent implements OnInit {
                 .filter(vol => vol['volDatastore']);
 
             results['volumeStores'].forEach(vol => {
+                // if volume file folder doesn't start with '/', prepend the value with '/'
                 if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
                     vol['volFileFolder'] = '/' + vol['volFileFolder'];
                 }
