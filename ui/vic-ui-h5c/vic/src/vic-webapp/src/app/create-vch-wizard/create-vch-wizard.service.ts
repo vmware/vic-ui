@@ -30,6 +30,7 @@ export class CreateVchWizardService {
     private _userId: string = null;
     private _serverGuid: string = null;
     private _serverThumbprint: string = null;
+    private _serverHostname: string = null;
     private _clusters: any[] = null;
     private _clusterToHostRpsMap = {};
     private _networkingTree: any[] = null;
@@ -81,7 +82,7 @@ export class CreateVchWizardService {
      */
     getServerGuid(): string {
         if (!this._serverGuid) {
-            // TODO: improve
+            // TODO: improve, refactor
             const userSession = <any>this.globalsService.getWebPlatform().getUserSession();
             this._serverGuid = userSession['serversInfo'][0]['serviceGuid'];
         }
@@ -90,7 +91,7 @@ export class CreateVchWizardService {
 
     /**
      * Get VC's thumbprint
-     * TODO: unit test
+     * TODO: unit test, refactor
      */
     getServerThumbprint(): string {
         if (!this._serverThumbprint) {
@@ -98,6 +99,18 @@ export class CreateVchWizardService {
             this._serverThumbprint = userSession['serversInfo'][0]['thumbprint'];
         }
         return this._serverThumbprint;
+    }
+
+    /**
+     * Get VC's hostname
+     * TODO: unit test, refactor
+     */
+    getVcHostname(): string {
+        if (!this._serverHostname) {
+            const userSession = <any>this.globalsService.getWebPlatform().getUserSession();
+            this._serverHostname = userSession['serversInfo'][0]['name'];
+        }
+        return this._serverHostname;
     }
 
     /**
