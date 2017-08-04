@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 
@@ -27,24 +27,131 @@ export class SummaryComponent implements OnInit {
     public form: FormGroup;
     public formErrMessage = '';
     @Input() payload: any;
+    public processedPayload: any;
+    public targetOs: string;
+    public copySucceeded: boolean = null;
+    private _isSetup = false;
 
     constructor(
-        private formBuilder: FormBuilder
-    ) { }
+        private formBuilder: FormBuilder,
+        private elementRef: ElementRef
+    ) {
+        this.processedPayload = null;
+        this.form = formBuilder.group({
+            targetOs: '',
+            cliCommand: ''
+        });
+    }
 
     ngOnInit() {
 
     }
 
-    onPageLoad() {
-        // TODO: remove
-        console.log('pre commit', this.payload);
+    /**
+     * On WizardPage load event, start listening for events on inputs
+     */
+    onPageLoad(): void {
+        // refresh based on any changes made to the previous pages
+        this.processedPayload = this.processPayload();
+        this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
+
+        // prevent subscription from getting set up more than once
+        if (this._isSetup) {
+            return;
+        }
+        this.form.get('targetOs').valueChanges
+            .subscribe(v => {
+                if (!v) {
+                    return;
+                }
+                const textareaNode = this.elementRef.nativeElement.querySelector('textarea#cliCommand');
+                this.targetOs = v;
+                this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
+            });
+        this._isSetup = true;
+    }
+
+    /**
+     * Copy the content of the textarea to clipboard
+     */
+    copyCliCommandToClipboard(): void {
+        const textareaNode = this.elementRef.nativeElement.querySelector('textarea#cliCommand');
+        textareaNode.select();
+
+        try {
+            this.copySucceeded = window.document.execCommand('copy');
+            Observable.timer(1500)
+                .subscribe(() => {
+                    this.copySucceeded = null;
+                });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    /**
+     * Convert camelcase keys into dash-separated ones, remove fields with
+     * an empty array, and then return the array joined
+     * @returns {string} vic-machine compatible arguments
+     */
+    stringifyProcessedPayload(): string {
+        if (!this.targetOs) {
+            return null;
+        }
+
+        const payload = this.processedPayload;
+        const camelCasePattern = new RegExp(/([a-z])([A-Z])/g);
+        const results = [];
+
+        let vicMachineBinary = `vic-machine-${this.targetOs}`;
+        const createCommand = 'create';
+        if (this.targetOs !== 'windows')  {
+            vicMachineBinary = `./${vicMachineBinary}`;
+        }
+        results.push(vicMachineBinary);
+        results.push(createCommand);
+
+        for (const section in payload) {
+            if (!payload[section]) {
+                continue;
+            }
+
+            // if there is only one entry in the section and it's of string type
+            // add it to results array here
+            if (typeof payload[section] === 'string') {
+                results.push(`--${section} ${payload[section]}`);
+                continue;
+            }
+
+            for (const key in payload[section]) {
+                if (!payload[section][key]) {
+                    continue;
+                }
+                const newKey = key.replace(camelCasePattern, '$1-$2').toLowerCase();
+                const value = payload[section][key];
+                if (typeof value === 'string') {
+                    results.push(`--${newKey} ${value}`);
+                } else if (typeof value === 'boolean') {
+                    results.push(`--${newKey}`);
+                } else {
+                    // repeat adding multiple, optional fields with the same key
+                    for (const i in value) {
+                        if (!value[i]) {
+                            continue;
+                        }
+                        results.push(`--${newKey} ${value[i]}`);
+                    }
+                }
+            }
+        }
+
+        return results.join(' ');
     }
 
     /**
      * Transform some fields before sending it to vic-machine API
      */
-    onCommit(): Observable<any> {
+    private processPayload(): any {
         const results = JSON.parse(JSON.stringify(this.payload));
 
         // transform image store entry to something vic-machine command friendly
@@ -81,7 +188,14 @@ export class SummaryComponent implements OnInit {
                     };
                 }
             });
+        return results;
+    }
 
-        return Observable.of(results);
+    /**
+     * Emit the processed payload that will be sent to vic-machine API endpoint 
+     * @returns {Observable<any>}
+     */
+    onCommit(): Observable<any> {
+        return Observable.of(this.processedPayload);
     }
 }
