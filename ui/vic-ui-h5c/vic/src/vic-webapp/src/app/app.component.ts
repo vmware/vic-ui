@@ -41,10 +41,16 @@ export class AppComponent {
         private refreshService: RefreshService,
         private i18nService: I18nService
     ) {
-        // Refresh handler to be used in plugin mode
-        this.globalsService.getWebPlatform().setGlobalRefreshHandler(
-            this.refresh.bind(this), document
-        );
+        const h5cPluginIframeEls = window.top.document.querySelectorAll('iframe');
+
+        // this prevents the setGlobalRefreshHandler set by the parent vic-app (vch view)
+        // from getting overriden by the child vic-app (create vch wizard)
+        if (h5cPluginIframeEls.length === 1) {
+            // Refresh handler to be used in plugin mode
+            this.globalsService.getWebPlatform().setGlobalRefreshHandler(
+                this.refresh.bind(this), document
+            );
+        }
 
         // Manual injection of ActionDevService, used in webPlatformStub
         if (!this.globalsService.isPluginMode()) {
