@@ -16,6 +16,7 @@
 import { Component, OnInit, EventEmitter, Input, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
+import { camelCasePattern } from '../../shared/utils/regex';
 
 // TODO: refactor & clean up the template
 @Component({
@@ -28,7 +29,7 @@ export class SummaryComponent implements OnInit {
     public formErrMessage = '';
     @Input() payload: any;
     public processedPayload: any;
-    public targetOs: string;
+    public targetOS: string;
     public copySucceeded: boolean = null;
     private _isSetup = false;
 
@@ -38,7 +39,7 @@ export class SummaryComponent implements OnInit {
     ) {
         this.processedPayload = null;
         this.form = formBuilder.group({
-            targetOs: '',
+            targetOS: '',
             cliCommand: ''
         });
     }
@@ -59,13 +60,13 @@ export class SummaryComponent implements OnInit {
         if (this._isSetup) {
             return;
         }
-        this.form.get('targetOs').valueChanges
+        this.form.get('targetOS').valueChanges
             .subscribe(v => {
                 if (!v) {
                     return;
                 }
                 const textareaNode = this.elementRef.nativeElement.querySelector('textarea#cliCommand');
-                this.targetOs = v;
+                this.targetOS = v;
                 this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
             });
         this._isSetup = true;
@@ -95,17 +96,16 @@ export class SummaryComponent implements OnInit {
      * @returns {string} vic-machine compatible arguments
      */
     stringifyProcessedPayload(): string {
-        if (!this.targetOs) {
+        if (!this.targetOS) {
             return null;
         }
 
         const payload = this.processedPayload;
-        const camelCasePattern = new RegExp(/([a-z])([A-Z])/g);
         const results = [];
 
-        let vicMachineBinary = `vic-machine-${this.targetOs}`;
+        let vicMachineBinary = `vic-machine-${this.targetOS}`;
         const createCommand = 'create';
-        if (this.targetOs !== 'windows')  {
+        if (this.targetOS !== 'windows')  {
             vicMachineBinary = `./${vicMachineBinary}`;
         }
         results.push(vicMachineBinary);
@@ -192,7 +192,7 @@ export class SummaryComponent implements OnInit {
     }
 
     /**
-     * Emit the processed payload that will be sent to vic-machine API endpoint 
+     * Emit the processed payload that will be sent to vic-machine API endpoint
      * @returns {Observable<any>}
      */
     onCommit(): Observable<any> {
