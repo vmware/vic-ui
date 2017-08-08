@@ -25,7 +25,6 @@ import { GlobalsService } from '../shared';
 @Injectable()
 export class CreateVchWizardService {
     // TODO: make a proper interface
-    private _vchManifest: any;
     private _datacenter: any[] = null;
     private _userId: string = null;
     private _serverGuid: string = null;
@@ -35,12 +34,20 @@ export class CreateVchWizardService {
     private _clusterToHostRpsMap = {};
     private _networkingTree: any[] = null;
     private _distributedPortGroups: any[] = null;
+    private _userSession: any = null;
 
     constructor(
         private http: Http,
         private globalsService: GlobalsService
     ) {
-        this.getWipManifest();
+        this.getUserSession();
+    }
+
+    getUserSession() {
+        const webPlatform = <any>this.globalsService.getWebPlatform();
+        if (typeof webPlatform.getUserSession === 'function') {
+            this._userSession = webPlatform.getUserSession();
+        }
     }
 
     /**
@@ -58,21 +65,12 @@ export class CreateVchWizardService {
             .catch(e => Observable.throw(e));
     }
 
-    // TODO: to be implemented
-    getWipManifest() {
-    }
-
-    get vchManifest() {
-        return this._vchManifest;
-    }
-
     /**
      * Get user id
      */
     getUserId(): string {
         if (!this._userId) {
-            const userSession = <any>this.globalsService.getWebPlatform().getUserSession();
-            this._userId = userSession['userName'];
+            this._userId = this._userSession['userName'];
         }
         return this._userId;
     }
@@ -82,9 +80,9 @@ export class CreateVchWizardService {
      */
     getServerGuid(): string {
         if (!this._serverGuid) {
-            // TODO: improve, refactor
-            const userSession = <any>this.globalsService.getWebPlatform().getUserSession();
-            this._serverGuid = userSession['serversInfo'][0]['serviceGuid'];
+            // TODO: come up with a better solution to handle a case where
+            // linked datacenters are involved in a VC
+            this._serverGuid = this._userSession['serversInfo'][0]['serviceGuid'];
         }
         return this._serverGuid;
     }
@@ -95,8 +93,8 @@ export class CreateVchWizardService {
      */
     getServerThumbprint(): string {
         if (!this._serverThumbprint) {
-            const userSession = <any>this.globalsService.getWebPlatform().getUserSession();
-            this._serverThumbprint = userSession['serversInfo'][0]['thumbprint'];
+            // TODO: see line 76
+            this._serverThumbprint = this._userSession['serversInfo'][0]['thumbprint'];
         }
         return this._serverThumbprint;
     }
@@ -107,8 +105,8 @@ export class CreateVchWizardService {
      */
     getVcHostname(): string {
         if (!this._serverHostname) {
-            const userSession = <any>this.globalsService.getWebPlatform().getUserSession();
-            this._serverHostname = userSession['serversInfo'][0]['name'];
+            // TODO: see line 76
+            this._serverHostname = this._userSession['serversInfo'][0]['name'];
         }
         return this._serverHostname;
     }
