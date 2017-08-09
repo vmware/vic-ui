@@ -11,8 +11,8 @@
             Loading...
           </option>
           <option value="">Not selected</option>
-          <option [value]="datastore.text" *ngFor="let datastore of datastores">
-            {{ datastore.text }}
+          <option [value]="datastore.name" *ngFor="let datastore of datastores">
+            {{ datastore?.name }} ({{ datastore?.info?.freeSpace }} free)
           </option>
         </select>
       </div>
@@ -42,8 +42,8 @@
               <div class="select">
                 <select formControlName="volDatastore">
                   <option value="">Not selected</option>
-                  <option [value]="datastore.text" *ngFor="let datastore of datastores">
-                    {{ datastore.text }}
+                  <option [value]="datastore.name" *ngFor="let datastore of datastores">
+                    {{ datastore?.name }} ({{ datastore?.info?.freeSpace }} free)
                   </option>
                 </select>
               </div>

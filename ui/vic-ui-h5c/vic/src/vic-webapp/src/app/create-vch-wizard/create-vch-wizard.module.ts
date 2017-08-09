@@ -38,7 +38,6 @@ const routes: Routes = [
     imports: [
         CommonModule,
         FormsModule,
-        HttpModule,
         ReactiveFormsModule,
         ClarityModule,
         RouterModule.forChild(routes)
@@ -53,9 +52,7 @@ const routes: Routes = [
         SummaryComponent
     ],
     providers: [
-        CreateVchWizardService,
-        Globals,
-        GlobalsService
+        CreateVchWizardService
     ],
     exports: [
         CreateVchWizardComponent,

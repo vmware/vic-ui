@@ -17,10 +17,12 @@ import { Injectable } from '@angular/core';
 import { Http, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
+import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
 import { CHECK_RP_UNIQUENESS_URL } from '../shared/constants';
 import { GlobalsService } from '../shared';
+import { byteToLegibleUnit } from '../shared/utils/filesize';
 
 @Injectable()
 export class CreateVchWizardService {
@@ -158,7 +160,6 @@ export class CreateVchWizardService {
      */
     getHostsAndResourcePools(clusterObjId: string): Observable<any[]> {
         // TODO: refactor. e.g. move constants to constant file
-        // TODO: support vapp and resourcepools to be shown (or check with backend)
         if (this._clusterToHostRpsMap[clusterObjId]) {
             // if there is a cache for the provided cluster object id, return immediately
             return Observable.of(this._clusterToHostRpsMap[clusterObjId]);
@@ -179,7 +180,6 @@ export class CreateVchWizardService {
     }
 
     getResourceAllocationsInfo(resourceObjId: string, isCluster: boolean): Observable<any> {
-        // TODO: cache
         if (isCluster) {
             return this.http.get(`/ui/data/${resourceObjId}` +
                 '?model=com.vmware.vsphere.client.clusterui.model.ResourcePoolConfigData')
@@ -222,13 +222,28 @@ export class CreateVchWizardService {
 
     }
 
-    getDatastores(datacenterObjId: string): Observable<any[]> {
-        // TODO: cache
-        return this.http.get('/ui/tree/children?nodeTypeId=Datacenter' +
-            `&objRef=${datacenterObjId}&treeId=vsphere.core.storageInventorySpec`)
+    getDatastores(resourceObjRef: string): Observable<any[]> {
+        return this.http.get('/ui/data/properties/' +
+            `${resourceObjRef}?properties=datastore`)
             .catch(e => Observable.throw(e))
             .map(response => response.json())
-            .catch(e => Observable.throw(e));
+            .catch(e => Observable.throw(e))
+            .switchMap(response => {
+                const refs = response['datastore'].map(ref => {
+                    return `urn:vmomi:Datastore:${ref['value']}:${ref['serverGuid']}`;
+                });
+                const obsArray = refs.map(objRef => {
+                    return this.http.get('/ui/data/properties/' +
+                        `${objRef}?properties=name,info,overallStatus`)
+                        .catch(e => Observable.throw(e))
+                        .map(rsp => rsp.json())
+                        .do(rsp => {
+                            rsp['info']['freeSpace'] = byteToLegibleUnit(rsp['info']['freeSpace']);
+                        })
+                        .catch(e => Observable.throw(e));
+                });
+                return Observable.zip.apply(null, obsArray);
+            });
     }
 
     getNetworkingTree(): Observable<any[]> {

@@ -53,7 +53,7 @@
         </ul>
       </div>
     </clr-alert>
-    <vic-vch-creation-storage-capacity #step3></vic-vch-creation-storage-capacity>
+    <vic-vch-creation-storage-capacity [resourceObjRef]="step2.selectedResourceObjRef" #step3></vic-vch-creation-storage-capacity>
   </clr-wizard-page>
 
   <clr-wizard-page [clrWizardPageNextDisabled]="step4.form.invalid" clrWizardPagePreventDefault="true" (clrWizardPageOnLoad)="onPageLoad(step4.onPageLoad())"

@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input } from '@angular/core';
 import {
     FormBuilder,
     FormGroup,
@@ -36,6 +36,8 @@ export class StorageCapacityComponent implements OnInit {
     public inAdvancedMode = false;
     public datastores: any[] = [];
     public datastoresLoading = true;
+    @Input() resourceObjRef;
+    private _isSetup = false;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -84,8 +86,16 @@ export class StorageCapacityComponent implements OnInit {
     }
 
     onPageLoad() {
-        // if image datastore is already selected return here
-        if (this.form.get('imageStore').value) {
+        // load datastores
+        this.createWzService.getDatastores(this.resourceObjRef)
+            .subscribe(v => {
+                this.datastores = v;
+                this.form.get('imageStore').setValue('');
+                this.datastoresLoading = false;
+            }, err => console.error(err));
+
+        // prevent subscribing to the following input changes for more than once
+        if (this._isSetup) {
             return;
         }
 
@@ -128,14 +138,7 @@ export class StorageCapacityComponent implements OnInit {
                 });
             });
 
-        // load datastores
-        this.createWzService.getDatacenter()
-            .switchMap((dcs) => this.createWzService.getDatastores(dcs[0]['objRef']))
-            .subscribe(v => {
-                this.datastores = v;
-                this.form.get('imageStore').setValue('');
-                this.datastoresLoading = false;
-            }, err => console.error(err));
+        this._isSetup = true;
     }
 
     /**
