@@ -49,6 +49,7 @@ export class ComputeCapacityComponent implements OnInit {
         memory: { maxUsage: null, unreservedForPool: null }
     };
     public selectedObjectName: string;
+    public selectedResourceObjRef: string;
     private _selectedComputeResource: string;
 
     constructor(
@@ -136,10 +137,14 @@ export class ComputeCapacityComponent implements OnInit {
             if (isCluster) {
                 computeResource = `${computeResource}/${resource['text']}`;
                 resourceObj = resource['aliases'][0];
-            } else if (nodeTypeId === 'ClusterHostSystem') {
-                computeResource = `${computeResource}/${cluster['text']}/${resource['text']}`;
+
+            } else {
+                computeResource = cluster ?
+                    `${computeResource}/${cluster['text']}/${resource['text']}` :
+                    `${computeResource}/${resource['text']}`;
                 resourceObj = resource['objRef'];
             }
+            this.selectedResourceObjRef = resource['objRef'];
             this.selectedObjectName = resource['text'];
             this._selectedComputeResource = computeResource;
 
@@ -185,6 +190,14 @@ export class ComputeCapacityComponent implements OnInit {
                     this.form.get('endpointMemory').updateValueAndValidity();
                     this.form.get('cpuReservation').updateValueAndValidity();
                     this.form.get('memoryReservation').updateValueAndValidity();
+
+                    // this prevents the next button from getting disabled when the
+                    // user selects a host or cluster that has less than 2048MB of ram
+                    // available for VM endpoint. as a solution, we set the smaller
+                    // value between 2048 and memory['maxUsage']
+                    this.form.get('endpointMemory').setValue(
+                        Math.min(memory['maxUsage'], 2048) + '')
+                    this.form.get('endpointMemory').updateValueAndValidity();
                 });
         });
     }
