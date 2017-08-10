@@ -75,7 +75,8 @@ export class CreateVchWizardComponent implements OnInit {
 
       this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
       this.renderer.setElementStyle(modalBodyEl, 'max-height', '75vh');
-      this.renderer.setElementStyle(targetIframeEl, 'height', '75vh');
+      this.renderer.setElementStyle(targetIframeEl, 'width', '100%');
+      this.renderer.setElementStyle(targetIframeEl, 'height', '73vh');
       this.renderer.setElementStyle(
         this.elRef.nativeElement.querySelector('clr-wizard'),
         'height',
