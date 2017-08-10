@@ -22,7 +22,7 @@
         </span>
       </div>
     </div>
-    <clr-tabs>
+    <clr-tabs (clrTabsCurrentTabContentChanged)="clearFileReaderError()">
       <clr-tab-link [clrTabLinkActive]="true">Docker API Access</clr-tab-link>
       <clr-tab-link>Registry Access</clr-tab-link>
       <clr-tab-link>Operations User</clr-tab-link>
@@ -120,25 +120,27 @@
               </div>
               <!-- sub block for existing client cert -->
               <div *ngIf="form.get('clientCertSource').value === 'existing'">
-                <div class="alert alert-danger">
-                  <div class="alert-item">
-                    <span class="alert-text">These will be replaced with file upload inputs once API is ready</span>
-                  </div>
-                </div>
                 <span>
                   You can use one or more CA certificates you may have created using some other certificate authority.
                 </span>
+                <div *ngIf="fileReaderError" class="alert alert-danger">
+                  <div class="alert-item">
+                    <span class="alert-text">
+                      {{ fileReaderError }}
+                    </span>
+                  </div>
+                </div>
                 <div [class.p3]="i === 0" formArrayName="tlsCas" *ngFor="let tlsCa of form.controls.tlsCas.controls; let i=index">
                   <div [formGroupName]="i" class="form-group row zero-margin-bottom">
                     <div class="col-xs-3">
-                      <div *ngIf="i === 0">Path to client CAs</div>
+                      <div *ngIf="i === 0">Client CAs</div>
                     </div>
                     <div class="col-xs-4">
-                      <input size="30" id="tls-ca" formControlName="tlsCa" class="form-control" type="text">
+                      <input id="tls-ca" (change)="addFileContent($event, 'tlsCas', i)" formControlName="tlsCa" class="form-control" type="file">
                     </div>
                     <div class="col-xs-2 input-add-remove-container">
-                      <clr-icon *ngIf="i > 0" shape="times-circle" (click)="removeTlsCaEntry(i)"></clr-icon>
-                      <clr-icon *ngIf="i === form.controls.tlsCas.controls.length - 1" shape="plus-circle" (click)="addNewTlsCaEntry()"></clr-icon>
+                      <clr-icon shape="times-circle" (click)="removeFormArrayEntry('tlsCas', i)"></clr-icon>
+                      <clr-icon *ngIf="i === form.controls.tlsCas.controls.length - 1" shape="plus-circle" (click)="addNewFormArrayEntry('tlsCas')"></clr-icon>
                     </div>
                   </div>
                 </div>
@@ -175,8 +177,8 @@
                   </div>
                 </div>
                 <div class="col-xs-2 input-add-remove-container">
-                  <clr-icon *ngIf="i > 0" shape="times-circle" (click)="removeWhitelistRegistryEntry(i)"></clr-icon>
-                  <clr-icon *ngIf="i === form.controls.whitelistRegistries.controls.length - 1" shape="plus-circle" (click)="addNewWhitelistRegistryEntry()"></clr-icon>
+                  <clr-icon *ngIf="i > 0" shape="times-circle" (click)="removeFormArrayEntry('whitelistRegistries', i)"></clr-icon>
+                  <clr-icon *ngIf="i === form.controls.whitelistRegistries.controls.length - 1" shape="plus-circle" (click)="addNewFormArrayEntry('whitelistRegistries')"></clr-icon>
                 </div>
               </div>
             </div>
@@ -200,8 +202,8 @@
                     <input type="text" class="form-control" placeholder="Port" formControlName="insecureRegistryPort">
                   </div>
                   <div class="col-xs-2 input-add-remove-container">
-                    <clr-icon *ngIf="j > 0" shape="times-circle" (click)="removeInsecureRegistryEntry(j)"></clr-icon>
-                    <clr-icon *ngIf="j === form.controls.insecureRegistries.controls.length - 1" shape="plus-circle" (click)="addNewInsecureRegistryEntry()"></clr-icon>
+                    <clr-icon *ngIf="j > 0" shape="times-circle" (click)="removeFormArrayEntry('insecureRegistries', j)"></clr-icon>
+                    <clr-icon *ngIf="j === form.controls.insecureRegistries.controls.length - 1" shape="plus-circle" (click)="addNewFormArrayEntry('insecureRegistries')"></clr-icon>
                   </div>
                 </div>
               </div>
@@ -213,19 +215,21 @@
               Add registry certificates for those registries which need custom or self-signed certificates, like the vSphere Integrated
               Containers Registry.
             </p>
-            <div class="alert alert-danger">
+            <div *ngIf="fileReaderError" class="alert alert-danger mb10">
               <div class="alert-item">
-                <span class="alert-text">These will be replaced with file upload inputs once API is ready</span>
+                <span class="alert-text">
+                  {{ fileReaderError }}
+                </span>
               </div>
             </div>
             <div formArrayName="registryCas" *ngFor="let registryCa of form.controls.registryCas.controls; let i=index">
               <div [formGroupName]="i" class="form-group row zero-margin-bottom">
                 <div class="col-xs-6">
-                  <input type="text" class="form-control" placeholder="Select X.509 certificate pem file" formControlName="registryCa">
+                  <input type="file" class="form-control" formControlName="registryCa" (change)="addFileContent($event, 'registryCas', i)">
                 </div>
                 <div class="col-xs-2 input-add-remove-container">
-                  <clr-icon *ngIf="i > 0" shape="times-circle" (click)="removeRegistryCaEntry(i)"></clr-icon>
-                  <clr-icon *ngIf="i === form.controls.registryCas.controls.length - 1" shape="plus-circle" (click)="addNewRegistryCaEntry()"></clr-icon>
+                  <clr-icon shape="times-circle" (click)="removeFormArrayEntry('registryCas', i)"></clr-icon>
+                  <clr-icon *ngIf="i === form.controls.registryCas.controls.length - 1" shape="plus-circle" (click)="addNewFormArrayEntry('registryCas')"></clr-icon>
                 </div>
               </div>
             </div>

@@ -17,6 +17,7 @@ import { Component, OnInit, EventEmitter, Input, ElementRef } from '@angular/cor
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { camelCasePattern } from '../../shared/utils/regex';
+import { isUploadableFileObject } from '../../shared/utils/model-checker';
 
 // TODO: refactor & clean up the template
 @Component({
@@ -139,7 +140,17 @@ export class SummaryComponent implements OnInit {
                         if (!value[i]) {
                             continue;
                         }
-                        results.push(`--${newKey} ${value[i]}`);
+
+                        let stringValue;
+                        const rawValue = value[i];
+                        if (typeof rawValue === 'string') {
+                            stringValue = rawValue;
+                        } else if (typeof rawValue === 'object' &&
+                            isUploadableFileObject(rawValue)) {
+                                stringValue = rawValue.name;
+                            }
+
+                        results.push(`--${newKey} ${stringValue}`);
                     }
                 }
             }
