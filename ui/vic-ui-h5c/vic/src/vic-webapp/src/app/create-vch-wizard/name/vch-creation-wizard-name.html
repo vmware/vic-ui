@@ -1,16 +1,47 @@
-<p class="smaller-p-body-text">
-  This wizard allows you to create a virtual container host by following a few steps.
+<p>
+  This wizard builds a command that creates a virtual container host.
+  You can copy the command from the Summary page into your command line interface.
 </p>
+
 <form [formGroup]="form" novalidate>
   <section class="form-block">
-    <div class="form-group">
-      <label for="nameInput">Name <span class="red-text">*</span></label>
-      <label for="nameInput" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-lg tooltip-top-left"
-        [class.invalid]="form.get('name').invalid
-                    && (form.get('name').dirty || form.get('name').touched)">
-        <input id="nameInput" size="50" type="text" placeholder="virtual-container-host" formControlName="name">
-        <span class="tooltip-content">{{ formErrMessage }}</span>
-      </label>
+
+    <div class="form-group row">
+      <div class="col-xs-2">
+
+        <label for="nameInput" class="required">
+          Name
+        </label>
+
+      </div>
+      <div class="col-xs-6">
+
+        <label for="nameInput"
+               aria-haspopup="true"
+               role="tooltip"
+               class="form-control tooltip tooltip-validation tooltip-lg tooltip-top-left"
+               [class.invalid]="form.get('name').invalid && (form.get('name').dirty || form.get('name').touched)">
+
+          <input id="nameInput"
+                 class="form-control"
+                 type="text"
+                 placeholder="virtual-container-host"
+                 formControlName="name">
+          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+        </label>
+
+      </div>
+
+      <clr-signpost [clrSignpostPosition]="'bottom-left'">
+        <clr-signpost-content *clrIfOpen="signpostOpenState">
+            <span>
+              Virtual container host names can contain up to 80 characters and must be unique within each vCenter
+            </span>
+        </clr-signpost-content>
+      </clr-signpost>
+
     </div>
+
   </section>
 </form>

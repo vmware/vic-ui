@@ -1,38 +1,12 @@
-div.form-group {
-  & span.red-text {
-    color: red;
-    margin: 0;
-  }
-}
-
-form {
-  & a#advanced-toggle {
-    padding-left: 0;
-  }
-  & div.vol-datastore-header {
-    height: 0;
-    position: relative;
-    top: -15px;
-    font-size: 0.8em;
+.vol-datastore {
+  &-header {
+    position: absolute;
+    top: -20px;
     font-weight: bold;
   }
-  & .vol-datastore-first-header label {
-    font-size: 0.7em;
-    letter-spacing: -0.3px;
-  }
-  & .input-add-remove-container clr-icon {
-    float: left;
+
+  &-actions clr-icon {
+    margin-top: 9px;
     cursor: pointer;
   }
-  & .fg-group {
-    padding: 10px 0;
-  }
-}
-
-.smaller-p-body-text {
-  font-size: 12px;
-}
-
-.zero-margin-bottom {
-  margin-bottom: 0 !important;
 }
