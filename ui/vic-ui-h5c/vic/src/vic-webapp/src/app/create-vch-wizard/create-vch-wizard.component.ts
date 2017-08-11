@@ -70,13 +70,14 @@ export class CreateVchWizardComponent implements OnInit {
       const modalDialogEl = <HTMLElement>clrModalEl.querySelector('.modal-dialog');
 
       if (modalHeaderEl !== null) {
-        modalHeaderEl.remove();
+        modalHeaderEl.parentNode.removeChild(modalHeaderEl);
       }
 
       this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
+      this.renderer.setElementStyle(modalBodyEl, 'height', '75vh');
       this.renderer.setElementStyle(modalBodyEl, 'max-height', '75vh');
       this.renderer.setElementStyle(targetIframeEl, 'width', '100%');
-      this.renderer.setElementStyle(targetIframeEl, 'height', '73vh');
+      this.renderer.setElementStyle(targetIframeEl, 'height', '100%');
       this.renderer.setElementStyle(
         this.elRef.nativeElement.querySelector('clr-wizard'),
         'height',
