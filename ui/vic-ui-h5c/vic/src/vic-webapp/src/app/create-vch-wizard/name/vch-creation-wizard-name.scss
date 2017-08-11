@@ -1,14 +1,4 @@
-div.form-group {
-  padding-left: 150px;
-  & label:first-child {
-    width: 150px;
-  }
-  & span.red-text {
-    color: red;
-    margin: 0;
-  }
-}
-
-.smaller-p-body-text {
-  font-size: 12px;
+:host ::ng-deep clr-signpost .signpost-action {
+  margin-top: 0;
+  margin-bottom: 0;
 }

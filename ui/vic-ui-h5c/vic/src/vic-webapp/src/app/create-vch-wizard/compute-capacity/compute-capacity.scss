@@ -1,43 +1,19 @@
-div.form-group {
-  padding-left: 200px;
-  & label:first-child {
-    width: 200px;
-  }
-  & span.red-text {
-    color: red;
-    margin: 0;
-  }
-  & #compute-resource-selector {
-    border: 1px solid #999;
-    width: 330px;
-    height: 150px;
-    overflow: auto;
-    &.invalid {
-      border-color: red;
-    }
-  }
-  & clr-tree-node button {
-    margin: 0;
+@import "../../../../node_modules/clarity-ui/src/color/utils/_colors.clarity.scss";
+
+:host ::ng-deep clr-tree-node {
+  .clr-treenode-link,
+  .clr-treenode-caret {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }
 
-form {
-  & a#advanced-toggle {
-    padding-left: 0;
-  }
-  & label.tooltip .maxResourceIndicator {
-    font-size: 0.8em;
-    color: #888;
-  }
-  & div.fg-group {
-    padding: 10px 0;
-  }
-}
+#compute-resource-selector {
+  border: 2px solid $clr-lighter-midtone-gray;
+  height: 150px;
+  overflow: auto;
 
-.smaller-p-body-text {
-  font-size: 12px;
-}
-
-.zero-margin-bottom {
-  margin: 0;
+  &.invalid {
+    border-color: $clr-red;
+  }
 }

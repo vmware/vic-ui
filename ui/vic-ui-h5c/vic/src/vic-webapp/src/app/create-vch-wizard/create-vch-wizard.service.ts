@@ -20,7 +20,7 @@ import 'rxjs/add/observable/timer';
 import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
-import { CHECK_RP_UNIQUENESS_URL } from '../shared/constants';
+import { CHECK_RP_UNIQUENESS_URL, CPU_MIN_LIMIT_MHZ, MEMORY_MIN_LIMIT_MB } from '../shared/constants';
 import { GlobalsService } from '../shared';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
 
@@ -188,10 +188,13 @@ export class CreateVchWizardService {
                 .catch(e => Observable.throw(e))
                 .map(response => {
                     const memory = response['runtimeInfo']['memory'];
+                    const cpu = response['runtimeInfo']['cpu'];
                     memory['maxUsage'] = Math.round(memory['maxUsage'] / 1024 / 1024);
+                    memory['minUsage'] = MEMORY_MIN_LIMIT_MB;
                     memory['unreservedForPool'] = Math.round(memory['unreservedForPool'] / 1024 / 1024);
+                    cpu['minUsage'] = CPU_MIN_LIMIT_MHZ;
                     return {
-                        cpu: response['runtimeInfo']['cpu'],
+                        cpu: cpu,
                         memory: memory
                     };
 
@@ -208,11 +211,13 @@ export class CreateVchWizardService {
                     return {
                         cpu: {
                             maxUsage: config['cpuAllocation']['limit'],
+                            minUsage: CPU_MIN_LIMIT_MHZ,
                             unreservedForPool: config['cpuAllocation']['reservation'],
                             shares: config['cpuAllocation']['shares']['shares']
                         },
                         memory: {
                             maxUsage: config['memoryAllocation']['limit'],
+                            minUsage: MEMORY_MIN_LIMIT_MB,
                             unreservedForPool: config['memoryAllocation']['reservation'],
                             shares: config['memoryAllocation']['shares']['shares']
                         }

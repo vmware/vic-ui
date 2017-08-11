@@ -45,8 +45,8 @@ export class ComputeCapacityComponent implements OnInit {
     public isTreeLoading = false;
     public inAdvancedMode = false;
     public resourceLimits: any = {
-        cpu: { maxUsage: null, unreservedForPool: null },
-        memory: { maxUsage: null, unreservedForPool: null }
+        cpu: { maxUsage: null, minUsage: null, unreservedForPool: null },
+        memory: { maxUsage: null, minUsage: null, unreservedForPool: null }
     };
     public selectedObjectName: string;
     public selectedResourceObjRef: string;
