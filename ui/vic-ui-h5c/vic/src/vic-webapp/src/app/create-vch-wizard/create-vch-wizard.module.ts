@@ -16,7 +16,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
@@ -30,37 +29,37 @@ import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Globals, GlobalsService } from '../shared';
 
 const routes: Routes = [
-    { path: '', component: CreateVchWizardComponent },
-    { path: ':id', component: CreateVchWizardComponent }
+  { path: '', component: CreateVchWizardComponent },
+  { path: ':id', component: CreateVchWizardComponent }
 ];
 
 @NgModule({
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        ClarityModule,
-        RouterModule.forChild(routes)
-    ],
-    declarations: [
-        CreateVchWizardComponent,
-        VchCreationWizardNameComponent,
-        ComputeCapacityComponent,
-        StorageCapacityComponent,
-        NetworksComponent,
-        SecurityComponent,
-        SummaryComponent
-    ],
-    providers: [
-        CreateVchWizardService
-    ],
-    exports: [
-        CreateVchWizardComponent,
-        VchCreationWizardNameComponent,
-        ComputeCapacityComponent,
-        StorageCapacityComponent,
-        SecurityComponent,
-        SummaryComponent
-    ]
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ClarityModule,
+    RouterModule.forChild(routes)
+  ],
+  declarations: [
+    CreateVchWizardComponent,
+    VchCreationWizardNameComponent,
+    ComputeCapacityComponent,
+    StorageCapacityComponent,
+    NetworksComponent,
+    SecurityComponent,
+    SummaryComponent
+  ],
+  providers: [
+    CreateVchWizardService
+  ],
+  exports: [
+    CreateVchWizardComponent,
+    VchCreationWizardNameComponent,
+    ComputeCapacityComponent,
+    StorageCapacityComponent,
+    SecurityComponent,
+    SummaryComponent
+  ]
 })
 export class CreateVchWizardModule { }

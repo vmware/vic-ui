@@ -42,7 +42,7 @@ import {
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { VirtualContainerHost } from '../vch-view/vch.model';
 import { ContainerVm } from '../container-view/container.model';
-import { ContainerVmResponse, VchVmResponse } from '../vm.interface';
+import { ContainerVmResponse, VchVmResponse } from '../interfaces/vm.interface';
 
 describe('VicVchViewService', () => {
     let service: VicVmViewService;

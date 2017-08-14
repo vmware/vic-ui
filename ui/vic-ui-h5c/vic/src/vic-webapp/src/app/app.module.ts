@@ -21,13 +21,13 @@ import { HttpModule } from '@angular/http';
 import { ClarityModule } from 'clarity-angular';
 
 import {
-    Globals,
-    GlobalsService,
-    I18nService,
-    Vic18nService,
-    RefreshService,
-    AppAlertComponent,
-    AppAlertService
+  Globals,
+  GlobalsService,
+  I18nService,
+  Vic18nService,
+  RefreshService,
+  AppAlertComponent,
+  AppAlertService
 } from './shared/index';
 import { ActionDevService } from './services/action-dev.service';
 import { AppErrorHandler } from './shared/appErrorHandler';
@@ -36,30 +36,30 @@ import { AppRoutingModule, routedComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
-    imports: [
-        BrowserModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        HttpModule,
-        ClarityModule.forRoot()
-    ],
-    declarations: [
-        AppComponent,
-        AppAlertComponent,
-        routedComponents
-    ],
-    providers: [
-        ActionDevService,
-        AppAlertService,
-        AppErrorHandler,
-        Globals,
-        GlobalsService,
-        I18nService,
-        Vic18nService,
-        RefreshService,
-        { provide: ErrorHandler, useClass: AppErrorHandler }
-    ],
-    bootstrap: [AppComponent]
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    HttpModule,
+    ClarityModule.forRoot()
+  ],
+  declarations: [
+    AppComponent,
+    AppAlertComponent,
+    routedComponents
+  ],
+  providers: [
+    ActionDevService,
+    AppAlertService,
+    AppErrorHandler,
+    Globals,
+    GlobalsService,
+    I18nService,
+    Vic18nService,
+    RefreshService,
+    { provide: ErrorHandler, useClass: AppErrorHandler }
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule {
 
