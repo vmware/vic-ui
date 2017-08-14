@@ -15,60 +15,60 @@
 */
 
 import {
-    VirtualMachine,
-    VchVmResponse
-} from '../vm.interface';
+  VirtualMachine,
+  VchVmResponse
+} from '../interfaces/vm.interface';
 
 const FORWARD_SLASH = '/';
 const COLON = ':';
 
 export class VirtualContainerHost implements VirtualMachine {
-    private _parentObj: {
-        value: string;
-        type: string;
-    };
-    private _vchVmId: string;
-    public readonly isVCH: boolean = true;
-    public readonly isContainer: boolean = false;
-    public isUsingTls = true;
-    public name: string;
-    public overallStatus: string;
-    public powerState: string;
-    public vchIp: string;
-    public overallCpuUsage: number;
-    public guestMemoryUsage: number;
-    public committedStorage: number;
-    public resourceConfig: any;
+  private _parentObj: {
+    value: string;
+    type: string;
+  };
+  private _vchVmId: string;
+  public readonly isVCH: boolean = true;
+  public readonly isContainer: boolean = false;
+  public isUsingTls = true;
+  public name: string;
+  public overallStatus: string;
+  public powerState: string;
+  public vchIp: string;
+  public overallCpuUsage: number;
+  public guestMemoryUsage: number;
+  public committedStorage: number;
+  public resourceConfig: any;
 
-    constructor(data: VchVmResponse) {
-        try {
-            const splitVmId = data.id.split(FORWARD_SLASH);
-            this._parentObj = data.resourcePool;
-            this._vchVmId = `urn:vmomi:VirtualMachine:${splitVmId[1]}${COLON}${splitVmId[0]}`;
-            this.name = data.name;
-            this.overallStatus = data.overallStatus;
-            this.powerState = data.powerState;
-            this.vchIp = data.clientIp;
-            this.isUsingTls = data.isUsingTls;
-            this.overallCpuUsage = data.overallCpuUsage;
-            this.guestMemoryUsage = data.guestMemoryUsage;
-            this.committedStorage = data.committedStorage;
-            this.resourceConfig = data.resourceConfig;
-        } catch (e) {
-            throw new Error('response does not fit into VchVmResponse! ' +
-                e.toString());
-        }
+  constructor(data: VchVmResponse) {
+    try {
+      const splitVmId = data.id.split(FORWARD_SLASH);
+      this._parentObj = data.resourcePool;
+      this._vchVmId = `urn:vmomi:VirtualMachine:${splitVmId[1]}${COLON}${splitVmId[0]}`;
+      this.name = data.name;
+      this.overallStatus = data.overallStatus;
+      this.powerState = data.powerState;
+      this.vchIp = data.clientIp;
+      this.isUsingTls = data.isUsingTls;
+      this.overallCpuUsage = data.overallCpuUsage;
+      this.guestMemoryUsage = data.guestMemoryUsage;
+      this.committedStorage = data.committedStorage;
+      this.resourceConfig = data.resourceConfig;
+    } catch (e) {
+      throw new Error('response does not fit into VchVmResponse! ' +
+        e.toString());
     }
+  }
 
-    get parentType(): string {
-        return this._parentObj.type;
-    }
+  get parentType(): string {
+    return this._parentObj.type;
+  }
 
-    get id(): string {
-        return this._vchVmId;
-    }
+  get id(): string {
+    return this._vchVmId;
+  }
 
-    get vchVmId(): string {
-        return this._vchVmId;
-    }
+  get vchVmId(): string {
+    return this._vchVmId;
+  }
 }

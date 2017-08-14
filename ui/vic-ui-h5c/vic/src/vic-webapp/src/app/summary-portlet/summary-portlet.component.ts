@@ -15,9 +15,9 @@
 */
 
 import {
-    Component,
-    OnDestroy,
-    ChangeDetectorRef
+  Component,
+  OnDestroy,
+  ChangeDetectorRef
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
@@ -25,12 +25,12 @@ import 'rxjs/add/operator/switchMap';
 
 import { DataPropertyService } from '../services/data-property.service';
 import { GlobalsService, RefreshService, AppAlertService } from '../shared/index';
-import { VirtualMachine } from '../vm.interface';
-import { VM_PROPERTIES_TO_EXTRACT } from '../vm.constants';
+import { VirtualMachine } from '../interfaces/vm.interface';
+import { VM_PROPERTIES_TO_EXTRACT } from '../shared/constants/vm.constants';
 
 @Component({
-    selector: 'vic-summary-portlet',
-    template: `
+  selector: 'vic-summary-portlet',
+  template: `
     <div *ngIf="!gs.isPluginMode()">
         <button (click)="toggleVmType()">Toggle VM Type</button>
     </div>
@@ -40,60 +40,60 @@ import { VM_PROPERTIES_TO_EXTRACT } from '../vm.constants';
 })
 
 export class VicSummaryPortletComponent implements OnDestroy {
-    public activeVm: VirtualMachine;
-    private refreshSubscription: Subscription;
-    private vmInfoSubscription: Subscription;
-    private stubType = 'vch';
+  public activeVm: VirtualMachine;
+  private refreshSubscription: Subscription;
+  private vmInfoSubscription: Subscription;
+  private stubType = 'vch';
 
-    constructor(
-        public gs: GlobalsService,
-        private service: DataPropertyService,
-        private refreshService: RefreshService,
-        private appAlertService: AppAlertService,
-        private route: ActivatedRoute,
-        private router: Router,
-        private cd: ChangeDetectorRef
-    ) {
-        this.refreshSubscription = refreshService.refreshObservable$.subscribe(
-            () => {
-                this.service.fetchVmInfo(VM_PROPERTIES_TO_EXTRACT);
-            }
-        );
-        this.vmInfoSubscription = this.service.vmInfo$.subscribe(
-            (results: VirtualMachine) => {
-                this.activeVm = results;
-                this.cd.detectChanges();
-            },
-            (err) => {
-                this.appAlertService.showError(err);
-                console.error('data fetch failed!', err);
-            }
-        );
+  constructor(
+    public gs: GlobalsService,
+    private service: DataPropertyService,
+    private refreshService: RefreshService,
+    private appAlertService: AppAlertService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private cd: ChangeDetectorRef
+  ) {
+    this.refreshSubscription = refreshService.refreshObservable$.subscribe(
+      () => {
+        this.service.fetchVmInfo(VM_PROPERTIES_TO_EXTRACT);
+      }
+    );
+    this.vmInfoSubscription = this.service.vmInfo$.subscribe(
+      (results: VirtualMachine) => {
+        this.activeVm = results;
+        this.cd.detectChanges();
+      },
+      (err) => {
+        this.appAlertService.showError(err);
+        console.error('data fetch failed!', err);
+      }
+    );
 
-        // set up objectId in data property service
-        const paramsIntervalTimer = setInterval(() => {
-            if (this.route && this.route.params) {
-                this.route.params.subscribe((params: any) => {
-                    this.service.setObjectId(params.id);
-                    this.service.fetchVmInfo(VM_PROPERTIES_TO_EXTRACT, this.stubType);
-                });
-                clearInterval(paramsIntervalTimer);
-            }
-        }, 5);
+    // set up objectId in data property service
+    const paramsIntervalTimer = setInterval(() => {
+      if (this.route && this.route.params) {
+        this.route.params.subscribe((params: any) => {
+          this.service.setObjectId(params.id);
+          this.service.fetchVmInfo(VM_PROPERTIES_TO_EXTRACT, this.stubType);
+        });
+        clearInterval(paramsIntervalTimer);
+      }
+    }, 5);
+  }
+
+  ngOnDestroy() {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
     }
 
-    ngOnDestroy() {
-        if (this.refreshSubscription) {
-            this.refreshSubscription.unsubscribe();
-        }
-
-        if (this.vmInfoSubscription) {
-            this.vmInfoSubscription.unsubscribe();
-        }
+    if (this.vmInfoSubscription) {
+      this.vmInfoSubscription.unsubscribe();
     }
+  }
 
-    toggleVmType() {
-        this.stubType = this.stubType === 'vch' ? 'container' : 'vch';
-        this.service.fetchVmInfo(VM_PROPERTIES_TO_EXTRACT, this.stubType);
-    }
+  toggleVmType() {
+    this.stubType = this.stubType === 'vch' ? 'container' : 'vch';
+    this.service.fetchVmInfo(VM_PROPERTIES_TO_EXTRACT, this.stubType);
+  }
 }

@@ -25,108 +25,108 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
 import {
-    CONTAINER_VM_IMAGE_NAME_KEY,
-    CONTAINER_VM_PORTMAPPING_KEY,
-    CONTAINER_PRETTY_NAME_KEY,
-    VCH_VM_CLIENT_IP_KEY,
-    DOCKER_PERSONALITY_ARGS_KEY,
-    VCH_VM_LOG_PORT
-} from '../vm.constants';
-import { VirtualMachine } from '../vm.interface';
+  CONTAINER_VM_IMAGE_NAME_KEY,
+  CONTAINER_VM_PORTMAPPING_KEY,
+  CONTAINER_PRETTY_NAME_KEY,
+  VCH_VM_CLIENT_IP_KEY,
+  DOCKER_PERSONALITY_ARGS_KEY,
+  VCH_VM_LOG_PORT
+} from '../shared/constants/vm.constants';
+import { VirtualMachine } from '../interfaces/vm.interface';
 import { getVmStubData } from './mocks/vmStub';
 
 @Injectable()
 export class DataPropertyService {
-    private _objectId: string;
-    private vmInfoSource: Subject<VirtualMachine> = new Subject<VirtualMachine>();
-    private vicObjectSource: Subject<any> = new Subject<any>();
-    public vmInfo$: Observable<VirtualMachine> = this.vmInfoSource.asObservable();
-    public vicObject$: Observable<any> = this.vicObjectSource.asObservable();
+  private _objectId: string;
+  private vmInfoSource: Subject<VirtualMachine> = new Subject<VirtualMachine>();
+  private vicObjectSource: Subject<any> = new Subject<any>();
+  public vmInfo$: Observable<VirtualMachine> = this.vmInfoSource.asObservable();
+  public vicObject$: Observable<any> = this.vicObjectSource.asObservable();
 
-    constructor(
-        private http: Http,
-        private globalsService: GlobalsService
-    ) { }
+  constructor(
+    private http: Http,
+    private globalsService: GlobalsService
+  ) { }
 
-    setObjectId(id: string) {
-        this._objectId = id;
+  setObjectId(id: string) {
+    this._objectId = id;
+  }
+
+  /**
+   * Builds data URL for vSphere Client's REST API
+   * @param   id
+   * @param   props : properties to extract
+   * @return  data URL
+   */
+  buildDataUrl(id: string = this._objectId, props: string[]): string {
+    const namespace = window[APP_CONFIG.bundleName];
+    if (namespace) {
+      return namespace.buildDataUrl(id, props);
+    }
+    return null;
+  }
+
+  /**
+   * Calls the vSphere Client's API endpoint to retrieve VM information,
+   * and emits the results to Observable
+   * @param props
+   * @param stubVmType? : stub type (vch or container)
+   */
+  fetchVmInfo(props: string[], stubVmType?: string): void {
+    if (!this.globalsService.isPluginMode()) {
+      this.vmInfoSource.next(<VirtualMachine>getVmStubData(stubVmType));
     }
 
-    /**
-     * Builds data URL for vSphere Client's REST API
-     * @param   id
-     * @param   props : properties to extract
-     * @return  data URL
-     */
-    buildDataUrl(id: string = this._objectId, props: string[]): string {
-        const namespace = window[APP_CONFIG.bundleName];
-        if (namespace) {
-            return namespace.buildDataUrl(id, props);
-        }
-        return null;
-    }
+    this.http.get(this.buildDataUrl(this._objectId, props))
+      .map(res => {
+        const parsed = res.json();
+        return parsed;
+      })
+      .map(processPowerState)
+      .map(processVmType)
+      .catch((err: Response | any) => {
+        return Observable.throw(err);
+      })
+      .subscribe(
+      res => {
+        this.vmInfoSource.next(<VirtualMachine>res);
+      }, err => {
+        this.vmInfoSource.error(err);
+      }
+      );
+  }
 
-    /**
-     * Calls the vSphere Client's API endpoint to retrieve VM information,
-     * and emits the results to Observable
-     * @param props
-     * @param stubVmType? : stub type (vch or container)
-     */
-    fetchVmInfo(props: string[], stubVmType?: string): void {
-        if (!this.globalsService.isPluginMode()) {
-            this.vmInfoSource.next(<VirtualMachine>getVmStubData(stubVmType));
-        }
-
-        this.http.get(this.buildDataUrl(this._objectId, props))
-            .map(res => {
-                const parsed = res.json();
-                return parsed;
-            })
-            .map(processPowerState)
-            .map(processVmType)
-            .catch((err: Response | any) => {
-                return Observable.throw(err);
-            })
-            .subscribe(
-            res => {
-                this.vmInfoSource.next(<VirtualMachine>res);
-            }, err => {
-                this.vmInfoSource.error(err);
-            }
-            );
+  /**
+   * Calls the vSphere Client's API endpoint to retrieve VIC Root information,
+   * and emits the results to Observable
+   * @param props
+   */
+  fetchRootInfo(props: string[]): void {
+    if (!this.globalsService.isPluginMode()) {
+      this.vicObjectSource.next({
+        uiVersion: '3.14159265',
+        vchVmsLen: 1000,
+        containerVmsLen: 50000
+      });
+      return;
     }
-
-    /**
-     * Calls the vSphere Client's API endpoint to retrieve VIC Root information,
-     * and emits the results to Observable
-     * @param props
-     */
-    fetchRootInfo(props: string[]): void {
-        if (!this.globalsService.isPluginMode()) {
-            this.vicObjectSource.next({
-                uiVersion: '3.14159265',
-                vchVmsLen: 1000,
-                containerVmsLen: 50000
-            });
-            return;
-        }
-        this.http.get(
-            this.buildDataUrl(
-                'urn:vic:vic:Root:vic%252Fvic-root',
-                props)
-        )
-            .map(res => res.json())
-            .catch((err: Response | any) => {
-                return Observable.throw(err);
-            })
-            .subscribe(
-            res => {
-                this.vicObjectSource.next(res);
-            }, err => {
-                this.vicObjectSource.next(err);
-            }
-            );
-    }
+    this.http.get(
+      this.buildDataUrl(
+        'urn:vic:vic:Root:vic%252Fvic-root',
+        props)
+    )
+      .map(res => res.json())
+      .catch((err: Response | any) => {
+        return Observable.throw(err);
+      })
+      .subscribe(
+      res => {
+        this.vicObjectSource.next(res);
+      }, err => {
+        this.vicObjectSource.next(err);
+      }
+      );
+  }
 }
 
 /**
@@ -135,68 +135,68 @@ export class DataPropertyService {
  * @param obj : raw json object
  */
 function processVmType(obj: any): any {
-    if (!obj) {
-        return {};
+  if (!obj) {
+    return {};
+  }
+
+  const extConfig: any[] = obj['config.extraConfig'];
+  delete obj['config.extraConfig'];
+
+  // initial values for dockerLog and dockerEndpoint
+  if (obj.isVCH) {
+    obj.dockerEndpoint = obj.dockerLog = '-';
+    if (obj.powerState === 'poweredOff') {
+      return obj;
     }
 
-    const extConfig: any[] = obj['config.extraConfig'];
-    delete obj['config.extraConfig'];
+    let isUsingTls = true;
 
-    // initial values for dockerLog and dockerEndpoint
-    if (obj.isVCH) {
-        obj.dockerEndpoint = obj.dockerLog = '-';
-        if (obj.powerState === 'poweredOff') {
-            return obj;
-        }
+    for (const { key, value } of extConfig) {
+      if (key === VCH_VM_CLIENT_IP_KEY) {
+        const base64Decoded: string = atob(value);
+        const decIpLength = base64Decoded.length;
+        // if the ip is in ipv6 format, the decoded string is
+        // 16 bytes long
+        const decIpIdx = decIpLength === 16 ? decIpLength - 4 : 0;
+        const ipv4: string = base64Decoded.charCodeAt(decIpIdx) + '.'
+          + base64Decoded.charCodeAt(decIpIdx + 1) + '.'
+          + base64Decoded.charCodeAt(decIpIdx + 2) + '.'
+          + base64Decoded.charCodeAt(decIpIdx + 3);
+        obj.dockerEndpoint = `DOCKER_HOST=tcp://${ipv4}`;
+        obj.dockerLog = `https://${ipv4}${VCH_VM_LOG_PORT}`;
+        continue;
+      }
 
-        let isUsingTls = true;
-
-        for (const { key, value } of extConfig) {
-            if (key === VCH_VM_CLIENT_IP_KEY) {
-                const base64Decoded: string = atob(value);
-                const decIpLength = base64Decoded.length;
-                // if the ip is in ipv6 format, the decoded string is
-                // 16 bytes long
-                const decIpIdx = decIpLength === 16 ? decIpLength - 4 : 0;
-                const ipv4: string = base64Decoded.charCodeAt(decIpIdx) + '.'
-                    + base64Decoded.charCodeAt(decIpIdx + 1) + '.'
-                    + base64Decoded.charCodeAt(decIpIdx + 2) + '.'
-                    + base64Decoded.charCodeAt(decIpIdx + 3);
-                obj.dockerEndpoint = `DOCKER_HOST=tcp://${ipv4}`;
-                obj.dockerLog = `https://${ipv4}${VCH_VM_LOG_PORT}`;
-                continue;
-            }
-
-            if (key === DOCKER_PERSONALITY_ARGS_KEY) {
-                isUsingTls = value.indexOf('2376') > -1;
-                continue;
-            }
-        }
-
-        // since the order in which list items are processed is not much guaranteed,
-        // we set the port for Docker API endpoint at the end of the loop
-        obj.dockerEndpoint += isUsingTls ? ':2376' : ':2375';
-
-    } else {
-        for (const { key, value } of extConfig) {
-            if (key === CONTAINER_VM_IMAGE_NAME_KEY) {
-                obj.image_name = value;
-                continue;
-            }
-
-            if (key === CONTAINER_PRETTY_NAME_KEY) {
-                obj.container_name = value;
-                continue;
-            }
-
-            if (key === CONTAINER_VM_PORTMAPPING_KEY) {
-                obj.portmapping = value;
-                continue;
-            }
-        }
+      if (key === DOCKER_PERSONALITY_ARGS_KEY) {
+        isUsingTls = value.indexOf('2376') > -1;
+        continue;
+      }
     }
 
-    return obj;
+    // since the order in which list items are processed is not much guaranteed,
+    // we set the port for Docker API endpoint at the end of the loop
+    obj.dockerEndpoint += isUsingTls ? ':2376' : ':2375';
+
+  } else {
+    for (const { key, value } of extConfig) {
+      if (key === CONTAINER_VM_IMAGE_NAME_KEY) {
+        obj.image_name = value;
+        continue;
+      }
+
+      if (key === CONTAINER_PRETTY_NAME_KEY) {
+        obj.container_name = value;
+        continue;
+      }
+
+      if (key === CONTAINER_VM_PORTMAPPING_KEY) {
+        obj.portmapping = value;
+        continue;
+      }
+    }
+  }
+
+  return obj;
 }
 
 /**
@@ -205,7 +205,7 @@ function processVmType(obj: any): any {
  * @param obj : raw json object
  */
 function processPowerState(obj: any): any {
-    obj.powerState = obj['summary.runtime.powerState'];
-    delete obj['summary.runtime.powerState'];
-    return obj;
+  obj.powerState = obj['summary.runtime.powerState'];
+  delete obj['summary.runtime.powerState'];
+  return obj;
 }

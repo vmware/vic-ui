@@ -18,7 +18,7 @@ import { I18nService } from '../../shared/i18n.service';
 import { GlobalsService } from '../../shared/globals.service';
 
 import { Component, OnInit, Input } from '@angular/core';
-import { VirtualMachine } from '../../vm.interface';
+import { VirtualMachine } from '../../interfaces/vm.interface';
 
 import {
     DEFAULT_CONTAINER_NAME_LABEL,
