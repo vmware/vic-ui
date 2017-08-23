@@ -17,11 +17,9 @@ limitations under the License.
 */
 package com.vmware.vic;
 
-import java.lang.reflect.Array;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -137,173 +135,166 @@ public class PropFetcher implements ClientSessionEndListener {
         List<PropertyValue> pvList = new ArrayList<PropertyValue>();
         ResultItem resultItem = new ResultItem();
 
-        String serviceGuid = null;
         ServerInfo[] sInfos = _userSessionService.getUserSession().serversInfo;
+        // get VMs for every linked VC
         for (ServerInfo sInfo : sInfos) {
             if (sInfo.serviceGuid != null) {
-                // TODO: 
-                serviceGuid = sInfo.serviceGuid;
-                break;
-            }
-        }
+                String serviceGuid = sInfo.serviceGuid;
+                ServiceContent service = getServiceContent(serviceGuid);
+                if (service == null) {
+                    _logger.error("Failed to retrieve ServiceContent!");
+                    return null;
+                }
 
-        ServiceContent service = getServiceContent(serviceGuid);
-        if (service == null) {
-            _logger.error("Failed to retrieve ServiceContent!");
-            return null;
-        }
+                ManagedObjectReference viewMgrRef = service.getViewManager();
+                List<String> vmList = new ArrayList<String>();
+                vmList.add(VsphereObjects.VirtualMachine);
+                try {
+                    ManagedObjectReference cViewRef = _vimPort.createContainerView(
+                        viewMgrRef,
+                        service.getRootFolder(),
+                        vmList,
+                        true);
 
-        ManagedObjectReference viewMgrRef = service.getViewManager();
-        List<String> vmList = new ArrayList<String>();
-        vmList.add(VsphereObjects.VirtualMachine);
-        try {
-            ManagedObjectReference cViewRef = _vimPort.createContainerView(
-                viewMgrRef,
-                service.getRootFolder(),
-                vmList,
-                true);
-            
-            PropertySpec propertySpec = new PropertySpec();
-            propertySpec.setType(VsphereObjects.VirtualMachine);
-            List<String> pSpecPathSet = propertySpec.getPathSet();
-            for (String vmProp : VM_PROPERTIES_TO_FETCH) {
-                pSpecPathSet.add(vmProp);
-            }
+                    PropertySpec propertySpec = new PropertySpec();
+                    propertySpec.setType(VsphereObjects.VirtualMachine);
+                    List<String> pSpecPathSet = propertySpec.getPathSet();
+                    for (String vmProp : VM_PROPERTIES_TO_FETCH) {
+                        pSpecPathSet.add(vmProp);
+                    }
 
-            // TODO: move "ResourcePool" to the constants file
-            PropertySpec propertySpecRp = new PropertySpec();
-            propertySpecRp.setType(VsphereObjects.ResourcePool);
-            List<String> pSpecPathSetRp = propertySpecRp.getPathSet();
-            pSpecPathSetRp.add(VsphereObjects.NamePropertyKey);
-            pSpecPathSetRp.add(VsphereObjects.VmPropertyValueKey);
+                    PropertySpec propertySpecRp = new PropertySpec();
+                    propertySpecRp.setType(VsphereObjects.ResourcePool);
+                    List<String> pSpecPathSetRp = propertySpecRp.getPathSet();
+                    pSpecPathSetRp.add(VsphereObjects.NamePropertyKey);
+                    pSpecPathSetRp.add(VsphereObjects.VmPropertyValueKey);
 
-            // set the root traversal spec
-            TraversalSpec tSpec = new TraversalSpec();
-            tSpec.setName("traverseEntities");
-            tSpec.setPath("view");
-            tSpec.setSkip(false);
-            tSpec.setType("ContainerView");
+                    // set the root traversal spec
+                    TraversalSpec tSpec = new TraversalSpec();
+                    tSpec.setName("traverseEntities");
+                    tSpec.setPath("view");
+                    tSpec.setSkip(false);
+                    tSpec.setType("ContainerView");
 
-            // add traversal spec for VirtualMachine->ResourcePool
-            TraversalSpec vmRpTraversalSpec = new TraversalSpec();
-            vmRpTraversalSpec.setName("traverseResourcePool");
-            vmRpTraversalSpec.setPath("resourcePool");
-            vmRpTraversalSpec.setSkip(false);
-            vmRpTraversalSpec.setType(VsphereObjects.VirtualMachine);
-            tSpec.getSelectSet().add(vmRpTraversalSpec);
+                    // add traversal spec for VirtualMachine->ResourcePool
+                    TraversalSpec vmRpTraversalSpec = new TraversalSpec();
+                    vmRpTraversalSpec.setName("traverseResourcePool");
+                    vmRpTraversalSpec.setPath("resourcePool");
+                    vmRpTraversalSpec.setSkip(false);
+                    vmRpTraversalSpec.setType(VsphereObjects.VirtualMachine);
+                    tSpec.getSelectSet().add(vmRpTraversalSpec);
 
-            TraversalSpec rpVmTraversalSpec = new TraversalSpec();
-            rpVmTraversalSpec.setName("traversalRpVm");
-            rpVmTraversalSpec.setPath(VsphereObjects.VmPropertyValueKey);
-            rpVmTraversalSpec.setSkip(false);
-            rpVmTraversalSpec.setType(VsphereObjects.ResourcePool);
-            vmRpTraversalSpec.getSelectSet().add(rpVmTraversalSpec);
+                    TraversalSpec rpVmTraversalSpec = new TraversalSpec();
+                    rpVmTraversalSpec.setName("traversalRpVm");
+                    rpVmTraversalSpec.setPath(VsphereObjects.VmPropertyValueKey);
+                    rpVmTraversalSpec.setSkip(false);
+                    rpVmTraversalSpec.setType(VsphereObjects.ResourcePool);
+                    vmRpTraversalSpec.getSelectSet().add(rpVmTraversalSpec);
 
-            // set objectspec and attach the root traversal spec
-            ObjectSpec objectSpec = new ObjectSpec();
-            objectSpec.setObj(cViewRef);
-            objectSpec.setSkip(Boolean.TRUE);
-            objectSpec.getSelectSet().add(tSpec);
+                    // set objectspec and attach the root traversal spec
+                    ObjectSpec objectSpec = new ObjectSpec();
+                    objectSpec.setObj(cViewRef);
+                    objectSpec.setSkip(Boolean.TRUE);
+                    objectSpec.getSelectSet().add(tSpec);
 
-            PropertyFilterSpec propertyFilterSpec = new PropertyFilterSpec();
-            propertyFilterSpec.getPropSet().add(propertySpec);
-            propertyFilterSpec.getPropSet().add(propertySpecRp);
-            propertyFilterSpec.getObjectSet().add(objectSpec);
+                    PropertyFilterSpec propertyFilterSpec = new PropertyFilterSpec();
+                    propertyFilterSpec.getPropSet().add(propertySpec);
+                    propertyFilterSpec.getPropSet().add(propertySpecRp);
+                    propertyFilterSpec.getObjectSet().add(objectSpec);
 
-            List<PropertyFilterSpec> propertyFilterSpecs = new ArrayList<PropertyFilterSpec>();
-            propertyFilterSpecs.add(propertyFilterSpec);
-            RetrieveOptions ro = new RetrieveOptions();
+                    List<PropertyFilterSpec> propertyFilterSpecs = new ArrayList<PropertyFilterSpec>();
+                    propertyFilterSpecs.add(propertyFilterSpec);
+                    RetrieveOptions ro = new RetrieveOptions();
 
-            RetrieveResult props = _vimPort.retrievePropertiesEx(
-                    service.getPropertyCollector(),
-                    propertyFilterSpecs,
-                    ro);
-            if (props != null) {
-                // hashmap to store Container VM's
-                // MOR value: VCH VirtualApp's name mapping
-                Map<String, String> vcValueRpNameMap = new HashMap<String, String>();
+                    RetrieveResult props = _vimPort.retrievePropertiesEx(
+                            service.getPropertyCollector(),
+                            propertyFilterSpecs,
+                            ro);
+                    if (props != null) {
+                        // hashmap to store Container VM's
+                        // MOR value: VCH VirtualApp's name mapping
+                        Map<String, String> vcValueRpNameMap = new HashMap<String, String>();
 
-                for (ObjectContent objC : props.getObjects()) {
-                    List<DynamicProperty> dpList = objC.getPropSet();
-                    String objType = objC.getObj().getType();
-                    boolean isVicVm = false;
+                        for (ObjectContent objC : props.getObjects()) {
+                            List<DynamicProperty> dpList = objC.getPropSet();
+                            String objType = objC.getObj().getType();
+                            boolean isVicVm = false;
 
-                    if (objType.equals(VsphereObjects.VirtualApp) ||
-                            objType.equals(VsphereObjects.ResourcePool)) {
-                        // process ResourcePool to populate vcValueRpNameMap
-                        vcValueRpNameMap = getVcMorValueRpNameMap(
-                                dpList,
-                                vcValueRpNameMap);
-                        continue;
+                            if (objType.equals(VsphereObjects.VirtualApp) ||
+                                    objType.equals(VsphereObjects.ResourcePool)) {
+                                // process ResourcePool to populate vcValueRpNameMap
+                                vcValueRpNameMap = getVcMorValueRpNameMap(
+                                        dpList,
+                                        vcValueRpNameMap);
+                                continue;
 
-                    } else if (objType.equals(VsphereObjects.VirtualMachine)) {
-                        // process VirtualMachine by looking for
-                        // config.guestFullName to determine if the VM is
-                        // the desired VIC VM. if so, then set flag isVicVm to
-                        // true such that this VirtualMachine object will be
-                        // processed to be returned in the ResultItem object
-                        for (DynamicProperty dp : dpList) {
-                            if (dp.getName().equals(
-                                    BaseVm.Config.VM_GUESTFULLNAME)) {
-                                String guestName = ((String)dp.getVal());
-                                if (isVch) {
-                                    isVicVm = guestName.contains(
-                                            VM_GUESTNAME_VCH_IDENTIFIER);
-                                } else {
-                                    for (String contId :
-                                        VM_GUESTNAME_CONTAINER_IDENTIFIER) {
-                                        if (guestName.contains(contId)) {
-                                            isVicVm = true;
-                                            break;
+                            } else if (objType.equals(VsphereObjects.VirtualMachine)) {
+                                // process VirtualMachine by looking for
+                                // config.guestFullName to determine if the VM is
+                                // the desired VIC VM. if so, then set flag isVicVm to
+                                // true such that this VirtualMachine object will be
+                                // processed to be returned in the ResultItem object
+                                for (DynamicProperty dp : dpList) {
+                                    if (dp.getName().equals(
+                                            BaseVm.Config.VM_GUESTFULLNAME)) {
+                                        String guestName = ((String)dp.getVal());
+                                        if (isVch) {
+                                            isVicVm = guestName.contains(
+                                                    VM_GUESTNAME_VCH_IDENTIFIER);
+                                        } else {
+                                            for (String contId :
+                                                VM_GUESTNAME_CONTAINER_IDENTIFIER) {
+                                                if (guestName.contains(contId)) {
+                                                    isVicVm = true;
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
+
+                            // if this ObjectContent is indeed either a VCH VM or a
+                            // Container VM then create an instance of its class and
+                            // add it to the array list
+                            if (isVicVm) {
+                                PropertyValue pv = new PropertyValue();
+                                pv.propertyName = VsphereObjects.VmPropertyValueKey;
+                                if (isVch) {
+                                    pv.value = new VirtualContainerHostVm(
+                                            objC, serviceGuid);
+                                } else {
+                                    pv.value = new ContainerVm(
+                                            objC, serviceGuid);
+                                }
+                                pvList.add(pv);
+                                continue;
+                            }
+                        }
+
+                        // if requesting Container VMs, get the name of its
+                        // parent ResourcePool or VirtualApp for each
+                        if (!isVch) {
+                            for (PropertyValue pv : pvList) {
+                                // for each container vm, get the parent object's
+                                // name from vcValueRpNameMap
+                                ContainerVm cvm = (ContainerVm)pv.value;
+                                String cvmId = cvm.getMorValue();
+                                String nameOfParent = vcValueRpNameMap.get(cvmId);
+                                cvm.setParentName(nameOfParent);
+                            }
                         }
                     }
-
-                    // if this ObjectContent is indeed either a VCH VM or a
-                    // Container VM then create an instance of its class and
-                    // add it to the array list
-                    if (isVicVm) {
-                        PropertyValue pv = new PropertyValue();
-                        pv.propertyName = VsphereObjects.VmPropertyValueKey;
-                        if (isVch) {
-                            pv.value = new VirtualContainerHostVm(
-                                    objC, serviceGuid);
-                        } else {
-                            pv.value = new ContainerVm(
-                                    objC, serviceGuid);
-                        }
-                        pvList.add(pv);
-                        continue;
-                    }
-                }
-
-                // if requesting Container VMs, get the name of its
-                // parent ResourcePool or VirtualApp for each
-                if (!isVch) {
-                    for (PropertyValue pv : pvList) {
-                        // for each container vm, get the parent object's
-                        // name from vcValueRpNameMap
-                        ContainerVm cvm = (ContainerVm)pv.value;
-                        String cvmId = cvm.getMorValue();
-                        String nameOfParent = vcValueRpNameMap.get(cvmId);
-                        cvm.setParentName(nameOfParent);
-                    }
+                } catch (InvalidPropertyFaultMsg e) {
+                    _logger.error(e);
+                } catch (RuntimeFaultFaultMsg e) {
+                    _logger.error(e);
                 }
             }
-
-            resultItem.properties = pvList.toArray(new PropertyValue[]{});
-            return resultItem;
-
-        } catch (InvalidPropertyFaultMsg e) {
-            _logger.error(e);
-        } catch (RuntimeFaultFaultMsg e) {
-            _logger.error(e);
         }
-        
-        return null;
+
+        resultItem.properties = pvList.toArray(new PropertyValue[]{});
+        return resultItem;
     }
 
 	/**
