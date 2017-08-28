@@ -291,10 +291,13 @@
                       <label *ngIf="i === 0">Client CAs</label>
 
                     </div>
-                    <div class="col-xs-4">
+                    <div class="col-xs-4 text-truncate">
 
-                      <input id="tls-ca"
-                             class="form-control"
+                      <span class="text-muted" *ngIf="!tlsCaContents[i]?.name">Select certificate pem file</span>
+                      <span *ngIf="tlsCaContents[i]?.name">{{ tlsCaContents[i]?.name }}</span>
+
+                      <input id="tls-ca-{{i}}"
+                             class="hidden-xs-up"
                              type="file"
                              formControlName="tlsCa"
                              (change)="addFileContent($event, 'tlsCas', i)">
@@ -302,11 +305,15 @@
                     </div>
                     <div class="col-xs px-0 add-remove-actions">
 
-                      <clr-icon class="is-solid"
+                      <label class="btn btn-link my-0" for="tls-ca-{{i}}">
+                        Select
+                      </label>
+
+                      <clr-icon class="is-solid mt-0"
                                 shape="times-circle"
                                 (click)="removeFormArrayEntry('tlsCas', i)">
                       </clr-icon>
-                      <clr-icon class="is-solid"
+                      <clr-icon class="is-solid mt-0"
                                 shape="plus-circle"
                                 (click)="addNewFormArrayEntry('tlsCas')"
                                 *ngIf="i === form.controls.tlsCas.controls.length - 1">
@@ -460,21 +467,29 @@
             <div formArrayName="registryCas" *ngFor="let registryCa of form.controls.registryCas.controls; let i=index">
 
               <div [formGroupName]="i" class="form-group row mb-0">
-                <div class="col-xs-5">
+                <div class="col-xs-5 text-truncate">
 
-                  <input class="form-control"
+                  <span class="text-muted" *ngIf="!registryCaContents[i]?.name">Select certificate pem file</span>
+                  <span *ngIf="registryCaContents[i]?.name">{{ registryCaContents[i]?.name }}</span>
+
+                  <input id="registry-ca-{{i}}"
+                         class="form-control hidden-xs-up"
                          type="file"
                          formControlName="registryCa"
                          (change)="addFileContent($event, 'registryCas', i)">
 
                 </div>
-                <div class="col-xs-1 px-0 add-remove-actions">
+                <div class="col-xs px-0 add-remove-actions">
 
-                  <clr-icon class="is-solid"
+                  <label class="btn btn-link my-0" for="registry-ca-{{i}}">
+                    Select
+                  </label>
+
+                  <clr-icon class="is-solid mt-0"
                             shape="times-circle"
                             (click)="removeFormArrayEntry('registryCas', i)">
                   </clr-icon>
-                  <clr-icon class="is-solid"
+                  <clr-icon class="is-solid mt-0"
                             shape="plus-circle"
                             (click)="addNewFormArrayEntry('registryCas')"
                             *ngIf="i === form.controls.registryCas.controls.length - 1">

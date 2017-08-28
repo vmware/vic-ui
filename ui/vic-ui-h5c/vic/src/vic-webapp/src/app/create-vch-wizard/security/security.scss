@@ -1,9 +1,22 @@
+@import "../../../../node_modules/clarity-ui/src/color/utils/_colors.clarity.scss";
+
 :host ::ng-deep clr-signpost .signpost-action {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.add-remove-actions clr-icon {
-  margin-top: 9px;
-  cursor: pointer;
+.add-remove-actions {
+
+  clr-icon {
+    margin-top: 9px;
+    cursor: pointer;
+  }
+
+  .btn {
+    color: $clr-action-blue-dark-midtone;
+
+    &:hover {
+      color: $clr-action-blue-dark;
+    }
+  }
 }
