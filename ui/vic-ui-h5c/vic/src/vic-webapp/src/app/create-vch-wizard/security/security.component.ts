@@ -32,9 +32,9 @@ export class SecurityComponent {
     public signpostOpenState = false;
     public fileReaderError: string = null;
     // internal array that keeps track of TLS CA files' name and content
-    private tlsCaContents: any[] = [];
+    public tlsCaContents: any[] = [];
     // internal array that keeps track of registry CA files' name and content
-    private registryCaContents: any[] = [];
+    public registryCaContents: any[] = [];
     private _isSetup = false;
     @Input() vchName: string;
 
