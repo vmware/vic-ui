@@ -13,12 +13,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import { Http, URLSearchParams } from '@angular/http';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { supportedCharsPattern } from '../../shared/utils/regex';
 
 @Component({
     selector: 'vic-vch-creation-name',
@@ -27,11 +27,10 @@ import { CreateVchWizardService } from '../create-vch-wizard.service';
 })
 export class VchCreationWizardNameComponent implements OnInit {
     public form: FormGroup;
-    public formErrMessage = 'Name cannot be empty!';
+    public formErrMessage = '';
 
     constructor(
         private formBuilder: FormBuilder,
-        private http: Http,
         private createWzService: CreateVchWizardService
     ) {
         // create a FormGroup instance for the 'name' field with
@@ -43,7 +42,7 @@ export class VchCreationWizardNameComponent implements OnInit {
                 [
                     Validators.required,
                     Validators.maxLength(80),
-                    Validators.pattern(new RegExp(/^[\w-]+$/))
+                    Validators.pattern(supportedCharsPattern)
                 ]
             ]
         });
@@ -55,28 +54,7 @@ export class VchCreationWizardNameComponent implements OnInit {
         // TODO: update value & validity only if there is a value already
     }
 
-    onPageLoad() {
-        // handle synchronous validations
-        this.form.get('name').statusChanges
-            .debounce(() => Observable.timer(250))
-            .subscribe(v => {
-                const nameFormControl = this.form.get('name');
-                if (nameFormControl.hasError('required')) {
-                    this.formErrMessage = 'Name cannot be empty!';
-                    return;
-                }
-
-                if (nameFormControl.hasError('maxlength')) {
-                    this.formErrMessage = 'Name cannot be more than 80 characters long!';
-                    return;
-                }
-
-                if (nameFormControl.hasError('pattern')) {
-                    this.formErrMessage = 'Name contains characters that are not allowed!';
-                    return;
-                }
-            });
-    }
+    onPageLoad() { }
 
     /**
      * Async validation for the Name section
@@ -87,17 +65,13 @@ export class VchCreationWizardNameComponent implements OnInit {
      */
     onCommit(): Observable<any> {
         // TODO: unit test this
-        return this.createWzService.checkVchNameUniqueness(
-            this.form.get('name').value)
+        return this.createWzService.checkVchNameUniqueness(this.form.get('name').value)
             .switchMap(isUnique => {
                 if (!isUnique) {
                     this.form.get('name').setErrors({
                         resourcePoolExists: true
                     });
-                    this.formErrMessage =
-                        'There is already a VirtualApp or ResourcePool that exists with the same name!';
-
-                    return Observable.throw([this.formErrMessage]);
+                    return Observable.throw(null);
                 }
                 return Observable.of({ name: this.form.get('name').value });
             });

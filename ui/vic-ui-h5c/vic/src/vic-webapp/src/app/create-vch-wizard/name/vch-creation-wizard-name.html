@@ -27,7 +27,22 @@
                  type="text"
                  placeholder="virtual-container-host"
                  formControlName="name">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('name').hasError('required')">
+            Name cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('name').hasError('maxLength')">
+            Name cannot be more than 80 characters long
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('name').hasError('pattern')">
+            Name contains characters that are not allowed
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('name').hasError('resourcePoolExists')">
+            There is already a VirtualApp or ResourcePool that exists with the same name
+          </span>
 
         </label>
 

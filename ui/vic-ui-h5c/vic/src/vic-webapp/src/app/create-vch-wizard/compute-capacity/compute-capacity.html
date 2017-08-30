@@ -76,7 +76,22 @@
                  class="form-control"
                  type="text"
                  formControlName="cpuLimit">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuLimit').hasError('required')">
+            CPU limit cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuLimit').hasError('pattern')">
+            CPU limit should either be 'Unlimited' or a number
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuLimit').hasError('min')">
+            CPU limit should be bigger than 0
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuLimit').hasError('max')">
+            CPU limit cannot be bigger than {{ resourceLimits['cpu']['maxUsage'] }} MHz
+          </span>
 
           <small class="text-muted">
             Max: {{ resourceLimits.cpu.maxUsage || '-' }} MHz, Min: {{ resourceLimits.cpu.minUsage || '-' }} MHz
@@ -110,7 +125,22 @@
                  class="form-control"
                  type="text"
                  formControlName="memoryLimit">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryLimit').hasError('required')">
+            Memory limit cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryLimit').hasError('pattern')">
+            Memory limit should either be 'Unlimited' or a number
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryLimit').hasError('min')">
+            Memory limit should be bigger than 0
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryLimit').hasError('max')">
+            Memory limit cannot be bigger than {{ resourceLimits['memory']['maxUsage'] }} MB
+          </span>
 
           <small class="text-muted">
             Max: {{ resourceLimits.memory.maxUsage || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB
@@ -188,7 +218,22 @@
                  class="form-control"
                  type="text"
                  formControlName="cpuReservation">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuReservation').hasError('required')">
+            CPU reservation cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuReservation').hasError('pattern')">
+            CPU reservation should be numeric
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuReservation').hasError('min')">
+            CPU reservation should be bigger than 0
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('cpuReservation').hasError('max')">
+            CPU reservation cannot be bigger than {{ resourceLimits['cpu']['unreservedForPool'] }} MHz
+          </span>
 
           <small class="text-muted">
             Max: {{ resourceLimits.cpu.unreservedForPool || '-' }} MHz, Min: {{ resourceLimits.cpu.minUsage || '-' }} MHz
@@ -226,7 +271,6 @@
     <div class="form-group row">
       <div class="col-xs-4">
 
-
         <label for="memory-reservation-selector">
           Memory reservation
         </label>
@@ -244,7 +288,22 @@
                  class="form-control"
                  type="text"
                  formControlName="memoryReservation">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryReservation').hasError('required')">
+            Memory limit cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryReservation').hasError('pattern')">
+            Memory limit should be numeric
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryReservation').hasError('min')">
+            Memory limit should be bigger than 0
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('memoryReservation').hasError('max')">
+            Memory limit cannot be bigger than {{ resourceLimits['memory']['unreservedForPool'] }} MB
+          </span>
 
           <small class="text-muted">
             Max: {{ resourceLimits.memory.unreservedForPool || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB
@@ -303,7 +362,18 @@
                  class="form-control"
                  type="text"
                  formControlName="endpointCpu">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('endpointCpu').hasError('required')">
+            CPU limit cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('endpointCpu').hasError('pattern')">
+            CPU limit should be numeric
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('endpointCpu').hasError('min')">
+            CPU limit should be bigger than 0
+          </span>
 
         </label>
 
@@ -331,7 +401,22 @@
                  class="form-control"
                  type="text"
                  formControlName="endpointMemory">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('endpointMemory').hasError('required')">
+            Memory limit cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('endpointMemory').hasError('pattern')">
+            Memory limit should be numeric
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('endpointMemory').hasError('min')">
+            Memory limit should be bigger than 0
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('endpointMemory').hasError('max')">
+            Memory limit cannot be bigger than {{ resourceLimits['memory']['maxUsage'] }} MB
+          </span>
 
           <small class="text-muted">
             Max: {{ resourceLimits.memory.maxUsage || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB

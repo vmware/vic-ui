@@ -13,17 +13,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter } from '@angular/core';
-import {
-    FormBuilder,
-    FormGroup,
-    FormArray,
-    Validators
-} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import { Http, URLSearchParams } from '@angular/http';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { supportedCharsPattern, ipPattern} from '../../shared/utils/regex';
 
 @Component({
     selector: 'vic-vch-creation-networks',
@@ -35,25 +30,36 @@ export class NetworksComponent implements OnInit {
     public formErrMessage = '';
     public inAdvancedMode = false;
     public portgroupsLoading = true;
-    public portgroups: any[] = null;
+    public portgroups: any[] = [];
 
     constructor(
         private formBuilder: FormBuilder,
         private createWzService: CreateVchWizardService
     ) {
-        // TODO: advanced validation logics
         this.form = formBuilder.group({
             bridgeNetwork: ['', Validators.required],
-            bridgeNetworkRange: '172.16.0.0/12',
+            bridgeNetworkRange: ['172.16.0.0/12', Validators.required],
             publicNetwork: ['', Validators.required],
-            publicNetworkIp: [{ value: '', disabled: true }, Validators.required],
+            publicNetworkIp: [{ value: '', disabled: true }, [
+                Validators.required,
+                Validators.pattern(ipPattern)
+            ]],
             publicNetworkType: 'dhcp',
-            publicNetworkGateway: [{ value: '', disabled: true }, Validators.required],
+            publicNetworkGateway: [{ value: '', disabled: true }, [
+                Validators.required,
+                Validators.pattern(ipPattern)
+            ]],
             clientNetwork: '',
             managementNetwork: '',
-            managementNetworkIp: [{ value: '', disabled: true }, Validators.required],
+            managementNetworkIp: [{ value: '', disabled: true }, [
+                Validators.required,
+                Validators.pattern(ipPattern)
+            ]],
             managementNetworkType: 'dhcp',
-            managementNetworkGateway: [{ value: '', disabled: true }, Validators.required],
+            managementNetworkGateway: [{ value: '', disabled: true }, [
+                Validators.required,
+                Validators.pattern(ipPattern)
+            ]],
             containerNetworks: formBuilder.array([this.createNewContainerNetworkEntry()]),
             httpProxy: '',
             httpProxyPort: '',
@@ -86,23 +92,26 @@ export class NetworksComponent implements OnInit {
             containerNetwork: '',
             containerNetworkIpRange: [{ value: '', disabled: true }, Validators.required],
             containerNetworkType: [{value: 'dhcp', disabled: true}],
-            containerNetworkDns: [{ value: '', disabled: true }, Validators.required],
-            containerNetworkGateway: [{ value: '', disabled: true }, Validators.required],
-            containerNetworkLabel: [{ value: '', disabled: true }, Validators.required]
+            containerNetworkDns: [{ value: '', disabled: true }, [
+                Validators.required,
+                Validators.pattern(ipPattern)
+            ]],
+            containerNetworkGateway: [{ value: '', disabled: true }, [
+                Validators.required,
+                Validators.pattern(ipPattern)
+            ]],
+            containerNetworkLabel: [{ value: '', disabled: true }, [
+                Validators.required,
+                Validators.pattern(supportedCharsPattern)
+            ]]
         });
     }
 
     onPageLoad() {
-        if (this.portgroups !== null) {
+
+        if (this.portgroups.length) {
             return;
         }
-
-        this.form.get('bridgeNetwork').statusChanges
-            .subscribe(v => {
-                if (this.form.get('bridgeNetwork').hasError('required')) {
-                    this.formErrMessage = 'Bridge network cannot be empty!';
-                }
-            });
 
         this.form.get('publicNetworkType').valueChanges
             .subscribe(v => {
@@ -133,7 +142,7 @@ export class NetworksComponent implements OnInit {
                     const networkControl = controls['containerNetwork'];
                     const networkTypeControl = controls['containerNetworkType'];
                     const labelControl = controls['containerNetworkLabel'];
-                    const iprangeControl = controls['containerNetworkIpRange'];
+                    const ipRangeControl = controls['containerNetworkIpRange'];
                     const gatewayControl = controls['containerNetworkGateway'];
                     const dnsControl = controls['containerNetworkDns'];
 
@@ -145,8 +154,8 @@ export class NetworksComponent implements OnInit {
                             networkTypeControl.enable();
                         }
                         if (networkTypeControl.value === 'static') {
-                            if (iprangeControl.disabled) {
-                                iprangeControl.enable();
+                            if (ipRangeControl.disabled) {
+                                ipRangeControl.enable();
                             }
                             if (gatewayControl.disabled) {
                                 gatewayControl.enable();
@@ -155,8 +164,8 @@ export class NetworksComponent implements OnInit {
                                 dnsControl.enable();
                             }
                         } else {
-                            if (iprangeControl.enabled) {
-                                iprangeControl.disable();
+                            if (ipRangeControl.enabled) {
+                                ipRangeControl.disable();
                             }
                             if (gatewayControl.enabled) {
                                 gatewayControl.disable();
@@ -172,8 +181,8 @@ export class NetworksComponent implements OnInit {
                         if (networkTypeControl.enabled) {
                             networkTypeControl.disable();
                         }
-                        if (iprangeControl.enabled) {
-                                iprangeControl.disable();
+                        if (ipRangeControl.enabled) {
+                                ipRangeControl.disable();
                         }
                         if (gatewayControl.enabled) {
                             gatewayControl.disable();
@@ -198,27 +207,8 @@ export class NetworksComponent implements OnInit {
     }
 
     /**
-     * Toggle IP and Gateway inputs for Container networks
-     * @param {boolean} enable
-     * @param {number} index
-     */
-    toggleNetworkIpGatewayDns(enable: boolean, index: number) {
-        const controls = this.form.get('containerNetworks')['controls'][index]['controls'];
-        if (enable) {
-            controls['containerNetworkIpRange'].enable();
-            controls['containerNetworkGateway'].enable();
-            controls['containerNetworkDns'].enable();
-        } else {
-            controls['containerNetworkIpRange'].disable();
-            controls['containerNetworkGateway'].disable();
-            controls['containerNetworkDns'].disable();
-        }
-    }
-
-    /**
      */
     onCommit(): Observable<any> {
-        const errs: string[] = [];
         const results: any = {};
 
         results['bridgeNetwork'] = this.form.get('bridgeNetwork').value;

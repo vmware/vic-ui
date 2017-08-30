@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import {
     FormBuilder,
     FormGroup,
@@ -21,9 +21,9 @@ import {
     Validators
 } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import { Http, URLSearchParams } from '@angular/http';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { supportedCharsPattern, numberPattern } from '../../shared/utils/regex';
 
 @Component({
     selector: 'vic-vch-creation-storage-capacity',
@@ -51,7 +51,7 @@ export class StorageCapacityComponent implements OnInit {
                 '8',
                 [
                     Validators.required,
-                    Validators.pattern(new RegExp(/^\d+$/))
+                    Validators.pattern(numberPattern)
                 ]
             ],
             baseImageSizeUnit: 'GB'
@@ -81,7 +81,10 @@ export class StorageCapacityComponent implements OnInit {
         return this.formBuilder.group({
             volDatastore: '',
             volFileFolder: '',
-            dockerVolName: [{ value: '', disabled: true }, Validators.required]
+            dockerVolName: [{ value: '', disabled: true }, [
+              Validators.required,
+              Validators.pattern(supportedCharsPattern)
+            ]]
         });
     }
 
@@ -98,31 +101,6 @@ export class StorageCapacityComponent implements OnInit {
         if (this._isSetup) {
             return;
         }
-
-        // listen for imageStore changes and handle validation errors
-        this.form.get('imageStore').statusChanges
-            .subscribe(v => {
-                if (this.form.get('imageStore').hasError('required')) {
-                    this.formErrMessage = 'Image datastore cannot be empty!';
-                    return;
-                }
-            });
-
-        // listen for imageStore changes and handle validation errors, only if advanced mode is on
-        this.form.get('baseImageSize').statusChanges
-            .subscribe(v => {
-                if (!this.inAdvancedMode) {
-                    return;
-                }
-                if (this.form.get('baseImageSize').hasError('required')) {
-                    this.formErrMessage = 'Base image size cannot be empty!';
-                    return;
-                }
-                if (this.form.get('baseImageSize').hasError('pattern')) {
-                    this.formErrMessage = 'Base image size should be numeric!';
-                    return;
-                }
-            });
 
         this.form.get('volumeStores').valueChanges
             .subscribe(v => {
@@ -149,8 +127,8 @@ export class StorageCapacityComponent implements OnInit {
 
         if (this.form.invalid) {
             if (this.form.get('imageStore').hasError('required')) {
-                this.formErrMessage = 'Image store should be selected!';
-                return Observable.throw('Image store should be selected!');
+                this.formErrMessage = 'Image store should be selected';
+                return Observable.throw(this.formErrMessage);
             }
         }
 
