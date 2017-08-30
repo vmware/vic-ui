@@ -18,15 +18,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { numberPattern, unlimitedPattern } from '../../shared/utils/regex';
 
-const unlimitedRegexPattern = new RegExp(/^[Uu]nlimited$/);
-const unlimitedOrNumPattern = new RegExp(/(^[uU]nlimited$|^\d+$)/);
-const numPattern = new RegExp(/^\d+$/);
+const unlimitedOrNumberPattern = new RegExp(unlimitedPattern.source + '|' + numberPattern.source);
+const endpointMemoryDefaultValue = 2048;
 
 function getNumericValidatorsArray(allowUnlimited: boolean) {
     return [
         Validators.required,
-        Validators.pattern(allowUnlimited ? unlimitedOrNumPattern : numPattern),
+        Validators.pattern(allowUnlimited ? unlimitedOrNumberPattern : numberPattern),
         Validators.min(1)
     ];
 }
@@ -82,7 +82,7 @@ export class ComputeCapacityComponent implements OnInit {
                 getNumericValidatorsArray(false)
             ],
             endpointMemory: [
-                '2048',
+                endpointMemoryDefaultValue,
                 getNumericValidatorsArray(false)
             ]
         });
@@ -191,12 +191,10 @@ export class ComputeCapacityComponent implements OnInit {
                     this.form.get('cpuReservation').updateValueAndValidity();
                     this.form.get('memoryReservation').updateValueAndValidity();
 
-                    // this prevents the next button from getting disabled when the
-                    // user selects a host or cluster that has less than 2048MB of ram
-                    // available for VM endpoint. as a solution, we set the smaller
-                    // value between 2048 and memory['maxUsage']
-                    this.form.get('endpointMemory').setValue(
-                        Math.min(memory['maxUsage'], 2048) + '')
+                    // This prevents the next button from getting disabled when the user selects a host or cluster that has less RAM
+                    // available for VM endpoint than the default value. As a solution, we set the smaller value between the default value
+                    // and memory['maxUsage']
+                    this.form.get('endpointMemory').setValue(Math.min(memory['maxUsage'], endpointMemoryDefaultValue) + '');
                     this.form.get('endpointMemory').updateValueAndValidity();
                 });
         });
@@ -212,152 +210,6 @@ export class ComputeCapacityComponent implements OnInit {
             return;
         }
 
-        // listen for cpuLimit changes and handle validation errors
-        this.form.get('cpuLimit').statusChanges
-            .debounce(() => Observable.timer(250))
-            .subscribe(v => {
-                const cpuLimitFormControl = this.form.get('cpuLimit');
-                if (cpuLimitFormControl.hasError('required')) {
-                    this.formErrMessage = 'CPU limit cannot be empty!';
-                    return;
-                }
-                if (cpuLimitFormControl.hasError('pattern')) {
-                    this.formErrMessage = 'CPU limit should either be \'Unlimited\' or a number!';
-                    return;
-                }
-                if (cpuLimitFormControl.hasError('min')) {
-                    this.formErrMessage = 'CPU limit should be bigger than 0!';
-                    return;
-                }
-                if (cpuLimitFormControl.hasError('max')) {
-                    this.formErrMessage = `CPU limit cannot be bigger than ${this.resourceLimits['cpu']['maxUsage']} MHz!`;
-                    return;
-                }
-            });
-
-        // listen for memoryLimit changes and handle validation errors
-        this.form.get('memoryLimit').statusChanges
-            .debounce(() => Observable.timer(250))
-            .subscribe(v => {
-                const memoryLimitFormControl = this.form.get('memoryLimit');
-                if (memoryLimitFormControl.hasError('required')) {
-                    this.formErrMessage = 'Memory limit cannot be empty!';
-                    return;
-                }
-                if (memoryLimitFormControl.hasError('pattern')) {
-                    this.formErrMessage = 'Memory limit should either be \'Unlimited\' or a number!';
-                    return;
-                }
-                if (memoryLimitFormControl.hasError('min')) {
-                    this.formErrMessage = 'Memory limit should be bigger than 0!';
-                    return;
-                }
-                if (memoryLimitFormControl.hasError('max')) {
-                    this.formErrMessage = `Memory limit cannot be bigger than ${this.resourceLimits['memory']['maxUsage']} MB!`;
-                    return;
-                }
-            });
-
-        // listen for cpuReservation changes and handle validation errors, only if advanced mode is on
-        this.form.get('cpuReservation').statusChanges
-            .debounce(() => Observable.timer(250))
-            .subscribe(v => {
-                if (!this.inAdvancedMode) {
-                    return;
-                }
-                const cpuReservationFormControl = this.form.get('cpuReservation');
-                if (cpuReservationFormControl.hasError('required')) {
-                    this.formErrMessage = 'CPU reservation cannot be empty!';
-                    return;
-                }
-                if (cpuReservationFormControl.hasError('pattern')) {
-                    this.formErrMessage = 'CPU reservation should be numberic!';
-                    return;
-                }
-                if (cpuReservationFormControl.hasError('min')) {
-                    this.formErrMessage = 'CPU reservation should be bigger than 0!';
-                    return;
-                }
-                if (cpuReservationFormControl.hasError('max')) {
-                    this.formErrMessage = `CPU reservation cannot be bigger than ${this.resourceLimits['cpu']['unreservedForPool']} MHz!`;
-                    return;
-                }
-            });
-
-        // listen for memoryReservation changes and handle validation errors, only if advanced mode is on
-        this.form.get('memoryReservation').statusChanges
-            .debounce(() => Observable.timer(250))
-            .subscribe(v => {
-                if (!this.inAdvancedMode) {
-                    return;
-                }
-                const memoryReservationFormControl = this.form.get('memoryReservation');
-                if (memoryReservationFormControl.hasError('required')) {
-                    this.formErrMessage = 'Memory limit cannot be empty!';
-                    return;
-                }
-                if (memoryReservationFormControl.hasError('pattern')) {
-                    this.formErrMessage = 'Memory limit should be numberic!';
-                    return;
-                }
-                if (memoryReservationFormControl.hasError('min')) {
-                    this.formErrMessage = 'Memory limit should be bigger than 0!';
-                    return;
-                }
-                if (memoryReservationFormControl.hasError('max')) {
-                    this.formErrMessage = `Memory limit cannot be bigger than ${this.resourceLimits['memory']['unreservedForPool']} MB!`;
-                    return;
-                }
-            });
-
-        // listen for endpointCpu changes and handle validation errors, only if advanced mode is on
-        this.form.get('endpointCpu').statusChanges
-            .debounce(() => Observable.timer(250))
-            .subscribe(v => {
-                if (!this.inAdvancedMode) {
-                    return;
-                }
-                const endpointCpuFormControl = this.form.get('endpointCpu');
-                if (endpointCpuFormControl.hasError('required')) {
-                    this.formErrMessage = 'CPU limit cannot be empty!';
-                    return;
-                }
-                if (endpointCpuFormControl.hasError('pattern')) {
-                    this.formErrMessage = 'CPU limit should be numberic!';
-                    return;
-                }
-                if (endpointCpuFormControl.hasError('min')) {
-                    this.formErrMessage = 'CPU limit should be bigger than 0!';
-                    return;
-                }
-            });
-
-        // listen for endpointMemory changes and handle validation errors, only if advanced mode is on
-        this.form.get('endpointMemory').statusChanges
-            .debounce(() => Observable.timer(250))
-            .subscribe(v => {
-                if (!this.inAdvancedMode) {
-                    return;
-                }
-                const endpointMemoryFormControl = this.form.get('endpointMemory');
-                if (endpointMemoryFormControl.hasError('required')) {
-                    this.formErrMessage = 'Memory limit cannot be empty!';
-                    return;
-                }
-                if (endpointMemoryFormControl.hasError('pattern')) {
-                    this.formErrMessage = 'Memory limit should be numberic!';
-                    return;
-                }
-                if (endpointMemoryFormControl.hasError('min')) {
-                    this.formErrMessage = 'Memory limit should be bigger than 0!';
-                    return;
-                }
-                if (endpointMemoryFormControl.hasError('max')) {
-                    this.formErrMessage = `Memory limit cannot be bigger than ${this.resourceLimits['memory']['maxUsage']} MB!`;
-                    return;
-                }
-            });
-
         this.createWzService.getDatacenter().subscribe(dcs => {
             this.datacenter = dcs;
         });
@@ -371,11 +223,12 @@ export class ComputeCapacityComponent implements OnInit {
         const results: any = {};
 
         if (!this.selectedComputeResource) {
-            errs.push('Please choose a valid compute resource!');
+            errs.push('Please choose a valid compute resource');
             formErrors = { invalidComputeResource: true };
         }
 
         this.form.setErrors(formErrors);
+
         if (formErrors) {
             return Observable.throw(errs);
         } else {
@@ -383,8 +236,8 @@ export class ComputeCapacityComponent implements OnInit {
             const memoryLimitValue = this.form.get('memoryLimit').value;
 
             results['computeResource'] = this.selectedComputeResource;
-            results['cpu'] = unlimitedRegexPattern.test(cpuLimitValue) ? '0' : cpuLimitValue;
-            results['memory'] = unlimitedRegexPattern.test(memoryLimitValue) ? '0' : memoryLimitValue;
+            results['cpu'] = unlimitedPattern.test(cpuLimitValue) ? '0' : cpuLimitValue;
+            results['memory'] = unlimitedPattern.test(memoryLimitValue) ? '0' : memoryLimitValue;
             if (this.inAdvancedMode) {
                 results['debug'] = this.form.get('debug').value;
                 results['cpuReservation'] = this.form.get('cpuReservation').value;

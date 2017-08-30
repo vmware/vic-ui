@@ -1,6 +1,6 @@
 <div class="spinner" *ngIf="datastoresLoading"></div>
 
-<form class="pt-0" [formGroup]="form" novalidate>
+<form class="pt-0" [formGroup]="form" novalidate *ngIf="!datastoresLoading">
   <section class="form-block my-0">
 
     <label>
@@ -23,9 +23,6 @@
 
         <div class="select form-control">
           <select id="image-store-selector" formControlName="imageStore">
-            <option value="" *ngIf="!datastores || !datastores.length">
-              Loading...
-            </option>
             <option value="">Not selected</option>
             <option [value]="datastore.name" *ngFor="let datastore of datastores">
               {{ datastore.name }} ({{ datastore?.info?.freeSpace }} free)
@@ -118,7 +115,7 @@
         <div class="col-xs">
 
           <small class="vol-datastore-header" *ngIf="i === 0">Docker volume name</small>
-          <label class="form-control tooltip tooltip-validation tooltip-md tooltip-top-right"
+          <label class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
                  for="docker-volname-selector"
                  aria-haspopup="true"
                  role="tooltip"
@@ -129,6 +126,14 @@
                    type="text"
                    placeholder="Volume name"
                    formControlName="dockerVolName">
+
+            <span class="tooltip-content" *ngIf="form.get('volumeStores').controls[i].controls['dockerVolName'].hasError('required')">
+              Docker volume name cannot be empty
+            </span>
+
+            <span class="tooltip-content" *ngIf="form.get('volumeStores').controls[i].controls['dockerVolName'].hasError('pattern')">
+              Docker volume name contains characters that are not allowed
+            </span>
 
           </label>
 
@@ -171,7 +176,14 @@
                  id="base-image-size"
                  formControlName="baseImageSize"
                  class="form-control">
-          <span class="tooltip-content">{{ formErrMessage }}</span>
+
+          <span class="tooltip-content" *ngIf="form.get('baseImageSize').hasError('required')">
+            Base image size cannot be empty
+          </span>
+
+          <span class="tooltip-content" *ngIf="form.get('baseImageSize').hasError('pattern')">
+            Base image size should be numeric
+          </span>
 
         </label>
 

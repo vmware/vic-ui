@@ -20,37 +20,25 @@
 
   <div class="spinner" *ngIf="loading"></div>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="step1.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="nameStep.form.invalid"
                    clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(step1.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(nameStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
-                   (clrWizardPageOnCommit)="onCommit(step1.onCommit())"
+                   (clrWizardPageOnCommit)="onCommit(nameStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
     <ng-template clrPageTitle>Virtual Container Host Name</ng-template>
     <ng-template clrPageNavTitle>Name</ng-template>
 
-    <clr-alert *ngIf="errorFlag"
-               [clrAlertType]="'alert-danger'"
-               [clrAlertClosable]="false">
-
-      <div class="alert-item">
-        <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-          {{errMsg}}
-        </div>
-      </div>
-
-    </clr-alert>
-
-    <vic-vch-creation-name #step1></vic-vch-creation-name>
+    <vic-vch-creation-name #nameStep></vic-vch-creation-name>
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="step2.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="computeCapacityStep.form.invalid"
                    clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(step2.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(computeCapacityStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
-                   (clrWizardPageOnCommit)="onCommit(step2.onCommit())"
+                   (clrWizardPageOnCommit)="onCommit(computeCapacityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
     <ng-template clrPageTitle>Compute Capacity</ng-template>
@@ -67,15 +55,15 @@
 
     </clr-alert>
 
-    <vic-vch-creation-compute-capacity #step2></vic-vch-creation-compute-capacity>
+    <vic-vch-creation-compute-capacity #computeCapacityStep></vic-vch-creation-compute-capacity>
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="step3.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="storageCapacityStep.form.invalid"
                    clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(step3.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(storageCapacityStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
-                   (clrWizardPageOnCommit)="onCommit(step3.onCommit())"
+                   (clrWizardPageOnCommit)="onCommit(storageCapacityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
     <ng-template clrPageTitle>Storage Capacity</ng-template>
@@ -92,15 +80,17 @@
 
     </clr-alert>
 
-    <vic-vch-creation-storage-capacity [resourceObjRef]="step2.selectedResourceObjRef" #step3></vic-vch-creation-storage-capacity>
+    <vic-vch-creation-storage-capacity #storageCapacityStep
+                                       [resourceObjRef]="computeCapacityStep.selectedResourceObjRef">
+    </vic-vch-creation-storage-capacity>
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="step4.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="networksStep.form.invalid"
                    clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(step4.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(networksStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
-                   (clrWizardPageOnCommit)="onCommit(step4.onCommit())"
+                   (clrWizardPageOnCommit)="onCommit(networksStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
     <ng-template clrPageTitle>Configure Networks</ng-template>
@@ -118,15 +108,15 @@
 
     </clr-alert>
 
-    <vic-vch-creation-networks #step4></vic-vch-creation-networks>
+    <vic-vch-creation-networks #networksStep></vic-vch-creation-networks>
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="step5.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="securityStep.form.invalid"
                    clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(step5.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(securityStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
-                   (clrWizardPageOnCommit)="onCommit(step5.onCommit())"
+                   (clrWizardPageOnCommit)="onCommit(securityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
     <ng-template clrPageTitle>Security</ng-template>
@@ -143,15 +133,15 @@
 
     </clr-alert>
 
-    <vic-vch-creation-security [vchName]="step1.form.get('name').value" #step5></vic-vch-creation-security>
+    <vic-vch-creation-security [vchName]="nameStep.form.get('name').value" #securityStep></vic-vch-creation-security>
 
   </clr-wizard-page>
 
   <clr-wizard-page clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(step6.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(summaryStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPagePrevious)="goBack()"
-                   (clrWizardPageOnCommit)="onFinish(step6.onCommit())">
+                   (clrWizardPageOnCommit)="onFinish(summaryStep.onCommit())">
 
     <ng-template clrPageTitle>Summary</ng-template>
 
@@ -167,7 +157,7 @@
 
     </clr-alert>
 
-    <vic-vch-creation-summary [payload]="cachedData" #step6></vic-vch-creation-summary>
+    <vic-vch-creation-summary [payload]="cachedData" #summaryStep></vic-vch-creation-summary>
 
   </clr-wizard-page>
 
