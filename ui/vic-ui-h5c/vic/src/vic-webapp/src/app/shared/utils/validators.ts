@@ -13,6 +13,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+
+import { Validators } from '@angular/forms';
+
+/* validation regex */
 export const camelCasePattern = new RegExp(/([a-z])([A-Z])/g);
 export const supportedCharsPattern = new RegExp(/^[^%|&|*|$|#|@|!|\\|/|:|?|"|<|>|;|'||]+$/);
 export const unlimitedPattern = new RegExp(/^[Uu]nlimited$/);
@@ -24,3 +28,24 @@ export const ipPattern = new RegExp(ipV4Pattern.source + '|' + ipV6Pattern.sourc
 export const fqdnPattern = /^((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}$/;
 export const cidrPattern = /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/;
 export const wildcardDomainPattern = /^(\*\.)?([a-z\d][a-z\d-]*[a-z\d]\.)+[a-z]+$/;
+
+export const whiteListRegistryPattern = new RegExp(
+  ipPattern.source + '|' +
+  fqdnPattern.source + '|' +
+  cidrPattern.source + '|' +
+  wildcardDomainPattern.source
+);
+
+const unlimitedOrNumberPattern = new RegExp(unlimitedPattern.source + '|' + numberPattern.source);
+
+/* validation functions */
+
+export function getNumericValidatorsArray(allowUnlimited: boolean) {
+  return [
+    Validators.required,
+    Validators.pattern(allowUnlimited ? unlimitedOrNumberPattern : numberPattern),
+    Validators.min(1)
+  ];
+}
+
+
