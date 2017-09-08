@@ -91,7 +91,13 @@ export class SecurityComponent {
     } else if (controlName === 'insecureRegistries') {
       return this.formBuilder.group({
         insecureRegistryIp: '',
-        insecureRegistryPort: ''
+        insecureRegistryPort: [
+          '',
+          [
+            Validators.maxLength(5),
+            Validators.pattern(numberPattern)
+          ]
+        ]
       });
     } else if (controlName === 'whitelistRegistries') {
       return this.formBuilder.group({

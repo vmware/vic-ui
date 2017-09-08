@@ -18,7 +18,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { supportedCharsPattern, ipPattern } from '../../shared/utils/validators';
+import { supportedCharsPattern, ipPattern, numberPattern } from '../../shared/utils/validators';
 
 @Component({
   selector: 'vic-vch-creation-networks',
@@ -62,9 +62,21 @@ export class NetworksComponent implements OnInit {
       ]],
       containerNetworks: formBuilder.array([this.createNewContainerNetworkEntry()]),
       httpProxy: '',
-      httpProxyPort: '',
+      httpProxyPort: [
+        '',
+        [
+          Validators.maxLength(5),
+          Validators.pattern(numberPattern)
+        ]
+      ],
       httpsProxy: '',
-      httpsProxyPort: '',
+      httpsProxyPort: [
+        '',
+        [
+          Validators.maxLength(5),
+          Validators.pattern(numberPattern)
+        ]
+      ],
       dnsServer: ''
     });
   }
