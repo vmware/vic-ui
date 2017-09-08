@@ -64,7 +64,6 @@ export class VchCreationWizardNameComponent implements OnInit {
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    // TODO: unit test this
     return this.createWzService.checkVchNameUniqueness(this.form.get('name').value)
       .switchMap(isUnique => {
         if (!isUnique) {
