@@ -472,8 +472,25 @@
                   <span class="mx-0 px-0">:</span>
                   <div class="col-xs-2">
 
-                    <input class="form-control" type="text" placeholder="Port" formControlName="insecureRegistryPort">
+                    <label aria-haspopup="true"
+                           role="tooltip"
+                           class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+                           [class.invalid]="form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.invalid && (form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.dirty || form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.touched)">
 
+                      <input class="form-control"
+                             placeholder="Port"
+                             type="text"
+                             formControlName="insecureRegistryPort">
+
+                      <span class="tooltip-content" *ngIf="form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.hasError('maxlength')">
+                        Port cannot be more than 5 digits long
+                      </span>
+
+                      <span class="tooltip-content" *ngIf="form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.hasError('pattern')">
+                        Port should be numeric
+                      </span>
+
+                    </label>
                   </div>
                   <div class="col-xs-1 px-0 add-remove-actions">
 
