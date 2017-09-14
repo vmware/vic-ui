@@ -193,17 +193,17 @@ Run Script Test With Config
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g"
-    ...  -e "s|\#ROBOT_SCRIPT|${test_name}\.robot|g" > .drone.ui.tests.yml
+    ...  -e "s|\#ROBOT_SCRIPT|${test_name}\.robot|g" > .drone.local.tests.yml
 
-    # generate .drone.ui.tests.yml
-    Run  cat .drone.ui.script.yml | ${sed-replace-command}
-    OperatingSystem.File Should Exist  .drone.ui.tests.yml
+    # generate .drone.local.tests.yml
+    Run  cat .drone.local.script.yml | ${sed-replace-command}
+    OperatingSystem.File Should Exist  .drone.local.tests.yml
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"ui/vic-uia/test.secrets\" .drone.ui.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"ui/vic-uia/test.secrets\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -255,18 +255,18 @@ Run Plugin Test With Config
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#SELENIUM_BROWSER|${selenium_browser}|g"
     ...  -e "s|\#BROWSER_NORMALIZED_NAME|${selenium_browser_normalized}|g"
-    ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g" > .drone.ui.tests.yml
+    ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g" > .drone.local.tests.yml
 
-    # generate .drone.ui.tests.yml
-    Run  cat .drone.ui.plugin.yml | ${sed-replace-command}
-    OperatingSystem.File Should Exist  .drone.ui.tests.yml
+    # generate .drone.local.tests.yml
+    Run  cat .drone.local.plugin.yml | ${sed-replace-command}
+    OperatingSystem.File Should Exist  .drone.local.tests.yml
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ❌ Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"ui/vic-uia/test.secrets\" .drone.ui.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"ui/vic-uia/test.secrets\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -297,7 +297,7 @@ Cleanup Testbed
     Terminate All Processes  kill=True
 
     # Delete all transient and sensitive information
-    Run  rm -rf .drone.ui.tests.yml testbed-information tests/manual-test-cases/Group18-VIC-UI/testbed-information >/dev/null 2>&1
+    Run  rm -rf .drone.local.tests.yml testbed-information tests/manual-test-cases/Group18-VIC-UI/testbed-information >/dev/null 2>&1
     Run  rm -rf ui-test-results >/dev/null 2>&1
     Run  rm -rf Kickoff-Tests* VCH-0*
 
