@@ -1,0 +1,37 @@
+workspace:
+  base: /go
+  path: src/github.com/vmware/vic
+
+pipeline:
+  clone:
+    image: plugins/git
+    tags: true
+    recursive: false
+  vic-uia:
+    image: ${TEST_BUILD_IMAGE=gcr.io/eminent-nation-87317/vic-integration-test:1.33}
+    pull: true
+    environment:
+      BIN: bin
+      GOPATH: /go
+      SHELL: /bin/bash
+      DRONE_SERVER: ${DRONE_SERVER}
+      DRONE_TOKEN: ${DRONE_TOKEN}
+      NIMBUS_USER: ${NIMBUS_USER}
+      NIMBUS_PASSWORD: ${NIMBUS_PASSWORD}
+      NIMBUS_GW: ${NIMBUS_GW}
+      TEST_DATASTORE: ${TEST_DATASTORE}
+      TEST_RESOURCE: ${TEST_RESOURCE}
+      GOVC_INSECURE: true
+      BUILD_NUMBER: ${buildNumber}
+      TEST_VSPHERE_VER: #TEST_VSPHERE_VER
+      TEST_OS: #TEST_OS
+      UI_TEST_CASES_FOLDER: tests/manual-test-cases/Group18-VIC-UI
+      TEST_RESULTS_FOLDER: #TEST_RESULTS_FOLDER
+      ROBOT_SCRIPT: #ROBOT_SCRIPT
+    commands:
+      - set -e
+      - pip install pexpect
+      - cd $UI_TEST_CASES_FOLDER
+      - if [ $TEST_OS = "Mac" ] ; then robot --log container_log.html --report container_report.html --output container_output.xml --test *Mac -C ansi -d ../../../$TEST_RESULTS_FOLDER $ROBOT_SCRIPT ; fi
+      - if [ $TEST_OS = "Ubuntu" ] ; then robot --include anyos --include unixlike --test TestCase-* -C ansi -d ../../../$TEST_RESULTS_FOLDER $ROBOT_SCRIPT ; fi
+      - if [ $TEST_OS = "Windows" ] ; then robot --log container_log.html --report container_report.html --output container_output.xml --test *Windows -C ansi -d ../../../$TEST_RESULTS_FOLDER $ROBOT_SCRIPT ; fi
