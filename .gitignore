@@ -13,7 +13,6 @@ install-*.tar.gz
 *.log
 log.html
 report.html
-*.xml
 *.gas
 *.pyc
 package.list
@@ -42,6 +41,20 @@ tests/.project
 # Intellij files
 *.iml
 
-# Eclipse files
-.project
+*.zip
+\$*
 
+# vic plugin jar / war files
+scripts/plugin-manifest
+scripts/vsphere-client-serenity/
+scripts/plugin-packages/
+scripts/upload-to-staging-fileserver.sh
+test.secrets
+**/*.swf
+**/*.jar
+**/*.war
+**/bin
+**/target/*
+**/unittest-results/*
+flex/vic-uia/screenshots
+flex/vic-uia/testResultReportFile
