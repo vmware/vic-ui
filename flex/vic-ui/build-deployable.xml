@@ -86,12 +86,12 @@
    <target name="make-deployable" depends="make-folder,compile-ui,copy-ui-module,compile-service-and-copy">
       <copy file="${basedir}/plugin-package.xml" tofile="${DEPLOY_DIR}/plugin-package.xml"/>
       <copy file="${VSPHERE_SDK_HOME}/libs/vim25.jar" tofile="${DEPLOY_DIR}/plugins/vim25.jar"/>
-      <delete dir="${basedir}/../installer/vsphere-client-serenity"/>
-      <zip basedir="${DEPLOY_DIR}" destfile="${basedir}/../installer/vsphere-client-serenity/${pluginPackage(id)}-v${pluginPackage(version)}.zip"/>
-      <copy todir="${basedir}/../installer/vsphere-client-serenity/${pluginPackage(id)}-v${pluginPackage(version)}">
+      <delete dir="${basedir}/../../scripts/vsphere-client-serenity"/>
+      <zip basedir="${DEPLOY_DIR}" destfile="${basedir}/../../scripts/vsphere-client-serenity/${pluginPackage(id)}-v${pluginPackage(version)}.zip"/>
+      <copy todir="${basedir}/../../scripts/vsphere-client-serenity/${pluginPackage(id)}-v${pluginPackage(version)}">
          <fileset dir="${DEPLOY_DIR}"/>
       </copy>
-      <echo file="${basedir}/../installer/plugin-manifest">key_flex="${pluginPackage(id)}"
+      <echo file="${basedir}/../../scripts/plugin-manifest">key_flex="${pluginPackage(id)}"
 name="${pluginPackage(name)}"
 version="${pluginPackage(version)}"
 summary="${pluginPackage(description)}"
