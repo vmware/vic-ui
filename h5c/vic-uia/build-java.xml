@@ -1,0 +1,55 @@
+<project name="vic-uia" default="make-jar-bundle">
+   <description>
+   </description>
+
+   <property environment="env"/>
+   <property name="HSUIA_LOCATION" value="${env.HSUIA_LOCATION}"/>
+
+   <!-- name of the jar output file -->
+   <property name="JAR_FILE" value="vic-uia.jar"/>
+   <property name="BUILD_DIR" value="${basedir}/target"/>
+   <property name="CLASSES" value="${BUILD_DIR}/classes"/>
+   <property name="RES_DIR" value="${basedir}/src/main/resources"/>
+
+   <!-- clean the generated build files -->
+   <target name="clean" description="Do not select this internal target.">
+      <delete dir="${BUILD_DIR}" />
+      <mkdir dir="${BUILD_DIR}/classes" />
+   </target>
+
+   <path id="class.path">
+      <fileset dir="${HSUIA_LOCATION}">
+         <include name="*.jar" />
+      </fileset>
+   </path>
+
+   <target name="compile-java" depends="clean" description="Do not select this internal target.">
+      <javac target="1.7"  source="1.7"
+             includeantruntime="false"
+             destdir="${CLASSES}"
+             fork="true" debug="on">
+         <src path="${basedir}/src/main/java"/>
+         <classpath refid="class.path"/>
+      </javac>
+   </target>
+
+   <!-- Build the jar -->
+   <target name="make-jar-bundle" depends="compile-java"
+           description="No need to use this script within Eclipse, use the native project builder!">
+      <!-- Add resources -->
+      <copy todir="${CLASSES}">
+         <fileset dir="${RES_DIR}"/>
+      </copy>
+
+      <!-- Create the jar -->
+      <jar  destfile="${BUILD_DIR}/${JAR_FILE}"
+            basedir="${CLASSES}"/>
+
+      <!-- Move the jar file to HSUIA_LOCATION -->
+      <move file="${BUILD_DIR}/${JAR_FILE}"
+            todir="${HSUIA_LOCATION}"/>
+
+   </target>
+</project>
+
+
