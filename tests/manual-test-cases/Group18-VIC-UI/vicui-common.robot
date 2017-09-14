@@ -18,19 +18,11 @@ Resource  ../../resources/Util.robot
 Library  VicUiInstallPexpectLibrary.py
 
 *** Variables ***
-${TEST_VC_VERSION}          6.0
-${TEST_VC_ROOT_PASSWORD}    vmware
-${TIMEOUT}                  10 minutes
-
-${SELENIUM_SERVER_PORT}     4444
-${DATACENTER_NAME}          Datacenter
-${CLUSTER_NAME}             Cluster
-${DATASTORE_TYPE}           NFS
-${DATASTORE_NAME}           fake
-${DATASTORE_IP}             1.1.1.1
-${CONTAINER_VM_NAME}        sharp_feynman-d39db0a231f2f639a073814c2affc03e4737d9ad361649069eb424e6c4e09b52
-${TEST_OS}                  %{TEST_OS}
-${vic_macmini_fileserver_url}  https://10.20.121.192:3443/vsphere-plugins/
+${MACOS_HOST_IP}                      10.20.121.192
+${UBUNTU_HOST_IP}                     10.20.121.145
+${WINDOWS_HOST_IP}                    10.25.200.225
+${SECRETS_FILE}                       test.secrets
+${vic_macmini_fileserver_url}         https://10.20.121.192:3443/vsphere-plugins/
 ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:8B:86:5F:AD:79:CE
 
 *** Keywords ***
@@ -53,26 +45,39 @@ Load Nimbus Testbed Env
     Set Suite Variable  ${TEST_VC_USERNAME}  %{TEST_USERNAME}
     Set Suite Variable  ${TEST_VC_PASSWORD}  %{TEST_PASSWORD}
 
+Load Secrets
+    [Arguments]  ${secrets}=${SECRETS_FILE}
+    OperatingSystem.File Should Exist  ${secrets}
+    ${envs}=  OperatingSystem.Get File  ${secrets}
+    @{envs}=  Split To Lines  ${envs}
+    :FOR  ${item}  IN  @{envs}
+    \  @{kv}=  Split String  ${item}  =
+    \  ${stripped}=  Replace String  @{kv}[1]  "  ${EMPTY}
+    \  Set Environment Variable  @{kv}[0]  ${stripped}
+    \  Set Suite Variable  \$@{kv}[0]  @{kv}[1]
+
 Install VIC Appliance For VIC UI
     [Arguments]  ${vic-machine}=ui-nightly-run-bin/vic-machine-linux  ${appliance-iso}=ui-nightly-run-bin/appliance.iso  ${bootstrap-iso}=ui-nightly-run-bin/bootstrap.iso  ${certs}=${true}  ${vol}=default
     Set Test Environment Variables
     # disable firewall
     Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc host.esxcli network firewall set -e false
     # Attempt to cleanup old/canceled tests
-    Run Keyword And Ignore Error  Cleanup Dangling VMs On VIC UI Test Server
+    Run Keyword And Ignore Error  Cleanup Dangling VMs On VIC UI Test Server  ${vic-machine}
     Run Keyword And Ignore Error  Cleanup Datastore On Test Server
     Run Keyword And Ignore Error  Cleanup Dangling Networks On Test Server
     Run Keyword And Ignore Error  Cleanup Dangling vSwitches On Test Server
 
     # Install the VCH now
     Log To Console  \nInstalling VCH to test server...
-    ${output}=  Run VIC Machine Command  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}  ${EMPTY}
+    ${output}=  Run VIC Machine Command  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}  1  ${EMPTY}
     Log  ${output}
     Should Contain  ${output}  Installer completed successfully
     Get Docker Params  ${output}  ${certs}
+    Set Environment Variable  VIC-ADMIN  %{VCH-IP}:2378
     Log To Console  Installer completed successfully: %{VCH-NAME}...
 
 Cleanup Dangling VMs On VIC UI Test Server
+    [Arguments]  ${vic-machine-binary}=ui-nightly-run-bin/vic-machine-linux
     ${out}=  Run  govc ls vm
     ${vms}=  Split To Lines  ${out}
     :FOR  ${vm}  IN  @{vms}
@@ -85,24 +90,13 @@ Cleanup Dangling VMs On VIC UI Test Server
     \   Continue For Loop If  '${state}' == 'running'
     \   ${uuid}=  Run  govc vm.info -json\=true ${vm} | jq -r '.VirtualMachines[0].Config.Uuid'
     \   Log To Console  Destroying dangling VCH: ${vm}
-    \   ${rc}  ${output}=  Delete VIC Machine  ${vm}  ../../../ui-nightly-run-bin/vic-machine-linux
-
-Check Config And Install VCH
-    [Arguments]  ${plugin}=noop
-    Run Keyword  Set Absolute Script Paths
-    Load Nimbus Testbed Env
-    Set Environment Variable  DOMAIN  ${EMPTY}
-    Install VIC Appliance For VIC UI  ../../../ui-nightly-run-bin/vic-machine-linux  ../../../ui-nightly-run-bin/appliance.iso  ../../../ui-nightly-run-bin/bootstrap.iso
-    Set Environment Variable  VCH_VM_NAME  %{VCH-NAME}
-    ${vc_fingerprint}=  Run  ../../../ui-nightly-run-bin/vic-ui-linux info --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --target ${TEST_VC_IP} --key com.vmware.vic.noop 2>&1 | grep -o "(thumbprint.*)" | awk -F= '{print $2}' | sed 's/.$//'
-    Set Environment Variable  VC_FINGERPRINT  ${vc_fingerprint}
-    Run Keyword If  '${plugin}' == 'install'  Force Install Vicui Plugin
-    Run Keyword If  '${plugin}' == 'remove'  Force Remove Vicui Plugin
+    \   ${rc}  ${output}=  Delete VIC Machine  ${vm}  ${vic-machine-binary}
 
 Set Absolute Script Paths
-    ${UI_INSTALLERS_ROOT}=  Run  pwd
-    ${UI_INSTALLERS_ROOT}=  Join Path  ${UI_INSTALLERS_ROOT}  ../../../ui/installer
-    Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/VCSA
+    ${rc}  ${out}=  Run And Return Rc And Output  ver
+    ${is_windows}=  Run Keyword And Return Status  Should Contain  ${out}  Windows
+    ${UI_INSTALLERS_ROOT}=  Set Variable  ../../../ui/installer
+    Run Keyword If  ${is_windows}  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/vCenterForWindows  ELSE  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/VCSA
     Should Exist  ${UI_INSTALLER_PATH}
     ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs
     Set Suite Variable  ${configs}  ${configs_content}
@@ -126,19 +120,24 @@ Reset Configs
     Should Exist  ${UI_INSTALLER_PATH}/configs
 
 Force Install Vicui Plugin
+    ${rc}  ${ver}=  Run And Return Rc And Output  ver
+    ${is_windows}=  Run Keyword And Return Status  Should Contain  ${ver}  Windows
+    ${vic-ui-binary}=  Run Keyword If  ${is_windows}  Set Variable  ..\\..\\..\\vic-ui-windows  ELSE  Set Variable  ../../../vic-ui-linux
     Set Fileserver And Thumbprint In Configs
-    Append To File  ${UI_INSTALLER_PATH}/configs  BYPASS_PLUGIN_VERIFICATION=1\n
-    Install Plugin Successfully  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}  None  ${TRUE}
-    Reset Configs
+    Run Keyword Unless  ${is_windows}  Append To File  ${UI_INSTALLER_PATH}/configs  BYPASS_PLUGIN_VERIFICATION=1\n
+    Run Keyword If  ${is_windows}  Interact With Script  install  -f -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True  ELSE  Install Plugin Successfully  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}  None  ${TRUE}
+    Run Keyword Unless  ${is_windows}  Reset Configs
     ${output}=  OperatingSystem.GetFile  install.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
-    Run Keyword Unless  ${passed}  Copy File  install.log  fail-force-install-vicui-plugin.log
-    Remove File  install.log
+    Run Keyword Unless  ${passed}  Move File  install.log  fail-force-install-vicui-plugin.log
     Should Be True  ${passed}
 
 Force Remove Vicui Plugin
-    ${rc}  ${output}=  Run And Return Rc And Output  ../../../ui-nightly-run-bin/vic-ui-linux remove --thumbprint %{VC_FINGERPRINT} --target ${TEST_VC_IP} --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --key com.vmware.vic.ui
-    ${rc}  ${output}=  Run And Return Rc And Output  ../../../ui-nightly-run-bin/vic-ui-linux remove --thumbprint %{VC_FINGERPRINT} --target ${TEST_VC_IP} --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --key com.vmware.vic
+    ${rc}  ${ver}=  Run And Return Rc And Output  ver
+    ${is_windows}=  Run Keyword And Return Status  Should Contain  ${ver}  Windows
+    ${vic-ui-binary}=  Run Keyword If  ${is_windows}  Set Variable  ..\\..\\..\\vic-ui-windows  ELSE  Set Variable  ../../../vic-ui-linux
+    ${rc}  ${output}=  Run And Return Rc And Output  ${vic-ui-binary} remove --thumbprint %{VC_FINGERPRINT} --target ${TEST_VC_IP} --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --key com.vmware.vic.ui
+    ${rc}  ${output}=  Run And Return Rc And Output  ${vic-ui-binary} remove --thumbprint %{VC_FINGERPRINT} --target ${TEST_VC_IP} --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --key com.vmware.vic
 
 Rename Folder
     [Arguments]  ${old}  ${new}
@@ -148,8 +147,11 @@ Rename Folder
 Cleanup Installer Environment
     # Reverts the configs file and make sure the folder containing the UI binaries has its original name that might've been left modified due to a test failure
     Reset Configs
-    @{folders}=  OperatingSystem.List Directory  ${UI_INSTALLER_PATH}/..  ${plugin_folder}*
-    Run Keyword If  ('@{folders}[0]' != '${plugin_folder}')  Rename Folder  ${UI_INSTALLER_PATH}/../@{folders}[0]  ${UI_INSTALLER_PATH}/../${plugin_folder}
+    ${configs_dangling}=  Run Keyword And Return Status  OperatingSystem.File Should Exist  ${UI_INSTALLER_PATH}/configs_renamed
+    ${plugin_manifest_dangling}=  Run Keyword And Return Status  OperatingSystem.File Should Exist  ${UI_INSTALLER_PATH}/../plugin-manifest-a
+
+    Run Keyword If  ${configs_dangling}  Move File  ${UI_INSTALLER_PATH}/configs_renamed  ${UI_INSTALLER_PATH}/configs
+    Run Keyword If  ${plugin_manifest_dangling}  Move File  ${UI_INSTALLER_PATH}/../plugin-manifest-a  ${UI_INSTALLER_PATH}/../plugin-manifest
 
 Delete VIC Machine
     [Tags]  secret
@@ -162,10 +164,53 @@ Uninstall VCH
     Log To Console  Gathering logs from the test server...
     Gather Logs From Test Server
     Log To Console  Deleting the VCH appliance...
-    ${rc}  ${output}=  Delete VIC Machine  %{VCH-NAME}  ../../../ui-nightly-run-bin/vic-machine-linux
-    Check Delete Success  %{VCH-NAME}
+    ${uname_v}=  Run  uname -v
+    ${is_macos}=  Run Keyword And Return Status  Should Contain  ${uname_v}  Darwin
+    ${vic-machine-binary}=  Run Keyword If  ${is_macos}  Set Variable  vic-machine-darwin  ELSE  Set Variable  vic-machine-linux
+    ${rc}  ${output}=  Delete VIC Machine  %{VCH_VM_NAME}  ui-nightly-run-bin/${vic-machine-binary}
+    Check Delete Success  %{VCH_VM_NAME}
     Should Be Equal As Integers  ${rc}  0
     Should Contain  ${output}  Completed successfully
-    ${output}=  Run  rm -f %{VCH-NAME}-*.pem
-    ${out}=  Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc host.portgroup.remove %{VCH-NAME}-bridge
+    ${output}=  Run  rm -f %{VCH_VM_NAME}-*.pem
+    ${out}=  Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc host.portgroup.remove %{VCH_VM_NAME}-bridge
     Run Keyword If  ${remove_plugin} == ${TRUE}  Force Remove Vicui Plugin
+
+Teardown Script Test Suite
+    Close All Connections
+
+    # in case configs file remains renamed but not reverted let's rename it here
+    ${configs_renamed_exists}=  Run Keyword And Return Status  OperatingSystem.File Should Exist  ${UI_INSTALLER_PATH}/configs_renamed
+    Run Keyword If  ${configs_renamed_exists}  Move File  ${UI_INSTALLER_PATH}/configs_renamed  ${UI_INSTALLER_PATH}/configs
+
+    # in case plugin-manifest file remains renamed but not reverted let's rename it here
+    ${manifest_a_exists}=  Run Keyword And Return Status  OperatingSystem.File Should Exist  ${UI_INSTALLER_PATH}/../plugin-manifest-a
+    Run Keyword If  ${manifest_a_exists}  Move File  ${UI_INSTALLER_PATH}/../plugin-manifest-a  ${UI_INSTALLER_PATH}/../plugin-manifest
+
+    # remove other temp files and artifacts
+    ${rc}  ${uname_v}=  Run And Return Rc And Output  uname -v
+    ${is_windows}=  Run Keyword And Return Status  Should Be True  ${rc} > 0
+    ${is_mac}=  Run Keyword And Return Status  Should Contain  ${uname_v}  Darwin
+    Run Keyword If  not ${is_windows} and ${is_mac}  Cleanup MacOS Testbed
+    Run Keyword If  ${is_windows}  Cleanup Windows Testbed
+
+Cleanup MacOS Testbed
+    ${files_to_remove}=  Catenate
+    ...  /Users/jkim/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
+    ...  /Users/jkim/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
+    ...  /Users/jkim/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
+    ...  /Users/jkim/Desktop/vic/test.secrets
+    ...  /tmp/vic-ui-e2e-scratch
+
+    ${output}=  Run  rm -rvf ${files_to_remove} 2>&1
+    Log  Cleaning up macOS testbed...\n${output}
+
+Cleanup Windows Testbed
+    ${files_to_remove}=  Catenate
+    ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
+    ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
+    ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
+    ...  ~/vic/test.secrets
+    ...  /tmp/vic-ui-e2e-scratch
+
+    ${output}=  Run  rm -rf ${files_to_remove} 2>&1
+    Log  Cleaning up Windows testbed...\n${output}
