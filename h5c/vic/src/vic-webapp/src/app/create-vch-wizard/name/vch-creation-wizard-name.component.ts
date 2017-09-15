@@ -28,6 +28,7 @@ import { supportedCharsPattern } from '../../shared/utils/validators';
 export class VchCreationWizardNameComponent implements OnInit {
   public form: FormGroup;
   public formErrMessage = '';
+  public signpostOpenState = false;
 
   constructor(
     private formBuilder: FormBuilder,
