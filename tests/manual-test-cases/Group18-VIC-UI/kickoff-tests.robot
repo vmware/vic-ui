@@ -20,8 +20,9 @@ Resource         ../../resources/Util.robot
 Resource         ./vicui-common.robot
 
 *** Variables ***
-${TEST_SCRIPTS_ROOT}  tests/manual-test-cases/Group18-VIC-UI/
-${VICTEST2XL}         ${TEST_SCRIPTS_ROOT}/victest2xl.py
+${TEST_SCRIPTS_ROOT}     tests/manual-test-cases/Group18-VIC-UI/
+${VICTEST2XL}            ${TEST_SCRIPTS_ROOT}/victest2xl.py
+${IS_NIGHTLY_TEST}       ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
@@ -52,7 +53,7 @@ Check Drone
 Cleanup Previous Test Logs
     Log  Removing UI test result directories if present...
     Run  rm -rf ui-test-results 2>/dev/null
-    Run  for f in $(find ui/vic-uia/ -name "\$*") ; do rm $f ; done
+    Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
 
 Download VIC Engine Tarball
     [Arguments]  ${url}  ${filename}
@@ -70,14 +71,36 @@ Prepare VIC Engine Binaries
     Should Be Equal As Integers  ${rc2}  0
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
-    #no longer needed
-    #Run  cp -rf ui-nightly-run-bin/ui/* ./scripts/
-    # scp plugin binaries to the test file server. note that ssh authentication is done through publickey
+    Prepare Flex And H5 Plugins For Testing
 
-    # TODO: write a keyword that builds UI plugins
-    ###
+Prepare Flex And H5 Plugins For Testing
+    Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ui/* scripts/  ELSE  Build Flex And H5 Plugins
+    # scp plugin binaries to the test file server. note that ssh authentication is done through publickey
     Run  scp scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
     Run  scp scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
+
+Build Flex And H5 Plugins
+    # ensure build tools are accessible
+    ${rc}=  Run And Return Rc  ant -version
+    Should Be Equal As Integers  ${rc}  0
+    ${rc}=  Run And Return Rc  npm --version
+    Should Be Equal As Integers  ${rc}  0
+
+    ${rc}  ${out}=  Run And Return Rc And Output  wget -nv ${GCP_DOWNLOAD_PATH}${SDK_PACKAGE_ARCHIVE} -O /tmp/${SDK_PACKAGE_ARCHIVE}
+    Run Keyword Unless  ${rc} == 0  Fatal Error  wget error!: ${out}
+
+	${rc}  ${out}=  Run And Return Rc And Output  tar -xzf /tmp/${SDK_PACKAGE_ARCHIVE} -C /tmp/
+    Run Keyword Unless  ${rc} == 0  Fatal Error  tar error!: ${out}
+
+    Log To Console  Building Flex Client plugin...
+    ${rc}  ${out}=  Run And Return Rc And Output  ant -f flex/vic-ui/build-deployable.xml -Denv.VSPHERE_SDK_HOME=${ENV_VSPHERE_SDK_HOME} -Denv.FLEX_HOME=${ENV_FLEX_SDK_HOME} 2>&1
+    Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build Flex Client plugin! ${out}
+    Log To Console  Successfully built Flex Client plugin.\n
+
+    Log To Console  Building H5 Client plugin...
+    ${rc}  ${out}=  Run And Return Rc And Output  ant -f h5c/build-deployable.xml -Denv.VSPHERE_SDK_HOME=${ENV_VSPHERE_SDK_HOME} -Denv.FLEX_HOME=${ENV_FLEX_SDK_HOME} -Denv.VSPHERE_H5C_SDK_HOME=${ENV_HTML_SDK_HOME} -Denv.BUILD_MODE=prod 2>&1
+    Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build H5 Client plugin! ${out}
+    Log To Console  Successfully built H5 Client plugin.\n
 
 Get Latest Vic Engine Binary
     Log  Fetching the latest VIC Engine tar ball...
@@ -203,7 +226,7 @@ Run Script Test With Config
     Should Be Equal As Integers  ${rc}  0
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"ui/vic-uia/test.secrets\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"test.secrets\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -266,7 +289,7 @@ Run Plugin Test With Config
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ❌ Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"ui/vic-uia/test.secrets\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"test.secrets\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -297,7 +320,7 @@ Cleanup Testbed
     Terminate All Processes  kill=True
 
     # Delete all transient and sensitive information
-    Run  rm -rf .drone.local.tests.yml testbed-information tests/manual-test-cases/Group18-VIC-UI/testbed-information >/dev/null 2>&1
+    Run  rm -rf .drone.local.tests.yml testbed-information tests/manual-test-cases/Group18-VIC-UI/testbed-information /tmp/sdk/ >/dev/null 2>&1
     Run  rm -rf ui-test-results >/dev/null 2>&1
     Run  rm -rf Kickoff-Tests* VCH-0*
 
@@ -323,6 +346,8 @@ Send Email
     ${rc2}  ${testresults_base64}=  Run And Return Rc And Output  base64 "${zip_filename}"
     Should Be Equal As Integers  ${rc2}  0
 
+    ${head_commit}=  Run  git log -1 --pretty=format:%h
+    ${email_title}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  vic ui nightly run ${buildNumber}  ELSE  Set Variable  vic integration test run ${head_commit}
     ${email_body}=  Catenate  SEPARATOR=\n
     ...    To: kjosh@vmware.com
     ...    To: joshuak@vmware.com
@@ -330,8 +355,8 @@ Send Email
     ...    To: kmacdonell@vmware.com
     ...    To: mwilliamson@vmware.com
     ...    To: singhshweta@vmware.com
-    ...    Subject: vic ui nightly run ${buildNumber}
-    ...    From: vic nightly
+    ...    Subject: ${email_title}
+    ...    From: Josh Kim <kjosh@vmware.com>
     ...    MIME-Version: 1.0
     ...    Content-Type: multipart/mixed; boundary="${boundary}"${\n}
     ...    --${boundary}
