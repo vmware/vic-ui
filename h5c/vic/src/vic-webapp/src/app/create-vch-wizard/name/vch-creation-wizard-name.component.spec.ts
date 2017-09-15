@@ -75,8 +75,8 @@ describe('VchCreationWizardNameComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should start with an invalid form', () => {
-    expect(component.form.invalid).toBe(true);
+  it('should start with a valid form using default values', () => {
+    expect(component.form.valid).toBe(true);
   });
 
   it('should have a valid form after adding a name',  () => {
