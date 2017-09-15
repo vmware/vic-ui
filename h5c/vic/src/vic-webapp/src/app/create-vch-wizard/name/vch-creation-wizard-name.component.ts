@@ -39,7 +39,7 @@ export class VchCreationWizardNameComponent implements OnInit {
     // and not containing any invalid characters
     this.form = formBuilder.group({
       name: [
-        '', // TODO: implement a function to load existing data
+        'virtual-container-host',
         [
           Validators.required,
           Validators.maxLength(80),
