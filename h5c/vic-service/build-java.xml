@@ -78,7 +78,7 @@
    <target name="run-test" description="Run unit tests for VIC UI service">
       <delete dir="unittest-results"/>
       <mkdir dir="unittest-results"/>
-      <junit printsummary="yes" haltonfailure="no" errorproperty="test.failed" failureproperty="test.failed">
+      <junit printsummary="yes" haltonfailure="no" errorproperty="test.failed" failureproperty="test.failed" fork="true">
          <classpath location="${VSPHERE_H5C_SDK_HOME}/libs/vsphere-client-lib.jar"/>
          <classpath location="${VSPHERE_H5C_SDK_HOME}/libs/commons-logging-1.1.1.jar"/>
          <classpath location="${VSPHERE_H5C_SDK_HOME}/libs/junit-4.12.jar"/>
