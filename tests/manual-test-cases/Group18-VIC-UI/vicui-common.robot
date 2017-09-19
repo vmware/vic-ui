@@ -200,10 +200,10 @@ Teardown Script Test Suite
 
 Cleanup MacOS Testbed
     ${files_to_remove}=  Catenate
-    ...  /Users/jkim/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
-    ...  /Users/jkim/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
-    ...  /Users/jkim/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
-    ...  /Users/jkim/Desktop/vic/test.secrets
+    ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
+    ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
+    ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
+    ...  /Users/browseruser/Desktop/vic/test.secrets
     ...  /tmp/vic-ui-e2e-scratch
 
     ${output}=  Run  rm -rvf ${files_to_remove} 2>&1

@@ -155,7 +155,7 @@ Deploy Vcsa
     Open Connection  %{NIMBUS_GW}
     Wait Until Keyword Succeeds  2 min  30 sec  Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     # run nimbus command and make sure deployment was successful
-    ${output}=  Execute Command  nimbus-vcvadeploy --lease\=1 --vcvaBuild ${buildnum} ${name}
+    ${output}=  Execute Command  nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${buildnum} ${name}
     Run Keyword If  ${logfile} is not None  Create File  ${logfile}  ${output}
     Should Contain  ${output}  To manage this VM use
     

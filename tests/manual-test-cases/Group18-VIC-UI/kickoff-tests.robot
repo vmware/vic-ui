@@ -76,8 +76,8 @@ Prepare VIC Engine Binaries
 Prepare Flex And H5 Plugins For Testing
     Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ui/* scripts/  ELSE  Build Flex And H5 Plugins
     # scp plugin binaries to the test file server. note that ssh authentication is done through publickey
-    Run  scp scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
-    Run  scp scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
+    Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
+    Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
 
 Build Flex And H5 Plugins
     # ensure build tools are accessible
@@ -151,15 +151,14 @@ Setup Test Matrix
     # plugin test matrix
     @{plugin_test_config_matrix}=  Create List
     &{plugin_test_results_dict}=  Create Dictionary
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Ubuntu,Googlechrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Ubuntu,Firefox,Firefox
+    # vSphere H5C and Flex Client are not supported  on Linux
+    # https://docs.vmware.com/en/VMware-vSphere/6.0/com.vmware.vsphere.install.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
+    # https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.upgrade.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
     Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Mac,Googlechrome,Chrome
     Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Mac,Firefox,Firefox
     Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,Googlechrome,Chrome
     Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,Firefox,Firefox
     Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,iexplore,IE11
-    Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Ubuntu,Chrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Ubuntu,Firefox,Firefox
     Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Mac,Chrome,Chrome
     Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Mac,Firefox,Firefox
     Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Windows,Chrome,Chrome
@@ -242,8 +241,7 @@ Run Script Test With Config
     Log To Console  ${results.stderr}
 
     # move log files
-    ${mv_results}=  Run  mv tests/manual-test-cases/Group18-VIC-UI/*.log ${test_results_folder}/ 2>&1
-    Log To Console  ${mv_results}
+    Move Files  tests/manual-test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
 
 Run Plugin Test With Config
     [Arguments]  ${run_config}
@@ -305,8 +303,7 @@ Run Plugin Test With Config
     Log To Console  ${results.stderr}
 
     # move log files
-    ${mv_results}=  Run  mv tests/manual-test-cases/Group18-VIC-UI/*.log ${test_results_folder}/ 2>&1
-    Log To Console  ${mv_results}
+    Move Files  tests/manual-test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
 
 Generate Test Report
     ${script_exists}  ${out}=  Run Keyword And Ignore Error  OperatingSystem.File Should Exist  ${VICTEST2XL}
@@ -348,13 +345,17 @@ Send Email
 
     ${head_commit}=  Run  git log -1 --pretty=format:%h
     ${email_title}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  vic ui nightly run ${buildNumber}  ELSE  Set Variable  vic integration test run ${head_commit}
-    ${email_body}=  Catenate  SEPARATOR=\n
+    ${whoami}=  Run  whoami
+    ${nightly_recipients}=  Catenate  SEPARATOR=\n
     ...    To: kjosh@vmware.com
     ...    To: joshuak@vmware.com
     ...    To: cfalcone@vmware.com
     ...    To: kmacdonell@vmware.com
     ...    To: mwilliamson@vmware.com
     ...    To: singhshweta@vmware.com
+    ${email_to}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  ${nightly_recipients}  ELSE  Set Variable  To: ${whoami}@vmware.com
+    ${email_body}=  Catenate  SEPARATOR=\n
+    ...    ${email_to}
     ...    Subject: ${email_title}
     ...    From: Josh Kim <kjosh@vmware.com>
     ...    MIME-Version: 1.0
@@ -451,5 +452,5 @@ Launch Plugin Tests
     \    Uninstall VCH  ${TRUE}
 
 Report Results
-    Generate Test Report
+    Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Test Report
     Send Email
