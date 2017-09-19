@@ -27,7 +27,7 @@ ${REMOTE_RESULTS_FOLDER}  /tmp/vic-ui-e2e-installer
 Load Testbed Information And Force Remove Vicui Plugin
     # load nimbus & vch testbed information from testbed-information
     Load Nimbus Testbed Env
-    Load Secrets  ../../../vic-uia/test.secrets
+    Load Secrets  ../../../test.secrets
     Force Remove Vicui Plugin
     Set Absolute Script Paths
 
@@ -188,7 +188,7 @@ TestCase-Install Plugin Successfully
 # Run the test cases above in macOS
 Run Testcases On Mac
     ${results_folder}=  Set Variable  ../../../%{TEST_RESULTS_FOLDER}
-    ${remote_vic_root}=  Set Variable  /Users/jkim/Desktop/vic
+    ${remote_vic_root}=  Set Variable  /Users/browseruser/Desktop/vic
     ${remote_scratch_folder}=  Set Variable  /tmp/vic-ui-e2e-scratch
     OperatingSystem.Create Directory  ${results_folder}
 

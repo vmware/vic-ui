@@ -24,6 +24,8 @@ class VicUiInstallPexpectLibrary(object):
     IS_WINDOWS = platform.system() == 'Windows'
     SCRIPT_FOLDER = 'vCenterForWindows' if IS_WINDOWS else 'VCSA'
     SCRIPT_EXT = '.bat' if IS_WINDOWS else '.sh'
+    FLEX_UIA_PATH = os.path.realpath(os.path.join(os.path.dirname(
+        __file__), '..', '..', '..', 'flex', 'vic-uia'))
     INSTALLER_PATH = os.path.realpath(os.path.join(os.path.dirname(
         __file__), '..', '..', '..', 'ui', 'installer', SCRIPT_FOLDER))
 
@@ -191,7 +193,7 @@ class VicUiInstallPexpectLibrary(object):
         try:
             self._f = open('ngc_tests.log', 'wb')
             self._pchild = pexpect.spawn('mvn test -Dmaven.repo.local=' + working_directory + ' -Denv.VC_ADMIN_USERNAME=' + vcenter_user + ' -Denv.VC_ADMIN_PASSWORD=' + vcenter_password,
-                                         timeout=VicUiInstallPexpectLibrary.NGC_TESTS_TIMEOUT_LIMIT)
+                                         cwd=VicUiInstallPexpectLibrary.FLEX_UIA_PATH, timeout=VicUiInstallPexpectLibrary.NGC_TESTS_TIMEOUT_LIMIT)
             self._pchild.logfile = self._f
             self._pchild.expect(pexpect.EOF)
             self._f.close()
