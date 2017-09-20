@@ -33,6 +33,12 @@ IF NOT EXIST configs (
     EXIT /b 1
 )
 
+IF NOT EXIST ..\plugin-manifest (
+    ECHO -------------------------------------------------------------
+    ECHO Error! Plugin manifest was not found!
+    ENDLOCAL
+    EXIT /b 1
+)
 SET arg_name=%1
 SET arg_value=%2
 
@@ -91,12 +97,22 @@ REM entry routine
 GOTO retrieve_vc_thumbprint
 
 :retrieve_vc_thumbprint
-"%parent%..\..\vic-ui-windows.exe" info %vcenter_unreg_flags% --key com.vmware.vic.noop > scratch.tmp 2> NUL
+"%parent%..\..\vic-ui-windows.exe" info %vcenter_unreg_flags% --key com.vmware.vic.noop > scratch.tmp 2>&1
 TYPE scratch.tmp | findstr -c:"Failed to verify certificate" > NUL
 IF %ERRORLEVEL% EQU 0 (
     SETLOCAL ENABLEDELAYEDEXPANSION
     FOR /F "usebackq tokens=2 delims=(" %%B IN (scratch.tmp) DO SET vc_thumbprint=%%B
     SET vc_thumbprint=!vc_thumbprint:~11,-1!
+    ECHO.
+    ECHO SHA-1 key fingerprint of host '%target_vcenter_ip%' is '!vc_thumbprint!'
+    GOTO validate_vc_thumbprint
+)
+
+REM in case VIC_MACHINE_THUMBPRINT environment variable is set, use it
+TYPE scratch.tmp | findstr -c:"com.vmware.vic.noop is not registered" > NUL
+IF NOT "%VIC_MACHINE_THUMBPRINT%" == "" (
+    SETLOCAL ENABLEDELAYEDEXPANSION
+    SET vc_thumbprint=%VIC_MACHINE_THUMBPRINT%
     ECHO.
     ECHO SHA-1 key fingerprint of host '%target_vcenter_ip%' is '!vc_thumbprint!'
     GOTO validate_vc_thumbprint
