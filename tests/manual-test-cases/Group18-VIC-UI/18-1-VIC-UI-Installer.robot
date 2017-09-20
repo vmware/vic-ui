@@ -45,7 +45,6 @@ TestCase-Attempt To Install With Configs File Missing
 
 TestCase-Attempt To Install With Manifest Missing
     [Tags]    anyos
-    # NOTE: 18-1: "TestCase-Attempt To Install With Manifest Missing" fails because of a known issue (https://github.com/jooskim/vic/issues/68). This will be addressed in a subsequent PR to the vmware/vic-ui repository, which currently is under a legal review for creation at this moment
     Move File  ${UI_INSTALLER_PATH}/../plugin-manifest  ${UI_INSTALLER_PATH}/../plugin-manifest-a
     Run Keyword And Continue On Failure  Script Fails For Missing Config Or Manifest  install
     ${output}=  OperatingSystem.GetFile  install.log
@@ -144,7 +143,6 @@ TestCase-Attempt To Install With Wrong Vcenter Credentials
     [Tags]    windows
     Run Keyword And Continue On Failure  Interact With Script  install  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME}_nope -p ${TEST_VC_PASSWORD}_nope  ${EMPTY}  ${TRUE}
     ${output}=  OperatingSystem.GetFile  install.log
-    # TODO: replace the following error message with "Cannot complete login due to an incorrect user name or password"
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Error
     Run Keyword Unless  ${passed}  Move File  install.log  install-fail-attempt-to-install-with-wrong-vcenter-credentials.log
     Should Be True  ${passed}

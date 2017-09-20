@@ -45,7 +45,6 @@ TestCase-Attempt To Uninstall With Configs File Missing
 
 TestCase-Attempt To Uninstall With Plugin Manifest Missing
     [Tags]  anyos
-    # NOTE: 18-2: "TestCase-Attempt To Uninstall With Manifest Missing" fails because of a known issue (https://github.com/jooskim/vic/issues/68). This will be addressed in a subsequent PR to the vmware/vic-ui repository, which currently is under a legal review for creation at this moment
     Move File  ${UI_INSTALLER_PATH}/../plugin-manifest  ${UI_INSTALLER_PATH}/../plugin-manifest-a
     Run Keyword And Continue On Failure  Script Fails For Missing Config Or Manifest  uninstall
     ${output}=  OperatingSystem.GetFile  uninstall.log
@@ -105,7 +104,6 @@ TestCase-Be Prompted to Verify VC Thumbprint
 
 TestCase-Attempt To Uninstall With VIC_MACHINE_THUMBPRINT Env Var Set
     [Tags]    anyos
-    # NOTE: 18-2: "TestCase-Attempt To Uninstall With VIC_MACHINE_THUMBPRINT Env Var Set" currently fails because of a known issue (https://github.com/vmware/vic/issues/6161). This will be addressed in a subsequent PR to the vmware/vic-ui repository, which currently is under a legal review for creation at this moment
     Set Environment Variable  VIC_MACHINE_THUMBPRINT  ${VC_FINGERPRINT}
     Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Are you sure you trust the authenticity of this host
     ${output}=  OperatingSystem.GetFile  uninstall.log
