@@ -100,7 +100,7 @@ Cleanup Dangling VMs On VIC UI Test Server
 Set Absolute Script Paths
     ${rc}  ${out}=  Run And Return Rc And Output  ver
     ${is_windows}=  Run Keyword And Return Status  Should Contain  ${out}  Windows
-    ${UI_INSTALLERS_ROOT}=  Set Variable  ../../../ui/installer
+    ${UI_INSTALLERS_ROOT}=  Set Variable  ../../../scripts
     Run Keyword If  ${is_windows}  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/vCenterForWindows  ELSE  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/VCSA
     Should Exist  ${UI_INSTALLER_PATH}
     ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs
