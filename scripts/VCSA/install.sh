@@ -247,11 +247,11 @@ verify_plugin_url() {
         exit 1
     fi
 
-    local CURL_RESPONSE=$(curl --head $VIC_UI_HOST_URL$PLUGIN_BASENAME -k 2>&1)
+    local CURL_RESPONSE=$(curl --head ${VIC_UI_HOST_URL}files/$PLUGIN_BASENAME -k 2>&1)
 
     if [[ $(echo $CURL_RESPONSE | grep -i "could not resolve\|fail") ]] ; then
         echo "-------------------------------------------------------------"
-        echo "Error! Could not resolve the host provided. Please make sure the URL is correct"
+        echo "Error! Could not resolve the host at $VIC_UI_HOST_URL. Please make vSphere Integrated Containers Appliance is powered on and reachable from where you are running the script"
         exit 1
     fi
 
