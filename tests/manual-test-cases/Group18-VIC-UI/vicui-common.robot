@@ -33,7 +33,7 @@ ${ENV_HTML_SDK_HOME}                  /tmp/sdk/html-client-sdk
 *** Keywords ***
 Set Fileserver And Thumbprint In Configs
     [Arguments]  ${fake}=${FALSE}
-    ${fileserver_url}=  Run Keyword If  ${fake} == ${TRUE}  Set Variable  256.256.256.256  ELSE  Set Variable  ${vic_macmini_fileserver_url}
+    ${fileserver_url}=  Run Keyword If  ${fake} == ${TRUE}  Set Variable  https://256.256.256.256/  ELSE  Set Variable  ${vic_macmini_fileserver_url}
     ${fileserver_thumbprint}=  Run Keyword If  ${fake} == ${TRUE}  Set Variable  ab:cd:ef  ELSE  Set Variable  ${vic_macmini_fileserver_thumbprint}
     ${results}=  Replace String Using Regexp  ${configs}  VIC_UI_HOST_URL=.*  VIC_UI_HOST_URL=\"${fileserver_url}\"
     ${results}=  Replace String Using Regexp  ${results}  VIC_UI_HOST_THUMBPRINT=.*  VIC_UI_HOST_THUMBPRINT=\"${fileserver_thumbprint}\"

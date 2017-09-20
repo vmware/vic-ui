@@ -146,7 +146,7 @@ TestCase-Attempt To Upgrade With Wrong Vcenter Credentials
     Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-with-wrong-vcenter-credentials.log
     Should Be True  ${passed}
 
-TestCase-Attempt to Upgrade With Unmatching Fingerprint
+TestCase-Attempt to Upgrade With Unmatching VC Fingerprint
     [Tags]    unixlike
     Append To File  ${UI_INSTALLER_PATH}/configs  BYPASS_PLUGIN_VERIFICATION=1\n
     Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${FALSE}  ff:ff:ff

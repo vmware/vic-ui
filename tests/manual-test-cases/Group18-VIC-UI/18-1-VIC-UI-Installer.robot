@@ -145,7 +145,7 @@ TestCase-Attempt To Install With Wrong Vcenter Credentials
     Run Keyword Unless  ${passed}  Move File  install.log  install-fail-attempt-to-install-with-wrong-vcenter-credentials.log
     Should Be True  ${passed}
 
-TestCase-Attempt to Install With Unmatching Fingerprint
+TestCase-Attempt to Install With Unmatching VC Fingerprint
     [Tags]    unixlike
     Append To File  ${UI_INSTALLER_PATH}/configs  BYPASS_PLUGIN_VERIFICATION=1\n
     Run Keyword And Continue On Failure  Install Fails  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${FALSE}  ff:ff:ff
