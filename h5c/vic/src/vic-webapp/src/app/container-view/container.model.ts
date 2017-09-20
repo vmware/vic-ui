@@ -36,6 +36,7 @@ export class ContainerVm implements VirtualMachine {
   public powerState: string;
   public containerName: string;
   public parentObjectName: string;
+  public vchEndpointVmId: string;
   public imageName: string;
   public portMapping: string;
   public overallCpuUsage: number;
@@ -53,6 +54,7 @@ export class ContainerVm implements VirtualMachine {
         value: data.resourcePool.value
       };
       this.parentObjectName = data.parentObjectName;
+      this.vchEndpointVmId = `urn:vmomi:VirtualMachine:${data.vchEndpointVmMorValue}${COLON}${splitVmId[0]}`;
       this.vmId = `urn:vmomi:VirtualMachine:${splitVmId[1]}${COLON}${splitVmId[0]}`;
       this.name = data.name;
       this.overallStatus = data.overallStatus;

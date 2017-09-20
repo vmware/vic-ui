@@ -72,6 +72,7 @@ export interface ContainerVmResponse {
     type: string;
     containerName: string;
     parentObjectName: string;
+    vchEndpointVmMorValue: string;
     imageName: string;
     portMapping?: string | null;
     name: string;
