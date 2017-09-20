@@ -45,7 +45,6 @@ TestCase-Attempt To Upgrade With Configs File Missing
 
 TestCase-Attempt To Upgrade With Plugin Manifest Missing
     [Tags]  anyos
-    # NOTE: 18-3: "TestCase-Attempt To Upgrade With Manifest Missing" fails because of a known issue (https://github.com/jooskim/vic/issues/68). This will be addressed in a subsequent PR to the vmware/vic-ui repository, which currently is under a legal review for creation at this moment
     Move File  ${UI_INSTALLER_PATH}/../plugin-manifest  ${UI_INSTALLER_PATH}/../plugin-manifest-a
     Run Keyword And Continue On Failure  Script Fails For Missing Config Or Manifest  upgrade
     ${output}=  OperatingSystem.GetFile  upgrade.log
@@ -105,7 +104,6 @@ TestCase-Be Prompted to Verify VC Thumbprint
 
 TestCase-Attempt To Upgrade With VIC_MACHINE_THUMBPRINT Env Var Set
     [Tags]    anyos
-    # NOTE: 18-3: "TestCase-Attempt To Upgrade With VIC_MACHINE_THUMBPRINT Env Var Set" currently fails because of a known issue (https://github.com/vmware/vic/issues/6161). This will be addressed in a subsequent PR to the vmware/vic-ui repository, which currently is under a legal review for creation at this moment
     Set Environment Variable  VIC_MACHINE_THUMBPRINT  ${VC_FINGERPRINT}
     Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Are you sure you trust the authenticity of this host
     ${output}=  OperatingSystem.GetFile  upgrade.log
@@ -133,7 +131,6 @@ TestCase-Attempt To Upgrade Against A Non vCenter Server
 TestCase-Attempt To Upgrade With Wrong Vcenter Credentials
     [Tags]    unixlike
     Set Fileserver And Thumbprint In Configs
-    # NOTE: 18-3: "TestCase-Attempt To Upgrade With Wrong Vcenter Credentials, TestCase-Upgrade When No Plugin Is Installed, and TestCase-Upgrade When Plugins Are Already Installed" fail on macOS and Ubuntu because of a known issue (https://github.com/jooskim/vic/issues/75).
     Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}_nope  ${TEST_VC_PASSWORD}_nope
     ${output}=  OperatingSystem.GetFile  upgrade.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Cannot complete login due to an incorrect user name or password
