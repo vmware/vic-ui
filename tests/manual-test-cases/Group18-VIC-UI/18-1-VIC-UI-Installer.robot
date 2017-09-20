@@ -104,7 +104,6 @@ TestCase-Be Prompted to Verify VC Thumbprint
 
 TestCase-Attempt To Install With VIC_MACHINE_THUMBPRINT Env Var Set
     [Tags]    anyos
-    # NOTE: 18-1: "TestCase-Attempt To Install With VIC_MACHINE_THUMBPRINT Env Var Set" currently fails because of a known issue (https://github.com/vmware/vic/issues/6161). This will be addressed in a subsequent PR to the vmware/vic-ui repository, which currently is under a legal review for creation at this moment
     Set Environment Variable  VIC_MACHINE_THUMBPRINT  ${VC_FINGERPRINT}
     Run Keyword And Continue On Failure  Interact With Script  install  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Are you sure you trust the authenticity of this host
     ${output}=  OperatingSystem.GetFile  install.log
@@ -132,7 +131,6 @@ TestCase-Attempt To Install To A Non vCenter Server
 TestCase-Attempt To Install With Wrong Vcenter Credentials
     [Tags]    unixlike
     Set Fileserver And Thumbprint In Configs
-    # NOTE: 18-1: "TestCase-Attempt To Install With Wrong Vcenter Credentials, TestCase-Install Plugin Successfully" fail on macOS and Ubuntu because of a known issue (https://github.com/jooskim/vic/issues/75).
     Run Keyword And Continue On Failure  Install Fails  ${TEST_VC_IP}  ${TEST_VC_USERNAME}_nope  ${TEST_VC_PASSWORD}_nope  ${FALSE}  %{VC_FINGERPRINT}
     ${output}=  OperatingSystem.GetFile  install.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Cannot complete login due to an incorrect user name or password
