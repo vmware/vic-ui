@@ -75,7 +75,7 @@ Prepare VIC Engine Binaries
 
 Prepare Flex And H5 Plugins For Testing
     Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ui/* scripts/  ELSE  Build Flex And H5 Plugins
-    # scp plugin binaries to the test file server. note that ssh authentication is done through publickey
+    # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
 
@@ -187,7 +187,6 @@ Run Script Test With Config
     [Arguments]  ${run_config}  ${title}  ${test_name}  ${results_dict}
     # an example of ${title} is 'Installer test'
     # an example of ${test_name} is '18-1-VIC-UI-Installer'
-    @{config}=      Split String   ${run_config}  ,
     @{config}=      Split String   ${run_config}  ,
     ${vc_version}=  Get From List  ${config}  0
     ${esx_build}=   Get From List  ${config}  1
@@ -346,18 +345,18 @@ Send Email
     ${head_commit}=  Run  git log -1 --pretty=format:%h
     ${email_title}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  vic ui nightly run ${buildNumber}  ELSE  Set Variable  vic integration test run ${head_commit}
     ${whoami}=  Run  whoami
-    ${nightly_recipients}=  Catenate  SEPARATOR=\n
+    ${report_recipients}=  Catenate  SEPARATOR=\n
     ...    To: kjosh@vmware.com
     ...    To: joshuak@vmware.com
     ...    To: cfalcone@vmware.com
     ...    To: kmacdonell@vmware.com
     ...    To: mwilliamson@vmware.com
     ...    To: singhshweta@vmware.com
-    ${email_to}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  ${nightly_recipients}  ELSE  Set Variable  To: ${whoami}@vmware.com
+    ${email_to}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  ${report_recipients}  ELSE  Set Variable  To: ${whoami}@vmware.com
     ${email_body}=  Catenate  SEPARATOR=\n
     ...    ${email_to}
     ...    Subject: ${email_title}
-    ...    From: Josh Kim <kjosh@vmware.com>
+    ...    From: VIC Lifecycle - UI <kjosh@vmware.com>
     ...    MIME-Version: 1.0
     ...    Content-Type: multipart/mixed; boundary="${boundary}"${\n}
     ...    --${boundary}
