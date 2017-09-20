@@ -14,8 +14,6 @@ pipeline:
       BIN: bin
       GOPATH: /go
       SHELL: /bin/bash
-      DRONE_SERVER: ${DRONE_SERVER}
-      DRONE_TOKEN: ${DRONE_TOKEN}
       NIMBUS_USER: ${NIMBUS_USER}
       NIMBUS_PASSWORD: ${NIMBUS_PASSWORD}
       NIMBUS_GW: ${NIMBUS_GW}
