@@ -27,7 +27,7 @@ class VicUiInstallPexpectLibrary(object):
     FLEX_UIA_PATH = os.path.realpath(os.path.join(os.path.dirname(
         __file__), '..', '..', '..', 'flex', 'vic-uia'))
     INSTALLER_PATH = os.path.realpath(os.path.join(os.path.dirname(
-        __file__), '..', '..', '..', 'ui', 'installer', SCRIPT_FOLDER))
+        __file__), '..', '..', '..', 'scripts', SCRIPT_FOLDER))
 
     def _prepare_and_spawn(self, operation, callback=None, flags=None, timeout_sec=180):
         try:
