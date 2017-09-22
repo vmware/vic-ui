@@ -1,10 +1,10 @@
 <p>
   Select a cluster or resource pool to run this virtual container host.
-  <br>
-  Advanced options are available to specify additional requirements.
+  <br> Advanced options are available to specify additional requirements.
 </p>
 
-<form [formGroup]="form" novalidate>
+<form [formGroup]="form"
+      novalidate>
   <section class="form-block mb-0">
 
     <div class="form-group row">
@@ -156,12 +156,14 @@
 
   </section>
 
-  <a class="btn btn-link pl-0" (click)="toggleAdvancedMode()">
+  <a class="btn btn-link pl-0"
+     (click)="toggleAdvancedMode()">
     {{ inAdvancedMode ? 'Basic' : 'Advanced' }}
     <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon>
   </a>
 
-  <section class="form-block mt-0" *ngIf="inAdvancedMode">
+  <section class="form-block mt-0"
+           *ngIf="inAdvancedMode">
 
     <div class="alert alert-sm alert-info mt-0 mb-2">
       <div class="alert-item">
@@ -169,29 +171,6 @@
           The following options will be used for VCH creation only when the advanced mode is open.
         </div>
       </div>
-    </div>
-
-    <div class="form-group row">
-      <div class="col-xs-4">
-
-        <label for="debug-level-selector">
-          Debug
-        </label>
-
-      </div>
-      <div class="col-xs-6">
-
-        <div class="select form-control">
-          <select id="debug-level-selector" formControlName="debug">
-            <option value="0">0 - Verbose logging is disabled</option>
-            <option value="1">1 - Provides extra verbosity in the logs</option>
-            <option value="2">2 - Exposes server on more interfaces, launches pprof in container VMs</option>
-            <option value="3">3 - Disables recovery logic and logs sensitive data</option>
-          </select>
-        </div>
-
-      </div>
-
     </div>
 
     <label>
@@ -258,7 +237,8 @@
       <div class="col-xs-3">
 
         <div class="select form-control">
-          <select id="cpu-shares-selector" formControlName="cpuShares">
+          <select id="cpu-shares-selector"
+                  formControlName="cpuShares">
             <option value="2000">Low</option>
             <option value="4000">Normal</option>
             <option value="8000">High</option>
@@ -328,7 +308,8 @@
       <div class="col-xs-3">
 
         <div class="select form-control">
-          <select id="memory-shares-selector" formControlName="memoryShares">
+          <select id="memory-shares-selector"
+                  formControlName="memoryShares">
             <option value="81920">Low</option>
             <option value="163840">Normal</option>
             <option value="327680">High</option>

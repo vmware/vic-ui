@@ -61,7 +61,6 @@ export class ComputeCapacityComponent implements OnInit {
         'Unlimited',
         getNumericValidatorsArray(true)
       ],
-      debug: '0',
       cpuReservation: [
         '1',
         getNumericValidatorsArray(false)
@@ -239,7 +238,6 @@ export class ComputeCapacityComponent implements OnInit {
       results['cpu'] = unlimitedPattern.test(cpuLimitValue) ? '0' : cpuLimitValue;
       results['memory'] = unlimitedPattern.test(memoryLimitValue) ? '0' : memoryLimitValue;
       if (this.inAdvancedMode) {
-        results['debug'] = this.form.get('debug').value;
         results['cpuReservation'] = this.form.get('cpuReservation').value;
         results['cpuShares'] = this.form.get('cpuShares').value;
         results['memoryReservation'] = this.form.get('memoryReservation').value;
