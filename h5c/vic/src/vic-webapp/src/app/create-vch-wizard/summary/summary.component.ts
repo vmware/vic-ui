@@ -17,6 +17,7 @@ import { Component, OnInit, EventEmitter, Input, ElementRef } from '@angular/cor
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { camelCasePattern } from '../../shared/utils/validators';
+import { getClientOS } from '../../shared/utils/detection'
 import { isUploadableFileObject } from '../../shared/utils/model-checker';
 
 // TODO: refactor & clean up the template
@@ -40,6 +41,7 @@ export class SummaryComponent implements OnInit {
   ) {
     this.processedPayload = null;
     this.form = formBuilder.group({
+      debug: '0',
       targetOS: '',
       cliCommand: ''
     });
@@ -54,13 +56,21 @@ export class SummaryComponent implements OnInit {
    */
   onPageLoad(): void {
     // refresh based on any changes made to the previous pages
-    this.processedPayload = this.processPayload();
-    this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
 
     // prevent subscription from getting set up more than once
     if (this._isSetup) {
       return;
     }
+
+    /**
+     *  Subscribe to debug and os changes
+     *  we have to subscribe to these individually instead of the whole form
+     *  since we are manually setting a change on the cli field
+     */
+    this.form.get('debug').valueChanges.subscribe(data => {
+      this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
+    });
+
     this.form.get('targetOS').valueChanges
       .subscribe(v => {
         if (!v) {
@@ -69,7 +79,11 @@ export class SummaryComponent implements OnInit {
         this.targetOS = v;
         this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
       });
+
+    this.setDefaultOS();
     this._isSetup = true;
+
+    this.setDefaultOS();
   }
 
   /**
@@ -91,6 +105,13 @@ export class SummaryComponent implements OnInit {
   }
 
   /**
+   * default to users OS
+   */
+  setDefaultOS(): void {
+    this.form.patchValue({ 'targetOS': getClientOS() });
+  }
+
+  /**
    * Convert camelcase keys into dash-separated ones, remove fields with
    * an empty array, and then return the array joined
    * @returns {string} vic-machine compatible arguments
@@ -99,6 +120,8 @@ export class SummaryComponent implements OnInit {
     if (!this.targetOS) {
       return null;
     }
+
+    this.processedPayload = this.processPayload();
 
     const payload = this.processedPayload;
     const results = [];
@@ -198,6 +221,10 @@ export class SummaryComponent implements OnInit {
           };
         }
       });
+
+    // debug
+    results['debug'] = this.form.get('debug').value;
+
     return results;
   }
 
