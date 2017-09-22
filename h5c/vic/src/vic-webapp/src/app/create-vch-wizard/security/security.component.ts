@@ -26,6 +26,8 @@ import {
   ipPattern,
   whiteListRegistryPattern
 } from '../../shared/utils/validators';
+import {parseCertificatePEMFileContent, CertificateInfo, parsePrivateKeyPEMFileContent} from '../../shared/utils/certificates';
+import PrivateKeyInfo from 'pkijs/src/PrivateKeyInfo';
 
 @Component({
   selector: 'vic-vch-creation-security',
@@ -37,10 +39,14 @@ export class SecurityComponent {
   public formErrMessage = '';
   public inAdvancedMode = false;
   public signpostOpenState = false;
-  public fileReaderError: string = null;
-  // internal array that keeps track of TLS CA files' name and content
+  public tlsServerError: string = null;
+  public tlsServerCertContents: any = null;
+  public tlsServerKeyContents: any = null;
+  // array that keeps track of TLS CA files' name and content
+  public tlsCaError: string = null;
   public tlsCaContents: any[] = [];
-  // internal array that keeps track of registry CA files' name and content
+  // array that keeps track of registry CA files' name and content
+  public registryCaError: string = null;
   public registryCaContents: any[] = [];
   private _isSetup = false;
   @Input() vchName: string;
@@ -176,7 +182,6 @@ export class SecurityComponent {
   }
 
   onCommit(): Observable<any> {
-    const errs: string[] = [];
     const results: any = {};
 
     const useTlsValue = this.form.get('useTls').value;
@@ -186,11 +191,7 @@ export class SecurityComponent {
     const tlsCnameValue = this.form.get('tlsCname').value;
     const orgValue = this.form.get('organization').value;
     const certKeySizeValue = this.form.get('certificateKeySize').value;
-    const tlsServerCertValue = this.form.get('tlsServerCert').value;
-    const tlsServerKeyValue = this.form.get('tlsServerKey').value;
-
     const useClientAuthValue = this.form.get('useClientAuth').value;
-    const tlsCasValue = this.form.get('tlsCas').value;
 
     if (this.inAdvancedMode) {
       // Docker API Access
@@ -210,16 +211,15 @@ export class SecurityComponent {
             results['certificateKeySize'] = certKeySizeValue;
           }
         } else {
-          results['tlsServerCert'] = tlsServerCertValue;
-          results['tlsServerKey'] = tlsServerKeyValue;
+          results['tlsServerCert'] = this.tlsServerCertContents;
+          results['tlsServerKey'] = this.tlsServerKeyContents;
         }
 
         if (!useClientAuthValue) {
           results['noTlsverify'] = true;
           results['tlsCa'] = [];
         } else {
-          results['tlsCa'] = clientCertSourceValue === 'existing' ?
-            this.tlsCaContents : [];
+          results['tlsCa'] = clientCertSourceValue === 'existing' ? this.tlsCaContents : [];
         }
       }
 
@@ -227,7 +227,6 @@ export class SecurityComponent {
       const useWhitelistRegistryValue = this.form.get('useWhitelistRegistry').value;
       const insecureRegistriesValue = this.form.get('insecureRegistries').value;
       const whitelistRegistriesValue = this.form.get('whitelistRegistries').value;
-      const registryCasValue = this.form.get('registryCas').value;
 
       if (!useWhitelistRegistryValue) {
         results['whitelistRegistry'] = [];
@@ -279,32 +278,87 @@ export class SecurityComponent {
    * @param {Event} evt change event on file input
    * @param {string} targetField used to determine which array to push data to
    * @param {number} index FormArray index
+   * @param {boolean} isLast is FormArray last element
    */
-  addFileContent(evt: Event, targetField: string, index: number) {
+  addFileContent(evt: Event, targetField: string, index: number, isLast: boolean) {
     const fr = new FileReader();
     const fileList: FileList = evt.target['files'];
-    const filereaderOnloadFactory = (filename: string) => {
-      return () => {
-        let targetArray: any[];
-        if (targetField === 'tlsCas') {
-          targetArray = this.tlsCaContents;
-        } else if (targetField === 'registryCas') {
-          targetArray = this.registryCaContents;
-        }
 
-        if (targetArray[index]) {
-          // overwrite if value already exists at this index
-          targetArray[index] = {
+    const fileReaderOnLoadFactory = (filename: string) => {
+      let certificate: CertificateInfo;
+
+      switch (targetField) {
+        case 'tlsServerCert': return (event) => {
+          try {
+            certificate = parseCertificatePEMFileContent(event.target.result);
+          } catch (e) {
+            // TODO: i18n-ify
+            this.tlsServerError = 'Failed to parse server certificate PEM file!';
+            return;
+          }
+
+          this.tlsServerCertContents = {
             name: filename,
-            content: fr.result
+            content: event.target.result,
+            expires: certificate.expires
           };
-        } else {
-          targetArray.push({
+        };
+        case 'tlsServerKey': return (event) => {
+          try {
+            parsePrivateKeyPEMFileContent(event.target.result);
+          } catch (e) {
+            // TODO: i18n-ify
+            this.tlsServerError = 'Failed to parse server private key PEM file!';
+            return;
+          }
+
+          this.tlsServerKeyContents = {
             name: filename,
-            content: fr.result
-          });
-        }
-      };
+            content: event.target.result
+          };
+        };
+        case 'tlsCas':
+        case 'registryCas': return (event) => {
+          let targetArray: any[];
+
+          if (targetField === 'tlsCas') {
+            targetArray = this.tlsCaContents;
+          } else if (targetField === 'registryCas') {
+            targetArray = this.registryCaContents;
+          }
+
+          try {
+            certificate = parseCertificatePEMFileContent(event.target.result);
+          } catch (e) {
+            // TODO: i18n-ify
+            if (targetField === 'tlsCas') {
+              this.tlsCaError = 'Failed to parse client certificate PEM file!';
+            } else if (targetField === 'registryCas') {
+              this.registryCaError = 'Failed to parse registry certificate PEM file!';
+            }
+            return;
+          }
+
+          if (isLast) {
+            this.addNewFormArrayEntry(targetField);
+          }
+
+          if (targetArray[index]) {
+            // overwrite if value already exists at this index
+            targetArray[index] = {
+              name: filename,
+              content: event.target.result,
+              expires: certificate.expires
+            };
+          } else {
+            targetArray.push({
+              name: filename,
+              content: event.target.result,
+              expires: certificate.expires
+            });
+          }
+        };
+      }
     };
 
     // since input is without the 'multiple' attribute we are sure that
@@ -312,16 +366,24 @@ export class SecurityComponent {
     const fileInstance: File = fileList[0];
 
     // TODO: i18n-ify
-    this.fileReaderError = fileInstance ? null : 'FileReader failed to load the file!';
-    fr.onload = filereaderOnloadFactory(fileInstance.name);
+    if (targetField === 'tlsCas') {
+      this.tlsCaError = fileInstance ? null : 'Failed to load client certificate PEM file!';
+    } else if (targetField === 'registryCas') {
+      this.registryCaError = fileInstance ? null : 'Failed to load registry certificate PEM file!';
+    } else if (targetField === 'tlsServerCert') {
+      this.tlsServerError = fileInstance ? null : 'Failed to load server certificate PEM file!';
+    } else if (targetField === 'tlsServerKey') {
+      this.tlsServerError = fileInstance ? null : 'Failed to load registry certificate PEM file!';
+    }
+    fr.onload = fileReaderOnLoadFactory(fileInstance.name);
     fr.readAsText(fileInstance);
   }
 
   /**
-   * Clear the file reader error message. This method is called when clr-tab's
+   * Clear the file reader error messages. This method is called when clr-tab's
    * clrTabsCurrentTabContentChanged event is fired
    */
   clearFileReaderError() {
-    this.fileReaderError = null;
+    this.tlsCaError = this.registryCaError = this.tlsServerError = null;
   }
 }
