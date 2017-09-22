@@ -1,6 +1,409 @@
 <div>
-  <form [formGroup]="form"
-        novalidate>
+  <clr-stack-view id="vch-payload-stackview">
+    <!-- name -->
+    <clr-stack-block>
+      <clr-stack-label>Name</clr-stack-label>
+      <clr-stack-content>{{ payload?.name }}</clr-stack-content>
+    </clr-stack-block>
+    <!-- debug (displayed when advanced mode is active) -->
+    <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('debug')">
+      <clr-stack-label>
+        Debug
+      </clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.computeCapacity?.debug }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- compute resource -->
+    <clr-stack-block>
+      <clr-stack-label>Cluster/Resource pool</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.computeCapacity?.computeResource }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- cpu -->
+    <clr-stack-block>
+      <clr-stack-label>CPU</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.computeCapacity?.cpu === '0' ? 'Unlimited' : payload?.computeCapacity?.cpu + ' MHz' }}
+      </clr-stack-content>
+      <clr-stack-block>
+        <clr-stack-label>Limit</clr-stack-label>
+        <clr-stack-content>
+          {{ payload?.computeCapacity?.cpu === '0' ? 'Unlimited' : payload?.computeCapacity?.cpu + ' MHz' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('cpuReservation')">
+        <clr-stack-label>Reservation</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.computeCapacity.cpuReservation }} MHz
+        </clr-stack-content>
+      </clr-stack-block>
+        <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('cpuReservation')">
+        <clr-stack-label>Shares</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.computeCapacity.cpuShares }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- memory -->
+    <clr-stack-block>
+      <clr-stack-label>Memory</clr-stack-label>
+      <clr-stack-content>
+       {{ payload?.computeCapacity?.memory === '0' ? 'Unlimited' : payload?.computeCapacity?.memory + ' MB' }}
+      </clr-stack-content>
+      <clr-stack-block>
+        <clr-stack-label>Limit</clr-stack-label>
+        <clr-stack-content>
+          {{ payload?.computeCapacity?.memory === '0' ? 'Unlimited' : payload?.computeCapacity?.memory + ' MB' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('memoryReservation')">
+        <clr-stack-label>Reservation</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.computeCapacity.memoryReservation }} MB
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('memoryShares')">
+        <clr-stack-label>Shares</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.computeCapacity.memoryShares }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- vm endpoint -->
+    <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('endpointCpu')">
+      <clr-stack-label>VM endpoint</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.computeCapacity.endpointCpu }} CPU(s) / {{ payload.computeCapacity.endpointMemory }} MB
+      </clr-stack-content>
+      <clr-stack-block>
+        <clr-stack-label>vCPU</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.computeCapacity.endpointCpu }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Memory</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.computeCapacity.endpointMemory }} MB
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- image datastore -->
+    <clr-stack-block>
+      <clr-stack-label>Image datastore</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.storageCapacity?.imageStore }}{{ payload?.storageCapacity?.fileFolder }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <clr-stack-block *ngIf="payload?.storageCapacity?.hasOwnProperty('baseImageSize')">
+      <clr-stack-label>Base image size</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.storageCapacity.baseImageSize }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- volume datastores -->
+    <div *ngIf="payload?.storageCapacity?.hasOwnProperty('volumeStores')">
+      <clr-stack-block *ngFor="let volStore of payload.storageCapacity.volumeStores; let i = index">
+      <clr-stack-label>Volume datastore {{ i + 1 }}</clr-stack-label>
+      <clr-stack-content>
+        {{ volStore.volDatastore }}{{ volStore.volFileFolder }}
+      </clr-stack-content>
+      <clr-stack-block>
+        <clr-stack-label>Label</clr-stack-label>
+        <clr-stack-content>
+          {{ volStore.dockerVolName }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Datastore</clr-stack-label>
+        <clr-stack-content>
+          {{ volStore.volDatastore }}{{ volStore.volFileFolder }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    </div>
+    <!-- bridge network -->
+    <clr-stack-block>
+      <clr-stack-label>Bridge network</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.networks?.bridgeNetwork }}, {{ payload?.networks?.bridgeNetworkRange }}
+      </clr-stack-content>
+      <clr-stack-block>
+      <clr-stack-label>Portgroup name</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.networks?.bridgeNetwork }}
+      </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+      <clr-stack-label>Range</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.networks?.bridgeNetworkRange }}
+      </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- public network -->
+    <clr-stack-block>
+      <clr-stack-label>Public network</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.networks?.publicNetwork }}, {{ payload?.networks?.publicNetworkIp || 'DHCP' }}
+      </clr-stack-content>
+      <clr-stack-block>
+      <clr-stack-label>Portgroup name</clr-stack-label>
+      <clr-stack-content>
+        {{ payload?.networks?.publicNetwork }}
+      </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Static IP</clr-stack-label>
+        <clr-stack-content>
+          {{ payload?.networks?.publicNetworkIp || 'DHCP' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Gateway</clr-stack-label>
+        <clr-stack-content>
+          {{ payload?.networks?.publicNetworkGateway || 'DHCP' }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- client network -->
+    <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('clientNetwork')">
+      <clr-stack-label>Client network</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.networks.clientNetwork }}, {{ payload.networks.clientNetworkIp || 'DHCP' }}
+      </clr-stack-content>
+      <clr-stack-block>
+      <clr-stack-label>Portgroup name</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.networks.clientNetwork }}
+      </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Static IP</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.networks.clientNetworkIp || 'DHCP' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Gateway</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.networks.clientNetworkGateway || 'DHCP' }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- management network -->
+    <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('managementNetwork')">
+      <clr-stack-label>Management network</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.networks.managementNetwork }}, {{ payload.networks.managementNetworkIp || 'DHCP' }}
+      </clr-stack-content>
+      <clr-stack-block>
+        <clr-stack-label>Portgroup name</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.networks.managementNetwork }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Static IP</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.networks.managementNetworkIp || 'DHCP' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <clr-stack-block>
+        <clr-stack-label>Gateway</clr-stack-label>
+        <clr-stack-content>
+          {{ payload.networks.managementNetworkGateway || 'DHCP' }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- container networks -->
+    <div *ngIf="payload?.networks?.hasOwnProperty('containerNetworks')">
+      <clr-stack-block *ngFor="let containerNetwork of payload.networks.containerNetworks; let i = index">
+        <clr-stack-label>Container network {{ i + 1 }}</clr-stack-label>
+        <clr-stack-content>
+          {{ containerNetwork.containerNetwork }}, {{ containerNetwork.containerNetworkIpRange || 'DHCP' }}
+        </clr-stack-content>
+        <clr-stack-block>
+          <clr-stack-label>Portgroup name</clr-stack-label>
+          <clr-stack-content>
+            {{ containerNetwork.containerNetwork }}
+          </clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block *ngIf="containerNetwork.containerNetworkIpRange">
+          <clr-stack-label>Static IP Range</clr-stack-label>
+          <clr-stack-content>
+            {{ containerNetwork.containerNetworkIpRange }}
+          </clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block *ngIf="containerNetwork.containerNetworkGateway">
+          <clr-stack-label>Gateway</clr-stack-label>
+          <clr-stack-content>
+            {{ containerNetwork.containerNetworkGateway }}
+          </clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block *ngIf="containerNetwork.containerNetworkDns">
+          <clr-stack-label>DNS</clr-stack-label>
+          <clr-stack-content>
+            {{ containerNetwork.containerNetworkDns }}
+          </clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block>
+          <clr-stack-label>Label</clr-stack-label>
+          <clr-stack-content>
+            {{ containerNetwork.containerNetworkLabel }}
+          </clr-stack-content>
+        </clr-stack-block>
+      </clr-stack-block>
+    </div>
+    <clr-stack-block *ngIf="payload?.storageCapacity?.hasOwnProperty('baseImageSize')">
+      <clr-stack-label>Base image size</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.storageCapacity.baseImageSize }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- http proxy -->
+    <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('httpProxy')">
+      <clr-stack-label>HTTP proxy</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.networks.httpProxy }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- https proxy -->
+    <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('httpsProxy')">
+      <clr-stack-label>HTTPS proxy</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.networks.httpsProxy }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- dns -->
+    <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('dnsServer')">
+      <clr-stack-label>DNS</clr-stack-label>
+      <clr-stack-content>
+        {{ payload.networks.dnsServer }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- docker api access -->
+    <clr-stack-block>
+      <clr-stack-label>
+        Docker API Access
+      </clr-stack-label>
+      <clr-stack-content>
+        TLS {{ payload?.security?.noTls ? 'disabled ' : 'enabled' }}
+      </clr-stack-content>
+      <!-- cert folder -->
+      <clr-stack-block *ngIf="payload?.security?.tlsCertPath">
+        <clr-stack-label>
+          Certificate folder
+        </clr-stack-label>
+        <clr-stack-content>
+          {{ payload.security.tlsCertPath }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <!-- tls cname -->
+      <clr-stack-block *ngIf="payload?.security?.tlsCname">
+        <clr-stack-label>
+          Common name
+        </clr-stack-label>
+        <clr-stack-content>
+          {{ payload.security.tlsCname }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <!-- tls org -->
+      <clr-stack-block *ngIf="payload?.security?.organization">
+        <clr-stack-label>
+          Organization
+        </clr-stack-label>
+        <clr-stack-content>
+          {{ payload.security.organization }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <!-- cert key size -->
+      <clr-stack-block *ngIf="payload?.security?.certificateKeySize">
+        <clr-stack-label>
+          Certificate key size
+        </clr-stack-label>
+        <clr-stack-content>
+          {{ payload.security.certificateKeySize }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <!-- server cert -->
+      <clr-stack-block *ngIf="payload?.security && !payload.security.noTls">
+        <clr-stack-label>
+          Server certificate
+        </clr-stack-label>
+        <clr-stack-content>
+          {{ payload.security.tlsServerCert ? ('expires: ' + (payload.security.tlsServerCert.expires | date : 'mediumDate')) : '-' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <!-- server private key -->
+      <clr-stack-block *ngIf="payload?.security && !payload.security.noTls">
+        <clr-stack-label>
+          Server private key
+        </clr-stack-label>
+        <clr-stack-content>
+          {{ payload.security.tlsServerKey ? (payload.security.tlsServerKey.name) : '-' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <!-- tls verify -->
+      <clr-stack-block *ngIf="payload?.security && !payload.security.noTls">
+        <clr-stack-label>
+          TLS verify
+        </clr-stack-label>
+        <clr-stack-content>
+          {{ payload.security.noTlsverify ? 'Disabled' : 'Enabled' }}
+        </clr-stack-content>
+      </clr-stack-block>
+      <!-- client CAs -->
+      <clr-stack-block *ngFor="let tlsCa of payload?.security?.tlsCa; let i = index">
+        <clr-stack-label>
+          Client certificate {{ i + 1 }}
+        </clr-stack-label>
+        <clr-stack-content>
+          expires: {{ tlsCa.expires | date : 'mediumDate' }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-block>
+    <!-- whitelist registries -->
+    <clr-stack-block *ngFor="let whitelistReg of payload?.security?.whitelistRegistry; let i = index">
+      <clr-stack-label>
+        Whitelisted registry {{ i + 1 }}
+      </clr-stack-label>
+      <clr-stack-content>
+        {{ whitelistReg }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- insecure registries -->
+    <clr-stack-block *ngFor="let insecureReg of payload?.security?.insecureRegistry; let i = index">
+      <clr-stack-label>
+        Insecure registry {{ i + 1 }}
+      </clr-stack-label>
+      <clr-stack-content>
+        {{ insecureReg }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- regsitry CAs -->
+    <clr-stack-block *ngFor="let registryCa of payload?.security?.registryCa; let i = index">
+      <clr-stack-label>
+        Registry certificate {{ i + 1 }}
+      </clr-stack-label>
+      <clr-stack-content>
+        expires: {{ registryCa.expires | date : 'mediumDate' }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <!-- ops user -->
+    <clr-stack-block *ngIf="payload?.security?.opsUser">
+      <clr-stack-label>
+        Operations user
+      </clr-stack-label>
+      <clr-stack-content>
+        {{ payload.security.opsUser }}
+      </clr-stack-content>
+    </clr-stack-block>
+  </clr-stack-view>
+
+  <form [formGroup]="form" novalidate>
     <section class="form-block">
       <div class="form-group row">
         <div class="col-xs-3">
