@@ -30,3 +30,5 @@ questions about the CLA process, please refer to our [FAQ](https://cla.vmware.co
 refer to [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
+
+Refer to [LICENSE.txt](LICENSE.txt).
