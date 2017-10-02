@@ -1,0 +1,10 @@
+div.form-group {
+  & span.red-text {
+    color: red;
+  }
+}
+
+textarea#cliCommand {
+  min-height: 150px;
+  font-size: 0.9em;
+}

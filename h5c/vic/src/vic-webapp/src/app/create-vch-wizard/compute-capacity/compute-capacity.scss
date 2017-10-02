@@ -1,0 +1,19 @@
+@import "../../../../node_modules/clarity-ui/src/color/utils/_colors.clarity.scss";
+
+:host ::ng-deep clr-tree-node {
+  .clr-treenode-link,
+  .clr-treenode-caret {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+#compute-resource-selector {
+  border: 2px solid $clr-lighter-midtone-gray;
+  height: 150px;
+  overflow: auto;
+
+  &.invalid {
+    border-color: $clr-red;
+  }
+}

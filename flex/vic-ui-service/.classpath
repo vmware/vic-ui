@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry kind="src" output="target/classes" path="src/main/resources"/>
+	<classpathentry kind="src" output="target-test/classes" path="src/test/java"/>
+	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/vim25.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/vsphere-client-lib.jar"/>
+	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/junit-4.12.jar"/>
+	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="/Users/kjosh/go/src/github.com/vmware/vic/ui/vic-ui-service/libs/org.apache.httpcomponents.httpclient_4.5.2.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

@@ -1,0 +1,370 @@
+#!/usr/bin/env python
+
+import os
+import os.path
+import sys
+
+from optparse import OptionParser
+from exceptions import ValueError
+
+def parse_arguments():
+    parser = OptionParser()
+    parser.add_option("--admin.user", dest="admin.user", default="Administrator")
+    parser.add_option("--admin.domain", dest="admin.domain", default="vsphere.local")
+    parser.add_option("--admin.password", dest="admin.password", default="Admin!23")
+    parser.add_option("--h5client.ip", dest="h5client.ip")
+    parser.add_option("--h5client.port", dest="h5client.port")
+    parser.add_option("--h5client.url.suffix", dest="h5client.url.suffix", default="?debug=true")
+    parser.add_option("--selenium.ip", dest="selenium.ip", default="localhost")
+    parser.add_option("--browser.os", dest="browser.os", default="MacOSX")
+    parser.add_option("--selenium.port", dest="selenium.port", default="4444")
+    parser.add_option("--browser.type", dest="browser.type", default="Chrome")
+    parser.add_option("--workDir", dest="workDir", default=os.path.join(os.path.dirname(__file__), "work"))
+    parser.add_option("--vc.ip", dest="vc.ip")
+    parser.add_option("--vc.name", dest="vc.name", default="null")
+    parser.add_option("--host.ip", dest="host.ip")
+    parser.add_option("--host.license", dest="host.license", default="null")
+    parser.add_option("--host.datastore_name", dest="host.datastore_name", default='datastore1')
+    parser.add_option("--secondHost.ip", dest="secondHost.ip")
+    parser.add_option("--secondHost.datastore_name", dest="secondHost.datastore_name", default='datastore1 (1)')
+    parser.add_option("--secondHost.license", dest="secondHost.license", default="null")
+    parser.add_option("--iscsi.ip", dest="iscsi.ip")
+    parser.add_option("--iscsi.port", dest="iscsi.port")
+    parser.add_option("--nfs.ip", dest="nfs.ip")
+    parser.add_option("--nfs.shareMount", dest="nfs.shareMount")
+    parser.add_option("--vch.name", dest="vch.name")
+    parser.add_option("--vch.moid", dest="vch.moid")
+    parser.add_option("--container.name", dest="container.name")
+
+    (options, args) = parser.parse_args()
+    options = options.__dict__
+
+    validateRequiredOption('vc.ip', options)
+    validateRequiredOption('host.ip', options)
+    validateRequiredOption('vch.name', options)
+    validateRequiredOption('vch.moid', options)
+    validateRequiredOption('container.name', options)
+    validateRequiredOption('h5client.ip', options)
+    validateRequiredOption('h5client.port', options)
+
+    return (options, args)
+
+def validateRequiredOption(requiredOption, options):
+    if not options[requiredOption] :
+        raise ValueError("Requred parameter " + requiredOption + " is missing!!!")
+
+
+def getUserSpec(username, domain, password):
+    return '{username:"' + username + '",password:"' + password + '",domain:"' + domain + '"}'
+
+def getVcSpec(vcIp, adminUser, vcName):
+    return '{_endpoint:"' + vcIp + '",_user:' + adminUser + ',user:' + adminUser + ',endpoint:"' + vcIp + '", _vcName:"' + vcName + '", vcName:"' + vcName + '"}'
+
+def getHostSpec(hostIp, adminUser, license):
+    _license = '"'+license+'"' if license!='null' else 'null'
+    return '{_name:"' + hostIp + '",_user:' + adminUser + ',user:' + adminUser + ',name:"' + hostIp + '",mor:null,_mor:null,license:' + _license +'}'
+
+def getVmSpec(name, vmId=None):
+    mor = 'null' if vmId is None else '{_type:"VirtualMachine",_value:"' + vmId + '",type:"VirtualMachine",value:"' + vmId + '"}'
+    return '{_name:"' + name + '",_mor:' + mor + ',name:"' + name + '",mor:' + mor + '}'
+
+def getIscsiShareSpec(iscsiIp, port):
+    _port = port if port is not None else '3260'
+    return '{"_iscsiIpAddress": "' + iscsiIp + '", "_port": ' + _port + '}'
+
+def getNfsShareSpec(nfsIp, nfsVersion, nfsShareMountPoint, nfsShareAccessMode):
+    return '{_nfsServerVersion:"' + nfsVersion + '",_nfsServerIpAddress:"' + nfsIp + '",_nfsShareMountPoint:"' + nfsShareMountPoint + '",_nfsShareAccessMode:"' + nfsShareAccessMode + '",serverVersion:"' + nfsVersion + '",shareMountPoint:"' + nfsShareMountPoint + '",shareAccessMode:"' + nfsShareAccessMode + '",serverIpAddress:"' + nfsIp + '"}'
+
+def getDatastoreSpec(datastoreName):
+    return '{"_name": "' + datastoreName + '","_mor": null,"name": "' + datastoreName + '","mor": null}'
+
+def getH5cSpec(h5cIp, h5cPort, adminUser, urlSuffix):
+    return '{_endpoint:"https://' + h5cIp + ':' + h5cPort + '/ui/' + urlSuffix + '" ,_user:' + adminUser + ',user:' + adminUser + ',endpoint:"https://' + h5cIp + ':' + h5cPort + '/ui/' + urlSuffix + '"}'
+
+def getSsoSpec(ssoIp, adminUser):
+    return '{_endpoint:"' + ssoIp + '",_user:' + adminUser + ',componentManagerEndpoint:"https://' + ssoIp + '/cm/sdk",ssoVersion:"com.vmware.vim.binding.sso.version.version3_1",user:' + adminUser + ',endpoint:"' + ssoIp + '"}'
+
+def getSingleNgcTestbedSpec(vcSpec, h5cSpec, ssoSpec):
+    return '{clazz:"com.vmware.vsphere.client.automation.testbed.SingleNgcTestbed",vcSpec:' + vcSpec + ',ngcSpec:' + h5cSpec + ',ssoSpec: ' + ssoSpec + '}'
+
+def getBrowserTestbedSpec(seleniumIp, seleniumPort, browserType, os):
+    return '{clazz:"com.vmware.vsphere.client.automation.testbed.BrowserTestbed",browserSpec:{ip:"' + seleniumIp + '",' + 'os:"' + os + '",port:' + seleniumPort + ',browserType:"' + browserType + '",specId:"0d9d3965-c48b-400d-9a2c-26cf575fca6c"}}'
+
+def getHostTestbedSpec(hostSpec, datastoreSpec):
+    return '{clazz:"com.vmware.vsphere.client.automation.testbed.HostTestbed","hostSpec":' + hostSpec + ',"localDatastoreSpec":' + datastoreSpec + '}'
+
+def getVicTestbedSpec(vchVmSpec, containerVmSpec):
+    return '{clazz:"com.vmware.vsphere.client.automation.testbed.VicTestbed","vchVmSpec":' + vchVmSpec + ',"containerVmSpec":' + containerVmSpec + '}'
+
+def getIscsiShareTestbed(iscsiShareSpec):
+    return '{"clazz": "com.vmware.vsphere.client.automation.testbed.IscsiShareTestbed", "iscsiShareSpec": ' + iscsiShareSpec + '}'
+
+def getNfsShareTestbed(nfsSharedSpec):
+    return '{clazz:"com.vmware.vsphere.client.automation.testbed.NfsShareTestbed","nfsShareSpec":' + nfsSharedSpec + '}'
+
+def getSingleNgcTestbedData():
+    adminUser = getUserSpec(options['admin.user'], options['admin.domain'], options['admin.password'])
+    vcSpec = getVcSpec(options['vc.ip'], adminUser, options['vc.name'])
+    h5cSpec = getH5cSpec(options['h5client.ip'], options['h5client.port'], adminUser, options['h5client.url.suffix'])
+    ssoSpec = getSsoSpec(options['vc.ip'], adminUser)
+    return vcSpec, h5cSpec, ssoSpec
+
+def getSingleNgcTestbedJson():
+    vcSpec, h5cSpec, ssoSpec = getSingleNgcTestbedData()
+    return getSingleNgcTestbedSpec(vcSpec, h5cSpec, ssoSpec)
+
+def getBrowserTestbedJson():
+    return getBrowserTestbedSpec(options['selenium.ip'], options['selenium.port'], options['browser.type'], options['browser.os'])
+
+def getHostTestbedJson(hostIp, datastore, license):
+    adminUser = getUserSpec('root', '', 'ca$hc0w')
+    hostSpec = getHostSpec(hostIp, adminUser, license)
+    datastoreSpec = getDatastoreSpec(datastore)
+    return getHostTestbedSpec(hostSpec, datastoreSpec)
+
+def getVicTestbedJson(vchName, containerName):
+    vchVmSpec = getVmSpec(vchName, options['vch.moid'])
+    containerVmSpec = getVmSpec(containerName)
+    return getVicTestbedSpec(vchVmSpec, containerVmSpec)
+
+def getIscsiShareTestbedJson(iscsiIp, port):
+    iscsiShareSpec = getIscsiShareSpec(iscsiIp, port)
+    return getIscsiShareTestbed(iscsiShareSpec)
+
+def getNfsShareTestbedJson(nfsIp, nfsShareMount):
+    nfsShareSpec = getNfsShareSpec(nfsIp, 'NFS_3', nfsShareMount, 'READ_WRITE')
+    return getNfsShareTestbed(nfsShareSpec)
+
+def getVmGenericProvisioningTestbedJson():
+   vcSpec, h5cSpec, ssoSpec = getSingleNgcTestbedData()
+   testbedJson = '''{{
+   "clazz": "com.vmware.vsphere.client.automation.testbed.VmGenericProvisioningTestbed",
+   "vcSpec" : {0},
+   "ngcSpec" : {1},
+   "ssoSpec" : {2},
+   "datacenterSpec": {{
+      "name": null,
+      "mor": {{
+         "type": "Datacenter",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+   "standaloneHostsFolderSpec": {{
+      "name": null,
+      "mor": {{
+         "type": "Folder",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+   "hostASpec" : {{
+      "user": {{
+         "username": null,
+         "password": null,
+         "domain": ""
+      }},
+      "name": null,
+      "mor": {{
+         "type": "HostSystem",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+   "hostBSpec" : {{
+      "user": {{
+         "username": null,
+         "password": null,
+         "domain": ""
+      }},
+      "name": null,
+      "mor": {{
+         "type": "HostSystem",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+   "clusterDrsASpec" : {{
+      "name": null,
+      "mor": {{
+         "type" : "ClusterComputeResource",
+         "value" : null,
+         "serverGuid" : null
+      }}
+   }},
+   "hostCSpec" : {{
+      "name": null,
+      "mor": {{
+         "type": "HostSystem",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+   "hostDSpec" : {{
+      "name": null,
+      "mor": {{
+         "type": "HostSystem",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+   "clusterDrsBSpec" : {{
+      "name": null,
+      "mor": {{
+         "type" : "ClusterComputeResource",
+         "value" : null,
+         "serverGuid" : null
+      }}
+   }},
+   "hostESpec" : {{
+      "name": null,
+      "mor": {{
+         "type": "HostSystem",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+   "hostFSpec" : {{
+      "name": null,
+      "mor": {{
+         "type": "HostSystem",
+         "value": null,
+         "serverGuid": null
+      }}
+   }},
+  "localDatastoreHostASpec" : {{
+    "name" : null,
+    "mor" : {{
+      "type" : "Datastore",
+      "value" : null,
+      "serverGuid" : null
+    }}
+  }},
+  "localDatastoreHostBSpec" : {{
+    "name" : null,
+    "mor" : {{
+      "type" : "Datastore",
+      "value" : null,
+      "serverGuid" : null
+    }}
+  }},
+  "localDatastoreHostCSpec" : {{
+    "name" : null,
+    "mor" : {{
+      "type" : "Datastore",
+      "value" : null,
+      "serverGuid" : null
+    }}
+  }},
+  "localDatastoreHostDSpec" : {{
+    "name" : null,
+    "mor" : {{
+      "type" : "Datastore",
+      "value" : null,
+      "serverGuid" : null
+    }}
+  }},
+  "localDatastoreHostESpec" : {{
+    "name" : null,
+    "mor" : {{
+      "type" : "Datastore",
+      "value" : null,
+      "serverGuid" : null
+    }}
+  }},
+  "localDatastoreHostFSpec" : {{
+    "name" : null,
+    "mor" : {{
+      "type" : "Datastore",
+      "value" : null,
+      "serverGuid" : null
+    }}
+  }},
+   "sharedDatastoreASpec": {{
+      "clazz": "com.vmware.vsphere.client.automation.core.spec.NfsDatastoreSpec",
+      "name": null,
+      "mor": {{
+         "type": "Datastore",
+         "value": null,
+         "serverGuid": null
+      }}
+   }}
+}}
+'''.format(vcSpec, h5cSpec, ssoSpec)
+
+   return testbedJson
+
+def getRunlistContents(testbeds, resultsPath, tests):
+    contents = ""
+    for testbed in testbeds:
+        contents = contents + "registry-add-testbed " + testbed + "\n"
+    for test in tests:
+        contents = contents + "run-test " + test + " " + os.path.join(resultsPath, test.replace(".", "_")) + "\n"
+    return contents
+
+def saveToFile(dir, filename, contents):
+    targetFile = os.path.join(dir, filename)
+    file = open(targetFile, 'w')
+    file.write(contents)
+    file.close()
+    return targetFile
+
+if __name__ == '__main__':
+    (options, args)  = parse_arguments()
+    # create work folder if not exists
+    if (not os.path.exists(options['workDir'])):
+        os.mkdir(options['workDir'])
+    # create testbeds folder if not exists
+    testbedsPath = os.path.join(options['workDir'], 'testbeds')
+    if (not os.path.exists(testbedsPath)):
+       os.mkdir(testbedsPath)
+
+    # create runlists folder if not exists
+    runlistsPath = os.path.join(options['workDir'], 'runlists')
+    if (not os.path.exists(runlistsPath)):
+       os.mkdir(runlistsPath)
+
+    # create results folder if not exists
+    resultsPath = os.path.join(options['workDir'], 'results')
+    if (not os.path.exists(resultsPath)):
+       os.mkdir(resultsPath)
+
+    testbeds = []
+    print "Generating BrowserTestbed.json..."
+    browserTestbed = saveToFile(testbedsPath, 'BrowserTestbed.json', getBrowserTestbedJson())
+    testbeds.append(browserTestbed)
+
+    print "Generating SingleNgcTestbed.json..."
+    singleNgcTestbed = saveToFile(testbedsPath, 'SingleNgcTestbed.json', getSingleNgcTestbedJson())
+    testbeds.append(singleNgcTestbed)
+
+    print "Generating HostTestbed.json..."
+    hostTestbed = saveToFile(testbedsPath, 'HostTestbed.json', getHostTestbedJson(options['host.ip'], options['host.datastore_name'], options['host.license']))
+    testbeds.append(hostTestbed)
+
+    if options['secondHost.ip'] is not None :
+        print "Generating SecondHostTestbed.json..."
+        secondHostTestbed = saveToFile(testbedsPath, 'SecondHostTestbed.json', getHostTestbedJson(options['secondHost.ip'], options['secondHost.datastore_name'], options['secondHost.license']))
+        testbeds.append(secondHostTestbed)
+
+    if options['nfs.ip'] is not None and options['nfs.shareMount'] is not None :
+        print "Generating NfsShareTestbed.json..."
+        nfsShareTestbed = saveToFile(testbedsPath, 'NfsShareTestbed.json', getNfsShareTestbedJson(options['nfs.ip'], options['nfs.shareMount']))
+        testbeds.append(nfsShareTestbed)
+
+    if options['iscsi.ip'] is not None :
+        print "Generating IscsiShareTestbed.json..."
+        iscsiShareTestbed = saveToFile(testbedsPath, 'IscsiShareTestbed.json', getIscsiShareTestbedJson(options['iscsi.ip'], options['iscsi.port']))
+        testbeds.append(iscsiShareTestbed)
+
+    print "Generating VmGenericProvisioningTestbed.json..."
+    genericVmPrivisioningTestbed = saveToFile(testbedsPath,
+           'VmGenericProvisioningTestbed.json',
+           getVmGenericProvisioningTestbedJson())
+
+    print "Generating VicTestbed.json..."
+    vicTestbed = saveToFile(testbedsPath, 'VicTestbed.json', getVicTestbedJson(options['vch.name'], options['container.name']))
+    testbeds.append(vicTestbed)
+
+    print "Generating HSUIA runlist..."
+    saveToFile(runlistsPath, 'default.runlist', getRunlistContents(testbeds, resultsPath, args))
