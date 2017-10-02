@@ -4,7 +4,7 @@
 
 ## Overview
 
-## Try it out
+vSphere UI plugin for Integrated Containers on vSphere
 
 ### Prerequisites
 
