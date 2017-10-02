@@ -1,0 +1,12 @@
+.vol-datastore {
+  &-header {
+    position: absolute;
+    top: -20px;
+    font-weight: bold;
+  }
+
+  &-actions clr-icon {
+    margin-top: 9px;
+    cursor: pointer;
+  }
+}

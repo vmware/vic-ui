@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+
+
+/* Fixes broken position of the spinner set by .clr-wizard */
+
+#compute-resource-selector .spinner {
+  top: 2% !important;
+  left: 2% !important;
+}
+
+.modal .mb10 {
+  margin-bottom: 10px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
