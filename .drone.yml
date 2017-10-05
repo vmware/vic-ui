@@ -1,0 +1,35 @@
+# After any change to this file you MUST re-sign and checkin the .drone.yml.sig
+# When you are ready to submit a pull request, you must regenerate .drone.yml.sig for the vmware/vic repo:
+# $ export DRONE_SERVER=https://ci.vcna.io
+# $ export DRONE_TOKEN=<token>
+# $ drone sign vmware/vic-ui
+# The secrets file is in our local git repo.  Ask mhagen for access.
+
+---
+workspace:
+  base: /go
+  path: src/github.com/vmware/vic-ui
+
+pipeline:
+  clone:
+    image: plugins/git
+    tags: true
+    # dont clone submodules
+    recursive: false
+
+  vic-ui:
+    image: harbor.ci.drone.local/library/vic-integration-test:1.36
+    pull: true
+    environment:
+      BUILD_NUMBER: ${DRONE_BUILD_NUMBER}
+      BIN: bin
+      GS_PROJECT_ID: ${GS_PROJECT_ID}
+      GS_CLIENT_EMAIL: ${GS_CLIENT_EMAIL}
+      GS_PRIVATE_KEY: ${GS_PRIVATE_KEY}
+    commands:
+      - make mark
+      - ui/build-ui-plugins.sh
+      - make sincemark
+    when:
+      repo: vmware/vic-ui
+      branch: [ master, releases/*, refs/tags/* ]
