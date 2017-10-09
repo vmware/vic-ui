@@ -78,6 +78,8 @@ BbNdSRpHPUXGX4jDxtQRRjs5
 
   it('should parse a valid private key PEM file text content', () => {
     const privateKey = parsePrivateKeyPEMFileContent(privateKeyFixture);
-    expect(privateKey).toBe(true);
+    expect(privateKey).toEqual(jasmine.objectContaining({
+      algorithm: 'RSA'
+    }));
   });
 });
