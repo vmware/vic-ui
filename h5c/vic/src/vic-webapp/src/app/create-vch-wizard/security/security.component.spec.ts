@@ -86,11 +86,9 @@ describe('SecurityComponent', () => {
     component.toggleAdvancedMode();
 
     component.form.get('useTls').setValue(false);
-    expect(component.form.get('tlsCertPath').disabled).toBeTruthy();
     expect(component.form.get('certificateKeySize').disabled).toBeTruthy();
 
     component.form.get('useTls').setValue(true);
-    expect(component.form.get('tlsCertPath').enabled).toBeTruthy();
     expect(component.form.get('certificateKeySize').enabled).toBeTruthy();
 
     component.form.get('useWhitelistRegistry').setValue(false);

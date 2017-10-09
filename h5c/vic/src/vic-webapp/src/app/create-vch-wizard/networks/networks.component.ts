@@ -16,9 +16,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { supportedCharsPattern, ipPattern, numberPattern } from '../../shared/utils/validators';
+import { supportedCharsPattern, ipPattern, numberPattern, cidrPattern } from '../../shared/utils/validators';
 
 @Component({
   selector: 'vic-vch-creation-networks',
@@ -42,24 +41,39 @@ export class NetworksComponent implements OnInit {
       publicNetwork: ['', Validators.required],
       publicNetworkIp: [{ value: '', disabled: true }, [
         Validators.required,
-        Validators.pattern(ipPattern)
+        Validators.pattern(cidrPattern)
       ]],
       publicNetworkType: 'dhcp',
       publicNetworkGateway: [{ value: '', disabled: true }, [
         Validators.required,
         Validators.pattern(ipPattern)
       ]],
+      dnsServer: [{ value: '', disabled: true }, [
+        Validators.required,
+        Validators.pattern(ipPattern)
+      ]],
       clientNetwork: '',
+      clientNetworkIp: [{ value: '', disabled: true }, [
+        Validators.required,
+        Validators.pattern(cidrPattern)
+      ]],
+      clientNetworkType: 'dhcp',
+      clientNetworkGateway: [{ value: '', disabled: true }, [
+        Validators.required,
+        Validators.pattern(ipPattern)
+      ]],
+      clientNetworkRouting: [{ value: '', disabled: true }],
       managementNetwork: '',
       managementNetworkIp: [{ value: '', disabled: true }, [
         Validators.required,
-        Validators.pattern(ipPattern)
+        Validators.pattern(cidrPattern)
       ]],
       managementNetworkType: 'dhcp',
       managementNetworkGateway: [{ value: '', disabled: true }, [
         Validators.required,
         Validators.pattern(ipPattern)
       ]],
+      managementNetworkRouting: [{ value: '', disabled: true }],
       containerNetworks: formBuilder.array([this.createNewContainerNetworkEntry()]),
       httpProxy: '',
       httpProxyPort: [
@@ -76,12 +90,9 @@ export class NetworksComponent implements OnInit {
           Validators.maxLength(5),
           Validators.pattern(numberPattern)
         ]
-      ],
-      dnsServer: ''
+      ]
     });
   }
-
-  // TODO: function that calls a service's method to load WIP data and replace form values
 
   ngOnInit() {
 
@@ -130,9 +141,24 @@ export class NetworksComponent implements OnInit {
         if (v === 'dhcp') {
           this.form.get('publicNetworkIp').disable();
           this.form.get('publicNetworkGateway').disable();
+          this.form.get('dnsServer').disable();
         } else {
           this.form.get('publicNetworkIp').enable();
           this.form.get('publicNetworkGateway').enable();
+          this.form.get('dnsServer').enable();
+        }
+      });
+
+    this.form.get('clientNetworkType').valueChanges
+      .subscribe(v => {
+        if (v === 'dhcp') {
+          this.form.get('clientNetworkIp').disable();
+          this.form.get('clientNetworkGateway').disable();
+          this.form.get('clientNetworkRouting').disable();
+        } else {
+          this.form.get('clientNetworkIp').enable();
+          this.form.get('clientNetworkGateway').enable();
+          this.form.get('clientNetworkRouting').enable();
         }
       });
 
@@ -141,9 +167,11 @@ export class NetworksComponent implements OnInit {
         if (v === 'dhcp') {
           this.form.get('managementNetworkIp').disable();
           this.form.get('managementNetworkGateway').disable();
+          this.form.get('managementNetworkRouting').disable();
         } else {
           this.form.get('managementNetworkIp').enable();
           this.form.get('managementNetworkGateway').enable();
+          this.form.get('managementNetworkRouting').enable();
         }
       });
 
@@ -232,15 +260,8 @@ export class NetworksComponent implements OnInit {
       results['publicNetworkIp'] = this.form.get('publicNetworkIp').value;
       results['publicNetworkGateway'] = this.form.get('publicNetworkGateway').value;
     }
-    if (this.form.get('clientNetwork').value) {
-      results['clientNetwork'] = this.form.get('clientNetwork').value;
-    }
-    if (this.form.get('managementNetwork').value) {
-      results['managementNetwork'] = this.form.get('managementNetwork').value;
-      if (this.form.get('managementNetworkType').value === 'static') {
-        results['managementNetworkIp'] = this.form.get('managementNetworkIp').value;
-        results['managementNetworkGateway'] = this.form.get('managementNetworkGateway').value;
-      }
+    if (this.form.get('dnsServer').value) {
+      results['dnsServer'] = this.form.get('dnsServer').value;
     }
 
     const httpProxyValue = this.form.get('httpProxy').value;
@@ -249,6 +270,22 @@ export class NetworksComponent implements OnInit {
     const httpsProxyPortValue = this.form.get('httpsProxyPort').value;
 
     if (this.inAdvancedMode) {
+      if (this.form.get('clientNetwork').value) {
+        results['clientNetwork'] = this.form.get('clientNetwork').value;
+        if (this.form.get('clientNetworkType').value === 'static') {
+          results['clientNetworkIp'] = this.form.get('clientNetworkIp').value;
+          results['clientNetworkGateway'] = this.form.get('clientNetworkGateway').value;
+          results['clientNetworkRouting'] = this.form.get('clientNetworkRouting').value;
+        }
+      }
+      if (this.form.get('managementNetwork').value) {
+        results['managementNetwork'] = this.form.get('managementNetwork').value;
+        if (this.form.get('managementNetworkType').value === 'static') {
+          results['managementNetworkIp'] = this.form.get('managementNetworkIp').value;
+          results['managementNetworkGateway'] = this.form.get('managementNetworkGateway').value;
+          results['managementNetworkRouting'] = this.form.get('managementNetworkRouting').value;
+        }
+      }
       results['containerNetworks'] = this.form.get('containerNetworks')
         .value
         .filter(entry => entry['containerNetwork']);
@@ -259,11 +296,6 @@ export class NetworksComponent implements OnInit {
 
       if (httpsProxyValue && httpsProxyPortValue) {
         results['httpsProxy'] = `https://${httpsProxyValue}:${httpsProxyPortValue}`;
-      }
-
-      const dnsServerValue = this.form.get('dnsServer').value.trim();
-      if (dnsServerValue) {
-        results['dnsServer'] = dnsServerValue;
       }
     } else {
       results['containerNetworks'] = [];

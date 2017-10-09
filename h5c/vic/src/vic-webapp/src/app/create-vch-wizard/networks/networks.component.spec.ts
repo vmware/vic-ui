@@ -87,50 +87,66 @@ describe('NetworksComponent', () => {
 
   it('should validate static IP address related fields', () => {
     const publicNetworkType = component.form.get('publicNetworkType');
+    const clientNetworkType = component.form.get('clientNetworkType');
     const managementNetworkType = component.form.get('managementNetworkType');
     const publicNetworkIp = component.form.get('publicNetworkIp');
+    const clientNetworkIp = component.form.get('clientNetworkIp');
     const managementNetworkIp = component.form.get('managementNetworkIp');
     const publicNetworkGateway = component.form.get('publicNetworkGateway');
+    const clientNetworkGateway = component.form.get('clientNetworkGateway');
     const managementNetworkGateway = component.form.get('managementNetworkGateway');
+    const dnsServer = component.form.get('dnsServer');
 
     setDefaultRequiredValues();
+    component.toggleAdvancedMode();
     component.form.get('managementNetwork').setValue('portGroup');
 
     publicNetworkType.setValue('static');
+    clientNetworkType.setValue('static');
     managementNetworkType.setValue('static');
 
     expect(component.form.invalid).toBe(true);
 
     // static IP address fields are required
     expect(publicNetworkIp.errors['required']).toBeTruthy();
+    expect(clientNetworkIp.errors['required']).toBeTruthy();
     expect(managementNetworkIp.errors['required']).toBeTruthy();
 
     // static IP address fields to something incorrect
     publicNetworkIp.setValue('invalidAddress');
+    clientNetworkIp.setValue('invalidAddress');
     managementNetworkIp.setValue('invalidAddress');
     expect(publicNetworkIp.errors['pattern']).toBeTruthy();
+    expect(clientNetworkIp.errors['pattern']).toBeTruthy();
     expect(managementNetworkIp.errors['pattern']).toBeTruthy();
 
     // gateway fields are required
     expect(publicNetworkGateway.errors['required']).toBeTruthy();
+    expect(clientNetworkGateway.errors['required']).toBeTruthy();
     expect(managementNetworkGateway.errors['required']).toBeTruthy();
 
     // gateway fields to something incorrect
     publicNetworkGateway.setValue('invalidAddress');
+    clientNetworkGateway.setValue('invalidAddress');
     managementNetworkGateway.setValue('invalidAddress');
     expect(publicNetworkGateway.errors['pattern']).toBeTruthy();
+    expect(clientNetworkGateway.errors['pattern']).toBeTruthy();
     expect(managementNetworkGateway.errors['pattern']).toBeTruthy();
 
     // valid form with correct values
-    publicNetworkIp.setValue('127.0.0.1');
+    publicNetworkIp.setValue('127.0.0.1/24');
     publicNetworkGateway.setValue('127.0.0.1');
-    managementNetworkIp.setValue('127.0.0.1');
+    clientNetworkIp.setValue('127.0.0.1/24');
+    clientNetworkGateway.setValue('127.0.0.1');
+    managementNetworkIp.setValue('127.0.0.1/24');
     managementNetworkGateway.setValue('127.0.0.1');
+    dnsServer.setValue('127.0.0.1');
     component.onCommit();
     expect(component.form.valid).toBe(true);
 
     // back to DHCP and still a valid form
     publicNetworkType.setValue('dhcp');
+    clientNetworkType.setValue('dhcp');
     managementNetworkType.setValue('dhcp');
     expect(component.form.valid).toBe(true);
   });

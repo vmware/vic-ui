@@ -17,11 +17,35 @@
 import { fromBase64, stringToArrayBuffer } from 'pvutils';
 import { fromBER } from 'asn1js';
 import Certificate from 'pkijs/build/Certificate';
-import PrivateKeyInfo from 'pkijs/build/PrivateKeyInfo';
+import InternalPrivateKeyInfo from 'pkijs/build/PrivateKeyInfo';
 
 export interface CertificateInfo {
   expires: Date
 }
+
+export interface PrivateKeyInfo {
+  algorithm: any
+}
+
+const algorithmsMap = {
+  '1.2.840.113549.1.1.1': 'RSA',
+  '1.2.840.113549.2.1': 'MD2',
+  '1.2.840.113549.1.1.2': 'MD2 with RSA',
+  '1.2.840.113549.2.5': 'MD5',
+  '1.2.840.113549.1.1.4': 'MD5 with RSA',
+  '1.3.14.3.2.26': 'SHA1',
+  '1.2.840.10040.4.3': 'SHA1 with DSA',
+  '1.2.840.10045.4.1': 'SHA1 with ECDSA',
+  '1.2.840.113549.1.1.5': 'SHA1 with RSA',
+  '2.16.840.1.101.3.4.2.4': 'SHA224',
+  '1.2.840.113549.1.1.14': 'SHA224 with RSA',
+  '2.16.840.1.101.3.4.2.1': 'SHA256',
+  '1.2.840.113549.1.1.11': 'SHA256 with RSA',
+  '2.16.840.1.101.3.4.2.2': 'SHA384',
+  '1.2.840.113549.1.1.12': 'SHA384 with RSA',
+  '2.16.840.1.101.3.4.2.3': 'SHA512',
+  '1.2.840.113549.1.1.13': 'SHA512 with RSA'
+};
 
 export function parseCertificatePEMFileContent(str: string): CertificateInfo {
 
@@ -39,7 +63,7 @@ export function parseCertificatePEMFileContent(str: string): CertificateInfo {
   }
 }
 
-export function parsePrivateKeyPEMFileContent(str: string): boolean {
+export function parsePrivateKeyPEMFileContent(str: string): PrivateKeyInfo {
 
   // Remove headers
   str = str.replace(/(-----(BEGIN|END) PRIVATE KEY-----|\n)/g, '');
@@ -48,7 +72,9 @@ export function parsePrivateKeyPEMFileContent(str: string): boolean {
   const asn1 = fromBER(stringToArrayBuffer(fromBase64(str)));
 
   // Create Private Key model
-  const privateKey = new PrivateKeyInfo({ schema: asn1.result });
+  const privateKey = new InternalPrivateKeyInfo({ schema: asn1.result });
 
-  return true;
+  return {
+    algorithm: algorithmsMap[privateKey.privateKeyAlgorithm.algorithmId]
+  };
 }
