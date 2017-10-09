@@ -58,3 +58,6 @@ test.secrets
 **/unittest-results/*
 flex/vic-uia/screenshots
 flex/vic-uia/testResultReportFile
+
+# IDE configs files
+.idea/

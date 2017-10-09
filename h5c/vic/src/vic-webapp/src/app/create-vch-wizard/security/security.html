@@ -5,7 +5,7 @@
   <ul class="list compact" id="default-security-settings-list">
     <li>
       A self-signed server certificate will be generated and connections will be encrypted.
-      However, any client can connect with authentication.
+      However, any client can connect without authentication.
     </li>
     <li>Only private registries using common CAs will be available to docker clients.</li>
     <li>No restricted operations credentials are used to deploy this Virtual Container Host.</li>
@@ -49,52 +49,19 @@
             </div>
             <div class="col-xs">
 
-              <div class="toggle-switch">
+              <div class="toggle-switch toggle-switch--no-label">
                 <input type="checkbox" id="use-tls" formControlName="useTls">
-                <label for="use-tls">Verify server and encrypt connection</label>
+                <label for="use-tls"></label>
               </div>
+
+              <span class="text-muted">
+                {{ form.get('useTls').value ? 'Verify server and encrypt connection' : 'No authentication with server' }}
+              </span>
 
             </div>
           </div>
 
           <div id="tls-dependent-input-groups" *ngIf="form.get('useTls').value">
-
-            <div class="form-group row">
-              <div class="col-xs-3">
-
-                <label for="tls-cert-path">
-                  Path to certificates folder
-                </label>
-
-              </div>
-              <div class="col-xs-4">
-
-                <label for="tls-cert-path"
-                       aria-haspopup="true"
-                       role="tooltip"
-                       class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
-                       [class.invalid]="form.get('tlsCertPath').invalid && (form.get('tlsCertPath').dirty || form.get('tlsCertPath').touched)">
-
-                  <input id="tls-cert-path" class="form-control" type="text" formControlName="tlsCertPath">
-
-                  <span class="tooltip-content" *ngIf="form.get('tlsCertPath').hasError('required')">
-                    Path to certificates folder cannot be empty
-                  </span>
-
-                  <span class="tooltip-content" *ngIf="form.get('tlsCertPath').hasError('pattern')">
-                    Path is not valid
-                  </span>
-
-                </label>
-              </div>
-
-              <clr-signpost [clrSignpostPosition]="'left-top'">
-                <clr-signpost-content *clrIfOpen="signpostOpenState">
-                  <span>The local directory where generated certificates are stored or searched</span>
-                </clr-signpost-content>
-              </clr-signpost>
-
-            </div>
 
             <label>Server Certificates</label>
 
@@ -256,7 +223,7 @@
 
                   <span class="text-muted" *ngIf="!tlsServerKeyContents">Select encrypted key pem file</span>
                   <span *ngIf="tlsServerKeyContents">
-                        {{ tlsServerKeyContents.name }}
+                        {{ tlsServerKeyContents.name }}, algorithm: {{ tlsServerKeyContents.algorithm}}
                       </span>
 
                   <input id="tls-server-key"
@@ -288,10 +255,14 @@
                 <div class="form-group mb-0 row">
                   <div class="col-xs">
 
-                    <div class="toggle-switch">
+                    <div class="toggle-switch toggle-switch--no-label">
                       <input type="checkbox" id="use-client-auth" formControlName="useClientAuth">
-                      <label for="use-client-auth">Clients will need to authenticate</label>
+                      <label for="use-client-auth"></label>
                     </div>
+
+                    <span class="text-muted">
+                      {{ form.get('useClientAuth').value ? 'Clients will need to authenticate' : 'Clients do not need to authenticate' }}
+                    </span>
 
                   </div>
                 </div>
@@ -596,7 +567,7 @@
             <div class="col-xs-3">
 
               <label for="ops-user">
-                vSphere user account
+                vSphere user credentials
               </label>
 
             </div>
@@ -605,8 +576,19 @@
               <input id="ops-user"
                      class="form-control"
                      type="text"
-                     placeholder="vSphere user that deploys VCH"
+                     placeholder="username@domain.local"
                      formControlName="opsUser">
+
+            </div>
+          </div>
+          <div class="form-group row mb-2">
+            <div class="col-xs-5 offset-xs-3">
+
+              <input id="ops-user-pass"
+                     class="form-control"
+                     type="password"
+                     placeholder="Password"
+                     formControlName="opsUserPass">
 
             </div>
           </div>
