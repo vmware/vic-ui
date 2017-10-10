@@ -17,7 +17,7 @@ pipeline:
     # dont clone submodules
     recursive: false
 
-  vic-ui:
+vic-ui:
     image: harbor.ci.drone.local/library/vic-integration-test:1.36
     pull: true
     environment:
@@ -31,3 +31,37 @@ pipeline:
     when:
       repo: vmware/vic-ui
       branch: [ master, releases/*, refs/tags/* ]
+
+bundle:
+    image: harbor.ci.drone.local/library/golang:1.8
+    pull: true
+    environment:
+      BIN: bin
+      BIN_TEMP_DIR: bin/ci
+      GOPATH: /go
+      SHELL: /bin/bash
+    commands:
+      - rm -rf $BIN_TEMP_DIR
+      - mkdir -p $BIN_TEMP_DIR/ui
+      - cp -rf bin/ui/* $BIN_TEMP_DIR/ui
+      - tar -czvf vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN_TEMP_DIR/ui
+      - mkdir bundle
+      - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle
+    when:
+      repo: vmware/vic-ui
+      event: [ push, tag ]
+      branch: [ master, releases/*, refs/tags/* ]
+
+publish-gcs-builds-on-pass:
+    image: maplain/drone-gcs:latest
+    pull: true
+    source: bundle
+    target: vic-ui-builds
+    acl:
+      - allUsers:READER
+    cache_control: public,max-age=3600
+    when:
+      repo: vmware/vic-ui
+      event: [ push ]
+      branch: [ master, releases/*, refs/tags/* ]
+      status: success
