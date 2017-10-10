@@ -17,7 +17,7 @@ pipeline:
     # dont clone submodules
     recursive: false
 
-vic-ui:
+  vic-ui:
     image: harbor.ci.drone.local/library/vic-integration-test:1.36
     pull: true
     environment:
@@ -32,7 +32,7 @@ vic-ui:
       repo: vmware/vic-ui
       branch: [ master, releases/*, refs/tags/* ]
 
-bundle:
+  bundle:
     image: harbor.ci.drone.local/library/golang:1.8
     pull: true
     environment:
@@ -52,7 +52,7 @@ bundle:
       event: [ push, tag ]
       branch: [ master, releases/*, refs/tags/* ]
 
-publish-gcs-builds-on-pass:
+  publish-gcs-builds-on-pass:
     image: maplain/drone-gcs:latest
     pull: true
     source: bundle
