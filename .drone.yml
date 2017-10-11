@@ -47,9 +47,8 @@ pipeline:
       - tar -czvf $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN_TEMP_DIR/ui
       - mkdir bundle
       - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle
-      - ls -la bundle
-    # when:
-    #   repo: vmware/vic-ui
+    when:
+      repo: vmware/vic-ui
     # event: [ push, tag ]
     # branch: [ master, releases/*, refs/tags/* ]
 
@@ -61,8 +60,8 @@ pipeline:
     acl:
       - allUsers:READER
     cache_control: public,max-age=3600
-    # when:
-    #   repo: vmware/vic-ui
+    when:
+      repo: vmware/vic-ui
     # event: [ push ]
     # branch: [ master, releases/*, refs/tags/* ]
-      # status: success
+      status: success
