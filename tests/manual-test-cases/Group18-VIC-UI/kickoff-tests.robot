@@ -41,7 +41,7 @@ Check Working Dir
     ${wd_level_len}=  Get Length  ${wd_split}
     ${last_level_idx}=  Evaluate  ${wd_level_len} - 1
     ${current_folder}=  Get From List  ${wd_split}  ${last_level_idx}
-    Run Keyword Unless  '${current_folder}' == 'vic'  Fatal Error  Test script should be run from vic/
+    Run Keyword Unless  '${current_folder}' == 'vic-ui'  Fatal Error  Test script should be run from vic-ui/
 
 Check Drone
     ${rc}  ${drone_ver}=  Run And Return Rc And Output  drone --version 2>&1
