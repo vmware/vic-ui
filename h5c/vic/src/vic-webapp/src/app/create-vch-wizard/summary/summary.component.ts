@@ -28,9 +28,7 @@ import { isUploadableFileObject } from '../../shared/utils/model-checker';
 })
 export class SummaryComponent implements OnInit {
   public form: FormGroup;
-  public formErrMessage = '';
   @Input() payload: any;
-  public processedPayload: any;
   public targetOS: string;
   public copySucceeded: boolean = null;
   private _isSetup = false;
@@ -39,8 +37,8 @@ export class SummaryComponent implements OnInit {
     private formBuilder: FormBuilder,
     private elementRef: ElementRef
   ) {
-    this.processedPayload = null;
     this.form = formBuilder.group({
+      // TODO move debug to name section
       debug: '0',
       targetOS: '',
       cliCommand: ''
@@ -81,9 +79,8 @@ export class SummaryComponent implements OnInit {
       });
 
     this.setDefaultOS();
-    this._isSetup = true;
 
-    this.setDefaultOS();
+    this._isSetup = true;
   }
 
   /**
@@ -121,9 +118,7 @@ export class SummaryComponent implements OnInit {
       return null;
     }
 
-    this.processedPayload = this.processPayload();
-
-    const payload = this.processedPayload;
+    const payload = this.processPayload();
     const results = [];
 
     let vicMachineBinary = `vic-machine-${this.targetOS}`;
@@ -182,24 +177,27 @@ export class SummaryComponent implements OnInit {
   }
 
   /**
-   * Transform some fields before sending it to vic-machine API
+   * Transform payload to something vic-machine command friendly
    */
   private processPayload(): any {
     const results = JSON.parse(JSON.stringify(this.payload));
 
-    // transform image store entry to something vic-machine command friendly
+    // transform image store entry
     results['storageCapacity']['imageStore'] =
       results['storageCapacity']['imageStore'] + (results['storageCapacity']['fileFolder'] || '');
     delete results['storageCapacity']['fileFolder'];
 
-    // transform each volume store entry to something vic-machine command friendly
+    results['baseImageSize'] = results['baseImageSize'] + results['baseImageSizeUnit'].replace('i', '');
+    delete results['baseImageSizeUnit'];
+
+    // transform each volume store entry
     const volumeStoresRef = results['storageCapacity']['volumeStores'];
     results['storageCapacity']['volumeStores'] =
       volumeStoresRef.map(volStoreObj => {
         return `${volStoreObj['volDatastore']}${volStoreObj['volFileFolder']}:${volStoreObj['dockerVolName']}`;
       });
 
-    // transform each container network entry to something vic-machine command friendly
+    // transform each container network entry
     const containerNetworksRef = results['networks']['containerNetworks'];
     results['networks']['containerNetworks'] =
       containerNetworksRef.map(containerNetObj => {
@@ -229,10 +227,11 @@ export class SummaryComponent implements OnInit {
   }
 
   /**
-   * Emit the processed payload that will be sent to vic-machine API endpoint
+   * Emit the payload that will be sent to vic-machine API endpoint
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    return Observable.of(this.processedPayload);
+    this.payload['debug'] = this.form.get('debug').value;
+    return Observable.of(this.payload);
   }
 }

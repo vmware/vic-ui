@@ -54,7 +54,7 @@ export class StorageCapacityComponent implements OnInit {
           Validators.pattern(numberPattern)
         ]
       ],
-      baseImageSizeUnit: 'GB'
+      baseImageSizeUnit: 'GiB'
     });
 
     // volume store validation is disabled by default, as user starts in the basic mode
@@ -141,9 +141,10 @@ export class StorageCapacityComponent implements OnInit {
       results['fileFolder'] = val;
     }
 
+    results['baseImageSize'] = this.form.get('baseImageSize').value;
+    results['baseImageSizeUnit'] = this.form.get('baseImageSizeUnit').value;
+
     if (this.inAdvancedMode) {
-      results['baseImageSize'] =
-        this.form.get('baseImageSize').value + this.form.get('baseImageSizeUnit').value;
 
       // filter ones with empty datastore
       results['volumeStores'] = this.form.get('volumeStores').value

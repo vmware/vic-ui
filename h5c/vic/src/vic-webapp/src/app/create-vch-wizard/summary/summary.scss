@@ -8,3 +8,7 @@ textarea#cliCommand {
   min-height: 150px;
   font-size: 0.9em;
 }
+
+#vch-payload-stackview ::ng-deep > .stack-view {
+  height: auto;
+}

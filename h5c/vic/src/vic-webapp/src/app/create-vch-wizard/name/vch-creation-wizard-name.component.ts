@@ -27,16 +27,12 @@ import { supportedCharsPattern } from '../../shared/utils/validators';
 })
 export class VchCreationWizardNameComponent implements OnInit {
   public form: FormGroup;
-  public formErrMessage = '';
   public signpostOpenState = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private createWzService: CreateVchWizardService
   ) {
-    // create a FormGroup instance for the 'name' field with
-    // three synchronous validations - not empty, max char length of 80
-    // and not containing any invalid characters
     this.form = formBuilder.group({
       name: [
         'virtual-container-host',
@@ -47,13 +43,12 @@ export class VchCreationWizardNameComponent implements OnInit {
         ]
       ]
     });
+
+    // TODO: add syslog field and change name step to general settings
+    // TODO: add container vm template name fields
   }
 
-  // TODO: function that calls a service's method to load WIP data and replace form values
-
-  ngOnInit() {
-    // TODO: update value & validity only if there is a value already
-  }
+  ngOnInit() { }
 
   onPageLoad() { }
 

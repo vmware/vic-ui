@@ -33,7 +33,6 @@ import {
 })
 export class SecurityComponent {
   public form: FormGroup;
-  public formErrMessage = '';
   public inAdvancedMode = false;
   public signpostOpenState = false;
   public tlsServerError: string = null;
@@ -77,6 +76,9 @@ export class SecurityComponent {
     // Since useWhitelistRegistry is false by default, disable whitelistRegistries validations
     this.form.get('whitelistRegistries').disable();
   }
+
+  // TODO: move security options out of advanced mode
+  // TODO: move opsUser credentials to a new step
 
   addNewFormArrayEntry(controlName: string) {
     const control = this.form.get(controlName) as FormArray;
