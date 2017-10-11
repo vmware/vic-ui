@@ -20,9 +20,10 @@ Library  requests
 Library  Process
 Library  SSHLibrary  5 minute
 Library  DateTime
-Library  Selenium2Library  3  3
+Library  Selenium2Library  30  30
 Resource  Nimbus-Util.robot
 Resource  Vsphere-Util.robot
+Resource  Vsphere-UI-Util.robot
 Resource  VCH-Util.robot
 Resource  Drone-Util.robot
 Resource  Github-Util.robot
@@ -34,3 +35,6 @@ Resource  Cert-Util.robot
 Resource  Slack-Util.robot
 
 Variables  dynamic-vars.py
+
+*** Variables ***
+@{BROWSERS}  chrome  #firefox  ie
