@@ -18,6 +18,8 @@ import { Component, OnInit, ViewChild, ElementRef, Renderer } from '@angular/cor
 import { Wizard } from 'clarity-angular';
 import { GlobalsService } from 'app/shared';
 import { Observable } from 'rxjs/Observable';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { RefreshService } from 'app/shared';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -37,7 +39,9 @@ export class CreateVchWizardComponent implements OnInit {
   constructor(
     private elRef: ElementRef,
     private renderer: Renderer,
-    private globalsService: GlobalsService
+    private globalsService: GlobalsService,
+    private refressher: RefreshService,
+    private http: Http
   ) { }
 
   /**
@@ -111,10 +115,6 @@ export class CreateVchWizardComponent implements OnInit {
     this.wizard.previous();
   }
 
-  get cachedData(): any {
-    return this._cachedData;
-  }
-
   /**
    * Clear the error flag (this method might be removed)
    * @param fn : page-specific init function
@@ -129,23 +129,50 @@ export class CreateVchWizardComponent implements OnInit {
    * Perform the final data validation and send the data to the
    * OVA endpoint via a POST request
    */
-  onFinish(payloadObs: Observable<any> | null) {
-    // TODO: send the results to the OVA endpoint via a POST request
+  onFinish(payloadObs: Observable<any> | null): Observable<Response> {
     if (!this.loading && payloadObs) {
-      payloadObs.subscribe(data => {
+      payloadObs.subscribe(payload => {
+
+        console.log('wizard payload: ', payload);
+
         this.errorFlag = false;
-        console.log('TODO: send this payload to api endpoint', JSON.stringify(data));
-        // TODO: uncomment these
-        // this.wizard.forceFinish();
-        // this.onCancel();
+
+        // TODO: replace api endpoint IP with OVA IP and target IP with current target VC IP
+        const url = 'https://10.160.131.87:31337/container/target/10.160.255.106/vch?' +
+          'thumbprint=' + payload.security.thumbprint;
+
+        const body = this.processPayload(payload);
+
+        console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
+
+        const headers  = new Headers({
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic YWRtaW5pc3RyYXRvckB2c3BoZXJlLmxvY2FsOkFkbWluITIz'
+        });
+
+        const options  = new RequestOptions({ headers: headers });
+
+        this.http.post(url, JSON.stringify(body), options)
+          .map(response => response.json())
+          .subscribe(response => {
+            console.log(response);
+            this.wizard.forceFinish();
+            this.onCancel();
+            this.refressher.refreshView();
+          }, error => {
+            console.error('error from api:', error);
+            const response = JSON.parse(error._body);
+            this.errorFlag = true;
+            this.errorMsgs = [response.message];
+          });
       }, errors => {
+        console.error('error from form validations:', errors);
         this.loading = false;
         this.errorFlag = true;
         this.errorMsgs = errors;
       });
       return;
     }
-
     this.errorFlag = true;
     this.errorMsgs = ['User inputs validation failed!'];
   }
@@ -156,5 +183,165 @@ export class CreateVchWizardComponent implements OnInit {
   onCancel() {
     const webPlatform = this.globalsService.getWebPlatform();
     webPlatform.closeDialog();
+  }
+
+  get cachedData(): any {
+    return this._cachedData;
+  }
+
+  /**
+   * Transform wizard payload before sending it to vic-machine-service API
+   */
+  processPayload(payload) {
+
+    const processedPayload = {
+      'name': payload.name,
+      'compute': {
+        'cpu': {
+          'limit': {
+            // TODO: use selected unit from payload once units selectors are implemented
+            'units': 'MHz',
+            'value': payload.computeCapacity.cpu
+          }
+        },
+        'memory': {
+          'limit': {
+            'units': 'MiB',
+            'value': payload.computeCapacity.memory
+          }
+        },
+        'resource': {
+          'name': payload.computeCapacity.computeResource
+        }
+      },
+      'storage': {
+        'image_stores': [
+          payload.storageCapacity.imageStore + (payload.storageCapacity.fileFolder || '')
+        ],
+        'base_image_size': {
+          'units': payload.storageCapacity.baseImageSizeUnit,
+          'value': payload.storageCapacity.baseImageSize
+        }
+      },
+      'network': {
+        'bridge': {
+          'ip_range': payload.networks.bridgeNetworkRange,
+          'port_group': {'name': payload.networks.bridgeNetwork}
+        },
+        'public': {
+          'port_group': {'name': payload.networks.publicNetwork}
+        }
+      },
+      'auth': {}
+    };
+
+    if (payload.debug) {
+      processedPayload['debug'] = payload.debug;
+    }
+
+    if (payload.computeCapacity.cpuReservation) {
+      processedPayload.compute.cpu['reservation'] = {
+        'units': 'MHz',
+        'value': payload.computeCapacity.cpuReservation
+      };
+      processedPayload.compute.cpu['shares'] = {
+        'level': payload.computeCapacity.cpuShares
+      };
+      processedPayload.compute.memory['reservation'] = {
+        'units': 'MiB',
+        'value': payload.computeCapacity.memoryReservation
+      };
+      processedPayload.compute.memory['shares'] = {
+        'level': payload.computeCapacity.memoryShares
+      };
+      processedPayload['endpoint'] = {
+        cpu: {
+          'sockets': payload.computeCapacity.endpointCpu
+        },
+        memory: {
+          'units': 'MiB',
+          'value': payload.computeCapacity.endpointMemory
+        }
+      }
+    }
+
+    // TODO: map networks settings
+
+    if (payload.storageCapacity.volumeStores.length) {
+      processedPayload.storage['volume_stores'] = payload.storageCapacity.volumeStores.map(vol => {
+        return {
+          'datastore': vol.volDatastore + (vol.volFileFolder || ''),
+          'label': vol.dockerVolName
+        };
+      })
+    }
+
+    let auth: any;
+
+    if (payload.security.noTls) {
+      auth = {'no_tls': true}
+    } else {
+
+      auth = {
+        client: {},
+        server: {}
+      };
+
+      if (payload.security.noTlsverify) {
+        auth.client = {'no_tls_verify': true};
+      } else {
+        auth.client = {'certificate_authorities': payload.security['tlsCa'].map(cert => ({pem: cert.content}))};
+      }
+
+      if (payload.security.certificateKeySize) {
+        auth.server = {
+          generate: {
+            size: {
+              'value': parseInt(payload.security.certificateKeySize),
+              'units': 'bit'
+            },
+            organization: [payload.security.organization],
+            cname: payload.security.tlsCname
+          }
+        }
+      } else {
+        auth.server = {
+          certificate: {'pem': payload.security.tlsServerCert.content},
+          private_key: {'pem': payload.security.tlsServerKey.content}
+        }
+      }
+    }
+
+    processedPayload['auth'] = auth;
+
+    // TODO: map ops user for endpoint settings
+
+    const registry: any = {};
+
+    if (payload.whitelistRegistry && payload.whitelistRegistry.length) {
+      registry['whitelist'] = payload.whitelistRegistry;
+    }
+
+    if (payload.insecureRegistry && payload.insecureRegistry.length) {
+      registry['insecure'] = payload.insecureRegistry;
+    }
+
+    if (payload.registryCa && payload.registryCa.length) {
+      registry['certificate_authorities'] = payload.registryCa.map(cert => ({pem: cert.content}));
+    }
+
+    if (payload.networks.httpProxy || payload.networks.httpsProxy) {
+      registry['image_fetch_proxy'] = {};
+
+      if (payload.networks.httpProxy) {
+        registry['image_fetch_proxy']['http'] = payload.networks.httpProxy;
+      }
+
+      if (payload.networks.httpsProxy) {
+        registry['image_fetch_proxy']['https'] = payload.networks.httpsProxy;
+      }
+    }
+
+    return processedPayload;
   }
 }
