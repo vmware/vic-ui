@@ -15,13 +15,12 @@
 */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
-import { Globals, GlobalsService } from 'app/shared';
+import { GlobalsService } from 'app/shared';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Observable } from 'rxjs/Observable';
 import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
@@ -31,6 +30,7 @@ import { NetworksComponent } from './networks/networks.component';
 import { SecurityComponent } from './security/security.component';
 import { SummaryComponent } from './summary/summary.component';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
+import { RefreshService } from '../shared/refresh.service';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -63,6 +63,11 @@ describe('CreateVchWizardComponent', () => {
               return Observable.of(name === 'unique');
             },
             getClustersList: () => Observable.of([])
+          }
+        },
+        {
+          provide: RefreshService, useValue: {
+            refresh: () => {}
           }
         }
       ],

@@ -187,8 +187,9 @@ export class SummaryComponent implements OnInit {
       results['storageCapacity']['imageStore'] + (results['storageCapacity']['fileFolder'] || '');
     delete results['storageCapacity']['fileFolder'];
 
-    results['baseImageSize'] = results['baseImageSize'] + results['baseImageSizeUnit'].replace('i', '');
-    delete results['baseImageSizeUnit'];
+    results['storageCapacity']['baseImageSize'] = results['storageCapacity']['baseImageSize']
+      + results['storageCapacity']['baseImageSizeUnit'].replace('i', '');
+    delete results['storageCapacity']['baseImageSizeUnit'];
 
     // transform each volume store entry
     const volumeStoresRef = results['storageCapacity']['volumeStores'];

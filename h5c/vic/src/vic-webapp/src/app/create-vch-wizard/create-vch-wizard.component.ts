@@ -40,7 +40,7 @@ export class CreateVchWizardComponent implements OnInit {
     private elRef: ElementRef,
     private renderer: Renderer,
     private globalsService: GlobalsService,
-    private refressher: RefreshService,
+    private refresher: RefreshService,
     private http: Http
   ) { }
 
@@ -158,7 +158,7 @@ export class CreateVchWizardComponent implements OnInit {
             console.log(response);
             this.wizard.forceFinish();
             this.onCancel();
-            this.refressher.refreshView();
+            this.refresher.refreshView();
           }, error => {
             console.error('error from api:', error);
             const response = JSON.parse(error._body);
@@ -201,13 +201,13 @@ export class CreateVchWizardComponent implements OnInit {
           'limit': {
             // TODO: use selected unit from payload once units selectors are implemented
             'units': 'MHz',
-            'value': payload.computeCapacity.cpu
+            'value': parseInt(payload.computeCapacity.cpu, 10)
           }
         },
         'memory': {
           'limit': {
             'units': 'MiB',
-            'value': payload.computeCapacity.memory
+            'value': parseInt(payload.computeCapacity.memory, 10)
           }
         },
         'resource': {
@@ -220,7 +220,7 @@ export class CreateVchWizardComponent implements OnInit {
         ],
         'base_image_size': {
           'units': payload.storageCapacity.baseImageSizeUnit,
-          'value': payload.storageCapacity.baseImageSize
+          'value': parseInt(payload.storageCapacity.baseImageSize, 10)
         }
       },
       'network': {
@@ -236,31 +236,31 @@ export class CreateVchWizardComponent implements OnInit {
     };
 
     if (payload.debug) {
-      processedPayload['debug'] = payload.debug;
+      processedPayload['debug'] = parseInt(payload.debug, 10);
     }
 
     if (payload.computeCapacity.cpuReservation) {
       processedPayload.compute.cpu['reservation'] = {
         'units': 'MHz',
-        'value': payload.computeCapacity.cpuReservation
+        'value': parseInt(payload.computeCapacity.cpuReservation, 10)
       };
       processedPayload.compute.cpu['shares'] = {
         'level': payload.computeCapacity.cpuShares
       };
       processedPayload.compute.memory['reservation'] = {
         'units': 'MiB',
-        'value': payload.computeCapacity.memoryReservation
+        'value': parseInt(payload.computeCapacity.memoryReservation, 10)
       };
       processedPayload.compute.memory['shares'] = {
         'level': payload.computeCapacity.memoryShares
       };
       processedPayload['endpoint'] = {
         cpu: {
-          'sockets': payload.computeCapacity.endpointCpu
+          'sockets': parseInt(payload.computeCapacity.endpointCpu, 10)
         },
         memory: {
           'units': 'MiB',
-          'value': payload.computeCapacity.endpointMemory
+          'value': parseInt(payload.computeCapacity.endpointMemory, 10)
         }
       }
     }
@@ -297,7 +297,7 @@ export class CreateVchWizardComponent implements OnInit {
         auth.server = {
           generate: {
             size: {
-              'value': parseInt(payload.security.certificateKeySize),
+              'value': parseInt(payload.security.certificateKeySize, 10),
               'units': 'bit'
             },
             organization: [payload.security.organization],

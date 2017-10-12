@@ -55,6 +55,7 @@ describe('SummaryComponent', () => {
     component.payload = {
       storageCapacity: {
         imageStore: 'datastore',
+        baseImageSizeUnit: 'GiB',
         volumeStores: []
       },
       networks: {
