@@ -18,7 +18,7 @@ pipeline:
     recursive: false
 
   vic-ui:
-    image: harbor.ci.drone.local/library/vic-integration-test:1.36
+    image: gcr.io/eminent-nation-87317/vic-integration-test:1.36
     pull: true
     environment:
       BUILD_NUMBER: ${DRONE_BUILD_NUMBER}
@@ -33,7 +33,7 @@ pipeline:
       branch: [ master, releases/*, refs/tags/* ]
 
   bundle:
-    image: harbor.ci.drone.local/library/golang:1.8
+    image: alpine
     pull: true
     environment:
       BIN: bin
