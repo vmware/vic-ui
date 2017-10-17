@@ -280,25 +280,48 @@ Predeploy Vc And Esx
 
 Check Variables
     ${isset_SHELL}=  Run Keyword And Return Status  Environment Variable Should Be Set  SHELL
-    ${isset_NIMBUS_USER}=  Run Keyword And Return Status  Environment Variable Should Be Set  NIMBUS_USER
-    ${isset_NIMBUS_PASSWORD}=  Run Keyword And Return Status  Environment Variable Should Be Set  NIMBUS_PASSWORD
-    ${isset_NIMBUS_GW}=  Run Keyword And Return Status  Environment Variable Should Be Set  NIMBUS_GW
     ${isset_TEST_DATASTORE}=  Run Keyword And Return Status  Environment Variable Should Be Set  TEST_DATASTORE
     ${isset_TEST_RESOURCE}=  Run Keyword And Return Status  Environment Variable Should Be Set  TEST_RESOURCE
     ${isset_GOVC_INSECURE}=  Run Keyword And Return Status  Environment Variable Should Be Set  GOVC_INSECURE
     Log To Console  \nChecking environment variables
     Log To Console  SHELL ${isset_SHELL}
-    Log To Console  NIMBUS_USER ${isset_NIMBUS_USER}
-    Log To Console  NIMBUS_PASSWORD ${isset_NIMBUS_PASSWORD}
-    Log To Console  NIMBUS_GW ${isset_NIMBUS_GW}
     Log To Console  TEST_DATASTORE ${isset_TEST_DATASTORE}
     Log To Console  TEST_RESOURCE ${isset_TEST_RESOURCE}
     Log To Console  GOVC_INSECURE ${isset_GOVC_INSECURE}
     Log To Console  TEST_VSPHERE_VER %{TEST_VSPHERE_VER}
-    Should Be True  ${isset_SHELL} and ${isset_NIMBUS_USER} and ${isset_NIMBUS_GW} and ${isset_TEST_DATASTORE} and ${isset_TEST_RESOURCE} and ${isset_GOVC_INSECURE} and %{TEST_VSPHERE_VER}
+    Should Be True  ${isset_SHELL} and ${isset_TEST_DATASTORE} and ${isset_TEST_RESOURCE} and ${isset_GOVC_INSECURE} and %{TEST_VSPHERE_VER}
 
-Check Nimbus Machines
-    Check If Nimbus VMs Exist
+Get VMs Information
+    # remove testbed-information if it exists
+    ${ti_exists}=  Run Keyword And Return Status  OperatingSystem.Should Exist  testbed-information
+    Run Keyword If  ${ti_exists}  Remove File  testbed-information
+
+    # choose which selenium grid to use
+    Run Keyword If  '%{TEST_OS}' == 'Mac'  Set Environment Variable  SELENIUM_SERVER_IP  ${MACOS_HOST_IP}  ELSE  Set Environment Variable  SELENIUM_SERVER_IP  ${WINDOWS_HOST_IP}
+
+    ${esx_ip}=  Set Variable  ${BUILD_%{TEST_ESX_BUILD}_IP}
+    ${vcsa_ip}=  Set Variable  ${BUILD_%{TEST_VCSA_BUILD}_IP}
+
+    ${testbed-information-content}=  Catenate  SEPARATOR=\n
+    ...  TEST_VSPHERE_VER=%{TEST_VSPHERE_VER}
+    ...  SELENIUM_SERVER_IP=%{SELENIUM_SERVER_IP}
+    ...  TEST_ESX_NAME=esx-%{TEST_ESX_BUILD}
+    ...  ESX_HOST_IP=${esx_ip}
+    ...  ESX_HOST_PASSWORD=ca*hc0w
+    ...  TEST_VC_NAME=vc-%{TEST_VCSA_BUILD}
+    ...  TEST_VC_IP=${vcsa_ip}
+    ...  TEST_URL_ARRAY=${vcsa_ip}
+    ...  TEST_USERNAME=Administrator@vsphere.local
+    ...  TEST_PASSWORD=Admin\!23
+    ...  TEST_DATASTORE=datastore1
+    ...  EXTERNAL_NETWORK=vm-network
+    ...  TEST_TIMEOUT=30m
+    ...  GOVC_INSECURE=1
+    ...  GOVC_USERNAME=Administrator@vsphere.local
+    ...  GOVC_PASSWORD=Admin\!23
+    ...  GOVC_URL=${vcsa_ip}\n
+
+    Create File  testbed-information  ${testbed-information-content}
 
 Deploy VCH
     Load Nimbus Testbed Env

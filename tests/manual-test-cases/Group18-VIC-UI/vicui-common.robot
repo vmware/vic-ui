@@ -21,6 +21,10 @@ Library  VicUiInstallPexpectLibrary.py
 ${MACOS_HOST_IP}                      10.20.121.192
 ${UBUNTU_HOST_IP}                     10.20.121.145
 ${WINDOWS_HOST_IP}                    10.25.200.225
+${BUILD_3620759_IP}                   10.25.200.237
+${BUILD_3634791_IP}                   10.25.200.245
+${BUILD_5310538_IP}                   10.25.200.231
+${BUILD_5318154_IP}                   10.25.200.243
 ${SECRETS_FILE}                       test.secrets
 ${vic_macmini_fileserver_url}         https://10.20.121.192:3443/vsphere-plugins/
 ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:8B:86:5F:AD:79:CE

@@ -193,6 +193,8 @@ Run Script Test With Config
     ${vc_build}=    Get From List  ${config}  2
     ${os}=          Get From List  ${config}  3
     Set Environment Variable  TEST_VSPHERE_VER  ${vc_version}
+    Set Environment Variable  TEST_ESX_BUILD  ${esx_build}
+    Set Environment Variable  TEST_VCSA_BUILD  ${vc_build}
     Set Environment Variable  TEST_OS  ${os}
 
     Log To Console  ${\n}........................................
@@ -252,6 +254,8 @@ Run Plugin Test With Config
     ${selenium_browser}=             Get From List  ${config}  4
     ${selenium_browser_normalized}=  Get From List  ${config}  5
     Set Environment Variable  TEST_VSPHERE_VER  ${vc_version}
+    Set Environment Variable  TEST_ESX_BUILD  ${esx_build}
+    Set Environment Variable  TEST_VCSA_BUILD  ${vc_build}
     Set Environment Variable  TEST_OS  ${os}
 
     Log To Console  ${\n}........................................
