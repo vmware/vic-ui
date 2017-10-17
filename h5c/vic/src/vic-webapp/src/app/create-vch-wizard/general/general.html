@@ -1,26 +1,23 @@
-<p>
-  This wizard builds a command that creates a virtual container host.
-  You can copy the command from the Summary page into your command line interface.
-</p>
+<p>Provide the name and log configuration for this new Virtual Container Host (VCH).</p>
 
 <form [formGroup]="form" novalidate>
   <section class="form-block">
 
     <div class="form-group row">
-      <div class="col-xs-2">
+      <div class="col-xs-3">
 
         <label for="nameInput" class="required">
-          Name
+          VCH name
         </label>
 
       </div>
-      <div class="col-xs-6">
+      <div class="col-xs-7">
 
         <label for="nameInput"
                aria-haspopup="true"
                role="tooltip"
                class="form-control tooltip tooltip-validation tooltip-lg tooltip-top-left"
-               [class.invalid]="form.get('name').invalid && (form.get('name').dirty || form.get('name').touched)">
+               [class.invalid]="form.get('name').invalid">
 
           <input id="nameInput"
                  class="form-control"
@@ -49,7 +46,7 @@
       </div>
 
       <clr-signpost [clrSignpostPosition]="'bottom-left'">
-        <clr-signpost-content *clrIfOpen="signpostOpenState">
+        <clr-signpost-content *clrIfOpen>
             <span>
               Virtual container host names can contain up to 80 characters and must be unique within each vCenter
             </span>
@@ -57,6 +54,47 @@
       </clr-signpost>
 
     </div>
+
+    <!-- TODO: Add container vm template name fields -->
+
+  </section>
+
+  <p>Set level of logging and an endpoint for log aggregation.</p>
+
+  <section class="form-block">
+
+    <div class="form-group row">
+      <div class="col-xs-3">
+
+        <label for="debug-level-selector">Debug</label>
+
+      </div>
+      <div class="col-xs-5">
+
+        <div class="select form-control">
+          <select id="debug-level-selector"
+                  formControlName="debug">
+            <option value="0">0 - Verbose logging is disabled</option>
+            <option value="1">1 - Provides extra verbosity in the logs</option>
+            <option value="2">2 - Exposes server on more interfaces, launches pprof in container VMs</option>
+            <option value="3">3 - Disables recovery logic and logs sensitive data</option>
+          </select>
+        </div>
+
+      </div>
+
+      <clr-signpost [clrSignpostPosition]="'top-left'">
+        <clr-signpost-content *clrIfOpen>
+            <span>
+              Deploy the VCH with more verbose levels of logging, an optionally modify the behavior of vic-machine
+              for troubleshooting purposes.
+            </span>
+        </clr-signpost-content>
+      </clr-signpost>
+
+    </div>
+
+    <!-- TODO: add syslog field -->
 
   </section>
 </form>

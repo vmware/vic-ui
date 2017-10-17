@@ -81,18 +81,7 @@ describe('StorageCapacityComponent', () => {
     expect(component.form.valid).toBe(true);
   });
 
-  it('should validate advanced fields defaults values', () => {
-    component.form.get('imageStore').setValue(datastoreName);
-    component.toggleAdvancedMode();
-    expect(component.form.get('volumeStores').enabled).toBeTruthy();
-    component.onCommit();
-    expect(component.form.valid).toBe(true);
-    component.toggleAdvancedMode();
-    expect(component.form.get('volumeStores').disabled).toBeTruthy();
-  });
-
   it('should validate volume store fields', () => {
-    component.toggleAdvancedMode();
     const controls = component.form.get('volumeStores')['controls'][0]['controls'];
 
     controls['volDatastore'].setValue(datastoreName);
@@ -120,8 +109,6 @@ describe('StorageCapacityComponent', () => {
     const expectedFolderName = '/folder';
     component.form.get('imageStore').setValue(datastoreName);
     component.form.get('fileFolder').setValue(folderName);
-
-    component.toggleAdvancedMode();
 
     const controls = component.form.get('volumeStores')['controls'][0]['controls'];
     controls['volDatastore'].setValue(datastoreName);

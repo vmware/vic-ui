@@ -21,13 +21,12 @@ import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { supportedCharsPattern } from '../../shared/utils/validators';
 
 @Component({
-  selector: 'vic-vch-creation-name',
-  templateUrl: './vch-creation-wizard-name.html',
-  styleUrls: ['./vch-creation-wizard-name.scss']
+  selector: 'vic-vch-creation-general',
+  templateUrl: './general.html',
+  styleUrls: ['./general.scss']
 })
-export class VchCreationWizardNameComponent implements OnInit {
+export class VchCreationWizardGeneralComponent implements OnInit {
   public form: FormGroup;
-  public signpostOpenState = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -41,11 +40,12 @@ export class VchCreationWizardNameComponent implements OnInit {
           Validators.maxLength(80),
           Validators.pattern(supportedCharsPattern)
         ]
-      ]
+      ],
+      debug: '0',
     });
 
-    // TODO: add syslog field and change name step to general settings
-    // TODO: add container vm template name fields
+    // TODO: add container vm template name fields once the service api implements them
+    // TODO: add syslog field once the service api implements it
   }
 
   ngOnInit() { }
@@ -68,7 +68,10 @@ export class VchCreationWizardNameComponent implements OnInit {
           });
           return Observable.throw(null);
         }
-        return Observable.of({ name: this.form.get('name').value });
+        return Observable.of({
+          name: this.form.get('name').value,
+          debug: this.form.get('debug').value
+        });
       });
   }
 }

@@ -13,8 +13,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter, Input, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, Input, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { camelCasePattern } from '../../shared/utils/validators';
 import { getClientOS } from '../../shared/utils/detection'
@@ -38,8 +38,6 @@ export class SummaryComponent implements OnInit {
     private elementRef: ElementRef
   ) {
     this.form = formBuilder.group({
-      // TODO move debug to name section
-      debug: '0',
       targetOS: '',
       cliCommand: ''
     });
@@ -61,14 +59,10 @@ export class SummaryComponent implements OnInit {
     }
 
     /**
-     *  Subscribe to debug and os changes
-     *  we have to subscribe to these individually instead of the whole form
+     *  Subscribe to os changes
+     *  we have to subscribe to this individually instead of the whole form
      *  since we are manually setting a change on the cli field
      */
-    this.form.get('debug').valueChanges.subscribe(data => {
-      this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
-    });
-
     this.form.get('targetOS').valueChanges
       .subscribe(v => {
         if (!v) {
@@ -221,9 +215,6 @@ export class SummaryComponent implements OnInit {
         }
       });
 
-    // debug
-    results['debug'] = this.form.get('debug').value;
-
     return results;
   }
 
@@ -232,7 +223,6 @@ export class SummaryComponent implements OnInit {
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    this.payload['debug'] = this.form.get('debug').value;
     return Observable.of(this.payload);
   }
 }

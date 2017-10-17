@@ -23,7 +23,7 @@ import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { GlobalsService } from 'app/shared';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Observable } from 'rxjs/Observable';
-import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
+import { VchCreationWizardGeneralComponent } from './general/general.component';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { NetworksComponent } from './networks/networks.component';
@@ -62,7 +62,8 @@ describe('CreateVchWizardComponent', () => {
               // TODO: check if this makes sense
               return Observable.of(name === 'unique');
             },
-            getClustersList: () => Observable.of([])
+            getClustersList: () => Observable.of([]),
+            getDatastores: () => Observable.of([])
           }
         },
         {
@@ -73,7 +74,7 @@ describe('CreateVchWizardComponent', () => {
       ],
       declarations: [
         CreateVchWizardComponent,
-        VchCreationWizardNameComponent,
+        VchCreationWizardGeneralComponent,
         ComputeCapacityComponent,
         StorageCapacityComponent,
         NetworksComponent,

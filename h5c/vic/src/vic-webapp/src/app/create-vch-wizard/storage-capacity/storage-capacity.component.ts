@@ -33,11 +33,12 @@ import { supportedCharsPattern, numberPattern } from '../../shared/utils/validat
 export class StorageCapacityComponent implements OnInit {
   public form: FormGroup;
   public formErrMessage = '';
-  public inAdvancedMode = false;
   public datastores: any[] = [];
   public datastoresLoading = true;
-  @Input() resourceObjRef;
   private _isSetup = false;
+  @Input() set resourceObjRef(value) {
+    this.loadDatastore(value);
+  }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -46,7 +47,6 @@ export class StorageCapacityComponent implements OnInit {
     this.form = formBuilder.group({
       imageStore: ['', Validators.required],
       fileFolder: '',
-      volumeStores: formBuilder.array([this.createNewVolumeDatastoreEntry()]),
       baseImageSize: [
         '8',
         [
@@ -54,18 +54,13 @@ export class StorageCapacityComponent implements OnInit {
           Validators.pattern(numberPattern)
         ]
       ],
-      baseImageSizeUnit: 'GiB'
+      baseImageSizeUnit: 'GiB',
+      enableAnonymousVolumes: false,
+      volumeStores: formBuilder.array([this.createNewVolumeDatastoreEntry()])
     });
-
-    // volume store validation is disabled by default, as user starts in the basic mode
-    this.form.get('volumeStores').disable();
   }
 
-  // TODO: function that calls a service's method to load WIP data and replace form values
-
-  ngOnInit() {
-
-  }
+  ngOnInit() { }
 
   addNewVolumeDatastoreEntry() {
     const volStores = this.form.get('volumeStores') as FormArray;
@@ -88,19 +83,38 @@ export class StorageCapacityComponent implements OnInit {
     });
   }
 
-  onPageLoad() {
-    // load datastores
-    this.createWzService.getDatastores(this.resourceObjRef)
+  loadDatastore(resource) {
+    this.datastoresLoading = true;
+    this.createWzService.getDatastores(resource)
       .subscribe(v => {
         this.datastores = v;
         this.form.get('imageStore').setValue('');
         this.datastoresLoading = false;
       }, err => console.error(err));
+  }
+
+  datastoreTrackByFn(index, datastore) {
+    return datastore.id;
+  }
+
+  onPageLoad() {
 
     // prevent subscribing to the following input changes for more than once
     if (this._isSetup) {
       return;
     }
+
+    this.form.get('enableAnonymousVolumes').valueChanges
+      .subscribe(v => {
+        const volStores = this.form.get('volumeStores') as FormArray;
+        if (v) {
+          const defaultVolumeStore = this.createNewVolumeDatastoreEntry();
+          defaultVolumeStore.get('dockerVolName').setValue('default');
+          volStores.insert(0, defaultVolumeStore);
+        } else {
+          volStores.removeAt(0);
+        }
+      });
 
     this.form.get('volumeStores').valueChanges
       .subscribe(v => {
@@ -122,7 +136,6 @@ export class StorageCapacityComponent implements OnInit {
   /**
    */
   onCommit(): Observable<any> {
-    const errs: string[] = [];
     const results: any = {};
 
     if (this.form.invalid) {
@@ -144,31 +157,17 @@ export class StorageCapacityComponent implements OnInit {
     results['baseImageSize'] = this.form.get('baseImageSize').value;
     results['baseImageSizeUnit'] = this.form.get('baseImageSizeUnit').value;
 
-    if (this.inAdvancedMode) {
+    // filter ones with empty datastore
+    results['volumeStores'] = this.form.get('volumeStores').value
+      .filter(vol => vol['volDatastore']);
 
-      // filter ones with empty datastore
-      results['volumeStores'] = this.form.get('volumeStores').value
-        .filter(vol => vol['volDatastore']);
-
-      results['volumeStores'].forEach(vol => {
-        // if volume file folder doesn't start with '/', prepend the value with '/'
-        if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
-          vol['volFileFolder'] = '/' + vol['volFileFolder'];
-        }
-      });
-    } else {
-      results['volumeStores'] = [];
-    }
+    results['volumeStores'].forEach(vol => {
+      // if volume file folder doesn't start with '/', prepend the value with '/'
+      if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
+        vol['volFileFolder'] = '/' + vol['volFileFolder'];
+      }
+    });
 
     return Observable.of({ storageCapacity: results });
-  }
-
-  toggleAdvancedMode() {
-    this.inAdvancedMode = !this.inAdvancedMode;
-    if (!this.inAdvancedMode) {
-      this.form.get('volumeStores').disable();
-    } else {
-      this.form.get('volumeStores').enable();
-    }
   }
 }

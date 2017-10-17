@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
-import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
+import { VchCreationWizardGeneralComponent } from './general/general.component';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { NetworksComponent } from './networks/networks.component';
@@ -43,7 +43,7 @@ const routes: Routes = [
   ],
   declarations: [
     CreateVchWizardComponent,
-    VchCreationWizardNameComponent,
+    VchCreationWizardGeneralComponent,
     ComputeCapacityComponent,
     StorageCapacityComponent,
     NetworksComponent,
@@ -55,7 +55,7 @@ const routes: Routes = [
   ],
   exports: [
     CreateVchWizardComponent,
-    VchCreationWizardNameComponent,
+    VchCreationWizardGeneralComponent,
     ComputeCapacityComponent,
     StorageCapacityComponent,
     SecurityComponent,
