@@ -49,3 +49,11 @@ Navigate To VCH Creation Wizard
     Wait Until Element Is Visible  css=span.com_vmware_vic-home-shortcut-icon
     Wait Until Element Is Enabled  css=span.com_vmware_vic-home-shortcut-icon
     Click Element  css=span.com_vmware_vic-home-shortcut-icon
+    
+    Wait Until Element Is Visible  css=span[title='vSphere Integrated Containers']
+    Wait Until Element Is Enabled  css=span[title='vSphere Integrated Containers']
+    Click Element  css=span[title='vSphere Integrated Containers']
+
+    Wait Until Page Contains  Summary
+    Wait Until Page Contains  Virtual Container Hosts
+    Wait Until Page Contains  Containers

@@ -23,6 +23,8 @@ Library  DateTime
 Library  Selenium2Library  30  30
 Resource  Nimbus-Util.robot
 Resource  Vsphere-Util.robot
+Resource  Vsphere-VCH-Plugin.robot
+Resource  VCH-Creation-Wizard-UI-Util.robot
 Resource  Vsphere-UI-Util.robot
 Resource  VCH-Util.robot
 Resource  Drone-Util.robot

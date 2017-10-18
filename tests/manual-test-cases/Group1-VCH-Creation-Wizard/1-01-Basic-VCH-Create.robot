@@ -26,3 +26,20 @@ Test
     \   Maximize Browser Window
     \   Login To Vsphere UI
     \   Navigate To VCH Creation Wizard
+    \   Navigate To VCH Tab
+    \   Click New Virtual Container Host Button
+    \   Input VCH Name  test-vch
+    \   Click Next Button
+    \   Select Cluster
+    \   Click Next Button
+    \   Select Image Datastore  datastore1
+    \   Click Next Button
+    \   Select Bridge Network  bridge
+    \   Select Public Network  vm-network  
+    \   Click Next Button
+    \   # Security
+    \   Click Next Button
+    \   # Finish
+    \   Click Next Button
+    
+    Sleep  10
