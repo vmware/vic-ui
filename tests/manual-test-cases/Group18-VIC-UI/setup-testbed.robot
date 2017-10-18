@@ -280,16 +280,12 @@ Predeploy Vc And Esx
 
 Check Variables
     ${isset_SHELL}=  Run Keyword And Return Status  Environment Variable Should Be Set  SHELL
-    ${isset_TEST_DATASTORE}=  Run Keyword And Return Status  Environment Variable Should Be Set  TEST_DATASTORE
-    ${isset_TEST_RESOURCE}=  Run Keyword And Return Status  Environment Variable Should Be Set  TEST_RESOURCE
     ${isset_GOVC_INSECURE}=  Run Keyword And Return Status  Environment Variable Should Be Set  GOVC_INSECURE
     Log To Console  \nChecking environment variables
     Log To Console  SHELL ${isset_SHELL}
-    Log To Console  TEST_DATASTORE ${isset_TEST_DATASTORE}
-    Log To Console  TEST_RESOURCE ${isset_TEST_RESOURCE}
     Log To Console  GOVC_INSECURE ${isset_GOVC_INSECURE}
     Log To Console  TEST_VSPHERE_VER %{TEST_VSPHERE_VER}
-    Should Be True  ${isset_SHELL} and ${isset_TEST_DATASTORE} and ${isset_TEST_RESOURCE} and ${isset_GOVC_INSECURE} and %{TEST_VSPHERE_VER}
+    Should Be True  ${isset_SHELL} and ${isset_GOVC_INSECURE} and %{TEST_VSPHERE_VER}
 
 Get VMs Information
     # remove testbed-information if it exists
@@ -313,7 +309,7 @@ Get VMs Information
     ...  TEST_URL_ARRAY=${vcsa_ip}
     ...  TEST_USERNAME=Administrator@vsphere.local
     ...  TEST_PASSWORD=Admin\!23
-    ...  TEST_DATASTORE=datastore1
+    ...  TEST_DATASTORE=${TEST_DATASTORE}
     ...  EXTERNAL_NETWORK=vm-network
     ...  TEST_TIMEOUT=30m
     ...  GOVC_INSECURE=1
@@ -335,7 +331,7 @@ Deploy VCH
     Append To File  testbed-information  TEST_OS=%{TEST_OS}\n
     Append To File  testbed-information  DRONE_BUILD_NUMBER=%{DRONE_BUILD_NUMBER}\n
     Append To File  testbed-information  BRIDGE_NETWORK=%{BRIDGE_NETWORK}\n
-    Append To File  testbed-information  TEST_DATACENTER=%{TEST_DATACENTER}\n
+    Append To File  testbed-information  TEST_DATACENTER=${TEST_DATACENTER}\n
     Append To File  testbed-information  TEST_URL=%{TEST_URL}\n
     Append To File  testbed-information  VCH_VM_NAME=%{VCH-NAME}\n
     Append To File  testbed-information  VCH-IP=%{VCH-IP}\n

@@ -27,7 +27,6 @@ ${REMOTE_RESULTS_FOLDER}  /tmp/vic-ui-e2e-uninstaller
 Load Testbed Information And Force Install Vicui Plugin
     # load nimbus & vch testbed information from testbed-information
     Load Nimbus Testbed Env
-    Load Secrets  ../../../test.secrets
     Set Absolute Script Paths
     Force Install Vicui Plugin
 

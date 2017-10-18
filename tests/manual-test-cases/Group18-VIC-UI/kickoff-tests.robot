@@ -31,7 +31,6 @@ Prepare Testbed
     Cleanup Previous Test Logs
     Check Working Dir
     Check Drone
-    Load Secrets
     Get Latest Vic Engine Binary
     Setup Test Matrix
 

@@ -26,6 +26,13 @@ ${BUILD_3634791_IP}                   10.25.200.245
 ${BUILD_5310538_IP}                   10.25.200.231
 ${BUILD_5318154_IP}                   10.25.200.243
 ${SECRETS_FILE}                       test.secrets
+${TEST_DATASTORE}                     datastore1
+${TEST_DATACENTER}                    /Datacenter
+${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
+${MACOS_HOST_USER}                    browseruser
+${MACOS_HOST_PASSWORD}                ca*hc0w
+${WINDOWS_HOST_USER}                  IEUser
+${WINDOWS_HOST_PASSWORD}              Passw0rd!
 ${vic_macmini_fileserver_url}         https://10.20.121.192:3443/vsphere-plugins/
 ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:8B:86:5F:AD:79:CE
 ${GCP_DOWNLOAD_PATH}                  https://storage.googleapis.com/vic-engine-builds/
@@ -53,17 +60,6 @@ Load Nimbus Testbed Env
     \  Set Suite Variable  \$@{kv}[0]  @{kv}[1]
     Set Suite Variable  ${TEST_VC_USERNAME}  %{TEST_USERNAME}
     Set Suite Variable  ${TEST_VC_PASSWORD}  %{TEST_PASSWORD}
-
-Load Secrets
-    [Arguments]  ${secrets}=${SECRETS_FILE}
-    OperatingSystem.File Should Exist  ${secrets}
-    ${envs}=  OperatingSystem.Get File  ${secrets}
-    @{envs}=  Split To Lines  ${envs}
-    :FOR  ${item}  IN  @{envs}
-    \  @{kv}=  Split String  ${item}  =
-    \  ${stripped}=  Replace String  @{kv}[1]  "  ${EMPTY}
-    \  Set Environment Variable  @{kv}[0]  ${stripped}
-    \  Set Suite Variable  \$@{kv}[0]  @{kv}[1]
 
 Install VIC Appliance For VIC UI
     [Arguments]  ${vic-machine}=ui-nightly-run-bin/vic-machine-linux  ${appliance-iso}=ui-nightly-run-bin/appliance.iso  ${bootstrap-iso}=ui-nightly-run-bin/bootstrap.iso  ${certs}=${true}  ${vol}=default
@@ -165,7 +161,7 @@ Cleanup Installer Environment
 Delete VIC Machine
     [Tags]  secret
     [Arguments]  ${vch-name}  ${vic-machine}=ui-nightly-run-bin/vic-machine-linux
-    ${rc}  ${output}=  Run And Return Rc And Output  ${vic-machine} delete --name=${vch-name} --target=%{TEST_URL}%{TEST_DATACENTER} --user=%{TEST_USERNAME} --password=%{TEST_PASSWORD} --force=true --compute-resource=%{TEST_RESOURCE} --timeout %{TEST_TIMEOUT}
+    ${rc}  ${output}=  Run And Return Rc And Output  ${vic-machine} delete --name=${vch-name} --target=%{TEST_URL}${TEST_DATACENTER} --user=%{TEST_USERNAME} --password=%{TEST_PASSWORD} --force=true --compute-resource=${TEST_RESOURCE} --timeout %{TEST_TIMEOUT}
     [Return]  ${rc}  ${output}
 
 Uninstall VCH
