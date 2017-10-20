@@ -19,7 +19,3 @@ This test requires that a vSphere server is running and available and VIC OVA wi
 # Possible Problems:
 None
 
-
-
-
-
