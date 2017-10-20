@@ -22,13 +22,14 @@ Suite Teardown  Close All Browsers
 *** Test Cases ***
 Test
     :FOR  ${browser}  IN  @{BROWSERS}
-    \   Open Browser  https://127.0.0.1  browser=${browser}
+    \   Open Browser  ${BASE_URL}  browser=${browser}
     \   Maximize Browser Window
     \   Login To Vsphere UI
     \   Navigate To VCH Creation Wizard
     \   Navigate To VCH Tab
     \   Click New Virtual Container Host Button
-    \   Input VCH Name  test-vch
+    \   ${name}=  Evaluate  'VCH-1-01-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
+    \   Input VCH Name  ${name}
     \   Click Next Button
     \   Select Cluster
     \   Click Next Button

@@ -40,3 +40,4 @@ Variables  dynamic-vars.py
 
 *** Variables ***
 @{BROWSERS}  chrome  #firefox  ie
+${BASE_URL}  https://127.0.0.1
