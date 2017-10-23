@@ -18,34 +18,28 @@ Documentation  This resource contains any keywords dealing with web based operat
 *** Keywords ***
 Input VCH Name
     [Arguments]  ${name}
-    Wait Until Element Is Visible  nameInput
-    Wait Until Element Is Enabled  nameInput
+    Wait Until Element Is Visible And Enabled  nameInput
     Input Text  nameInput  ${name}
 
 Click Next Button
-    Wait Until Element Is Visible  css=button.btn.clr-wizard-btn.btn-primary
-    Wait Until Element Is Enabled  css=button.btn.clr-wizard-btn.btn-primary
+    Wait Until Element Is Visible And Enabled  css=button.btn.clr-wizard-btn.btn-primary
     Click Button  css=button.btn.clr-wizard-btn.btn-primary
 
 Select Cluster
-    Wait Until Element Is Visible  css=clr-icon[shape='cluster']
-    Wait Until Element Is Enabled  css=clr-icon[shape='cluster']
+    Wait Until Element Is Visible And Enabled  css=clr-icon[shape='cluster']
     Click Element  css=clr-icon[shape='cluster']
 
 Select Image Datastore
     [Arguments]  ${datastore}
-    Wait Until Element Is Visible  image-store-selector
-    Wait Until Element Is Enabled  image-store-selector
+    Wait Until Element Is Visible And Enabled  image-store-selector
     Select From List By Value  image-store-selector  ${datastore}
 
 Select Bridge Network
     [Arguments]  ${network}
-    Wait Until Element Is Visible  bridge-network-selector
-    Wait Until Element Is Enabled  bridge-network-selector
+    Wait Until Element Is Visible And Enabled  bridge-network-selector
     Select From List By Value  bridge-network-selector  ${network}
 
 Select Public Network
     [Arguments]  ${network}
-    Wait Until Element Is Visible  public-network-selector
-    Wait Until Element Is Enabled  public-network-selector
+    Wait Until Element Is Visible And Enabled  public-network-selector
     Select From List By Value  public-network-selector  ${network}

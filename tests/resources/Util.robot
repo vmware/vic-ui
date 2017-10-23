@@ -41,3 +41,9 @@ Variables  dynamic-vars.py
 *** Variables ***
 @{BROWSERS}  chrome  #firefox  ie
 ${BASE_URL}  https://127.0.0.1
+
+*** Keywords ***
+Wait Until Element Is Visible And Enabled
+    [Arguments]  ${element}
+    Wait Until Element Is Visible  ${element}
+    Wait Until Element Is Enabled  ${element}

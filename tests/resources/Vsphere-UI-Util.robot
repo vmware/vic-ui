@@ -19,10 +19,8 @@ Documentation  This resource contains any keywords dealing with web based operat
 Login To Vsphere UI
     [Arguments]  ${url}=%{TEST_URL}  ${username}=%{TEST_USERNAME}  ${password}=%{TEST_PASSWORD}
     Go To  ${url}
-    Wait Until Element Is Visible  username
-    Wait Until Element Is Enabled  username
-    Wait Until Element Is Visible  password
-    Wait Until Element Is Enabled  password
+    Wait Until Element Is Visible And Enabled  username
+    Wait Until Element Is Visible And Enabled  password
 
     Input Text  username  ${username}
     Input Text  password  ${password}
@@ -38,20 +36,16 @@ Login To Vsphere UI
     Wait Until Page Contains  Permissions
 
 Navigate To VCH Creation Wizard
-    Wait Until Element Is Visible  action-homeMenu
-    Wait Until Element Is Enabled  action-homeMenu
+    Wait Until Element Is Visible And Enabled  action-homeMenu
     Click Element  action-homeMenu
 
-    Wait Until Element Is Visible  xpath=//*[@id="homeMenu-vsphere.core.navigator.shortcuts"]
-    Wait Until Element Is Enabled  xpath=//*[@id="homeMenu-vsphere.core.navigator.shortcuts"]
+    Wait Until Element Is Visible And Enabled  xpath=//*[@id="homeMenu-vsphere.core.navigator.shortcuts"]
     Click Element  xpath=//*[@id="homeMenu-vsphere.core.navigator.shortcuts"]
 
-    Wait Until Element Is Visible  css=span.com_vmware_vic-home-shortcut-icon
-    Wait Until Element Is Enabled  css=span.com_vmware_vic-home-shortcut-icon
+    Wait Until Element Is Visible And Enabled  css=span.com_vmware_vic-home-shortcut-icon
     Click Element  css=span.com_vmware_vic-home-shortcut-icon
     
-    Wait Until Element Is Visible  css=span[title='vSphere Integrated Containers']
-    Wait Until Element Is Enabled  css=span[title='vSphere Integrated Containers']
+    Wait Until Element Is Visible And Enabled  css=span[title='vSphere Integrated Containers']
     Click Element  css=span[title='vSphere Integrated Containers']
 
     Wait Until Page Contains  Summary
