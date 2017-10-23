@@ -25,8 +25,7 @@ Login To Vsphere UI
     Input Text  username  ${username}
     Input Text  password  ${password}
 
-    Wait Until Element Is Visible  submit
-    Wait Until Element Is Enabled  submit
+    Wait Until Element Is Visible And Enabled  submit
 
     Click Button  submit
 
