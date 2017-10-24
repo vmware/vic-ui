@@ -215,6 +215,16 @@ export class SummaryComponent implements OnInit {
         }
       });
 
+    // transform server cert and key
+
+    if (results['security']['tlsServerCert']) {
+      results['security']['tlsServerCert'] = results['security']['tlsServerCert']['name']
+    }
+
+    if (results['security']['tlsServerKey']) {
+      results['security']['tlsServerKey'] = results['security']['tlsServerKey']['name']
+    }
+
     return results;
   }
 

@@ -195,7 +195,7 @@ export class CreateVchWizardComponent implements OnInit {
   processPayload(payload) {
 
     const processedPayload = {
-      'name': payload.name,
+      'name': payload.general.name,
       'compute': {
         'cpu': {
           'limit': {
@@ -235,8 +235,12 @@ export class CreateVchWizardComponent implements OnInit {
       'auth': {}
     };
 
-    if (payload.debug) {
-      processedPayload['debug'] = parseInt(payload.debug, 10);
+    if (payload.general.syslogAddress) {
+      processedPayload['syslog_addr'] = payload.general.syslogAddress;
+    }
+
+    if (payload.general.debug) {
+      processedPayload['debug'] = parseInt(payload.general.debug, 10);
     }
 
     if (payload.computeCapacity.cpuReservation) {
@@ -278,43 +282,47 @@ export class CreateVchWizardComponent implements OnInit {
 
     let auth: any;
 
-    if (payload.security.noTls) {
-      auth = {'no_tls': true}
+    auth = {
+      client: {},
+      server: {}
+    };
+
+    if (payload.security.noTlsverify) {
+      auth.client = {'no_tls_verify': true};
     } else {
+      auth.client = {'certificate_authorities': payload.security['tlsCa'].map(cert => ({pem: cert.content}))};
+    }
 
-      auth = {
-        client: {},
-        server: {}
-      };
-
-      if (payload.security.noTlsverify) {
-        auth.client = {'no_tls_verify': true};
-      } else {
-        auth.client = {'certificate_authorities': payload.security['tlsCa'].map(cert => ({pem: cert.content}))};
-      }
-
-      if (payload.security.certificateKeySize) {
-        auth.server = {
-          generate: {
-            size: {
-              'value': parseInt(payload.security.certificateKeySize, 10),
-              'units': 'bit'
-            },
-            organization: [payload.security.organization],
-            cname: payload.security.tlsCname
-          }
+    if (payload.security.certificateKeySize) {
+      auth.server = {
+        generate: {
+          size: {
+            'value': parseInt(payload.security.certificateKeySize, 10),
+            'units': 'bit'
+          },
+          organization: [payload.security.organization],
+          cname: payload.security.tlsCname
         }
-      } else {
-        auth.server = {
-          certificate: {'pem': payload.security.tlsServerCert.content},
-          private_key: {'pem': payload.security.tlsServerKey.content}
+      }
+    } else if (payload.security.tlsServerCert) {
+      auth.server = {
+        certificate: {'pem': payload.security.tlsServerCert.content},
+        private_key: {'pem': payload.security.tlsServerKey.content}
+      }
+    } else {
+      auth.server = {
+        generate: {
+          size: {
+            value: 2048,
+            units: 'bits'
+          },
+          organization: [payload.general.name],
+          cname: payload.general.name
         }
       }
     }
 
     processedPayload['auth'] = auth;
-
-    // TODO: map ops user for endpoint settings
 
     const registry: any = {};
 

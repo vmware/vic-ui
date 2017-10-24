@@ -18,7 +18,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { supportedCharsPattern } from '../../shared/utils/validators';
+import { numberPattern, supportedCharsPattern} from '../../shared/utils/validators';
 
 @Component({
   selector: 'vic-vch-creation-general',
@@ -41,11 +41,20 @@ export class VchCreationWizardGeneralComponent implements OnInit {
           Validators.pattern(supportedCharsPattern)
         ]
       ],
+      containerNameConventionPrefix: '',
+      containerNameConvention: '{name}',
+      containerNameConventionPostfix: '',
       debug: '0',
+      syslogTransport: 'tcp',
+      syslogHost: '',
+      syslogPort: [
+        '',
+        [
+          Validators.maxLength(5),
+          Validators.pattern(numberPattern)
+        ]
+      ]
     });
-
-    // TODO: add container vm template name fields once the service api implements them
-    // TODO: add syslog field once the service api implements it
   }
 
   ngOnInit() { }
@@ -68,10 +77,30 @@ export class VchCreationWizardGeneralComponent implements OnInit {
           });
           return Observable.throw(null);
         }
-        return Observable.of({
-          name: this.form.get('name').value,
-          debug: this.form.get('debug').value
-        });
+
+        const results = {
+          general: {
+            name: this.form.get('name').value,
+            debug: this.form.get('debug').value
+          }
+        };
+
+        const containerNameConventionPrefixValue = this.form.get('containerNameConventionPrefix').value;
+        const containerNameConventionValue = this.form.get('containerNameConvention').value;
+        const containerNameConventionPostfixValue = this.form.get('containerNameConventionPostfix').value;
+
+        results['general']['containerNameConvention'] =
+          containerNameConventionPrefixValue + containerNameConventionValue + containerNameConventionPostfixValue;
+
+        const syslogTransportValue = this.form.get('syslogTransport').value;
+        const syslogHostValue = this.form.get('syslogHost').value;
+        const syslogPortValue = this.form.get('syslogPort').value;
+
+        if (syslogHostValue && syslogPortValue) {
+          results['general']['syslogAddress'] = `${syslogTransportValue}://${syslogHostValue}:${syslogPortValue}`;
+        }
+
+        return Observable.of(results);
       });
   }
 }

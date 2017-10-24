@@ -6,15 +6,33 @@
           <!-- name -->
           <clr-stack-block>
             <clr-stack-label>Name</clr-stack-label>
-            <clr-stack-content>{{ payload?.name }}</clr-stack-content>
+            <clr-stack-content>{{ payload?.general?.name }}</clr-stack-content>
           </clr-stack-block>
-          <!-- debug (displayed when advanced mode is active) -->
-          <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('debug')">
+          <!-- container name convention -->
+          <clr-stack-block>
+            <clr-stack-label>
+              Container VM name template
+            </clr-stack-label>
+            <clr-stack-content>
+              {{ payload?.general?.containerNameConvention }}
+            </clr-stack-content>
+          </clr-stack-block>
+          <!-- debug -->
+          <clr-stack-block>
             <clr-stack-label>
               Debug
             </clr-stack-label>
             <clr-stack-content>
-              {{ payload?.computeCapacity?.debug }}
+              {{ payload?.general?.debug }}
+            </clr-stack-content>
+          </clr-stack-block>
+          <!-- syslog -->
+          <clr-stack-block>
+            <clr-stack-label>
+              Syslog
+            </clr-stack-label>
+            <clr-stack-content>
+              {{ payload?.general?.syslogAddress || '-' }}
             </clr-stack-content>
           </clr-stack-block>
           <!-- compute resource -->
@@ -170,6 +188,12 @@
                 {{ payload?.networks?.publicNetworkGateway || 'DHCP' }}
               </clr-stack-content>
             </clr-stack-block>
+            <clr-stack-block>
+              <clr-stack-label>DNS</clr-stack-label>
+              <clr-stack-content>
+                {{ payload?.networks?.dnsServer || (payload?.networks?.publicNetworkIp ? '8.8.8.8' : 'DHCP') }}
+              </clr-stack-content>
+            </clr-stack-block>
           </clr-stack-block>
           <!-- client network -->
           <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('clientNetwork')">
@@ -195,6 +219,18 @@
                 {{ payload.networks.clientNetworkGateway || 'DHCP' }}
               </clr-stack-content>
             </clr-stack-block>
+            <clr-stack-block>
+              <clr-stack-label>Routing destination</clr-stack-label>
+              <clr-stack-content>
+                {{ payload?.networks?.clientNetworkRouting || '-' }}
+              </clr-stack-content>
+            </clr-stack-block>
+            <clr-stack-block>
+              <clr-stack-label>DNS</clr-stack-label>
+              <clr-stack-content>
+                {{ payload?.networks?.dnsServer || (payload?.networks?.clientNetworkIp ? '8.8.8.8' : 'DHCP') }}
+              </clr-stack-content>
+            </clr-stack-block>
           </clr-stack-block>
           <!-- management network -->
           <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('managementNetwork')">
@@ -218,6 +254,18 @@
               <clr-stack-label>Gateway</clr-stack-label>
               <clr-stack-content>
                 {{ payload.networks.managementNetworkGateway || 'DHCP' }}
+              </clr-stack-content>
+            </clr-stack-block>
+            <clr-stack-block>
+              <clr-stack-label>Routing destination</clr-stack-label>
+              <clr-stack-content>
+                {{ payload?.networks?.managementNetworkRouting || '-' }}
+              </clr-stack-content>
+            </clr-stack-block>
+            <clr-stack-block>
+              <clr-stack-label>DNS</clr-stack-label>
+              <clr-stack-content>
+                {{ payload?.networks?.dnsServer || (payload?.networks?.managementNetworkIp ? '8.8.8.8' : 'DHCP') }}
               </clr-stack-content>
             </clr-stack-block>
           </clr-stack-block>
@@ -293,16 +341,16 @@
               Docker API Access
             </clr-stack-label>
             <clr-stack-content>
-              TLS {{ payload?.security?.noTls ? 'disabled ' : 'enabled' }}
+              TLS verify {{ payload?.security?.noTlsverify ? 'disabled ' : 'enabled' }}
             </clr-stack-content>
             <!-- cert folder -->
-            <clr-stack-block *ngIf="!payload?.security?.noTls">
+            <clr-stack-block *ngIf="!payload?.security?.noTlsverify">
               <clr-stack-label>
                 Certificate folder
               </clr-stack-label>
               <clr-stack-content>
                 <!-- TODO: define user in cert path -->
-                {{ '/home/{user}/' + payload?.name + '/' }}
+                {{ '/home/{user}/' + payload?.general?.name + '/' }}
               </clr-stack-content>
             </clr-stack-block>
             <!-- tls cname -->
@@ -333,25 +381,25 @@
               </clr-stack-content>
             </clr-stack-block>
             <!-- server cert -->
-            <clr-stack-block *ngIf="payload?.security && !payload.security.noTls">
+            <clr-stack-block *ngIf="payload?.security?.tlsServerCert">
               <clr-stack-label>
                 Server certificate
               </clr-stack-label>
               <clr-stack-content>
-                {{ payload.security.tlsServerCert ? ('expires: ' + (payload.security.tlsServerCert.expires | date : 'mediumDate')) : '-' }}
+                {{ 'expires: ' + (payload.security.tlsServerCert.expires | date : 'mediumDate') }}
               </clr-stack-content>
             </clr-stack-block>
             <!-- server private key -->
-            <clr-stack-block *ngIf="payload?.security && !payload.security.noTls">
+            <clr-stack-block *ngIf="payload?.security?.tlsServerKey">
               <clr-stack-label>
                 Server private key
               </clr-stack-label>
               <clr-stack-content>
-                {{ payload.security.tlsServerKey ? (payload.security.tlsServerKey.name) : '-' }}
+                {{ payload.security.tlsServerKey.name }}
               </clr-stack-content>
             </clr-stack-block>
             <!-- tls verify -->
-            <clr-stack-block *ngIf="payload?.security && !payload.security.noTls">
+            <clr-stack-block *ngIf="payload?.security && !payload.security.noTlsverify">
               <clr-stack-label>
                 TLS verify
               </clr-stack-label>

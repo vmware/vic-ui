@@ -20,11 +20,11 @@
 
   <div class="spinner" *ngIf="loading"></div>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="nameStep.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid"
                    clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(nameStep.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
-                   (clrWizardPageOnCommit)="onCommit(nameStep.onCommit())"
+                   (clrWizardPageOnCommit)="onCommit(generalStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
     <ng-template clrPageTitle>
@@ -33,7 +33,7 @@
     </ng-template>
     <ng-template clrPageNavTitle>General</ng-template>
 
-    <vic-vch-creation-general #nameStep></vic-vch-creation-general>
+    <vic-vch-creation-general #generalStep></vic-vch-creation-general>
 
   </clr-wizard-page>
 
@@ -147,7 +147,7 @@
     </ng-template>
     <ng-template clrPageNavTitle>Security</ng-template>
 
-    <vic-vch-creation-security [vchName]="nameStep.form.get('name').value" #securityStep></vic-vch-creation-security>
+    <vic-vch-creation-security [vchName]="generalStep.form.get('name').value" #securityStep></vic-vch-creation-security>
 
   </clr-wizard-page>
 
