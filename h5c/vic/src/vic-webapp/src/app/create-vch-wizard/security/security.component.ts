@@ -65,9 +65,7 @@ export class SecurityComponent {
       useWhitelistRegistry: false,
       insecureRegistries: formBuilder.array([this.createNewFormArrayEntry('insecureRegistries')]),
       whitelistRegistries: formBuilder.array([this.createNewFormArrayEntry('whitelistRegistries')]),
-      registryCas: formBuilder.array([this.createNewFormArrayEntry('registryCas')]),
-      opsUser: '',
-      opsUserPass: ''
+      registryCas: formBuilder.array([this.createNewFormArrayEntry('registryCas')])
     });
 
     // Since useWhitelistRegistry is false by default, disable whitelistRegistries validations
@@ -231,12 +229,6 @@ export class SecurityComponent {
     }
 
     results['registryCa'] = this.registryCaContents;
-
-    // Operations User
-    const opsUserValue = this.form.get('opsUser').value;
-    if (opsUserValue) {
-      results['opsUser'] = opsUserValue;
-    }
 
     // user id, vc thumbprint and target
     results['user'] = this.createWzService.getUserId();

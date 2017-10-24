@@ -28,6 +28,7 @@ import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.co
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { NetworksComponent } from './networks/networks.component';
 import { SecurityComponent } from './security/security.component';
+import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { SummaryComponent } from './summary/summary.component';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { RefreshService } from '../shared/refresh.service';
@@ -79,6 +80,7 @@ describe('CreateVchWizardComponent', () => {
         StorageCapacityComponent,
         NetworksComponent,
         SecurityComponent,
+        OperationsUserComponent,
         SummaryComponent
       ]
     })

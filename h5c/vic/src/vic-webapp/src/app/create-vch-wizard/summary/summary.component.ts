@@ -51,7 +51,8 @@ export class SummaryComponent implements OnInit {
    * On WizardPage load event, start listening for events on inputs
    */
   onPageLoad(): void {
-    // refresh based on any changes made to the previous pages
+    // refresh cli value based on any changes made to the previous pages
+    this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
 
     // prevent subscription from getting set up more than once
     if (this._isSetup) {
@@ -191,6 +192,20 @@ export class SummaryComponent implements OnInit {
       volumeStoresRef.map(volStoreObj => {
         return `${volStoreObj['volDatastore']}${volStoreObj['volFileFolder']}:${volStoreObj['dockerVolName']}`;
       });
+
+    // transform gateways with routing destinations
+
+    if (results['networks']['clientNetworkRouting']) {
+      results['networks']['clientNetworkGateway'] =
+        results['networks']['clientNetworkRouting'].join(',') + ':' + results['networks']['clientNetworkGateway'];
+      delete results['networks']['clientNetworkRouting'];
+    }
+
+    if (results['networks']['managementNetworkRouting']) {
+      results['networks']['managementNetworkGateway'] =
+        results['networks']['managementNetworkRouting'].join(',') + ':' + results['networks']['managementNetworkGateway'];
+      delete results['networks']['clientNetworkRouting'];
+    }
 
     // transform each container network entry
     const containerNetworksRef = results['networks']['containerNetworks'];

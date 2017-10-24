@@ -18,7 +18,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { numberPattern, supportedCharsPattern} from '../../shared/utils/validators';
+import { ipOrFqdnPattern, numberPattern, supportedCharsPattern } from '../../shared/utils/validators';
 
 @Component({
   selector: 'vic-vch-creation-general',
@@ -46,7 +46,12 @@ export class VchCreationWizardGeneralComponent implements OnInit {
       containerNameConventionPostfix: '',
       debug: '0',
       syslogTransport: 'tcp',
-      syslogHost: '',
+      syslogHost: [
+        '',
+        [
+          Validators.pattern(ipOrFqdnPattern)
+        ]
+      ],
       syslogPort: [
         '',
         [

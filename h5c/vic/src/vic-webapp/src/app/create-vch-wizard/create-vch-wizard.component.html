@@ -151,6 +151,34 @@
 
   </clr-wizard-page>
 
+  <clr-wizard-page [clrWizardPageNextDisabled]="operationsUserStep.form.invalid"
+                   clrWizardPagePreventDefault="true"
+                   (clrWizardPageOnLoad)="onPageLoad(operationsUserStep.onPageLoad())"
+                   (clrWizardPageOnCancel)="onCancel()"
+                   (clrWizardPageOnCommit)="onCommit(operationsUserStep.onCommit())"
+                   (clrWizardPagePrevious)="goBack()">
+
+    <ng-template clrPageTitle>
+      Operations User
+      <clr-icon shape="help" class="is-info"></clr-icon>
+      <clr-alert *ngIf="errorFlag"
+                 [clrAlertType]="'alert-danger'"
+                 [clrAlertClosable]="false">
+
+        <div class="alert-item">
+          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+            {{errMsg}}
+          </div>
+        </div>
+
+      </clr-alert>
+    </ng-template>
+    <ng-template clrPageNavTitle>Operations User</ng-template>
+
+    <vic-vch-creation-operations-user #operationsUserStep></vic-vch-creation-operations-user>
+
+  </clr-wizard-page>
+
   <clr-wizard-page clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(summaryStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"

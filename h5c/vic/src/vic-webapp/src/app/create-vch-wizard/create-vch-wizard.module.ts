@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,9 +24,9 @@ import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.co
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { NetworksComponent } from './networks/networks.component';
 import { SecurityComponent } from './security/security.component';
+import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { SummaryComponent } from './summary/summary.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
-import { Globals, GlobalsService } from '../shared';
 
 const routes: Routes = [
   { path: '', component: CreateVchWizardComponent },
@@ -48,6 +48,7 @@ const routes: Routes = [
     StorageCapacityComponent,
     NetworksComponent,
     SecurityComponent,
+    OperationsUserComponent,
     SummaryComponent
   ],
   providers: [
@@ -59,6 +60,7 @@ const routes: Routes = [
     ComputeCapacityComponent,
     StorageCapacityComponent,
     SecurityComponent,
+    OperationsUserComponent,
     SummaryComponent
   ]
 })

@@ -328,13 +328,6 @@
               {{ payload.networks.httpsProxy }}
             </clr-stack-content>
           </clr-stack-block>
-          <!-- dns -->
-          <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('dnsServer')">
-            <clr-stack-label>DNS</clr-stack-label>
-            <clr-stack-content>
-              {{ payload.networks.dnsServer }}
-            </clr-stack-content>
-          </clr-stack-block>
           <!-- docker api access -->
           <clr-stack-block>
             <clr-stack-label>
@@ -445,12 +438,12 @@
             </clr-stack-content>
           </clr-stack-block>
           <!-- ops user -->
-          <clr-stack-block *ngIf="payload?.security?.opsUser">
+          <clr-stack-block>
             <clr-stack-label>
               Operations user
             </clr-stack-label>
             <clr-stack-content>
-              {{ payload.security.opsUser }}
+              {{ payload?.operations?.opsUser }}
             </clr-stack-content>
           </clr-stack-block>
         </clr-stack-view>

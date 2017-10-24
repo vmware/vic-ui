@@ -30,7 +30,6 @@
 
       <clr-tab-link [clrTabLinkActive]="true">Docker API Access</clr-tab-link>
       <clr-tab-link>Registry Access</clr-tab-link>
-      <clr-tab-link>Operations User</clr-tab-link>
 
       <clr-tab-content [clrTabContentActive]="true">
 
@@ -119,12 +118,12 @@
                          formControlName="certificateKeySize">
 
                   <span class="tooltip-content" *ngIf="form.get('certificateKeySize').hasError('required')">
-                      Certificate key size cannot be empty
-                    </span>
+                    Certificate key size cannot be empty
+                  </span>
 
                   <span class="tooltip-content" *ngIf="form.get('certificateKeySize').hasError('pattern')">
-                      Certificate key size should be numeric
-                    </span>
+                    Certificate key size should be numeric
+                  </span>
 
                 </label>
 
@@ -492,53 +491,6 @@
               </div>
 
             </div>
-
-        </section>
-
-      </clr-tab-content>
-      <clr-tab-content>
-
-        <section class="form-block">
-
-          <p class="mt-1 mb-2">
-            This VCH will be managed by the vSphere user account that deploys it. You can choose a different vSphere user for deployment
-            and operation here.
-          </p>
-
-          <div class="form-group row mb-2">
-            <div class="col-xs-3">
-
-              <label for="ops-user">
-                vSphere user credentials
-              </label>
-
-            </div>
-            <div class="col-xs-5">
-
-              <input id="ops-user"
-                     class="form-control"
-                     type="text"
-                     placeholder="username@domain.local"
-                     formControlName="opsUser">
-
-            </div>
-          </div>
-          <div class="form-group row mb-2">
-            <div class="col-xs-5 offset-xs-3">
-
-              <input id="ops-user-pass"
-                     class="form-control"
-                     type="password"
-                     placeholder="Password"
-                     formControlName="opsUserPass">
-
-            </div>
-          </div>
-
-          <small>
-            Note: If you choose to define a user account, you must place the bridge network port group
-            in a network folder that has the Read-Only role with propagation enabled.
-          </small>
 
         </section>
 

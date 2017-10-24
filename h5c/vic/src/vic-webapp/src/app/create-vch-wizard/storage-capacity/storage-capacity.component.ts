@@ -21,7 +21,6 @@ import {
   Validators
 } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { supportedCharsPattern, numberPattern } from '../../shared/utils/validators';
 
