@@ -257,7 +257,7 @@ Run Script Test With Config
     Should Be Equal As Integers  ${rc}  0
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"test.secrets\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -321,7 +321,7 @@ Run Plugin Test With Config
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ❌ Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"test.secrets\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}

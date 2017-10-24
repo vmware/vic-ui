@@ -25,7 +25,6 @@ ${BUILD_3620759_IP}                   10.25.200.237
 ${BUILD_3634791_IP}                   10.25.200.245
 ${BUILD_5310538_IP}                   10.25.200.231
 ${BUILD_5318154_IP}                   10.25.200.243
-${SECRETS_FILE}                       test.secrets
 ${TEST_DATASTORE}                     datastore1
 ${TEST_DATACENTER}                    /Datacenter
 ${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
@@ -203,7 +202,6 @@ Cleanup MacOS Testbed
     ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
     ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
     ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
-    ...  /Users/browseruser/Desktop/vic/test.secrets
     ...  /tmp/vic-ui-e2e-scratch
 
     ${output}=  Run  rm -rvf ${files_to_remove} 2>&1
@@ -214,7 +212,6 @@ Cleanup Windows Testbed
     ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
     ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
     ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
-    ...  ~/vic/test.secrets
     ...  /tmp/vic-ui-e2e-scratch
 
     ${output}=  Run  rm -rf ${files_to_remove} 2>&1

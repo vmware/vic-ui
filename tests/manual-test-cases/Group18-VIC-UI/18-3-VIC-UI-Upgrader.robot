@@ -206,7 +206,7 @@ TestCase-Upgrade When Plugins Are Already Installed
 # Run the test cases above in macOS
 Run Testcases On Mac
     ${results_folder}=  Set Variable  ../../../%{TEST_RESULTS_FOLDER}
-    ${remote_vic_root}=  Set Variable  /Users/browseruser/Desktop/vic
+    ${remote_vic_root}=  Set Variable  /Users/browseruser/Desktop/vic-ui
     ${remote_scratch_folder}=  Set Variable  /tmp/vic-ui-e2e-scratch
     OperatingSystem.Create Directory  ${results_folder}
 
@@ -215,7 +215,6 @@ Run Testcases On Mac
     Login  ${MACOS_HOST_USER}  ${MACOS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  testbed-information  ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI/  mode=0700
-    Put File  ../../../test.secrets  ${remote_vic_root}/
     Put File  ../../../ui-nightly-run-bin/vic-ui-darwin  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${MACOS_HOST_USER}@${MACOS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
@@ -259,7 +258,7 @@ Run Testcases On Mac
 # Run the test cases above in Windows
 Run Testcases On Windows
     ${results_folder}=  Set Variable  ../../../%{TEST_RESULTS_FOLDER}
-    ${remote_vic_root}=  Set Variable  /cygdrive/c/Users/IEUser/vic
+    ${remote_vic_root}=  Set Variable  /cygdrive/c/Users/IEUser/vic-ui
     ${remote_scratch_folder}=  Set Variable  /tmp/vic-ui-e2e-scratch
     OperatingSystem.Create Directory  ${results_folder}
 
@@ -268,7 +267,6 @@ Run Testcases On Windows
     Login  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  testbed-information  ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI/
-    Put File  ../../../test.secrets  ${remote_vic_root}/
     Put File  ../../../scripts/plugin-manifest  ${remote_vic_root}/scripts/
     Put File  ../../../vic-ui-windows.exe  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_scratch_folder} 2>&1
