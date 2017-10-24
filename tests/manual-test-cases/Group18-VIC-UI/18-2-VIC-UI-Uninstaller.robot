@@ -209,11 +209,12 @@ Run Testcases On Mac
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     # update local repo
+    # TODO: replace vic-6548 with master once the branch gets merged
     ${update_repo_command}=  Catenate
     ...  mkdir -p ${REMOTE_RESULTS_FOLDER} &&
     ...  cd ${remote_vic_root} &&
     ...  git remote update &&
-    ...  git checkout -f jooskim/new-master
+    ...  git checkout -f jooskim/vic-6548
     ${stdout}  ${stderr}  ${rc}=  Execute Command  ${update_repo_command}  return_stderr=True  return_rc=True
     Run Keyword Unless  ${rc} == 0  Log To Console  ${stderr}
 
@@ -265,10 +266,11 @@ Run Testcases On Windows
     Execute Command  mkdir -p ${REMOTE_RESULTS_FOLDER}
 
     # remotely run robot test
+    # TODO: replace vic-6548 with master once the branch gets merged
     ${ssh_command}=  Catenate
     ...  cd ${remote_vic_root} &&
     ...  git remote update &&
-    ...  git checkout -f jooskim/new-master &&
+    ...  git checkout -f jooskim/vic-6548 &&
     ...  cd tests/manual-test-cases/Group18-VIC-UI &&
     ...  robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-2-VIC-UI-Uninstaller.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
