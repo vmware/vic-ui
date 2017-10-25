@@ -28,6 +28,11 @@ export const ipPattern = new RegExp(ipV4Pattern.source + '|' + ipV6Pattern.sourc
 export const fqdnPattern = /^((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}$/;
 export const cidrPattern = /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/;
 export const wildcardDomainPattern = /^(\*\.)?([a-z\d][a-z\d-]*[a-z\d]\.)+[a-z]+$/;
+export const ipOrFqdnPattern = new RegExp(ipPattern.source + '|' + fqdnPattern.source);
+export const ipListPattern =
+  new RegExp(`(\\s*(${ipPattern.source.slice(1, -1)})+\\s*)(,\\s*(${ipPattern.source.slice(1, -1)})+\\s*)*`);
+export const cidrListPattern =
+  new RegExp(`(\\s*(${cidrPattern.source.slice(1, -1)})+\\s*)(,\\s*(${cidrPattern.source.slice(1, -1)})+\\s*)*`);
 
 export const whiteListRegistryPattern = new RegExp(
   ipPattern.source + '|' +

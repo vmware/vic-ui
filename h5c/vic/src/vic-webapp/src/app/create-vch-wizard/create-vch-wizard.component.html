@@ -20,17 +20,20 @@
 
   <div class="spinner" *ngIf="loading"></div>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="nameStep.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid"
                    clrWizardPagePreventDefault="true"
-                   (clrWizardPageOnLoad)="onPageLoad(nameStep.onPageLoad())"
+                   (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
-                   (clrWizardPageOnCommit)="onCommit(nameStep.onCommit())"
+                   (clrWizardPageOnCommit)="onCommit(generalStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
-    <ng-template clrPageTitle>Virtual Container Host Name</ng-template>
-    <ng-template clrPageNavTitle>Name</ng-template>
+    <ng-template clrPageTitle>
+      General Settings
+      <clr-icon shape="help" class="is-info"></clr-icon>
+    </ng-template>
+    <ng-template clrPageNavTitle>General</ng-template>
 
-    <vic-vch-creation-name #nameStep></vic-vch-creation-name>
+    <vic-vch-creation-general #generalStep></vic-vch-creation-general>
 
   </clr-wizard-page>
 
@@ -41,19 +44,22 @@
                    (clrWizardPageOnCommit)="onCommit(computeCapacityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
-    <ng-template clrPageTitle>Compute Capacity</ng-template>
+    <ng-template clrPageTitle>
+      Compute Capacity
+      <clr-icon shape="help" class="is-info"></clr-icon>
+      <clr-alert *ngIf="errorFlag"
+                 [clrAlertType]="'alert-danger'"
+                 [clrAlertClosable]="false">
 
-    <clr-alert *ngIf="errorFlag"
-               [clrAlertType]="'alert-danger'"
-               [clrAlertClosable]="false">
-
-      <div class="alert-item">
-        <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-          {{errMsg}}
+        <div class="alert-item">
+          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+            {{errMsg}}
+          </div>
         </div>
-      </div>
 
-    </clr-alert>
+      </clr-alert>
+    </ng-template>
+    <ng-template clrPageNavTitle>Compute Capacity</ng-template>
 
     <vic-vch-creation-compute-capacity #computeCapacityStep></vic-vch-creation-compute-capacity>
 
@@ -66,19 +72,22 @@
                    (clrWizardPageOnCommit)="onCommit(storageCapacityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
-    <ng-template clrPageTitle>Storage Capacity</ng-template>
+    <ng-template clrPageTitle>
+      Storage Capacity
+      <clr-icon shape="help" class="is-info"></clr-icon>
+      <clr-alert *ngIf="errorFlag"
+                 [clrAlertType]="'alert-danger'"
+                 [clrAlertClosable]="false">
 
-    <clr-alert *ngIf="errorFlag"
-               [clrAlertType]="'alert-danger'"
-               [clrAlertClosable]="false">
-
-      <div class="alert-item">
-        <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-          {{errMsg}}
+        <div class="alert-item">
+          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+            {{errMsg}}
+          </div>
         </div>
-      </div>
 
-    </clr-alert>
+      </clr-alert>
+    </ng-template>
+    <ng-template clrPageNavTitle>Storage Capacity</ng-template>
 
     <vic-vch-creation-storage-capacity #storageCapacityStep
                                        [resourceObjRef]="computeCapacityStep.selectedResourceObjRef">
@@ -93,20 +102,22 @@
                    (clrWizardPageOnCommit)="onCommit(networksStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
-    <ng-template clrPageTitle>Configure Networks</ng-template>
-    <ng-template clrPageNavTitle>Networks</ng-template>
+    <ng-template clrPageTitle>
+      Configure Networks
+      <clr-icon shape="help" class="is-info"></clr-icon>
+      <clr-alert *ngIf="errorFlag"
+                 [clrAlertType]="'alert-danger'"
+                 [clrAlertClosable]="false">
 
-    <clr-alert *ngIf="errorFlag"
-               [clrAlertType]="'alert-danger'"
-               [clrAlertClosable]="false">
-
-      <div class="alert-item">
-        <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-          {{errMsg}}
+        <div class="alert-item">
+          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+            {{errMsg}}
+          </div>
         </div>
-      </div>
 
-    </clr-alert>
+      </clr-alert>
+    </ng-template>
+    <ng-template clrPageNavTitle>Networks</ng-template>
 
     <vic-vch-creation-networks #networksStep></vic-vch-creation-networks>
 
@@ -119,21 +130,52 @@
                    (clrWizardPageOnCommit)="onCommit(securityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
 
-    <ng-template clrPageTitle>Security</ng-template>
+    <ng-template clrPageTitle>
+      Security
+      <clr-icon shape="help" class="is-info"></clr-icon>
+      <clr-alert *ngIf="errorFlag"
+                 [clrAlertType]="'alert-danger'"
+                 [clrAlertClosable]="false">
 
-    <clr-alert *ngIf="errorFlag"
-               [clrAlertType]="'alert-danger'"
-               [clrAlertClosable]="false">
-
-      <div class="alert-item">
-        <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-          {{errMsg}}
+        <div class="alert-item">
+          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+            {{errMsg}}
+          </div>
         </div>
-      </div>
 
-    </clr-alert>
+      </clr-alert>
+    </ng-template>
+    <ng-template clrPageNavTitle>Security</ng-template>
 
-    <vic-vch-creation-security [vchName]="nameStep.form.get('name').value" #securityStep></vic-vch-creation-security>
+    <vic-vch-creation-security [vchName]="generalStep.form.get('name').value" #securityStep></vic-vch-creation-security>
+
+  </clr-wizard-page>
+
+  <clr-wizard-page [clrWizardPageNextDisabled]="operationsUserStep.form.invalid"
+                   clrWizardPagePreventDefault="true"
+                   (clrWizardPageOnLoad)="onPageLoad(operationsUserStep.onPageLoad())"
+                   (clrWizardPageOnCancel)="onCancel()"
+                   (clrWizardPageOnCommit)="onCommit(operationsUserStep.onCommit())"
+                   (clrWizardPagePrevious)="goBack()">
+
+    <ng-template clrPageTitle>
+      Operations User
+      <clr-icon shape="help" class="is-info"></clr-icon>
+      <clr-alert *ngIf="errorFlag"
+                 [clrAlertType]="'alert-danger'"
+                 [clrAlertClosable]="false">
+
+        <div class="alert-item">
+          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+            {{errMsg}}
+          </div>
+        </div>
+
+      </clr-alert>
+    </ng-template>
+    <ng-template clrPageNavTitle>Operations User</ng-template>
+
+    <vic-vch-creation-operations-user #operationsUserStep></vic-vch-creation-operations-user>
 
   </clr-wizard-page>
 
@@ -143,19 +185,22 @@
                    (clrWizardPagePrevious)="goBack()"
                    (clrWizardPageOnCommit)="onFinish(summaryStep.onCommit())">
 
-    <ng-template clrPageTitle>Summary</ng-template>
+    <ng-template clrPageTitle>
+      Summary
+      <clr-icon shape="help" class="is-info"></clr-icon>
+      <clr-alert *ngIf="errorFlag"
+                 [clrAlertType]="'alert-danger'"
+                 [clrAlertClosable]="false">
 
-    <clr-alert *ngIf="errorFlag"
-               [clrAlertType]="'alert-danger'"
-               [clrAlertClosable]="false">
-
-      <div class="alert-item">
-        <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-          {{errMsg}}
+        <div class="alert-item">
+          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+            {{errMsg}}
+          </div>
         </div>
-      </div>
 
-    </clr-alert>
+      </clr-alert>
+    </ng-template>
+    <ng-template clrPageNavTitle>Summary</ng-template>
 
     <vic-vch-creation-summary [payload]="cachedData" #summaryStep></vic-vch-creation-summary>
 

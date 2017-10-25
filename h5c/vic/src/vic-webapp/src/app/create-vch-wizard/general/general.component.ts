@@ -18,25 +18,20 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { supportedCharsPattern } from '../../shared/utils/validators';
+import { ipOrFqdnPattern, numberPattern, supportedCharsPattern } from '../../shared/utils/validators';
 
 @Component({
-  selector: 'vic-vch-creation-name',
-  templateUrl: './vch-creation-wizard-name.html',
-  styleUrls: ['./vch-creation-wizard-name.scss']
+  selector: 'vic-vch-creation-general',
+  templateUrl: './general.html',
+  styleUrls: ['./general.scss']
 })
-export class VchCreationWizardNameComponent implements OnInit {
+export class VchCreationWizardGeneralComponent implements OnInit {
   public form: FormGroup;
-  public formErrMessage = '';
-  public signpostOpenState = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private createWzService: CreateVchWizardService
   ) {
-    // create a FormGroup instance for the 'name' field with
-    // three synchronous validations - not empty, max char length of 80
-    // and not containing any invalid characters
     this.form = formBuilder.group({
       name: [
         'virtual-container-host',
@@ -45,15 +40,29 @@ export class VchCreationWizardNameComponent implements OnInit {
           Validators.maxLength(80),
           Validators.pattern(supportedCharsPattern)
         ]
+      ],
+      containerNameConventionPrefix: '',
+      containerNameConvention: '{name}',
+      containerNameConventionPostfix: '',
+      debug: '0',
+      syslogTransport: 'tcp',
+      syslogHost: [
+        '',
+        [
+          Validators.pattern(ipOrFqdnPattern)
+        ]
+      ],
+      syslogPort: [
+        '',
+        [
+          Validators.maxLength(5),
+          Validators.pattern(numberPattern)
+        ]
       ]
     });
   }
 
-  // TODO: function that calls a service's method to load WIP data and replace form values
-
-  ngOnInit() {
-    // TODO: update value & validity only if there is a value already
-  }
+  ngOnInit() { }
 
   onPageLoad() { }
 
@@ -73,7 +82,30 @@ export class VchCreationWizardNameComponent implements OnInit {
           });
           return Observable.throw(null);
         }
-        return Observable.of({ name: this.form.get('name').value });
+
+        const results = {
+          general: {
+            name: this.form.get('name').value,
+            debug: this.form.get('debug').value
+          }
+        };
+
+        const containerNameConventionPrefixValue = this.form.get('containerNameConventionPrefix').value;
+        const containerNameConventionValue = this.form.get('containerNameConvention').value;
+        const containerNameConventionPostfixValue = this.form.get('containerNameConventionPostfix').value;
+
+        results['general']['containerNameConvention'] =
+          containerNameConventionPrefixValue + containerNameConventionValue + containerNameConventionPostfixValue;
+
+        const syslogTransportValue = this.form.get('syslogTransport').value;
+        const syslogHostValue = this.form.get('syslogHost').value;
+        const syslogPortValue = this.form.get('syslogPort').value;
+
+        if (syslogHostValue && syslogPortValue) {
+          results['general']['syslogAddress'] = `${syslogTransportValue}://${syslogHostValue}:${syslogPortValue}`;
+        }
+
+        return Observable.of(results);
       });
   }
 }

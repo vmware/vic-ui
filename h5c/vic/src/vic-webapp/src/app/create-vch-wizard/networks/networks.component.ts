@@ -17,7 +17,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { supportedCharsPattern, ipPattern, numberPattern, cidrPattern } from '../../shared/utils/validators';
+import {
+  supportedCharsPattern,
+  ipPattern,
+  numberPattern,
+  cidrPattern,
+  ipListPattern, cidrListPattern
+} from '../../shared/utils/validators';
 
 @Component({
   selector: 'vic-vch-creation-networks',
@@ -26,7 +32,6 @@ import { supportedCharsPattern, ipPattern, numberPattern, cidrPattern } from '..
 })
 export class NetworksComponent implements OnInit {
   public form: FormGroup;
-  public formErrMessage = '';
   public inAdvancedMode = false;
   public portgroupsLoading = true;
   public portgroups: any[] = [];
@@ -48,10 +53,7 @@ export class NetworksComponent implements OnInit {
         Validators.required,
         Validators.pattern(ipPattern)
       ]],
-      dnsServer: [{ value: '', disabled: true }, [
-        Validators.required,
-        Validators.pattern(ipPattern)
-      ]],
+      dnsServer: ['', Validators.pattern(ipListPattern)],
       clientNetwork: '',
       clientNetworkIp: [{ value: '', disabled: true }, [
         Validators.required,
@@ -62,7 +64,9 @@ export class NetworksComponent implements OnInit {
         Validators.required,
         Validators.pattern(ipPattern)
       ]],
-      clientNetworkRouting: [{ value: '', disabled: true }],
+      clientNetworkRouting: [{ value: '', disabled: true }, [
+        Validators.pattern(cidrListPattern)
+      ]],
       managementNetwork: '',
       managementNetworkIp: [{ value: '', disabled: true }, [
         Validators.required,
@@ -73,7 +77,9 @@ export class NetworksComponent implements OnInit {
         Validators.required,
         Validators.pattern(ipPattern)
       ]],
-      managementNetworkRouting: [{ value: '', disabled: true }],
+      managementNetworkRouting: [{ value: '', disabled: true }, [
+        Validators.pattern(cidrListPattern)
+      ]],
       containerNetworks: formBuilder.array([this.createNewContainerNetworkEntry()]),
       httpProxy: '',
       httpProxyPort: [
@@ -94,9 +100,7 @@ export class NetworksComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-
-  }
+  ngOnInit() { }
 
   addNewContainerNetworkEntry() {
     const containerNetworks = this.form.get('containerNetworks') as FormArray;
@@ -141,11 +145,18 @@ export class NetworksComponent implements OnInit {
         if (v === 'dhcp') {
           this.form.get('publicNetworkIp').disable();
           this.form.get('publicNetworkGateway').disable();
-          this.form.get('dnsServer').disable();
+          this.form.get('dnsServer').setValidators([
+            Validators.pattern(ipListPattern)
+          ]);
+          this.form.get('dnsServer').updateValueAndValidity();
         } else {
           this.form.get('publicNetworkIp').enable();
           this.form.get('publicNetworkGateway').enable();
-          this.form.get('dnsServer').enable();
+          this.form.get('dnsServer').setValidators([
+            Validators.required,
+            Validators.pattern(ipListPattern)
+          ]);
+          this.form.get('dnsServer').updateValueAndValidity();
         }
       });
 
@@ -261,7 +272,7 @@ export class NetworksComponent implements OnInit {
       results['publicNetworkGateway'] = this.form.get('publicNetworkGateway').value;
     }
     if (this.form.get('dnsServer').value) {
-      results['dnsServer'] = this.form.get('dnsServer').value;
+      results['dnsServer'] = this.form.get('dnsServer').value.split(',').map(v => v.trim());
     }
 
     const httpProxyValue = this.form.get('httpProxy').value;
@@ -275,7 +286,7 @@ export class NetworksComponent implements OnInit {
         if (this.form.get('clientNetworkType').value === 'static') {
           results['clientNetworkIp'] = this.form.get('clientNetworkIp').value;
           results['clientNetworkGateway'] = this.form.get('clientNetworkGateway').value;
-          results['clientNetworkRouting'] = this.form.get('clientNetworkRouting').value;
+          results['clientNetworkRouting'] = this.form.get('clientNetworkRouting').value.split(',').map(v => v.trim());
         }
       }
       if (this.form.get('managementNetwork').value) {
@@ -283,7 +294,7 @@ export class NetworksComponent implements OnInit {
         if (this.form.get('managementNetworkType').value === 'static') {
           results['managementNetworkIp'] = this.form.get('managementNetworkIp').value;
           results['managementNetworkGateway'] = this.form.get('managementNetworkGateway').value;
-          results['managementNetworkRouting'] = this.form.get('managementNetworkRouting').value;
+          results['managementNetworkRouting'] = this.form.get('managementNetworkRouting').value.split(',').map(v => v.trim());
         }
       }
       results['containerNetworks'] = this.form.get('containerNetworks')

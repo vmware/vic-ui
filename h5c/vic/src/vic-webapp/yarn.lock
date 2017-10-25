@@ -24,9 +24,9 @@
     minimist "^1.2.0"
     rxjs "^5.4.2"
 
-"@angular/animations@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-4.3.6.tgz#bf9283ec7c8c98b32f569d84dcda10890fdc0262"
+"@angular/animations@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-4.4.5.tgz#5a5a551d757e5a5560098f6f8535c102d93954d7"
   dependencies:
     tslib "^1.7.1"
 
@@ -93,9 +93,9 @@
   optionalDependencies:
     node-sass "^4.3.0"
 
-"@angular/common@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/common/-/common-4.3.6.tgz#ed37e9307c7506dd834797c1a6cf675e52b5b6ee"
+"@angular/common@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/common/-/common-4.4.5.tgz#bd5179dc922adbf4c3ea6dfb19e73cb849ffdc37"
   dependencies:
     tslib "^1.7.1"
 
@@ -107,27 +107,27 @@
     minimist "^1.2.0"
     reflect-metadata "^0.1.2"
 
-"@angular/compiler@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-4.3.6.tgz#be170df098b71e835ccedf168d5fb7b23e5045b8"
+"@angular/compiler@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-4.4.5.tgz#8721a5910f2bb52f09e2d404cad264f35ede5902"
   dependencies:
     tslib "^1.7.1"
 
-"@angular/core@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-4.3.6.tgz#bbac63d68d0f7bcb389d12b34208652be3287e96"
+"@angular/core@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-4.4.5.tgz#54acbcbda11719f883c786a906974abeb132f1a0"
   dependencies:
     tslib "^1.7.1"
 
-"@angular/forms@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-4.3.6.tgz#0f20c4597c16a152745d7cd95559855a0a5c6687"
+"@angular/forms@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-4.4.5.tgz#e9552086232aab2ce1d08ef198b62204ea13c43b"
   dependencies:
     tslib "^1.7.1"
 
-"@angular/http@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/http/-/http-4.3.6.tgz#563827d1a7d5e89e3b7d86b77fbbd367b2c08591"
+"@angular/http@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/http/-/http-4.4.5.tgz#2c735ed842401fc2356419268e288dcf2396e84f"
   dependencies:
     tslib "^1.7.1"
 
@@ -135,21 +135,21 @@
   version "4.3.6"
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-4.3.6.tgz#71cf2dbb4661568f3d12a9c0e4b9e043ef93bd3a"
 
-"@angular/platform-browser-dynamic@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-4.3.6.tgz#9eabf826f119c98f85c2a96edcb18ab00b4efb1c"
+"@angular/platform-browser-dynamic@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-4.4.5.tgz#774dbdc1d90f775dbf1e319f6ed42b260623b61f"
   dependencies:
     tslib "^1.7.1"
 
-"@angular/platform-browser@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-4.3.6.tgz#6152b1f3b78d0246fc5e150e2f7b9ed4337e3ba6"
+"@angular/platform-browser@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-4.4.5.tgz#74eb91c0b758126f26d53ee56c7cf4668bd9cac5"
   dependencies:
     tslib "^1.7.1"
 
-"@angular/router@^4.3.3":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/@angular/router/-/router-4.3.6.tgz#64033edb4fcda08a323e7533b4a1820c0f28d130"
+"@angular/router@^4.3.4":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@angular/router/-/router-4.4.5.tgz#f73130cf487d9a32cc1988afda59665f44a28a89"
   dependencies:
     tslib "^1.7.1"
 
@@ -209,9 +209,9 @@
   version "2.53.42"
   resolved "https://registry.yarnpkg.com/@types/selenium-webdriver/-/selenium-webdriver-2.53.42.tgz#74cb77fb6052edaff2a8984ddafd88d419f25cac"
 
-"@webcomponents/custom-elements@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@webcomponents/custom-elements/-/custom-elements-1.0.0.tgz#b1726e12074b556aa31b93f36ff6a03a435259c4"
+"@webcomponents/custom-elements@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@webcomponents/custom-elements/-/custom-elements-1.0.2.tgz#4747102701d2d7eb2458af2a36b5015d7e06d9c7"
 
 abbrev@1:
   version "1.1.0"
@@ -1251,17 +1251,17 @@ clap@^1.0.9:
   dependencies:
     chalk "^1.1.3"
 
-clarity-angular@^0.9.8:
-  version "0.9.19"
-  resolved "https://registry.yarnpkg.com/clarity-angular/-/clarity-angular-0.9.19.tgz#f8753c8d7e810ea7727a2cbb113cd7766702cfd7"
+clarity-angular@^0.9.9:
+  version "0.9.20"
+  resolved "https://registry.yarnpkg.com/clarity-angular/-/clarity-angular-0.9.20.tgz#902f1538e4e33b8f2c3b090eeea84b4a9e50ff17"
 
-clarity-icons@^0.9.8:
-  version "0.9.19"
-  resolved "https://registry.yarnpkg.com/clarity-icons/-/clarity-icons-0.9.19.tgz#bb21202c04d7f64228b4d53c371287e46ed16645"
+clarity-icons@^0.9.9:
+  version "0.9.20"
+  resolved "https://registry.yarnpkg.com/clarity-icons/-/clarity-icons-0.9.20.tgz#4167d088a67fafa36a5c36f128844a037afe496d"
 
-clarity-ui@^0.9.8:
-  version "0.9.19"
-  resolved "https://registry.yarnpkg.com/clarity-ui/-/clarity-ui-0.9.19.tgz#97e87c9b95a3005ac8319101fec10156bfc7b24d"
+clarity-ui@^0.9.9:
+  version "0.9.20"
+  resolved "https://registry.yarnpkg.com/clarity-ui/-/clarity-ui-0.9.20.tgz#e0d234419d27ca0cb677a3937891fc0b7c351c17"
 
 classlist.js@^1.1.20150312:
   version "1.1.20150312"
@@ -1487,7 +1487,7 @@ copy-webpack-plugin@^4.0.1:
     minimatch "^3.0.0"
     node-dir "^0.1.10"
 
-core-js@^2.2.0, core-js@^2.4.0, core-js@^2.4.1, core-js@^2.5.0:
+core-js@^2.2.0, core-js@^2.4.0, core-js@^2.5.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.1.tgz#ae6874dc66937789b80754ff5428df66819ca50b"
 
@@ -4978,7 +4978,7 @@ rsvp@~3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-3.2.1.tgz#07cb4a5df25add9e826ebc67dcc9fd89db27d84a"
 
-rxjs@^5.1.0, rxjs@^5.4.2:
+rxjs@^5.3.0, rxjs@^5.4.2:
   version "5.4.3"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.4.3.tgz#0758cddee6033d68e0fd53676f0f3596ce3d483f"
   dependencies:
@@ -5894,7 +5894,7 @@ wbuf@^1.1.0, wbuf@^1.7.2:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-web-animations-js@^2.2.5:
+web-animations-js@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/web-animations-js/-/web-animations-js-2.3.1.tgz#3a6d9bc15196377a90f8e2803fa5262165b04510"
 
@@ -6217,9 +6217,9 @@ yn@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
 
-zone.js@0.8.12:
-  version "0.8.12"
-  resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.8.12.tgz#86ff5053c98aec291a0bf4bbac501d694a05cfbb"
+zone.js@0.8.8:
+  version "0.8.8"
+  resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.8.8.tgz#354f02bb7241af834bb83b310308a89ad012d3af"
 
 zone.js@^0.8.14:
   version "0.8.17"

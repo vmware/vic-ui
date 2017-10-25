@@ -13,13 +13,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import {
-  numberPattern,
   unlimitedPattern,
   getNumericValidatorsArray
 } from '../../shared/utils/validators';
@@ -33,7 +32,6 @@ const endpointMemoryDefaultValue = 2048;
 })
 export class ComputeCapacityComponent implements OnInit {
   public form: FormGroup;
-  public formErrMessage = '';
   public datacenter: any[] = [];
   public clusters: any[] = [];
   public resources: any[] = [];
@@ -65,8 +63,9 @@ export class ComputeCapacityComponent implements OnInit {
         '1',
         getNumericValidatorsArray(false)
       ],
-      cpuShares: '4000',
-      memoryShares: '163840',
+      // TODO: make cpuShares and memoryShares required on advanced mode
+      cpuShares: 'normal',
+      memoryShares: 'normal',
       memoryReservation: [
         '1',
         getNumericValidatorsArray(false)
@@ -82,7 +81,7 @@ export class ComputeCapacityComponent implements OnInit {
     });
   }
 
-  // TODO: function that calls a service's method to load WIP data and replace form values
+  // TODO: add units selectors to compute fields
 
   ngOnInit() {
 

@@ -77,18 +77,11 @@ describe('SecurityComponent', () => {
   });
 
   it('should validate advanced fields defaults values', () => {
-    component.toggleAdvancedMode();
     component.onCommit();
     expect(component.form.valid).toBe(true);
   });
 
   it('should validate advanced fields changes', () => {
-    component.toggleAdvancedMode();
-
-    component.form.get('useTls').setValue(false);
-    expect(component.form.get('certificateKeySize').disabled).toBeTruthy();
-
-    component.form.get('useTls').setValue(true);
     expect(component.form.get('certificateKeySize').enabled).toBeTruthy();
 
     component.form.get('useWhitelistRegistry').setValue(false);
