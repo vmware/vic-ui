@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import {VchCreationWizardNameComponent} from './vch-creation-wizard-name.component';
+import {VchCreationWizardGeneralComponent} from './general.component';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ClarityModule} from 'clarity-angular';
@@ -21,13 +21,13 @@ import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {Observable} from 'rxjs/Observable';
 
-describe('VchCreationWizardNameComponent', () => {
+describe('VchCreationWizardGeneralComponent', () => {
 
   const ValidVCHName = 'unique-vm-container-host';
   const InvalidVCHName = 'vm-container-host';
 
-  let component: VchCreationWizardNameComponent;
-  let fixture: ComponentFixture<VchCreationWizardNameComponent>;
+  let component: VchCreationWizardGeneralComponent;
+  let fixture: ComponentFixture<VchCreationWizardGeneralComponent>;
   let service: CreateVchWizardService;
 
   beforeEach(() => {
@@ -55,13 +55,13 @@ describe('VchCreationWizardNameComponent', () => {
         }
       ],
       declarations: [
-        VchCreationWizardNameComponent
+        VchCreationWizardGeneralComponent
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VchCreationWizardNameComponent);
+    fixture = TestBed.createComponent(VchCreationWizardGeneralComponent);
     component = fixture.componentInstance;
     component.onPageLoad();
     service = fixture.debugElement.injector.get(CreateVchWizardService);

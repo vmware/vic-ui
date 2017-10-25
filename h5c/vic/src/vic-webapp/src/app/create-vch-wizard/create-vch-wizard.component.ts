@@ -18,6 +18,8 @@ import { Component, OnInit, ViewChild, ElementRef, Renderer } from '@angular/cor
 import { Wizard } from 'clarity-angular';
 import { GlobalsService } from 'app/shared';
 import { Observable } from 'rxjs/Observable';
+import { Http, Headers, RequestOptions } from '@angular/http';
+import { RefreshService } from 'app/shared';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -37,7 +39,9 @@ export class CreateVchWizardComponent implements OnInit {
   constructor(
     private elRef: ElementRef,
     private renderer: Renderer,
-    private globalsService: GlobalsService
+    private globalsService: GlobalsService,
+    private refresher: RefreshService,
+    private http: Http
   ) { }
 
   /**
@@ -111,10 +115,6 @@ export class CreateVchWizardComponent implements OnInit {
     this.wizard.previous();
   }
 
-  get cachedData(): any {
-    return this._cachedData;
-  }
-
   /**
    * Clear the error flag (this method might be removed)
    * @param fn : page-specific init function
@@ -130,24 +130,51 @@ export class CreateVchWizardComponent implements OnInit {
    * OVA endpoint via a POST request
    */
   onFinish(payloadObs: Observable<any> | null) {
-    // TODO: send the results to the OVA endpoint via a POST request
     if (!this.loading && payloadObs) {
-      payloadObs.subscribe(data => {
+
+      this.loading = true;
+      payloadObs.subscribe(payload => {
+
+        console.log('wizard payload: ', payload);
+
         this.errorFlag = false;
-        console.log('TODO: send this payload to api endpoint', JSON.stringify(data));
-        // TODO: uncomment these
-        // this.wizard.forceFinish();
-        // this.onCancel();
+
+        // TODO: replace api endpoint IP with OVA IP and target IP with current target VC IP
+        const url = 'https://10.160.131.87:31337/container/target/10.160.255.106/vch?' +
+          'thumbprint=' + payload.security.thumbprint;
+
+        const body = this.processPayload(payload);
+
+        console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
+
+        const headers  = new Headers({
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic YWRtaW5pc3RyYXRvckB2c3BoZXJlLmxvY2FsOkFkbWluITIz'
+        });
+
+        const options  = new RequestOptions({ headers: headers });
+
+        this.http.post(url, JSON.stringify(body), options)
+          .map(response => response.json())
+          .subscribe(response => {
+            console.log('success response:', response);
+            this.wizard.forceFinish();
+            this.onCancel();
+            this.refresher.refreshView();
+          }, error => {
+            console.error('error response:', error);
+            error = error._body ? JSON.parse(error._body) : error;
+            this.errorFlag = true;
+            this.errorMsgs = [error.message || 'Error!'];
+          });
       }, errors => {
-        this.loading = false;
+        console.error('form validations error:', errors);
         this.errorFlag = true;
         this.errorMsgs = errors;
       });
+      this.loading = false;
       return;
     }
-
-    this.errorFlag = true;
-    this.errorMsgs = ['User inputs validation failed!'];
   }
 
   /**
@@ -156,5 +183,290 @@ export class CreateVchWizardComponent implements OnInit {
   onCancel() {
     const webPlatform = this.globalsService.getWebPlatform();
     webPlatform.closeDialog();
+  }
+
+  get cachedData(): any {
+    return this._cachedData;
+  }
+
+  /**
+   * Transform wizard payload before sending it to vic-machine-service API
+   */
+  processPayload(payload) {
+
+    const processedPayload = {
+      'name': payload.general.name,
+      'compute': {
+        'cpu': {
+          'limit': {
+            // TODO: use selected unit from payload once units selectors are implemented
+            'units': 'MHz',
+            'value': parseInt(payload.computeCapacity.cpu, 10)
+          }
+        },
+        'memory': {
+          'limit': {
+            'units': 'MiB',
+            'value': parseInt(payload.computeCapacity.memory, 10)
+          }
+        },
+        'resource': {
+          'name': payload.computeCapacity.computeResource
+        }
+      },
+      'storage': {
+        'image_stores': [
+          payload.storageCapacity.imageStore + (payload.storageCapacity.fileFolder || '')
+        ],
+        'base_image_size': {
+          'units': payload.storageCapacity.baseImageSizeUnit,
+          'value': parseInt(payload.storageCapacity.baseImageSize, 10)
+        }
+      },
+      'network': {
+        'bridge': {
+          'ip_range': payload.networks.bridgeNetworkRange,
+          'port_group': {'name': payload.networks.bridgeNetwork}
+        },
+        'public': {
+          'port_group': {'name': payload.networks.publicNetwork}
+        }
+      },
+      'auth': {}
+    };
+
+    // General ---------------------------------------------------------------------------------------------------------
+
+    // TODO: add vch vm name template
+
+    if (payload.general.debug) {
+      processedPayload['debug'] = parseInt(payload.general.debug, 10);
+    }
+
+    if (payload.general.syslogAddress) {
+      processedPayload['syslog_addr'] = payload.general.syslogAddress;
+    }
+
+    // Compute ---------------------------------------------------------------------------------------------------------
+
+    if (payload.computeCapacity.cpuReservation) {
+      processedPayload.compute.cpu['reservation'] = {
+        units: 'MHz',
+        value: parseInt(payload.computeCapacity.cpuReservation, 10)
+      };
+      processedPayload.compute.cpu['shares'] = {
+        level: payload.computeCapacity.cpuShares
+      };
+      processedPayload.compute.memory['reservation'] = {
+        units: 'MiB',
+        value: parseInt(payload.computeCapacity.memoryReservation, 10)
+      };
+      processedPayload.compute.memory['shares'] = {
+        level: payload.computeCapacity.memoryShares
+      };
+    }
+
+    // Endpoint --------------------------------------------------------------------------------------------------------
+
+    processedPayload['endpoint'] = {
+      operations_credentials: {
+        user: payload.operations.opsUser,
+        password: payload.operations.opsPassword
+      }
+    };
+
+    if (payload.computeCapacity.endpointCpu) {
+      processedPayload['endpoint']['cpu'] = {
+        sockets: parseInt(payload.computeCapacity.endpointCpu, 10)
+      };
+
+      processedPayload['endpoint']['memory'] = {
+        units: 'MiB',
+        value: parseInt(payload.computeCapacity.endpointMemory, 10)
+      };
+    }
+
+    // Storage ---------------------------------------------------------------------------------------------------------
+
+    if (payload.storageCapacity.volumeStores.length) {
+      processedPayload.storage['volume_stores'] = payload.storageCapacity.volumeStores.map(vol => {
+        return {
+          datastore: vol.volDatastore + (vol.volFileFolder || ''),
+          label: vol.dockerVolName
+        };
+      })
+    }
+
+    // Networks --------------------------------------------------------------------------------------------------------
+
+    if (payload.networks.publicNetworkIp) {
+      processedPayload.network.public['static'] = {
+        ip: payload.networks.publicNetworkIp
+      };
+
+      processedPayload.network.public['gateway'] = {
+        address: payload.networks.publicNetworkGateway
+      };
+
+      if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
+        processedPayload.network.public['nameservers'] = payload.networks.dnsServer;
+      }
+    }
+
+    if (payload.networks.clientNetwork) {
+      processedPayload.network['client'] = {
+        port_group: {
+          name: payload.networks.publicNetwork
+        }
+      };
+
+      if (payload.networks.clientNetworkIp) {
+        processedPayload.network['client']['static'] = {
+          ip: payload.networks.clientNetworkIp
+        };
+
+        processedPayload.network['client']['gateway'] = {
+          address: payload.networks.clientNetworkGateway
+        };
+
+        if (payload.networks.clientNetworkRouting && payload.networks.clientNetworkRouting.length) {
+          processedPayload.network['client']['gateway']['routing_destinations'] = payload.networks.clientNetworkRouting;
+        }
+
+        if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
+          processedPayload.network['client']['nameservers'] = payload.networks.dnsServer;
+        }
+      }
+    }
+
+    if (payload.networks.managementNetwork) {
+      processedPayload.network['management'] = {
+        port_group: {
+          name: payload.networks.managementNetwork
+        }
+      };
+
+      if (payload.networks.managementNetworkIp) {
+        processedPayload.network['management']['static'] = {
+          ip: payload.networks.managementNetworkIp
+        };
+
+        processedPayload.network['management']['gateway'] = {
+          address: payload.networks.managementNetworkGateway
+        };
+
+        if (payload.networks.managementNetworkRouting && payload.networks.managementNetworkRouting.length) {
+          processedPayload.network['management']['gateway']['routing_destinations'] = payload.networks.managementNetworkRouting;
+        }
+
+        if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
+          processedPayload.network['management']['nameservers'] = payload.networks.dnsServer;
+        }
+      }
+    }
+
+    if (payload.networks.containerNetworks && payload.networks.containerNetworks.length) {
+      processedPayload.network['container'] = payload.networks.containerNetworks.map(net => {
+        const network = {
+          port_group: {
+            name: net.containerNetwork
+          }
+        };
+
+        if (net.containerNetworkLabel) {
+          network['alias'] = net.containerNetworkLabel;
+        }
+
+        if (net.containerNetworkIpRange) {
+          network['ip_ranges'] = [net.containerNetworkIpRange];
+
+          network['gateway'] = {
+            address: net.containerNetworkGateway
+          };
+
+          network['nameservers'] = [net.containerNetworkDns];
+        }
+
+        return network;
+      });
+    }
+
+    // Auth ------------------------------------------------------------------------------------------------------------
+
+    let auth: any;
+
+    auth = {
+      client: {},
+      server: {}
+    };
+
+    if (payload.security.noTlsverify) {
+      auth.client = {'no_tls_verify': true};
+    } else {
+      auth.client = {'certificate_authorities': payload.security['tlsCa'].map(cert => ({pem: cert.content}))};
+    }
+
+    if (payload.security.certificateKeySize) {
+      auth.server = {
+        generate: {
+          size: {
+            value: parseInt(payload.security.certificateKeySize, 10),
+            units: 'bit'
+          },
+          organization: [payload.security.organization],
+          cname: payload.security.tlsCname
+        }
+      }
+    } else if (payload.security.tlsServerCert) {
+      auth.server = {
+        certificate: {pem: payload.security.tlsServerCert.content},
+        private_key: {pem: payload.security.tlsServerKey.content}
+      }
+    } else {
+      auth.server = {
+        generate: {
+          size: {
+            value: 2048,
+            units: 'bits'
+          },
+          organization: [payload.general.name],
+          cname: payload.general.name
+        }
+      }
+    }
+
+    processedPayload['auth'] = auth;
+
+    // Registry --------------------------------------------------------------------------------------------------------
+
+    const registry: any = {};
+
+    if (payload.security.whitelistRegistry && payload.security.whitelistRegistry.length) {
+      registry['whitelist'] = payload.security.whitelistRegistry;
+    }
+
+    if (payload.security.insecureRegistry && payload.security.insecureRegistry.length) {
+      registry['insecure'] = payload.security.insecureRegistry;
+    }
+
+    if (payload.security.registryCa && payload.security.registryCa.length) {
+      registry['certificate_authorities'] = payload.security.registryCa.map(cert => ({pem: cert.content}));
+    }
+
+    if (payload.networks.httpProxy || payload.networks.httpsProxy) {
+      registry['image_fetch_proxy'] = {};
+
+      if (payload.networks.httpProxy) {
+        registry['image_fetch_proxy']['http'] = payload.networks.httpProxy;
+      }
+
+      if (payload.networks.httpsProxy) {
+        registry['image_fetch_proxy']['https'] = payload.networks.httpsProxy;
+      }
+    }
+
+    processedPayload['registry'] = registry;
+
+    return processedPayload;
   }
 }

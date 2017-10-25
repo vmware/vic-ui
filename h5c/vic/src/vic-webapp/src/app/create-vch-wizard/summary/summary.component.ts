@@ -13,8 +13,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, EventEmitter, Input, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, Input, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { camelCasePattern } from '../../shared/utils/validators';
 import { getClientOS } from '../../shared/utils/detection'
@@ -28,9 +28,7 @@ import { isUploadableFileObject } from '../../shared/utils/model-checker';
 })
 export class SummaryComponent implements OnInit {
   public form: FormGroup;
-  public formErrMessage = '';
   @Input() payload: any;
-  public processedPayload: any;
   public targetOS: string;
   public copySucceeded: boolean = null;
   private _isSetup = false;
@@ -39,9 +37,7 @@ export class SummaryComponent implements OnInit {
     private formBuilder: FormBuilder,
     private elementRef: ElementRef
   ) {
-    this.processedPayload = null;
     this.form = formBuilder.group({
-      debug: '0',
       targetOS: '',
       cliCommand: ''
     });
@@ -55,7 +51,8 @@ export class SummaryComponent implements OnInit {
    * On WizardPage load event, start listening for events on inputs
    */
   onPageLoad(): void {
-    // refresh based on any changes made to the previous pages
+    // refresh cli value based on any changes made to the previous pages
+    this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
 
     // prevent subscription from getting set up more than once
     if (this._isSetup) {
@@ -63,14 +60,10 @@ export class SummaryComponent implements OnInit {
     }
 
     /**
-     *  Subscribe to debug and os changes
-     *  we have to subscribe to these individually instead of the whole form
+     *  Subscribe to os changes
+     *  we have to subscribe to this individually instead of the whole form
      *  since we are manually setting a change on the cli field
      */
-    this.form.get('debug').valueChanges.subscribe(data => {
-      this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
-    });
-
     this.form.get('targetOS').valueChanges
       .subscribe(v => {
         if (!v) {
@@ -81,9 +74,8 @@ export class SummaryComponent implements OnInit {
       });
 
     this.setDefaultOS();
-    this._isSetup = true;
 
-    this.setDefaultOS();
+    this._isSetup = true;
   }
 
   /**
@@ -121,9 +113,7 @@ export class SummaryComponent implements OnInit {
       return null;
     }
 
-    this.processedPayload = this.processPayload();
-
-    const payload = this.processedPayload;
+    const payload = this.processPayload();
     const results = [];
 
     let vicMachineBinary = `vic-machine-${this.targetOS}`;
@@ -182,24 +172,42 @@ export class SummaryComponent implements OnInit {
   }
 
   /**
-   * Transform some fields before sending it to vic-machine API
+   * Transform payload to something vic-machine command friendly
    */
   private processPayload(): any {
     const results = JSON.parse(JSON.stringify(this.payload));
 
-    // transform image store entry to something vic-machine command friendly
+    // transform image store entry
     results['storageCapacity']['imageStore'] =
       results['storageCapacity']['imageStore'] + (results['storageCapacity']['fileFolder'] || '');
     delete results['storageCapacity']['fileFolder'];
 
-    // transform each volume store entry to something vic-machine command friendly
+    results['storageCapacity']['baseImageSize'] = results['storageCapacity']['baseImageSize']
+      + results['storageCapacity']['baseImageSizeUnit'].replace('i', '');
+    delete results['storageCapacity']['baseImageSizeUnit'];
+
+    // transform each volume store entry
     const volumeStoresRef = results['storageCapacity']['volumeStores'];
     results['storageCapacity']['volumeStores'] =
       volumeStoresRef.map(volStoreObj => {
         return `${volStoreObj['volDatastore']}${volStoreObj['volFileFolder']}:${volStoreObj['dockerVolName']}`;
       });
 
-    // transform each container network entry to something vic-machine command friendly
+    // transform gateways with routing destinations
+
+    if (results['networks']['clientNetworkRouting']) {
+      results['networks']['clientNetworkGateway'] =
+        results['networks']['clientNetworkRouting'].join(',') + ':' + results['networks']['clientNetworkGateway'];
+      delete results['networks']['clientNetworkRouting'];
+    }
+
+    if (results['networks']['managementNetworkRouting']) {
+      results['networks']['managementNetworkGateway'] =
+        results['networks']['managementNetworkRouting'].join(',') + ':' + results['networks']['managementNetworkGateway'];
+      delete results['networks']['clientNetworkRouting'];
+    }
+
+    // transform each container network entry
     const containerNetworksRef = results['networks']['containerNetworks'];
     results['networks']['containerNetworks'] =
       containerNetworksRef.map(containerNetObj => {
@@ -222,17 +230,24 @@ export class SummaryComponent implements OnInit {
         }
       });
 
-    // debug
-    results['debug'] = this.form.get('debug').value;
+    // transform server cert and key
+
+    if (results['security']['tlsServerCert']) {
+      results['security']['tlsServerCert'] = results['security']['tlsServerCert']['name']
+    }
+
+    if (results['security']['tlsServerKey']) {
+      results['security']['tlsServerKey'] = results['security']['tlsServerKey']['name']
+    }
 
     return results;
   }
 
   /**
-   * Emit the processed payload that will be sent to vic-machine API endpoint
+   * Emit the payload that will be sent to vic-machine API endpoint
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    return Observable.of(this.processedPayload);
+    return Observable.of(this.payload);
   }
 }

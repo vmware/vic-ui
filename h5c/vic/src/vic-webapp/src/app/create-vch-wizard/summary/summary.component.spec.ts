@@ -55,11 +55,13 @@ describe('SummaryComponent', () => {
     component.payload = {
       storageCapacity: {
         imageStore: 'datastore',
+        baseImageSizeUnit: 'GiB',
         volumeStores: []
       },
       networks: {
         containerNetworks: []
-      }
+      },
+      security: {}
     };
     // component.form.get('targetOS').setValue('windows');
     component.onPageLoad();

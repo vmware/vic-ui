@@ -13,20 +13,20 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityModule } from 'clarity-angular';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
-import { VchCreationWizardNameComponent } from './name/vch-creation-wizard-name.component';
+import { VchCreationWizardGeneralComponent } from './general/general.component';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { NetworksComponent } from './networks/networks.component';
 import { SecurityComponent } from './security/security.component';
+import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { SummaryComponent } from './summary/summary.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
-import { Globals, GlobalsService } from '../shared';
 
 const routes: Routes = [
   { path: '', component: CreateVchWizardComponent },
@@ -43,11 +43,12 @@ const routes: Routes = [
   ],
   declarations: [
     CreateVchWizardComponent,
-    VchCreationWizardNameComponent,
+    VchCreationWizardGeneralComponent,
     ComputeCapacityComponent,
     StorageCapacityComponent,
     NetworksComponent,
     SecurityComponent,
+    OperationsUserComponent,
     SummaryComponent
   ],
   providers: [
@@ -55,10 +56,11 @@ const routes: Routes = [
   ],
   exports: [
     CreateVchWizardComponent,
-    VchCreationWizardNameComponent,
+    VchCreationWizardGeneralComponent,
     ComputeCapacityComponent,
     StorageCapacityComponent,
     SecurityComponent,
+    OperationsUserComponent,
     SummaryComponent
   ]
 })

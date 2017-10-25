@@ -11,8 +11,8 @@
       Select the image datastore to be used to hold container images and an optional folder.
     </p>
 
-    <div class="form-group row mb-0">
-      <div class="col-xs-2">
+    <div class="form-group row">
+      <div class="col-xs-3">
 
         <label class="required" for="image-store-selector">
           Datastore
@@ -24,7 +24,7 @@
         <div class="select form-control">
           <select id="image-store-selector" formControlName="imageStore">
             <option value="">Not selected</option>
-            <option [value]="datastore.name" *ngFor="let datastore of datastores">
+            <option [value]="datastore.name" *ngFor="let datastore of datastores; trackBy: datastoreTrackByFn">
               {{ datastore.name }} ({{ datastore?.info?.freeSpace }} free)
             </option>
           </select>
@@ -34,7 +34,7 @@
     </div>
 
     <div class="form-group row">
-      <div class="col-xs-2">
+      <div class="col-xs-3">
 
         <label for="file-folder-selector">
           File folder
@@ -52,31 +52,74 @@
       </div>
     </div>
 
-  </section>
+    <div class="form-group row">
+      <div class="col-xs-3">
 
-  <a class="btn btn-link pl-0" (click)="toggleAdvancedMode()">
-    {{ inAdvancedMode ? 'Basic' : 'Advanced' }}
-    <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon>
-  </a>
+        <label>
+          Base image size
+        </label>
 
-  <section class="form-block mt-0" *ngIf="inAdvancedMode">
+      </div>
+      <div class="col-xs-2">
 
-    <div class="alert alert-sm alert-info mt-0 mb-2">
-      <div class="alert-item">
-          <span class="alert-text">
-            The following options will be used for VCH creation only when the advanced mode is open.
+        <label for="base-image-size"
+               aria-haspopup="true"
+               role="tooltip"
+               class="form-control tooltip tooltip-validation tooltip-md tooltip-top-right"
+               [class.invalid]="form.get('baseImageSize').invalid && (form.get('baseImageSize').dirty || form.get('baseImageSize').touched)">
+
+          <input type="text"
+                 id="base-image-size"
+                 formControlName="baseImageSize"
+                 class="form-control">
+
+          <span class="tooltip-content" *ngIf="form.get('baseImageSize').hasError('required')">
+            Base image size cannot be empty
           </span>
+
+          <span class="tooltip-content" *ngIf="form.get('baseImageSize').hasError('pattern')">
+            Base image size should be numeric
+          </span>
+
+          <small class="text-muted text-nowrap">
+            This limit cannot be changed after deploying the VCH
+          </small>
+
+        </label>
+
+      </div>
+      <div class="col-xs-2">
+
+        <div class="select form-control">
+          <select formControlName="baseImageSizeUnit">
+            <option value="MiB">MB</option>
+            <option selected value="GiB">GB</option>
+          </select>
+        </div>
+
       </div>
     </div>
 
+  </section>
+
+  <section class="form-block">
+
     <label>
-      Additional Datastores
+      Volume Datastores
     </label>
 
-    <p class="mt-0 mb-3">
-      Optionally map Docker volumes to selected datastores and define the volume label that Docker users will see.
-      Optionally provide a folder to be used in that datastore.
+    <p class="mt-0">
+      Make selected datastores available for docker volumes
     </p>
+
+    <div class="form-group row mb-2">
+      <div class="col-xs">
+        <div class="toggle-switch">
+          <input type="checkbox" id="enable-anonymous-volumes" formControlName="enableAnonymousVolumes">
+          <label for="enable-anonymous-volumes">Enable anonymous volumes</label>
+        </div>
+      </div>
+    </div>
 
     <div class="mb-1" formArrayName="volumeStores">
 
@@ -85,7 +128,7 @@
            *ngFor="let volumeStore of form.controls.volumeStores.controls; let i=index">
         <div class="col-xs">
 
-          <label *ngIf="i === 0">
+          <label>
             Volume datastore
           </label>
 
@@ -114,12 +157,13 @@
         </div>
         <div class="col-xs">
 
-          <small class="vol-datastore-header" *ngIf="i === 0">Docker volume name</small>
+          <small class="vol-datastore-header" *ngIf="i === 0">Volume store name</small>
           <label class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
                  for="docker-volname-selector"
                  aria-haspopup="true"
                  role="tooltip"
-                 [class.invalid]="form.get('volumeStores').controls[i].invalid && (form.get('volumeStores').controls[i].dirty || form.get('volumeStores').controls[i].touched)">
+                 [class.invalid]="form.get('volumeStores').controls[i].invalid && (form.get('volumeStores').controls[i].dirty || form.get('volumeStores').controls[i].touched)"
+                 *ngIf="(form.get('enableAnonymousVolumes').value && i > 0) || (!form.get('enableAnonymousVolumes').value)">
 
             <input id="docker-volname-selector"
                    class="form-control"
@@ -137,13 +181,15 @@
 
           </label>
 
+          <span *ngIf="form.get('enableAnonymousVolumes').value && i === 0">Default</span>
+
         </div>
         <div class="col-xs-1 px-0 vol-datastore-actions">
 
           <clr-icon class="is-solid"
                     shape="times-circle"
                     (click)="removeVolumeDatastoreEntry(i)"
-                    *ngIf="i > 0">
+                    *ngIf="(form.get('enableAnonymousVolumes').value && i > 1) || (!form.get('enableAnonymousVolumes').value && i > 0)">
           </clr-icon>
           <clr-icon class="is-solid"
                     shape="plus-circle"
@@ -153,53 +199,6 @@
 
         </div>
       </div>
-    </div>
-
-
-    <div class="form-group row">
-      <div class="col-xs">
-
-        <label>
-          Base image size
-        </label>
-
-      </div>
-      <div class="col-xs-3">
-
-        <label for="base-image-size"
-               aria-haspopup="true"
-               role="tooltip"
-               class="form-control tooltip tooltip-validation tooltip-md tooltip-top-right"
-               [class.invalid]="form.get('baseImageSize').invalid && (form.get('baseImageSize').dirty || form.get('baseImageSize').touched)">
-
-          <input type="text"
-                 id="base-image-size"
-                 formControlName="baseImageSize"
-                 class="form-control">
-
-          <span class="tooltip-content" *ngIf="form.get('baseImageSize').hasError('required')">
-            Base image size cannot be empty
-          </span>
-
-          <span class="tooltip-content" *ngIf="form.get('baseImageSize').hasError('pattern')">
-            Base image size should be numeric
-          </span>
-
-        </label>
-
-      </div>
-      <div class="col-xs-2">
-
-        <div class="select form-control">
-          <select formControlName="baseImageSizeUnit">
-            <option value="MB">MB</option>
-            <option selected value="GB">GB</option>
-          </select>
-        </div>
-
-      </div>
-      <!-- To set previous columns widths, we need to set space for 1 dynamic width column and 2 fixed width columns -->
-      <div class="col-xs offset-xs-2"></div>
     </div>
 
   </section>
