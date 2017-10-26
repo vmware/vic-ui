@@ -66,3 +66,7 @@ pipeline:
       event: [ push ]
       branch: [ master, releases/*, refs/tags/* ]
       status: success
+
+services:
+  selenium:
+    image: selenium/standalone-firefox
