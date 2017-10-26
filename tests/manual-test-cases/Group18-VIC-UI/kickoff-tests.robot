@@ -76,7 +76,7 @@ Prepare VIC Engine Binaries
     Prepare Flex And H5 Plugins For Testing
 
 Prepare Flex And H5 Plugins For Testing
-    Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ci/ui/* scripts/  ELSE  Build Flex And H5 Plugins
+    Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ui/* scripts/  ELSE  Build Flex And H5 Plugins
     # TODO: remove the following line and the keyword being called once the build number of vic-ui is in sync with vic repo
     Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
@@ -92,9 +92,9 @@ Sync Vic Ui Version With Vic Repo
     ${build_number}=  Run  echo ${full_ver_string} | awk -F- '{print $2}'
     ${original_wd}=  Run  pwd
 
-    Run  sed 's/version=.*/version=\"${major_minor_patch}\.${build_number}\"/' ui-nightly-run-bin/ci/ui/plugin-manifest > scripts/plugin-manifest
-    Run  cp -rf ui-nightly-run-bin/ci/ui/plugin-packages/* scripts/plugin-packages/
-    Run  cp -rf ui-nightly-run-bin/ci/ui/vsphere-client-serenity/* scripts/vsphere-client-serenity/
+    Run  sed 's/version=.*/version=\"${major_minor_patch}\.${build_number}\"/' ui-nightly-run-bin/ui/plugin-manifest > scripts/plugin-manifest
+    Run  cp -rf ui-nightly-run-bin/ui/plugin-packages/* scripts/plugin-packages/
+    Run  cp -rf ui-nightly-run-bin/ui/vsphere-client-serenity/* scripts/vsphere-client-serenity/
 
     ${tmp_build_number}=  Run  echo ${LATEST_VIC_UI_TARBALL} | grep -o "[[:digit:]]\\+"
     Run  sed 's/vic" version="\.${tmp_build_number}"/vic" version="${major_minor_patch}\.${build_number}"/' scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number}/plugin-package.xml > /tmp/plugin-bundle-h5c.xml
