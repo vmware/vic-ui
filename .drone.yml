@@ -37,14 +37,12 @@ pipeline:
     pull: true
     environment:
       BIN: bin
-      BIN_TEMP_DIR: bin/ci
       GOPATH: /go
       SHELL: /bin/bash
     commands:
-      - rm -rf $BIN_TEMP_DIR
-      - mkdir -p $BIN_TEMP_DIR/ui
-      - cp -rf bin/ui/* $BIN_TEMP_DIR/ui
-      - tar -czvf $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN_TEMP_DIR/ui
+      - rm -rf $BIN
+      - mkdir -p $BIN/ui
+      - tar -czvf $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN/ui
       - mkdir bundle
       - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle
       - ls -la bundle
