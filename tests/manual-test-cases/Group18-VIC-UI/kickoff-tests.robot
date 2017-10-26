@@ -90,6 +90,7 @@ Sync Vic Ui Version With Vic Repo
     ${full_ver_string}=  Run  ${vic_machine_binary} version | awk '{print $3}' | sed -e 's/\-rc[[:digit:]]//g'
     ${major_minor_patch}=  Run  echo ${full_ver_string} | awk -F- '{print $1}' | cut -c 2-
     ${build_number}=  Run  echo ${full_ver_string} | awk -F- '{print $2}'
+    ${original_wd}=  Run  pwd
 
     Run  sed 's/version=.*/version=\"${major_minor_patch}\.${build_number}\"/' ui-nightly-run-bin/ci/ui/plugin-manifest > scripts/plugin-manifest
     Run  cp -rf ui-nightly-run-bin/ci/ui/plugin-packages/* scripts/plugin-packages/
@@ -102,8 +103,8 @@ Sync Vic Ui Version With Vic Repo
     Move File  /tmp/plugin-bundle-flex.xml  scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number}/plugin-package.xml
     Run  mv scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number} scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number}
     Run  mv scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number} scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number}
-    Run  zip -9 -r scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number}.zip scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number}/*
-    Run  zip -9 -r scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number}.zip scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number}/*
+    Run  cd scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number} && zip -9 -r ../com.vmware.vic-v${major_minor_patch}.${build_number}.zip ./* && cd ${original_wd}
+    Run  cd scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number} && zip -9 -r ../com.vmware.vic.ui-v${major_minor_patch}.${build_number}.zip ./* && cd ${original_wd}
 
 Build Flex And H5 Plugins
     # ensure build tools are accessible
