@@ -23,6 +23,7 @@ Resource         ./vicui-common.robot
 ${TEST_SCRIPTS_ROOT}     tests/manual-test-cases/Group18-VIC-UI/
 ${VICTEST2XL}            ${TEST_SCRIPTS_ROOT}/victest2xl.py
 ${IS_NIGHTLY_TEST}       ${TRUE}
+${BUILD_VER_ISSUE_WORKAROUND}  ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
@@ -31,7 +32,6 @@ Prepare Testbed
     Cleanup Previous Test Logs
     Check Working Dir
     Check Drone
-    Load Secrets
     Get Latest Vic Engine Binary
     Setup Test Matrix
 
@@ -67,17 +67,44 @@ Prepare VIC Engine Binaries
     Log  Extracting binary files...
     ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
     ${rc2}=  Run And Return Rc  tar xvzf ${LATEST_VIC_ENGINE_TARBALL} -C ui-nightly-run-bin --strip 1
+    ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
     Should Be Equal As Integers  ${rc1}  0
     Should Be Equal As Integers  ${rc2}  0
+    Should Be Equal As Integers  ${rc3}  0
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Prepare Flex And H5 Plugins For Testing
 
 Prepare Flex And H5 Plugins For Testing
     Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ui/* scripts/  ELSE  Build Flex And H5 Plugins
+    # TODO: remove the following line and the keyword being called once the build number of vic-ui is in sync with vic repo
+    Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
+
+Sync Vic Ui Version With Vic Repo
+    ${uname}=  Run  uname -v
+    ${is_macos}=  Run Keyword And Return Status  Should Contain  ${uname}  Darwin
+    ${vic_machine_binary}=  Run Keyword If  ${is_macos}  Set Variable  ./ui-nightly-run-bin/vic-machine-darwin  ELSE  Set Variable  ./ui-nightly-run-bin/vic-machine-linux
+    ${full_ver_string}=  Run  ${vic_machine_binary} version | awk '{print $3}' | sed -e 's/\-rc[[:digit:]]//g'
+    ${major_minor_patch}=  Run  echo ${full_ver_string} | awk -F- '{print $1}' | cut -c 2-
+    ${build_number}=  Run  echo ${full_ver_string} | awk -F- '{print $2}'
+    ${original_wd}=  Run  pwd
+
+    Run  sed 's/version=.*/version=\"${major_minor_patch}\.${build_number}\"/' ui-nightly-run-bin/ui/plugin-manifest > scripts/plugin-manifest
+    Run  cp -rf ui-nightly-run-bin/ui/plugin-packages/* scripts/plugin-packages/
+    Run  cp -rf ui-nightly-run-bin/ui/vsphere-client-serenity/* scripts/vsphere-client-serenity/
+
+    ${tmp_build_number}=  Run  echo ${LATEST_VIC_UI_TARBALL} | grep -o "[[:digit:]]\\+"
+    Run  sed 's/vic" version="\.${tmp_build_number}"/vic" version="${major_minor_patch}\.${build_number}"/' scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number}/plugin-package.xml > /tmp/plugin-bundle-h5c.xml
+    Run  sed 's/vic\.ui" version="\.${tmp_build_number}"/vic\.ui" version="${major_minor_patch}\.${build_number}"/' scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number}/plugin-package.xml > /tmp/plugin-bundle-flex.xml
+    Move File  /tmp/plugin-bundle-h5c.xml  scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number}/plugin-package.xml
+    Move File  /tmp/plugin-bundle-flex.xml  scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number}/plugin-package.xml
+    Run  mv scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number} scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number}
+    Run  mv scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number} scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number}
+    Run  cd scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number} && zip -9 -r ../com.vmware.vic-v${major_minor_patch}.${build_number}.zip ./* && cd ${original_wd}
+    Run  cd scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number} && zip -9 -r ../com.vmware.vic.ui-v${major_minor_patch}.${build_number}.zip ./* && cd ${original_wd}
 
 Build Flex And H5 Plugins
     # ensure build tools are accessible
@@ -107,7 +134,12 @@ Get Latest Vic Engine Binary
     ${input}=  Run  gsutil ls -l gs://vic-engine-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
     Set Suite Variable  ${buildNumber}  ${input}
     Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${input}
+    Log  Fetching the latest VIC UI tar ball...
+    ${input2}=  Run  gsutil ls -l gs://vic-ui-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
+    Set Suite Variable  ${LATEST_VIC_UI_TARBALL}  ${input2}
     ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-engine-builds/${input}  ${LATEST_VIC_ENGINE_TARBALL}
+    Should Be True  ${results}
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-ui-builds/${input2}  ${LATEST_VIC_UI_TARBALL}
     Should Be True  ${results}
     Prepare VIC Engine Binaries
 
@@ -193,6 +225,8 @@ Run Script Test With Config
     ${vc_build}=    Get From List  ${config}  2
     ${os}=          Get From List  ${config}  3
     Set Environment Variable  TEST_VSPHERE_VER  ${vc_version}
+    Set Environment Variable  TEST_ESX_BUILD  ${esx_build}
+    Set Environment Variable  TEST_VCSA_BUILD  ${vc_build}
     Set Environment Variable  TEST_OS  ${os}
 
     Log To Console  ${\n}........................................
@@ -224,7 +258,7 @@ Run Script Test With Config
     Should Be Equal As Integers  ${rc}  0
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"test.secrets\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -252,6 +286,8 @@ Run Plugin Test With Config
     ${selenium_browser}=             Get From List  ${config}  4
     ${selenium_browser_normalized}=  Get From List  ${config}  5
     Set Environment Variable  TEST_VSPHERE_VER  ${vc_version}
+    Set Environment Variable  TEST_ESX_BUILD  ${esx_build}
+    Set Environment Variable  TEST_VCSA_BUILD  ${vc_build}
     Set Environment Variable  TEST_OS  ${os}
 
     Log To Console  ${\n}........................................
@@ -286,7 +322,7 @@ Run Plugin Test With Config
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ❌ Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted --secrets-file \"test.secrets\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}

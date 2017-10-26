@@ -22,7 +22,6 @@ Suite Setup  Load Testbed Information And Force Install Vicui Plugin
 *** Keywords ***
 Load Testbed Information And Force Install Vicui Plugin
     Load Nimbus Testbed Env
-    Load Secrets  ../../../test.secrets
     Set Absolute Script Paths
     Force Install Vicui Plugin
 
@@ -102,7 +101,7 @@ Set Up Testbed For HSUIA
     ...  VC_ADMIN_DOMAIN=vsphere.local
     ...  VC_ADMIN_PW=%{TEST_PASSWORD}
     ...  HOST_IP=%{ESX_HOST_IP}
-    ...  HOST_DATASTORE_NAME=%{TEST_DATASTORE}
+    ...  HOST_DATASTORE_NAME=${TEST_DATASTORE}
     ...  H5C_IP=%{TEST_VC_IP}
     ...  H5C_PORT=443
     ...  SELENIUM_IP=%{SELENIUM_SERVER_IP}
@@ -117,11 +116,9 @@ Set Up Testbed For HSUIA
 Set Up Testbed For NGCTESTS
     Environment Variable Should Be Set  SELENIUM_SERVER_IP
     Environment Variable Should Be Set  SELENIUM_BROWSER
-    Environment Variable Should Be Set  TEST_DATASTORE
-    Environment Variable Should Be Set  TEST_RESOURCE
     Environment Variable Should Be Set  ESX_HOST_IP
     Environment Variable Should Be Set  TEST_VC_IP
-    ${ESX_HOST_PASSWORD}=  Set Variable  e2eFunctionalTest
+    ${ESX_HOST_PASSWORD}=  Set Variable  ca*hc0w
     ${TEST_VC_USERNAME}=   Set Variable  administrator@vsphere.local
     ${TEST_VC_PASSWORD}=   Set Variable  Admin\!23
 
