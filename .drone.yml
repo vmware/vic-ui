@@ -40,11 +40,11 @@ pipeline:
       GOPATH: /go
       SHELL: /bin/bash
     commands:
-      - rm -rf $BIN
       - mkdir -p $BIN/ui
       - tar -czvf $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN/ui
       - mkdir bundle
       - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle
+      - rm -rf $BIN
       - ls -la bundle
     when:
       repo: vmware/vic-ui
