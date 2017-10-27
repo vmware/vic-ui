@@ -213,7 +213,8 @@ Run Testcases On Mac
     ...  mkdir -p ${REMOTE_RESULTS_FOLDER} &&
     ...  cd ${remote_vic_root} &&
     ...  git remote update &&
-    ...  git checkout -f master
+    ...  git checkout -f master &&
+    ...  git rebase vmware/master
     ${stdout}  ${stderr}  ${rc}=  Execute Command  ${update_repo_command}  return_stderr=True  return_rc=True
     Run Keyword Unless  ${rc} == 0  Log To Console  ${stderr}
 
@@ -269,6 +270,7 @@ Run Testcases On Windows
     ...  cd ${remote_vic_root} &&
     ...  git remote update &&
     ...  git checkout -f master &&
+    ...  git rebase vmware/master &&
     ...  cd tests/manual-test-cases/Group18-VIC-UI &&
     ...  robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-2-VIC-UI-Uninstaller.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
