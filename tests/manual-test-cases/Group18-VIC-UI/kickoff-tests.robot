@@ -77,34 +77,15 @@ Prepare VIC Engine Binaries
 
 Prepare Flex And H5 Plugins For Testing
     Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ui/* scripts/  ELSE  Build Flex And H5 Plugins
-    # TODO: remove the following line and the keyword being called once the build number of vic-ui is in sync with vic repo
     Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
 
 Sync Vic Ui Version With Vic Repo
-    ${uname}=  Run  uname -v
-    ${is_macos}=  Run Keyword And Return Status  Should Contain  ${uname}  Darwin
-    ${vic_machine_binary}=  Run Keyword If  ${is_macos}  Set Variable  ./ui-nightly-run-bin/vic-machine-darwin  ELSE  Set Variable  ./ui-nightly-run-bin/vic-machine-linux
-    ${full_ver_string}=  Run  ${vic_machine_binary} version | awk '{print $3}' | sed -e 's/\-rc[[:digit:]]//g'
-    ${major_minor_patch}=  Run  echo ${full_ver_string} | awk -F- '{print $1}' | cut -c 2-
-    ${build_number}=  Run  echo ${full_ver_string} | awk -F- '{print $2}'
-    ${original_wd}=  Run  pwd
-
-    Run  sed 's/version=.*/version=\"${major_minor_patch}\.${build_number}\"/' ui-nightly-run-bin/ui/plugin-manifest > scripts/plugin-manifest
-    Run  cp -rf ui-nightly-run-bin/ui/plugin-packages/* scripts/plugin-packages/
-    Run  cp -rf ui-nightly-run-bin/ui/vsphere-client-serenity/* scripts/vsphere-client-serenity/
-
-    ${tmp_build_number}=  Run  echo ${LATEST_VIC_UI_TARBALL} | grep -o "[[:digit:]]\\+"
-    Run  sed 's/vic" version="\.${tmp_build_number}"/vic" version="${major_minor_patch}\.${build_number}"/' scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number}/plugin-package.xml > /tmp/plugin-bundle-h5c.xml
-    Run  sed 's/vic\.ui" version="\.${tmp_build_number}"/vic\.ui" version="${major_minor_patch}\.${build_number}"/' scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number}/plugin-package.xml > /tmp/plugin-bundle-flex.xml
-    Move File  /tmp/plugin-bundle-h5c.xml  scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number}/plugin-package.xml
-    Move File  /tmp/plugin-bundle-flex.xml  scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number}/plugin-package.xml
-    Run  mv scripts/plugin-packages/com.vmware.vic-v.${tmp_build_number} scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number}
-    Run  mv scripts/vsphere-client-serenity/com.vmware.vic.ui-v.${tmp_build_number} scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number}
-    Run  cd scripts/plugin-packages/com.vmware.vic-v${major_minor_patch}.${build_number} && zip -9 -r ../com.vmware.vic-v${major_minor_patch}.${build_number}.zip ./* && cd ${original_wd}
-    Run  cd scripts/vsphere-client-serenity/com.vmware.vic.ui-v${major_minor_patch}.${build_number} && zip -9 -r ../com.vmware.vic.ui-v${major_minor_patch}.${build_number}.zip ./* && cd ${original_wd}
+    ${rc}  ${out}=  Run And Return Rc And Output  ./scripts/sync-vic-ui-version.sh -p ui-nightly-run-bin/ 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  Failed to sync vic-ui version!: ${out}
+    Run  cp -rf ui-nightly-run-bin/ui/* scripts/
 
 Build Flex And H5 Plugins
     # ensure build tools are accessible
