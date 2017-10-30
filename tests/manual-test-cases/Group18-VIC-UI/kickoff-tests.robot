@@ -24,6 +24,7 @@ ${TEST_SCRIPTS_ROOT}     tests/manual-test-cases/Group18-VIC-UI/
 ${VICTEST2XL}            ${TEST_SCRIPTS_ROOT}/victest2xl.py
 ${IS_NIGHTLY_TEST}       ${TRUE}
 ${BUILD_VER_ISSUE_WORKAROUND}  ${TRUE}
+${ALL_TESTS_PASSED}            ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
@@ -76,7 +77,7 @@ Prepare VIC Engine Binaries
     Prepare Flex And H5 Plugins For Testing
 
 Prepare Flex And H5 Plugins For Testing
-    Run Keyword If  ${IS_NIGHTLY_TEST}  Run  cp -rf ui-nightly-run-bin/ui/* scripts/  ELSE  Build Flex And H5 Plugins
+    Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build Flex And H5 Plugins
     Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
@@ -246,6 +247,7 @@ Run Script Test With Config
     ${results}=  Wait For Process  ${pid}
 
     # set pass/fail based on return code
+    Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
     ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  ⭕️   ELSE  Set Variable  ❌ 
     ${pf_string}=  Set Variable  ${pf} ${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
     Set To Dictionary  ${results_dict}  ${dict_key}  ${pf_string}
@@ -310,6 +312,7 @@ Run Plugin Test With Config
     ${results}=  Wait For Process  ${pid}
 
     # set pass/fail based on return code
+    Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
     ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  ⭕️   ELSE  Set Variable  ❌ 
     ${pf_string}=  Set Variable  ${pf} Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ${pf_string}
@@ -470,3 +473,5 @@ Launch Plugin Tests
 Report Results
     Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Test Report
     Send Email
+    Run Keyword Unless  ${ALL_TESTS_PASSED}  Log To Console  At least one test failed!
+    Should Be True  ${ALL_TESTS_PASSED}
