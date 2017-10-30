@@ -95,4 +95,5 @@ if [ ! $(echo $VIC_UI_VER_STRING | grep -o "v[[:digit:]]\.[[:digit:]]\.[[:digit:
     mv ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-${VIC_UI_VER_STRING} ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}
 fi
 
-cd ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER} && zip -9 -r ../com.vmware.vic-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}.zip * && cd $CURRENT_WORKING_DIR
+cd ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER} && rm ../*.zip && zip -9 -r ../com.vmware.vic-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}.zip * && cd ${CURRENT_WORKING_DIR}
+cd ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER} && rm ../*.zip && zip -9 -r ../com.vmware.vic.ui-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}.zip * && cd ${CURRENT_WORKING_DIR}
