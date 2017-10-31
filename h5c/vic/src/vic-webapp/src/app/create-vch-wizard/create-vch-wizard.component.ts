@@ -132,7 +132,6 @@ export class CreateVchWizardComponent implements OnInit {
   onFinish(payloadObs: Observable<any> | null) {
     if (!this.loading && payloadObs) {
 
-      this.loading = true;
       payloadObs.subscribe(payload => {
 
         console.log('wizard payload: ', payload);
@@ -147,23 +146,28 @@ export class CreateVchWizardComponent implements OnInit {
 
         console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
 
-        const headers  = new Headers({
+        const options  = new RequestOptions({ headers: new Headers({
           'Content-Type': 'application/json',
           'Authorization': 'Basic YWRtaW5pc3RyYXRvckB2c3BoZXJlLmxvY2FsOkFkbWluITIz'
-        });
+        })});
 
-        const options  = new RequestOptions({ headers: headers });
-
+        this.loading = true;
         this.http.post(url, JSON.stringify(body), options)
           .map(response => response.json())
           .subscribe(response => {
             console.log('success response:', response);
+            this.loading = false;
+            this.refresher.refreshView();
             this.wizard.forceFinish();
             this.onCancel();
-            this.refresher.refreshView();
           }, error => {
             console.error('error response:', error);
-            error = error._body ? JSON.parse(error._body) : error;
+            this.loading = false;
+            try {
+              error = error._body ? JSON.parse(error._body) : error;
+            } catch (e) {
+              console.log('error parsing:', e);
+            }
             this.errorFlag = true;
             this.errorMsgs = [error.message || 'Error!'];
           });
@@ -172,7 +176,6 @@ export class CreateVchWizardComponent implements OnInit {
         this.errorFlag = true;
         this.errorMsgs = errors;
       });
-      this.loading = false;
       return;
     }
   }
