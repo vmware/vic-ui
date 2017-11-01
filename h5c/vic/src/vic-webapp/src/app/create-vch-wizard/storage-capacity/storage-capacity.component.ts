@@ -108,6 +108,11 @@ export class StorageCapacityComponent implements OnInit {
         const volStores = this.form.get('volumeStores') as FormArray;
         if (v) {
           const defaultVolumeStore = this.createNewVolumeDatastoreEntry();
+          const datastoreControl = defaultVolumeStore.get('volDatastore');
+          datastoreControl.setValidators([
+            Validators.required
+          ]);
+          datastoreControl.updateValueAndValidity();
           defaultVolumeStore.get('dockerVolName').setValue('default');
           volStores.insert(0, defaultVolumeStore);
         } else {
