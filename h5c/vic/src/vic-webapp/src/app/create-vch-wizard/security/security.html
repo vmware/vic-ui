@@ -64,14 +64,26 @@
             <div class="form-group row mb-0">
               <div class="col-xs-3">
 
-                <label for="tls-cname">
+                <label class="required" for="tls-cname">
                   Common Name (CN)
                 </label>
 
               </div>
               <div class="col-xs-4">
 
-                <input id="tls-cname" class="form-control" type="text" formControlName="tlsCname">
+                <label for="tls-cname"
+                       aria-haspopup="true"
+                       role="tooltip"
+                       class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
+                       [class.invalid]="form.get('tlsCname').invalid && (form.get('tlsCname').dirty || form.get('tlsCname').touched)">
+
+                  <input id="tls-cname" class="form-control" type="text" formControlName="tlsCname">
+
+                  <span class="tooltip-content" *ngIf="form.get('tlsCname').hasError('required')">
+                    Common Name (CN) cannot be empty
+                  </span>
+
+                </label>
 
               </div>
 
@@ -117,10 +129,6 @@
                   <input id="certificate-key-size" class="form-control" type="text"
                          formControlName="certificateKeySize">
 
-                  <span class="tooltip-content" *ngIf="form.get('certificateKeySize').hasError('required')">
-                    Certificate key size cannot be empty
-                  </span>
-
                   <span class="tooltip-content" *ngIf="form.get('certificateKeySize').hasError('pattern')">
                     Certificate key size should be numeric
                   </span>
@@ -136,7 +144,7 @@
           <div *ngIf="form.get('serverCertSource').value === 'existing'">
 
             <p class="mt-0 mb-1">
-              Use a certificate and key you have created using some other certificate authoroty.
+              Use a certificate and key you have created using some other certificate authority.
             </p>
 
             <div class="alert alert-danger mb-1" *ngIf="tlsServerError">
@@ -165,8 +173,10 @@
                 <input id="tls-server-cert"
                        class="hidden-xs-up"
                        type="file"
-                       formControlName="tlsServerCert"
                        (change)="addFileContent($event, 'tlsServerCert')">
+                <!-- Angular doesn't support <input type="file>
+                     Making the following input participate in form validation mechanism -->
+                <input type="hidden" formControlName="tlsServerCert">
 
               </div>
 
@@ -197,8 +207,10 @@
                 <input id="tls-server-key"
                        class="hidden-xs-up"
                        type="file"
-                       formControlName="tlsServerKey"
                        (change)="addFileContent($event, 'tlsServerKey')">
+                <!-- Angular doesn't support <input type="file>
+                     Making the following input participate in form validation mechanism -->
+                <input type="hidden" formControlName="tlsServerKey">
 
               </div>
               <div class="col-xs px-0 add-remove-actions">
