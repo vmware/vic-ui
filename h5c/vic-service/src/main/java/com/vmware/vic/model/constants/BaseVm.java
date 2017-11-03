@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-*/
+ */
 package com.vmware.vic.model.constants;
 
 public class BaseVm {
@@ -35,4 +35,6 @@ public class BaseVm {
     public static final String VM_OVERALLCPUUSAGE = "overallCpuUsage";
     public static final String VM_GUESTMEMORYUSAGE = "guestMemoryUsage";
     public static final String VM_COMMITTEDSTORAGE = "committedStorage";
+    public static final String VM_AVAILABLE_FIELD = "availableField";
+    public static final String VM_CUSTOM_VALUE = "value";
 }
