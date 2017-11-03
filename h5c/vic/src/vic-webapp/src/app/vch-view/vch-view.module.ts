@@ -18,8 +18,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { ClarityModule } from 'clarity-angular';
 import { VicVchViewComponent } from './vch-view.component';
+import { VicVchLogViewComponent } from './vch-log-view/vch-log-view.component';
 import { VicVmViewService } from '../services/vm-view.service';
 import { ExtendedUserSessionService } from '../services/extended-usersession.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
     { path: '', component: VicVchViewComponent },
@@ -30,14 +32,21 @@ const routes: Routes = [
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [
         CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
         ClarityModule,
         RouterModule.forChild(routes)
     ],
-    declarations: [VicVchViewComponent],
+    declarations: [
+      VicVchViewComponent,
+      VicVchLogViewComponent
+    ],
     providers: [
         VicVmViewService,
         ExtendedUserSessionService
     ],
-    exports: [VicVchViewComponent]
+    exports: [
+      VicVchViewComponent
+    ]
 })
 export class VicVchViewModule { }

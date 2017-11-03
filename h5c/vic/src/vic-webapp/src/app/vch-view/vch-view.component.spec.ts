@@ -115,11 +115,11 @@ describe('VicVchViewComponent', () => {
         if (rowElementsLength) {
             const cellElements = rowElements[0].queryAll(By.css('clr-dg-cell'));
             const cellElementsLength = cellElements.length;
-            expect(cellElementsLength).toBe(4);
-            expect(cellElements[0].nativeElement.textContent).toContain('vice-9703');
-            expect(cellElements[1].nativeElement.attributes['ng-reflect-ng-switch'].value).toBe('GREEN');
-            expect(cellElements[2].nativeElement.textContent).toContain('10.17.109.80:2376');
-            expect(cellElements[3].nativeElement.textContent).toContain('10.17.109.80:2378');
+            expect(cellElementsLength).toBe(5);
+            expect(cellElements[1].nativeElement.textContent).toContain('vice-9703');
+            expect(cellElements[2].nativeElement.attributes['ng-reflect-ng-switch'].value).toBe('GREEN');
+            expect(cellElements[3].nativeElement.textContent).toContain('10.17.109.80:2376');
+            expect(cellElements[4].nativeElement.textContent).toContain('10.17.109.80:2378');
         }
     }));
 
