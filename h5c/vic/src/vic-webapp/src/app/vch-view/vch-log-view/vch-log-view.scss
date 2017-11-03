@@ -1,0 +1,25 @@
+.log-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+
+  .log-title {
+    flex-grow: 1;
+  }
+
+  form {
+    display: flex;
+    align-items: center;
+
+    .toggle-switch {
+      margin: 0;
+    }
+  }
+}
+
+.log-content {
+  pre {
+    line-height: 1em;
+    border-radius: 0;
+  }
+}

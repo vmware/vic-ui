@@ -1,0 +1,23 @@
+<div class="container mr-0 my-1" [clrLoading]="loading">
+  <div class="row">
+    <div class="col-xs">
+      <div class="log-header">
+        <span class="log-title">Deployment log</span>
+        <form [formGroup]="form" class="py-0">
+          <label for="enable-ssh">Enable SSH</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="enable-ssh" formControlName="enableSSH">
+            <label for="enable-ssh"></label>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs">
+      <div class="log-content">
+        <pre class="language-txt my-0 px-1 py-1"><small>{{ log }}</small></pre>
+      </div>
+    </div>
+  </div>
+</div>
