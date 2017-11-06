@@ -91,6 +91,7 @@ public class PropFetcher implements ClientSessionEndListener {
             new String[]{
                     "Photon - Container", "Redhat - Container", "Windows - Container"};
     private static final String GROUP_ADMINISTRATORS = "Administrators";
+    private static final String VIC_OVA_IDENTIFIER_KEY = "vic-ova-identifier";
     private final UserSessionService _userSessionService;
     private final VimObjectReferenceService _vimObjectReferenceService;
     private Object _rpMorValueToVchLock = new Object();
@@ -483,8 +484,8 @@ public class PropFetcher implements ClientSessionEndListener {
                             if (dp.getName().equals(BaseVm.VM_AVAILABLE_FIELD)) {
                                 // get CustomField definition for VIC appliance ID among the
                                 // provided array of available definitions for the VirtualMachine object
-                                // TODO: set static final string in the beginning for vic appliance ID once backend implements their code
-                                cfdForVicApplId = getVicApplCustomFieldDef("vicApplianceId", (ArrayOfCustomFieldDef) dp.getVal());
+                                cfdForVicApplId = getVicApplCustomFieldDef(
+                                        VIC_OVA_IDENTIFIER_KEY, (ArrayOfCustomFieldDef) dp.getVal());
                             }
 
                             if (dp.getName().equals(BaseVm.VM_CUSTOM_VALUE)) {
