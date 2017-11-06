@@ -13,17 +13,32 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { async, TestBed, ComponentFixture } from '@angular/core/testing';
-import { GlobalsService } from '../shared';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { MockBackend, MockConnection } from '@angular/http/testing';
+
 import { ExtendedUserSessionService } from './extended-usersession.service';
+import { GlobalsService } from '../shared';
 import { IExtendedServerInfo } from './extended-serverinfo.interface';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
+import { Subscription } from 'rxjs/Rx';
+import {
+  BaseRequestOptions,
+  ConnectionBackend,
+  Headers,
+  Http,
+  HttpModule,
+  RequestOptions,
+  Response,
+  ResponseOptions,
+  ResponseType,
+  XHRBackend
+} from '@angular/http';
 
 describe('ExtendedUserSessionService', () => {
     let service: ExtendedUserSessionService;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
 
-    const getMockedGlobalsService = (groups: string, serversInfo: IExtendedServerInfo[]) => {
+    const getMockedGlobalsService = (serversInfo: IExtendedServerInfo[]) => {
         return {
             isPluginMode: () => {
                 return true;
@@ -32,7 +47,6 @@ describe('ExtendedUserSessionService', () => {
                 return {
                     getUserSession() {
                         return {
-                            groups: groups,
                             locale: 'en_US',
                             serversInfo: serversInfo,
                             samlTokenXml: 'loremipsum'
@@ -44,40 +58,69 @@ describe('ExtendedUserSessionService', () => {
     };
 
     it('should return true for isVsphereAdmin for an admin user ', async(() => {
+        let backend: MockBackend;
+        let connection: MockConnection;
         TestBed.configureTestingModule({
             providers: [
                 {
                     provide: GlobalsService,
-                    useValue: getMockedGlobalsService('vsphere.local\\Administrators', [])
+                    useValue: getMockedGlobalsService([])
                 },
-                ExtendedUserSessionService
+                ExtendedUserSessionService,
+                Http,
+                { provide: ConnectionBackend, useClass: MockBackend },
+                { provide: RequestOptions, useClass: BaseRequestOptions }
             ]
         }).compileComponents();
         service = TestBed.get(ExtendedUserSessionService);
-        expect(service.isVsphereAdmin).toBeTruthy();
+        backend = TestBed.get(ConnectionBackend);
+        backend.connections.subscribe((c: MockConnection) => connection = c);
+
+        service.isVsphereAdmin$.subscribe(results => {
+            expect(results).toBeTruthy();
+        });
+
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: true
+        })));
+
     }));
 
     it('should return false for isVsphereAdmin for a non-admin user', async(() => {
+        let backend: MockBackend;
+        let connection: MockConnection;
         TestBed.configureTestingModule({
             providers: [
                 {
                     provide: GlobalsService,
-                    useValue: getMockedGlobalsService('vsphere.local\\Everyones', [])
+                    useValue: getMockedGlobalsService([])
                 },
-                ExtendedUserSessionService
+                ExtendedUserSessionService,
+                Http,
+                { provide: ConnectionBackend, useClass: MockBackend },
+                { provide: RequestOptions, useClass: BaseRequestOptions }
             ]
         }).compileComponents();
         service = TestBed.get(ExtendedUserSessionService);
-        expect(service.isVsphereAdmin).toBeFalsy();
+        backend = TestBed.get(ConnectionBackend);
+        backend.connections.subscribe((c: MockConnection) => connection = c);
+
+        service.isVsphereAdmin$.subscribe(results => {
+            expect(results).toBeFalsy();
+        });
+
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: false
+        })));
     }));
 
     it('should return locale, samlTokenXml and ServerInfos', async(() => {
         TestBed.configureTestingModule({
+            imports: [ HttpModule ],
             providers: [
                 {
                     provide: GlobalsService,
                     useValue: getMockedGlobalsService(
-                        'vsphere.local\\Administrators',
                         [{
                             name: 'test-name',
                             serverGuid: 'test-guid',
@@ -90,6 +133,7 @@ describe('ExtendedUserSessionService', () => {
             ]
         }).compileComponents();
         service = TestBed.get(ExtendedUserSessionService);
+
         expect(service.locale).toBe('en_US');
         expect(service.samlTokenXml).toBe('loremipsum');
         const serverInfos = service.getVcenterServersInfo();
