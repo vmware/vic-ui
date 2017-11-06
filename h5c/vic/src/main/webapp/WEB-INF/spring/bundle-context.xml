@@ -60,6 +60,9 @@
 
    <osgi:reference id="rpService"
          interface="com.vmware.vic.services.ResourcePoolService" />
+         
+   <osgi:reference id="vicUserSessionService"
+         interface="com.vmware.vic.services.VicUserSessionService" />
 
    <osgi:reference id="sampleActionService"
          interface="com.vmware.vic.services.SampleActionService" />

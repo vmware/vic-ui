@@ -23,6 +23,10 @@
         <constructor-arg index="0" ref="vimObjectReferenceService"/>
    </bean>
 
+   <bean name="VicUserSessionServiceImpl"
+         class="com.vmware.vic.services.VicUserSessionServiceImpl">
+      <constructor-arg index="0" ref="PropFetcherImpl"></constructor-arg>
+   </bean>
    <bean name="PropFetcherImpl"
          class="com.vmware.vic.PropFetcher">
       <constructor-arg index="0" ref="userSessionService"></constructor-arg>
