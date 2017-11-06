@@ -17,6 +17,11 @@
          class="com.vmware.vic.services.ResourcePoolServiceImpl">
       <constructor-arg index="0" ref="dataService"></constructor-arg>
    </bean>
+   
+   <bean name="CloneTicketServiceImpl"
+         class="com.vmware.vic.services.CloneTicketServiceImpl">
+      <constructor-arg index="0" ref="PropFetcherImpl"></constructor-arg>
+   </bean>
 
    <bean name="SampleActionServiceImpl"
          class="com.vmware.vic.services.SampleActionServiceImpl">
