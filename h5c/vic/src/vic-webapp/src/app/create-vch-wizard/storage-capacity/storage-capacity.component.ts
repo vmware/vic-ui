@@ -36,7 +36,9 @@ export class StorageCapacityComponent implements OnInit {
   public datastoresLoading = true;
   private _isSetup = false;
   @Input() set resourceObjRef(value) {
-    this.loadDatastore(value);
+    if (typeof value !== 'undefined') {
+      this.loadDatastore(value);
+    }
   }
 
   constructor(
