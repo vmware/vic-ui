@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs/Subscription';
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -14,32 +15,43 @@
  limitations under the License.
 */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { HttpModule } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { By } from '@angular/platform-browser';
-
-import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import {
-    RefreshService,
     AppAlertService,
-    I18nService,
-    Vic18nService,
     Globals,
     GlobalsService,
+    I18nService,
+    RefreshService,
+    Vic18nService,
 } from '../shared';
-import { VicVmViewService } from '../services/vm-view.service';
-import { ExtendedUserSessionService } from '../services/extended-usersession.service';
-import { VicVchViewComponent } from './vch-view.component';
-import { VirtualContainerHost } from './vch.model';
-import { ClarityModule } from 'clarity-angular';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import {
-    getVchResponseStub,
-    getMalformedVchResponseStub
+    getMalformedVchResponseStub,
+    getVchResponseStub
 } from '../services/mocks/vch.response';
-import { WS_VCH } from '../shared/constants';
+import {
+  BaseRequestOptions,
+  ConnectionBackend,
+  Headers,
+  Http,
+  HttpModule,
+  RequestOptions,
+  Response,
+  ResponseOptions,
+  ResponseType,
+  XHRBackend
+} from '@angular/http';
+import { MockBackend, MockConnection } from '@angular/http/testing';
+import { By } from '@angular/platform-browser';
+import { ClarityModule } from 'clarity-angular';
+import { ExtendedUserSessionService } from '../services/extended-usersession.service';
+import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { VicVchViewComponent } from './vch-view.component';
+import { VicVmViewService } from '../services/vm-view.service';
+import { VirtualContainerHost } from './vch.model';
+import { WS_VCH } from '../shared/constants';
 
 let responseProperlyFormatted = true;
 
@@ -75,6 +87,8 @@ class VicVmViewServiceStub {
 
 describe('VicVchViewComponent', () => {
     let fixture: ComponentFixture<VicVchViewComponent>;
+    let backend: MockBackend;
+    let connection: MockConnection;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
 
     beforeEach(async(() => {
@@ -88,7 +102,10 @@ describe('VicVchViewComponent', () => {
                 RefreshService,
                 AppAlertService,
                 Vic18nService,
-                I18nService
+                I18nService,
+                Http,
+                { provide: ConnectionBackend, useClass: MockBackend },
+                { provide: RequestOptions, useClass: BaseRequestOptions }
             ],
             declarations: [
                 VicVchViewComponent
@@ -98,6 +115,8 @@ describe('VicVchViewComponent', () => {
                 HttpModule
             ]
         }).compileComponents();
+        backend = TestBed.get(ConnectionBackend);
+        backend.connections.subscribe((c: MockConnection) => connection = c);
     }));
 
     beforeEach(() => {
@@ -121,6 +140,9 @@ describe('VicVchViewComponent', () => {
             expect(cellElements[2].nativeElement.textContent).toContain('10.17.109.80:2376');
             expect(cellElements[3].nativeElement.textContent).toContain('10.17.109.80:2378');
         }
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: true
+        })));
     }));
 
     it('should render zero row for malformed data', async(() => {
@@ -135,6 +157,10 @@ describe('VicVchViewComponent', () => {
             const rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
             const rowElementsLength = rowElements.length;
             expect(rowElementsLength).toBe(0);
+
+            connection.mockRespond(new Response(new ResponseOptions({
+              body: true
+            })));
         }
     }));
 
@@ -170,6 +196,10 @@ describe('VicVchViewComponent', () => {
             WS_VCH.DG.COLUMNS.defaults[
             WS_VCH.DG.COLUMNS.keys.VCH_ADMIN_PORTAL
             ]);
+
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: true
+        })));
     }));
 
     it('should render the new VCH button for an admin user', async(() => {
@@ -181,6 +211,9 @@ describe('VicVchViewComponent', () => {
         const actionBarEl = fixture.debugElement.query(
             By.css('clr-dg-action-bar'));
         expect(actionBarEl).toBeTruthy();
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: true
+        })));
     }));
 
     it('should not render the new VCH button for a non-admin user', async(() => {
@@ -192,5 +225,8 @@ describe('VicVchViewComponent', () => {
         const actionBarEl = fixture.debugElement.query(
             By.css('clr-dg-action-bar'));
         expect(actionBarEl).toBeNull();
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: true
+        })));
     }));
 });

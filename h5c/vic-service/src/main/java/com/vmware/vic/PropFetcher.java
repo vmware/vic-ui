@@ -45,6 +45,7 @@ import com.vmware.vic.model.constants.VsphereObjects;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.InvalidPropertyFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.NotFoundFaultMsg;
 import com.vmware.vim25.ObjectContent;
 import com.vmware.vim25.ObjectSpec;
 import com.vmware.vim25.OptionValue;
@@ -55,6 +56,7 @@ import com.vmware.vim25.RetrieveResult;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.TraversalSpec;
+import com.vmware.vim25.UserSearchResult;
 import com.vmware.vim25.VimPortType;
 import com.vmware.vim25.VimService;
 import com.vmware.vim25.VirtualMachineConfigInfo;
@@ -82,6 +84,7 @@ public class PropFetcher implements ClientSessionEndListener {
     private static final String[] VM_GUESTNAME_CONTAINER_IDENTIFIER =
             new String[]{
                     "Photon - Container", "Redhat - Container", "Windows - Container"};
+    private static final String GROUP_ADMINISTRATORS = "Administrators";
     private final UserSessionService _userSessionService;
     private final VimObjectReferenceService _vimObjectReferenceService;
     private Object _rpMorValueToVchLock = new Object();
@@ -128,6 +131,49 @@ public class PropFetcher implements ClientSessionEndListener {
         }
         _userSessionService = userSessionService;
         _vimObjectReferenceService = vimObjectReferenceService;
+    }
+
+    /**
+     * Look up the current session user in UserDirectory
+     * and check if the user belongs to the vSphere administrators group
+     * @return true if admin
+     */
+    public boolean isSessionUserVsphereAdmin() {
+        ServerInfo[] sInfos = _userSessionService.getUserSession().serversInfo;
+        String login = _userSessionService.getUserSession().userName;
+        String[] loginSplit = login.split("@");
+        String userName = loginSplit[0];
+        String domain = "";
+        if (loginSplit.length > 1) {
+            domain = loginSplit[1];
+        }
+
+        for (ServerInfo sInfo : sInfos) {
+            if (sInfo.serviceGuid != null) {
+                String serverGuid = sInfo.serviceGuid;
+                ServiceContent service = getServiceContent(serverGuid);
+                if (service == null) {
+                    _logger.error("Failed to retrieve ServiceContent!");
+                    return false;
+                }
+
+                try {
+                    List<UserSearchResult> userSrchResults = _vimPort.retrieveUserGroups(
+                            service.getUserDirectory(),
+                            domain,
+                            userName,
+                            GROUP_ADMINISTRATORS,
+                            null, true, true, false);
+
+                    return userSrchResults.size() == 1;
+                } catch (NotFoundFaultMsg e) {
+                    _logger.warn(e.getMessage());
+                } catch (RuntimeFaultFaultMsg e) {
+                    _logger.error(e.getMessage());
+                }
+            }
+        }
+        return false;
     }
 
     /**

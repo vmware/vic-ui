@@ -19,6 +19,9 @@
    <osgi:service id="EchoService" ref="EchoServiceImpl"
          interface="com.vmware.vic.services.EchoService" />
 
+   <osgi:service id="VicUserSessionService" ref="VicUserSessionServiceImpl"
+         interface="com.vmware.vic.services.VicUserSessionService" />
+
    <osgi:service id="ResourcePoolService" ref="ResourcePoolServiceImpl"
          interface="com.vmware.vic.services.ResourcePoolService" />
 
