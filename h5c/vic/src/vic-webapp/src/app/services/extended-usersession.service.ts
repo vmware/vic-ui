@@ -1,3 +1,7 @@
+import { Globals, GlobalsService } from '../shared';
+
+import { Http } from '@angular/http';
+import { IExtendedServerInfo } from './extended-serverinfo.interface';
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -14,28 +18,30 @@
  limitations under the License.
 */
 import { Injectable } from '@angular/core';
-import { Globals, GlobalsService } from '../shared';
-import { IExtendedServerInfo } from './extended-serverinfo.interface';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class ExtendedUserSessionService {
-    private readonly VSPHERE_ADMIN_GROUP = 'vsphere.local\\Administrators';
-    private _groups: string[] = [];
+    public readonly IS_VSPHERE_ADMIN_QUERY_URL = '/ui/vic/rest/services/is-user-vsphere-admin';
     private _serversInfo: IExtendedServerInfo[] = [];
     private _samlTokenXml: string;
+    private _isUserVsphereAdmin: boolean;
     public locale: string;
 
     /**
      * Cache some information from the raw output of userSession() and
      * drop out unnecessary information
      * @param {GlobalsService} globalsService - GlobalsService from web-platform.js
+     * @param {Http} http
      */
-    constructor(private globalsService: GlobalsService) {
+    constructor(
+      private globalsService: GlobalsService,
+      private http: Http
+    ) {
         const wp = this.globalsService.getWebPlatform();
         // bypass initialization if user session is not available
         if (this.globalsService.isPluginMode() && wp.getUserSession) {
-            const { groups, locale, serversInfo, samlTokenXml } = <any>wp.getUserSession();
-            this._groups = groups;
+            const { locale, serversInfo, samlTokenXml } = <any>wp.getUserSession();
             this._samlTokenXml = samlTokenXml;
             this.locale = locale;
             for (let i = 0; i < serversInfo.length; i++) {
@@ -55,8 +61,17 @@ export class ExtendedUserSessionService {
      * Return if the current user is a vSphere admin
      * @returns {boolean}
      */
-    get isVsphereAdmin(): boolean {
-        return this._groups.indexOf(this.VSPHERE_ADMIN_GROUP) > -1;
+    get isVsphereAdmin$(): Observable<boolean> {
+        if (this._isUserVsphereAdmin !== undefined) {
+            return Observable.of(this._isUserVsphereAdmin);
+        }
+
+        return this.http.get(this.IS_VSPHERE_ADMIN_QUERY_URL)
+            .catch(err => Observable.throw(err))
+            .map(response => response.json())
+            .do(response => {
+                this._isUserVsphereAdmin = response;
+            });
     }
 
     /**

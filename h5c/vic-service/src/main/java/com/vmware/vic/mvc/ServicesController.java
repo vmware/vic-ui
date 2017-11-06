@@ -17,7 +17,7 @@ limitations under the License.
 Mac OS script starting an Ant build of the current flex project
 Note: if Ant runs out of memory try defining ANT_OPTS=-Xmx512M
 
-*/
+ */
 
 package com.vmware.vic.mvc;
 
@@ -28,16 +28,19 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.vmware.vic.services.EchoService;
 import com.vmware.vic.services.ResourcePoolService;
+import com.vmware.vic.services.VicUserSessionService;
 
 
 /**
@@ -48,72 +51,84 @@ import com.vmware.vic.services.ResourcePoolService;
 @Controller
 @RequestMapping(value = "/services")
 public class ServicesController {
-   private final static Log _logger = LogFactory.getLog(ServicesController.class);
+    private final EchoService _echoService;
+    private final ResourcePoolService _resourcePoolService;
+    private final VicUserSessionService _vicUserSessionService;
 
-   private final EchoService _echoService;
-   private final ResourcePoolService _resourcePoolService;
+    @Autowired
+    public ServicesController(
+            @Qualifier("echoService") EchoService echoService,
+            @Qualifier("rpService") ResourcePoolService resourcePoolService,
+            @Qualifier("vicUserSessionService") VicUserSessionService vicUserSessionService) {
+        _echoService = echoService;
+        _resourcePoolService = resourcePoolService;
+        _vicUserSessionService = vicUserSessionService;
+    }
 
-   @Autowired
-   public ServicesController(
-         @Qualifier("echoService") EchoService echoService,
-         @Qualifier("rpService") ResourcePoolService resourcePoolService) {
-      _echoService = echoService;
-      _resourcePoolService = resourcePoolService;
-   }
-
-   // Empty controller to avoid compiler warnings in vic's bundle-context.xml
-   // where the bean is declared
-   public ServicesController() {
-      _echoService = null;
-      _resourcePoolService = null;
-   }
+    // Empty controller to avoid compiler warnings in vic's bundle-context.xml
+    // where the bean is declared
+    public ServicesController() {
+        _echoService = null;
+        _resourcePoolService = null;
+        _vicUserSessionService = null;
+    }
 
 
-   /**
-    * Echo a message back to the client.
-    */
-   @RequestMapping(value = "/echo", method = RequestMethod.POST)
-   @ResponseBody
-   public String echo(@RequestParam(value = "message", required = true) String message)
-         throws Exception {
-      return _echoService.echo(message);
-   }
+    /**
+     * Echo a message back to the client.
+     */
+    @RequestMapping(value = "/echo", method = RequestMethod.POST)
+    @ResponseBody
+    public String echo(@RequestParam(value = "message", required = true) String message)
+            throws Exception {
+        return _echoService.echo(message);
+    }
 
-   /**
-    * Check if the name for a new ResourcePool already exists
- * @throws Exception
-    */
-   @RequestMapping(value = "/check-rp-uniqueness", method = RequestMethod.POST)
-   @ResponseBody
-   public boolean checkRpUniqueness(
-           @RequestParam(value = "name", required = true) String name) throws Exception {
-       return _resourcePoolService.isNameUnique(name);
-   }
+    /**
+     * Check if the name for a new ResourcePool already exists
+     * @throws Exception
+     */
+    @RequestMapping(value = "/check-rp-uniqueness", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean checkRpUniqueness(
+            @RequestParam(value = "name", required = true) String name) throws Exception {
+        return _resourcePoolService.isNameUnique(name);
+    }
 
-   /**
-    * Generic handling of internal exceptions.
-    * Sends a 500 server error response along with a json body with messages
-    *
-    * @param ex The exception that was thrown.
-    * @param response
-    * @return a map containing the exception message, the cause, and a stackTrace
-    */
-   @ExceptionHandler(Exception.class)
-   @ResponseBody
-   public Map<String, String> handleException(Exception ex, HttpServletResponse response) {
-      response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    /**
+     * Check if the current session user is vSphere admin
+     * @return true if admin
+     */
+    @RequestMapping(value = "/is-user-vsphere-admin", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isUserVsphereAdmin() {
+        return _vicUserSessionService.isCurrentUserVsphereAdmin();
+    }
 
-      Map<String,String> errorMap = new HashMap<String,String>();
-      errorMap.put("message", ex.getMessage());
-      if(ex.getCause() != null) {
-         errorMap.put("cause", ex.getCause().getMessage());
-      }
-      StringWriter sw = new StringWriter();
-      PrintWriter pw = new PrintWriter(sw);
-      ex.printStackTrace(pw);
-      errorMap.put("stackTrace", sw.toString());
+    /**
+     * Generic handling of internal exceptions.
+     * Sends a 500 server error response along with a json body with messages
+     *
+     * @param ex The exception that was thrown.
+     * @param response
+     * @return a map containing the exception message, the cause, and a stackTrace
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public Map<String, String> handleException(Exception ex, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-      return errorMap;
-   }
+        Map<String,String> errorMap = new HashMap<String,String>();
+        errorMap.put("message", ex.getMessage());
+        if(ex.getCause() != null) {
+            errorMap.put("cause", ex.getCause().getMessage());
+        }
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        errorMap.put("stackTrace", sw.toString());
+
+        return errorMap;
+    }
 }
 

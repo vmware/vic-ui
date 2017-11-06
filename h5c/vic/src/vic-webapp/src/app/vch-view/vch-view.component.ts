@@ -15,33 +15,34 @@
 */
 
 import {
+    CREATE_VCH_WIZARD_URL,
+    DOCKER_ENGINE_PORT_NOTLS,
+    DOCKER_ENGINE_PORT_TLS,
+    VIC_ROOT_OBJECT_ID_WITH_NAME,
+    VSPHERE_SERVEROBJ_VIEWEXT_KEY,
+    VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY,
+    VSPHERE_VM_SUMMARY_KEY,
+    WIZARD_MODAL_HEIGHT,
+    WIZARD_MODAL_WIDTH,
+    WS_VCH
+} from '../shared/constants';
+import {
     Component,
-    OnInit,
+    NgZone,
     OnDestroy,
-    NgZone
+    OnInit
 } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
-import { State } from 'clarity-angular';
-import { VirtualContainerHost } from './vch.model';
 import {
     GlobalsService,
     RefreshService,
     Vic18nService
 } from '../shared';
-import { VicVmViewService } from '../services/vm-view.service';
-import {
-    VSPHERE_VM_SUMMARY_KEY,
-    DOCKER_ENGINE_PORT_NOTLS,
-    DOCKER_ENGINE_PORT_TLS,
-    VSPHERE_SERVEROBJ_VIEWEXT_KEY,
-    VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY,
-    WS_VCH,
-    VIC_ROOT_OBJECT_ID_WITH_NAME,
-    CREATE_VCH_WIZARD_URL,
-    WIZARD_MODAL_WIDTH,
-    WIZARD_MODAL_HEIGHT
-} from '../shared/constants';
+
 import { ExtendedUserSessionService } from '../services/extended-usersession.service';
+import { State } from 'clarity-angular';
+import { Subscription } from 'rxjs/Subscription';
+import { VicVmViewService } from '../services/vm-view.service';
+import { VirtualContainerHost } from './vch.model';
 
 @Component({
     selector: 'vic-vch-view',
@@ -91,7 +92,9 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
         });
 
         // check if the current user is a vSphere Admin
-        this.isVsphereAdmin = this.sessionService.isVsphereAdmin;
+        this.sessionService.isVsphereAdmin$.subscribe(results => {
+          this.isVsphereAdmin = results;
+        });
     }
 
     ngOnDestroy() {
