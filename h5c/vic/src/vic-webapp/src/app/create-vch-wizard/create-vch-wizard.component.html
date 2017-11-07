@@ -179,7 +179,8 @@
 
   </clr-wizard-page>
 
-  <clr-wizard-page clrWizardPagePreventDefault="true"
+  <clr-wizard-page [clrWizardPageNextDisabled]="summaryStep.isApplianceUnavailable === undefined || summaryStep.isApplianceUnavailable"
+                   clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(summaryStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPagePrevious)="goBack()"
@@ -188,17 +189,6 @@
     <ng-template clrPageTitle>
       Summary
       <clr-icon shape="help" class="is-info"></clr-icon>
-      <clr-alert *ngIf="errorFlag"
-                 [clrAlertType]="'alert-danger'"
-                 [clrAlertClosable]="false">
-
-        <div class="alert-item">
-          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-            {{errMsg}}
-          </div>
-        </div>
-
-      </clr-alert>
     </ng-template>
     <ng-template clrPageNavTitle>Summary</ng-template>
 
