@@ -13,13 +13,16 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import {VchCreationWizardGeneralComponent} from './general.component';
+
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {ReactiveFormsModule} from '@angular/forms';
+
+import { By } from '@angular/platform-browser';
 import {ClarityModule} from 'clarity-angular';
-import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
+import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
+import {ReactiveFormsModule} from '@angular/forms';
+import {VchCreationWizardGeneralComponent} from './general.component';
 
 describe('VchCreationWizardGeneralComponent', () => {
 
@@ -50,6 +53,9 @@ describe('VchCreationWizardGeneralComponent', () => {
               } else {
                 return Observable.of(true);
               }
+            },
+            getVicApplianceIp: (): Observable<string> => {
+              return Observable.of('10.20.250.255');
             }
           }
         }
@@ -123,5 +129,13 @@ describe('VchCreationWizardGeneralComponent', () => {
       // And now we can test the form validity when an already defined name is entered.
       expect(component.form.invalid).toBe(true);
     })
+  });
+
+  it('should display an error when no VIC appliance could be detected', () => {
+    component.vicApplianceIp = null;
+    fixture.detectChanges();
+    const errorTextEl = By.css('clr-alert .alert-item .alert-text');
+    expect(fixture.debugElement.query(errorTextEl).nativeElement.textContent.trim())
+      .toBe('VIC appliance VM was not found or unreachable. Please make sure you have deployed it correctly.');
   });
 });

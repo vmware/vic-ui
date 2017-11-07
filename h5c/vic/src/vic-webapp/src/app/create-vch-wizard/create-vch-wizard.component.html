@@ -20,7 +20,7 @@
 
   <div class="spinner" *ngIf="loading"></div>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid || vicApplianceIp === null"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
@@ -179,8 +179,7 @@
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="summaryStep.isApplianceUnavailable === undefined || summaryStep.isApplianceUnavailable"
-                   clrWizardPagePreventDefault="true"
+  <clr-wizard-page clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(summaryStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPagePrevious)="goBack()"

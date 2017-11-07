@@ -16,7 +16,6 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { Observable } from 'rxjs/Observable';
 import { camelCasePattern } from '../../shared/utils/validators';
 import { getClientOS } from '../../shared/utils/detection'
@@ -34,12 +33,10 @@ export class SummaryComponent implements OnInit {
   public targetOS: string;
   public copySucceeded: boolean = null;
   private _isSetup = false;
-  public isApplianceUnavailable: boolean;
 
   constructor(
     private formBuilder: FormBuilder,
-    private elementRef: ElementRef,
-    private createWzService: CreateVchWizardService
+    private elementRef: ElementRef
   ) {
     this.form = formBuilder.group({
       targetOS: '',
@@ -57,16 +54,6 @@ export class SummaryComponent implements OnInit {
   onPageLoad(): void {
     // refresh cli value based on any changes made to the previous pages
     this.form.get('cliCommand').setValue(this.stringifyProcessedPayload());
-
-    // look up the ip address of the newest vic appliance
-    this.isApplianceUnavailable = undefined;
-    this.createWzService
-      .getVicApplianceIp()
-      .subscribe(resp => {
-        this.isApplianceUnavailable = false;
-      }, err => {
-        this.isApplianceUnavailable = true;
-      });
 
     // prevent subscription from getting set up more than once
     if (this._isSetup) {

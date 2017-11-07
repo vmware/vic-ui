@@ -39,15 +39,6 @@ describe('SummaryComponent', () => {
         ClarityModule,
         NoopAnimationsModule
       ],
-      providers: [
-        {
-          provide: CreateVchWizardService, useValue: {
-            getVicApplianceIp: (): Observable<string> => {
-              return Observable.of('10.20.250.255');
-            }
-          }
-        }
-      ],
       declarations: [
         SummaryComponent
       ]
@@ -104,17 +95,5 @@ describe('SummaryComponent', () => {
 
   it('should start with a valid form', () => {
     // expect(component.form.valid).toBe(true);
-  });
-
-  it('should display an error when no VIC appliance could be detected', () => {
-    const createWzService = TestBed.get(CreateVchWizardService);
-    spyOn(createWzService, 'getVicApplianceIp').and.returnValue(
-      Observable.throw(new Error('No VIC appliance was detected'))
-    );
-    component.onPageLoad();
-    fixture.detectChanges();
-    const errorTextEl = By.css('clr-alert .alert-item .alert-text');
-    expect(fixture.debugElement.query(errorTextEl).nativeElement.textContent.trim())
-      .toBe('VIC appliance VM was not found or unreachable. Please make sure you have deployed it correctly.');
   });
 });
