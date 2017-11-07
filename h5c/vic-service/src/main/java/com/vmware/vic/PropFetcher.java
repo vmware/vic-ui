@@ -20,6 +20,8 @@ package com.vmware.vic;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -531,6 +533,17 @@ public class PropFetcher implements ClientSessionEndListener {
                 e.printStackTrace();
             }
         }
+
+        Collections.sort(vicAppliancesList, new Comparator<String>() {
+            @Override
+            public int compare(String a, String b) {
+                String[] aSplit = a.split("-");
+                String[] bSplit = b.split("-");
+                int aBuildNumber = Integer.parseInt(aSplit[aSplit.length - 2]);
+                int bBuildNumber = Integer.parseInt(bSplit[bSplit.length - 2]);
+                return aBuildNumber > bBuildNumber ? -1 : (aBuildNumber < bBuildNumber ? 1 : 0);
+            }
+        });
 
         return vicAppliancesList;
     }
