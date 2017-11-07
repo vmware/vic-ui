@@ -1,4 +1,3 @@
-///<reference path="vch-log-view.component.ts"/>
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
