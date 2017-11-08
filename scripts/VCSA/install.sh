@@ -45,7 +45,7 @@ read_vc_information () {
     echo "-------------------------------------------------------------"
 
     if [ -z $VCENTER_IP ] ; then
-        read -p "Enter IP to target vCenter Server: " VCENTER_IP
+        read -p "Enter FQDN or IP to target vCenter Server: " VCENTER_IP
     fi
 
     if [ -z $VCENTER_ADMIN_USERNAME ] ; then
