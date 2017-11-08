@@ -14,26 +14,31 @@
  limitations under the License.
 */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import {
-  Http,
+  BaseRequestOptions,
   ConnectionBackend,
+  Http,
+  RequestOptions,
   Response,
   ResponseOptions,
-  RequestOptions,
-  BaseRequestOptions,
 } from '@angular/http';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { Globals, GlobalsService } from '../../shared';
+import { MockBackend, MockConnection } from '@angular/http/testing';
+
 import { By } from '@angular/platform-browser';
+import { ClarityModule } from 'clarity-angular';
+import { CreateVchWizardService } from '../../create-vch-wizard/create-vch-wizard.service';
+import { ExtendedUserSessionService } from '../../services/extended-usersession.service';
+import { IExtendedServerInfo } from '../../services/extended-serverinfo.interface';
+import { Observable } from 'rxjs/Observable';
+import { ReactiveFormsModule } from '@angular/forms';
+import { VchVmResponse } from '../../interfaces/vm.interface';
+import { VicVchLogViewComponent } from './vch-log-view.component';
+import { VirtualContainerHost } from '../vch.model';
 import {
   getVchResponseStub
 } from '../../services/mocks/vch.response';
-import { VicVchLogViewComponent } from './vch-log-view.component';
-import { ClarityModule } from 'clarity-angular';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MockBackend, MockConnection } from '@angular/http/testing';
-import { Globals, GlobalsService } from '../../shared';
-import { VirtualContainerHost } from '../vch.model';
-import { VchVmResponse } from '../../interfaces/vm.interface';
 
 describe('VicVchLogViewComponent', () => {
   let fixture: ComponentFixture<VicVchLogViewComponent>;
@@ -59,6 +64,31 @@ describe('VicVchLogViewComponent', () => {
                 serversInfo: [{ thumbprint: '00' }]
               })
             })
+          }
+        },
+        {
+          provide: CreateVchWizardService,
+          useValue: {
+            getVicApplianceIp(): Observable<string> {
+              return Observable.of('10.20.250.255');
+            },
+            acquireCloneTicket(): Observable<string> {
+              return Observable.of('ticket');
+            }
+          }
+        },
+        {
+          provide: ExtendedUserSessionService,
+          useValue: {
+            getVcenterServersInfo(): IExtendedServerInfo[] {
+              return [{
+                name: '10.20.30.10',
+                serverGuid: 'aa-dd-cc-00-ff',
+                sessionCookie: 'nomnom',
+                thumbprint: '01:AB:CD:EF',
+                version: '1'
+              }];
+            }
           }
         }
       ],

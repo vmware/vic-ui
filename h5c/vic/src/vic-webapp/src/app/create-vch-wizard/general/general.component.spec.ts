@@ -54,7 +54,7 @@ describe('VchCreationWizardGeneralComponent', () => {
                 return Observable.of(true);
               }
             },
-            getVicApplianceIp: (): Observable<string> => {
+            getVicApplianceIp(): Observable<string> {
               return Observable.of('10.20.250.255');
             }
           }

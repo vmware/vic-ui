@@ -16,9 +16,14 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { VirtualContainerHost } from '../vch.model';
-import { Http, Headers, RequestOptions } from '@angular/http';
+import { Headers, Http, RequestOptions } from '@angular/http';
+
+import { CreateVchWizardService } from '../../create-vch-wizard/create-vch-wizard.service';
+import { ExtendedUserSessionService } from '../../services/extended-usersession.service';
 import { GlobalsService } from '../../shared';
+import { Observable } from 'rxjs/Observable';
+import { VIC_APPLIANCE_PORT } from '../../shared/constants/create-vch-wizard';
+import { VirtualContainerHost } from '../vch.model';
 
 @Component({
   selector: 'vic-vch-log-view',
@@ -34,7 +39,9 @@ export class VicVchLogViewComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private globalsService: GlobalsService,
-    private http: Http
+    private http: Http,
+    private createWzService: CreateVchWizardService,
+    private extSessionService: ExtendedUserSessionService
   ) {
     this.form = formBuilder.group({
       enableSSH: false
@@ -42,33 +49,36 @@ export class VicVchLogViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    const vchId = this.vch.id.split(':')[3];
-    const serviceHost = '10.160.131.87';
-    const servicePort = '31337';
-    const targetHost = '10.192.93.240';
-    const targetThumbprint = this.globalsService.getWebPlatform().getUserSession()['serversInfo'][0]['thumbprint'];
-
-    // TODO: replace api endpoint IP with OVA IP and target IP with current target VC IP
-    const url = `https://${serviceHost}:${servicePort}/container/target/${targetHost}/vch/${vchId}/log?thumbprint=${targetThumbprint}`;
-
-    const headers  = new Headers({
-      'Content-Type': 'application/json',
-      'Authorization': 'Basic YWRtaW5pc3RyYXRvckB2c3BoZXJlLmxvY2FsOkFkbWluITIz'
-    });
-
-    const options  = new RequestOptions({ headers: headers });
-
     this.loading = true;
-    this.http.get(url, options)
-      .map(response => response.json())
-      .subscribe(response => {
-        console.log('success response:', response);
-        this.log = response;
-        this.loading = false;
-      }, error => {
-        console.error('error response:', error);
-        this.log = error.message || 'Error loading VCH log!';
-        this.loading = false;
+    Observable.combineLatest(
+      this.createWzService.getVicApplianceIp(),
+      this.createWzService.acquireCloneTicket()
+    ).catch(err => {
+      return Observable.throw(err);
+    }).subscribe(([serviceHost, cloneTicket]) => {
+      const vchId = this.vch.id.split(':')[3];
+      const servicePort = VIC_APPLIANCE_PORT;
+      const targetHost = this.extSessionService.getVcenterServersInfo()[0];
+      const targetHostname = targetHost.name;
+      const targetThumbprint = targetHost.thumbprint;
+      const url =
+        `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/vch/${vchId}/log?thumbprint=${targetThumbprint}`;
+
+      const headers  = new Headers({
+        'Content-Type': 'application/json',
+        'X-VMWARE-TICKET': cloneTicket
       });
+
+      const options  = new RequestOptions({ headers: headers });
+      this.http.get(url, options)
+        .map(response => response.json())
+        .subscribe(response => {
+          this.log = response;
+          this.loading = false;
+        }, error => {
+          this.log = error.message || 'Error loading VCH log!';
+          this.loading = false;
+        });
+    });
   }
 }

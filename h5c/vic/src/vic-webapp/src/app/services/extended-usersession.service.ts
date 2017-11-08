@@ -1,7 +1,3 @@
-import { Globals, GlobalsService } from '../shared';
-
-import { Http } from '@angular/http';
-import { IExtendedServerInfo } from './extended-serverinfo.interface';
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -17,6 +13,11 @@ import { IExtendedServerInfo } from './extended-serverinfo.interface';
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+
+import { Globals, GlobalsService } from '../shared';
+
+import { Http } from '@angular/http';
+import { IExtendedServerInfo } from './extended-serverinfo.interface';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
