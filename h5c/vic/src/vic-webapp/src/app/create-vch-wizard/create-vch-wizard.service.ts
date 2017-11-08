@@ -24,6 +24,7 @@ import {
   VIC_APPLIANCE_PORT,
   VIC_APPLIANCES_LOOKUP_URL,
   CHECK_RP_UNIQUENESS_URL,
+  GET_CLONE_TICKET_URL,
   CPU_MIN_LIMIT_MHZ,
   MEMORY_MIN_LIMIT_MB
 } from '../shared/constants';
@@ -73,6 +74,16 @@ export class CreateVchWizardService {
             .map(response => response.json())
             .catch(e => Observable.throw(e));
     }
+
+     /**
+     * Gets a clone ticket from vSphere api to be passed to vic-machine-server
+     * @returns {Observable<string>} Observable containing the clone ticket
+     */
+    acquireCloneTicket(): Observable<string> {
+      return this.http.get(GET_CLONE_TICKET_URL)
+        .catch(e => Observable.throw(e));
+    }
+
 
     /**
      * Get user id

@@ -21,6 +21,7 @@ export const CREATE_VCH_WIZARD_URL =
 export const WIZARD_MODAL_WIDTH = 1050;
 export const WIZARD_MODAL_HEIGHT = 700;
 export const CHECK_RP_UNIQUENESS_URL = '/ui/vic/rest/services/check-rp-uniqueness';
+export const GET_CLONE_TICKET_URL = '/ui/vic/rest/services/acquire-clone-ticket';
 export const CPU_MIN_LIMIT_MHZ = 1;
 export const MEMORY_MIN_LIMIT_MB = 1;
 export const VIC_APPLIANCE_PORT = 8443;

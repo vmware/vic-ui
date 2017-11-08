@@ -802,4 +802,37 @@ public class PropFetcher implements ClientSessionEndListener {
         _logger.info("Logging out client session - " + clientId);
     }
 
+    /**
+     * Obtain a clone ticket from vSphere
+     * @throws Exception
+     */
+    public String acquireCloneTicket() throws Exception {
+
+        String acquireCloneTicket = "";
+        ServerInfo[] sInfos = _userSessionService.getUserSession().serversInfo;
+
+        for (ServerInfo sInfo : sInfos) {
+            if (sInfo.serviceGuid != null) {
+
+                String serviceGuid = sInfo.serviceGuid;
+                ServiceContent service = getServiceContent(serviceGuid);
+
+                if (service == null) {
+                    _logger.error("Failed to retrieve ServiceContent!");
+                    return null;
+                }
+
+                try {
+                    ManagedObjectReference sessionMgrRef = service.getSessionManager();
+                    acquireCloneTicket = _vimPort.acquireCloneTicket(sessionMgrRef);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                } catch (RuntimeFaultFaultMsg e) {
+                    e.printStackTrace();
+                }
+             }
+         };
+
+         return acquireCloneTicket;
+     }
 }

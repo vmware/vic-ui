@@ -67,9 +67,11 @@
    <osgi:reference id="vaService"
          interface="com.vmware.vic.services.VicApplianceService" />
 
+   <osgi:reference id="cloneTicketService"
+          interface="com.vmware.vic.services.CloneTicketService" />
+
    <osgi:reference id="sampleActionService"
          interface="com.vmware.vic.services.SampleActionService" />
-
 
 </beans>
 
