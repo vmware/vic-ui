@@ -84,7 +84,7 @@ FOR /f "usebackq delims=" %%p in (`%psCommand%`) do set vcenter_password=%%p
 
 :after_vc_info_read
 SET plugin_manager_bin=%parent%..\..\vic-ui-windows.exe
-SET vcenter_unreg_flags=--target https://%target_vcenter_ip%/sdk/ --user %vcenter_username% --password %vcenter_password%
+SET vcenter_unreg_flags=--target https://%target_vcenter_ip%/sdk/ --user %vcenter_username% --password ^"%vcenter_password%^"
 
 REM read plugin-manifest
 FOR /F "tokens=1,2 delims==" %%A IN (..\plugin-manifest) DO (
@@ -103,6 +103,7 @@ IF %ERRORLEVEL% EQU 0 (
     SETLOCAL ENABLEDELAYEDEXPANSION
     FOR /F "usebackq tokens=2 delims=(" %%B IN (scratch.tmp) DO SET vc_thumbprint=%%B
     SET vc_thumbprint=!vc_thumbprint:~11,-1!
+    SET thumbprint_string=--thumbprint !vc_thumbprint!
     ECHO.
     ECHO SHA-1 key fingerprint of host '%target_vcenter_ip%' is '!vc_thumbprint!'
     GOTO validate_vc_thumbprint
@@ -113,16 +114,15 @@ TYPE scratch.tmp | findstr -c:"com.vmware.vic.noop is not registered" > NUL
 IF NOT "%VIC_MACHINE_THUMBPRINT%" == "" (
     SETLOCAL ENABLEDELAYEDEXPANSION
     SET vc_thumbprint=%VIC_MACHINE_THUMBPRINT%
+    SET thumbprint_string=--thumbprint !vc_thumbprint!
     ECHO.
     ECHO SHA-1 key fingerprint of host '%target_vcenter_ip%' is '!vc_thumbprint!'
     GOTO validate_vc_thumbprint
-) ELSE (
-    TYPE scratch.tmp
-    ECHO -------------------------------------------------------------
-    ECHO Error! Could not register plugin with vCenter Server. Please see the message above
-    DEL scratch*.tmp 2>NUL
-    ENDLOCAL
-    EXIT /b 1
+)
+
+REM either certificate is trusted or %VIC_MACHINE_THUMBPRINT% is set already
+IF [%vc_thumbprint%] == [] (
+    SET thumbprint_string=
 )
 
 :validate_vc_thumbprint
@@ -145,7 +145,7 @@ ECHO.
 ECHO -------------------------------------------------------------
 ECHO Preparing to unregister vCenter Extension %name:"=%-H5Client...
 ECHO -------------------------------------------------------------
-"%plugin_manager_bin%" remove %vcenter_unreg_flags% --key com.vmware.vic --thumbprint %vc_thumbprint%
+"%plugin_manager_bin%" remove %vcenter_unreg_flags% --key com.vmware.vic %thumbprint_string%
 IF %ERRORLEVEL% NEQ 0 (
     SET uninstall_successful=0
 )
@@ -153,7 +153,7 @@ ECHO.
 ECHO -------------------------------------------------------------
 ECHO Preparing to unregister vCenter Extension %name:"=%-FlexClient...
 ECHO -------------------------------------------------------------
-"%plugin_manager_bin%" remove %vcenter_unreg_flags% --key com.vmware.vic.ui --thumbprint %vc_thumbprint%
+"%plugin_manager_bin%" remove %vcenter_unreg_flags% --key com.vmware.vic.ui %thumbprint_string%
 IF %ERRORLEVEL% NEQ 0 (
     SET uninstall_successful=0
 )

@@ -85,7 +85,7 @@ FOR /f "usebackq delims=" %%p in (`%psCommand%`) do set vcenter_password=%%p
 
 :after_vc_info_read
 SET plugin_manager_bin=%parent%..\..\vic-ui-windows.exe
-SET vcenter_reg_common_flags=--target https://%target_vcenter_ip%/sdk/ --user %vcenter_username% --password %vcenter_password%
+SET vcenter_reg_common_flags=--target https://%target_vcenter_ip%/sdk/ --user %vcenter_username% --password ^"%vcenter_password%^"
 
 REM read plugin-manifest
 FOR /F "tokens=1,2 delims==" %%A IN (..\plugin-manifest) DO (
@@ -116,6 +116,7 @@ IF %ERRORLEVEL% EQU 0 (
     SETLOCAL ENABLEDELAYEDEXPANSION
     FOR /F "usebackq tokens=2 delims=(" %%B IN (scratch.tmp) DO SET vc_thumbprint=%%B
     SET vc_thumbprint=!vc_thumbprint:~11,-1!
+    SET thumbprint_string=--thumbprint !vc_thumbprint!
     ECHO.
     ECHO SHA-1 key fingerprint of host '%target_vcenter_ip%' is '!vc_thumbprint!'
     GOTO validate_vc_thumbprint
@@ -126,16 +127,10 @@ TYPE scratch.tmp | findstr -c:"com.vmware.vic.noop is not registered" > NUL
 IF NOT "%VIC_MACHINE_THUMBPRINT%" == "" (
     SETLOCAL ENABLEDELAYEDEXPANSION
     SET vc_thumbprint=%VIC_MACHINE_THUMBPRINT%
+    SET thumbprint_string=--thumbprint !vc_thumbprint!
     ECHO.
     ECHO SHA-1 key fingerprint of host '%target_vcenter_ip%' is '!vc_thumbprint!'
     GOTO validate_vc_thumbprint
-) ELSE (
-    TYPE scratch.tmp
-    ECHO -------------------------------------------------------------
-    ECHO Error! Could not register plugin with vCenter Server. Please see the message above
-    DEL scratch*.tmp 2>NUL
-    ENDLOCAL
-    EXIT /b 1
 )
 
 :validate_vc_thumbprint
@@ -159,9 +154,10 @@ ECHO Checking existing plugins...
 ECHO -------------------------------------------------------------
 SET plugins_installed=0
 REM check for h5c plugin
-"%parent%..\..\vic-ui-windows.exe" info %vcenter_reg_common_flags% --key com.vmware.vic --thumbprint %vc_thumbprint% > scratch.tmp 2>&1
-REM check for connection failure
-TYPE scratch.tmp | findstr -c:"fail" > NUL
+"%parent%..\..\vic-ui-windows.exe" info %vcenter_reg_common_flags% --key com.vmware.vic %thumbprint_string% > scratch.tmp 2>&1
+
+REM check for any failure
+TYPE scratch.tmp | findstr -i -c:"fail" > NUL
 IF %ERRORLEVEL% EQU 0 (
     TYPE scratch.tmp
     ECHO -------------------------------------------------------------
@@ -182,9 +178,10 @@ IF %ERRORLEVEL% GTR 0 (
     SETLOCAL DISABLEDELAYEDEXPANSION
 )
 REM check for flex plugin
-"%parent%..\..\vic-ui-windows.exe" info %vcenter_reg_common_flags% --key com.vmware.vic.ui --thumbprint %vc_thumbprint% > scratch.tmp 2>&1
-REM check for connection failure
-TYPE scratch.tmp | findstr -c:"fail" > NUL
+"%parent%..\..\vic-ui-windows.exe" info %vcenter_reg_common_flags% --key com.vmware.vic.ui %thumbprint_string% > scratch.tmp 2>&1
+
+REM check for any failure
+TYPE scratch.tmp | findstr -i -c:"fail" > NUL
 IF %ERRORLEVEL% EQU 0 (
     TYPE scratch.tmp
     ECHO -------------------------------------------------------------
@@ -268,12 +265,12 @@ GOTO confirm_fresh_install
 
 :parse_and_force_register_plugins
 REM remove obsolete plugin key if it ever exists
-"%plugin_manager_bin%" remove %vcenter_reg_common_flags% --key com.vmware.vicui.Vicui --thumbprint %vc_thumbprint% > NUL 2> NUL
+"%plugin_manager_bin%" remove %vcenter_reg_common_flags% --key com.vmware.vicui.Vicui %thumbprint_string% > NUL 2> NUL
 ECHO.
 ECHO -------------------------------------------------------------
 ECHO Preparing to register vCenter Extension %name:"=%-H5Client...
 ECHO -------------------------------------------------------------
-SET plugin_reg_flags=%vcenter_reg_common_flags% --force --name "%name:"=%-H5Client" --thumbprint %vc_thumbprint% --version %version:"=% --summary "Plugin for %name:"=%-H5Client" --company %company% --key %key_h5c:"=% --url %vic_ui_host_url%files/%key_h5c:"=%-v%version:"=%.zip --server-thumbprint %vic_ui_host_thumbprint%
+SET plugin_reg_flags=%vcenter_reg_common_flags% --force --name "%name:"=%-H5Client" %thumbprint_string% --version %version:"=% --summary "Plugin for %name:"=%-H5Client" --company %company% --key %key_h5c:"=% --url %vic_ui_host_url%files/%key_h5c:"=%-v%version:"=%.zip --server-thumbprint %vic_ui_host_thumbprint%
 "%plugin_manager_bin%" install %plugin_reg_flags%
 IF %ERRORLEVEL% NEQ 0 (
     ECHO -------------------------------------------------------------
@@ -286,7 +283,7 @@ ECHO.
 ECHO -------------------------------------------------------------
 ECHO Preparing to register vCenter Extension %name:"=%-FlexClient...
 ECHO -------------------------------------------------------------
-SET plugin_reg_flags=%vcenter_reg_common_flags% --force --name "%name:"=%-FlexClient" --thumbprint %vc_thumbprint% --version %version:"=% --summary "Plugin for %name:"=%-FlexClient" --company %company% --key %key_flex:"=% --url %vic_ui_host_url%files/%key_flex:"=%-v%version:"=%.zip --server-thumbprint %vic_ui_host_thumbprint%
+SET plugin_reg_flags=%vcenter_reg_common_flags% --force --name "%name:"=%-FlexClient" %thumbprint_string% --version %version:"=% --summary "Plugin for %name:"=%-FlexClient" --company %company% --key %key_flex:"=% --url %vic_ui_host_url%files/%key_flex:"=%-v%version:"=%.zip --server-thumbprint %vic_ui_host_thumbprint%
 "%plugin_manager_bin%" install %plugin_reg_flags%
 IF %ERRORLEVEL% NEQ 0 (
     ECHO -------------------------------------------------------------
