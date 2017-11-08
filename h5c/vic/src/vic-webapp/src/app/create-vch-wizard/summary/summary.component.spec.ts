@@ -14,12 +14,16 @@
  limitations under the License.
 */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+
+import { By } from '@angular/platform-browser';
 import { ClarityModule } from 'clarity-angular';
+import { CreateVchWizardService } from './../create-vch-wizard.service';
 import { HttpModule } from '@angular/http';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Observable } from 'rxjs/Observable';
+import { ReactiveFormsModule } from '@angular/forms';
 import { SummaryComponent } from './summary.component';
 import { TestScheduler } from 'rxjs/Rx';
-import { Observable } from 'rxjs/Observable';
 
 describe('SummaryComponent', () => {
 
@@ -32,7 +36,8 @@ describe('SummaryComponent', () => {
       imports: [
         ReactiveFormsModule,
         HttpModule,
-        ClarityModule
+        ClarityModule,
+        NoopAnimationsModule
       ],
       declarations: [
         SummaryComponent

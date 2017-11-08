@@ -20,7 +20,7 @@
 
   <div class="spinner" *ngIf="loading"></div>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid || vicApplianceIp === null"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
@@ -188,17 +188,6 @@
     <ng-template clrPageTitle>
       Summary
       <clr-icon shape="help" class="is-info"></clr-icon>
-      <clr-alert *ngIf="errorFlag"
-                 [clrAlertType]="'alert-danger'"
-                 [clrAlertClosable]="false">
-
-        <div class="alert-item">
-          <div class="alert-text" *ngFor="let errMsg of errorMsgs">
-            {{errMsg}}
-          </div>
-        </div>
-
-      </clr-alert>
     </ng-template>
     <ng-template clrPageNavTitle>Summary</ng-template>
 

@@ -13,8 +13,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, Input, ElementRef } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+
 import { Observable } from 'rxjs/Observable';
 import { camelCasePattern } from '../../shared/utils/validators';
 import { getClientOS } from '../../shared/utils/detection'

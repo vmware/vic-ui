@@ -1,3 +1,12 @@
+<clr-alert *ngIf="vicApplianceIp === null"
+           [clrAlertType]="'alert-danger'"
+           [clrAlertClosable]="false">
+  <div class="alert-item">
+    <div class="alert-text">
+      VIC appliance VM was not found or unreachable. Please make sure you have deployed it correctly.
+    </div>
+  </div>
+</clr-alert>
 <p>Provide the name and log configuration for this new Virtual Container Host (VCH).</p>
 
 <form [formGroup]="form" novalidate>

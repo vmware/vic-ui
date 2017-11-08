@@ -33,6 +33,11 @@
       <constructor-arg index="1" ref="vimObjectReferenceService"></constructor-arg>
    </bean>
 
+   <bean name="VicApplianceServiceImpl"
+         class="com.vmware.vic.services.VicApplianceServiceImpl">
+      <constructor-arg index="0" ref="PropFetcherImpl"></constructor-arg>
+   </bean>
+
    <bean name="VicUIPropertyProvider"
          class="com.vmware.vic.VicUIPropertyProvider">
       <constructor-arg index="0" ref="dataServiceExtensionRegistry"></constructor-arg>

@@ -14,29 +14,31 @@
  limitations under the License.
 */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpModule } from '@angular/http';
+import { ComponentFixture, TestBed, async, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClarityModule } from 'clarity-angular';
-import { CreateVchWizardComponent } from './create-vch-wizard.component';
-import { GlobalsService } from 'app/shared';
-import { CreateVchWizardService } from './create-vch-wizard.service';
-import { Observable } from 'rxjs/Observable';
-import { VchCreationWizardGeneralComponent } from './general/general.component';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
-import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
-import { NetworksComponent } from './networks/networks.component';
-import { SecurityComponent } from './security/security.component';
-import { OperationsUserComponent } from './operations-user/operations-user.component';
-import { SummaryComponent } from './summary/summary.component';
+import { CreateVchWizardComponent } from './create-vch-wizard.component';
+import { CreateVchWizardService } from './create-vch-wizard.service';
+import { GlobalsService } from 'app/shared';
+import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
+import { NetworksComponent } from './networks/networks.component';
+import { Observable } from 'rxjs/Observable';
+import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { RefreshService } from '../shared/refresh.service';
+import { SecurityComponent } from './security/security.component';
+import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
+import { SummaryComponent } from './summary/summary.component';
+import { VchCreationWizardGeneralComponent } from './general/general.component';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
   let component: CreateVchWizardComponent;
   let fixture: ComponentFixture<CreateVchWizardComponent>;
+  let service: CreateVchWizardService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -62,6 +64,9 @@ describe('CreateVchWizardComponent', () => {
             checkVchNameUniqueness: (name) => {
               // TODO: check if this makes sense
               return Observable.of(name === 'unique');
+            },
+            getVicApplianceIp: (): Observable<string> => {
+              return Observable.of('10.20.250.255');
             },
             getClustersList: () => Observable.of([]),
             getDatastores: () => Observable.of([])
@@ -90,13 +95,14 @@ describe('CreateVchWizardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateVchWizardComponent);
     component = fixture.componentInstance;
+    service = TestBed.get(CreateVchWizardService);
     spyOn(component, 'resizeToParentFrame').and.callThrough();
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
+  it('should be created', async(() => {
     expect(component).toBeTruthy();
-  });
+  }));
 
   it('should have called wizard.open', async(() => {
     expect(component.resizeToParentFrame).toHaveBeenCalled();

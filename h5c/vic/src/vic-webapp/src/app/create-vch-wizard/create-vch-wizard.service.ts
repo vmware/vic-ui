@@ -20,7 +20,13 @@ import 'rxjs/add/observable/timer';
 import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
-import { CHECK_RP_UNIQUENESS_URL, CPU_MIN_LIMIT_MHZ, MEMORY_MIN_LIMIT_MB } from '../shared/constants';
+import {
+  VIC_APPLIANCE_PORT,
+  VIC_APPLIANCES_LOOKUP_URL,
+  CHECK_RP_UNIQUENESS_URL,
+  CPU_MIN_LIMIT_MHZ,
+  MEMORY_MIN_LIMIT_MB
+} from '../shared/constants';
 import { GlobalsService } from '../shared';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
 
@@ -37,6 +43,7 @@ export class CreateVchWizardService {
     private _networkingTree: any[] = null;
     private _distributedPortGroups: any[] = null;
     private _userSession: any = null;
+    private _latestVicApplianceIp: string = null;
 
     constructor(
         private http: Http,
@@ -292,4 +299,31 @@ export class CreateVchWizardService {
             });
     }
 
+    /**
+     * Look up and return from the vSphere inventory name, version and IP address
+     * for all VIC appliance VMs
+     * @returns {Observable<string[]>} array of VIC appliances info sorted by build #
+     */
+    private getVicAppliancesList(): Observable<string[]> {
+      return this.http.get(VIC_APPLIANCES_LOOKUP_URL)
+        .catch(err => Observable.throw(err))
+        .map(response => response.json());
+    }
+
+    /**
+     * Get the IP address of the newest VIC appliance
+     */
+    public getVicApplianceIp(): Observable<string> {
+      return this.getVicAppliancesList()
+        .catch(err => Observable.throw(err))
+        .switchMap((list: string[]) => {
+          if (!list || !list.length) {
+            throw new Error('No VIC appliance was detected');
+          }
+          const splitByColon = list[0].split(':');
+          const ipAddress = splitByColon[1].split(',')[1].trim();
+          return Observable.of(ipAddress);
+        })
+        .catch(err => Observable.throw(err));
+    }
 }

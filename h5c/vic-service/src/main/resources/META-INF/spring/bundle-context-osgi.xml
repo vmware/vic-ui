@@ -22,6 +22,9 @@
    <osgi:service id="VicUserSessionService" ref="VicUserSessionServiceImpl"
          interface="com.vmware.vic.services.VicUserSessionService" />
 
+   <osgi:service id="VicApplianceService" ref="VicApplianceServiceImpl"
+         interface="com.vmware.vic.services.VicApplianceService" />
+
    <osgi:service id="ResourcePoolService" ref="ResourcePoolServiceImpl"
          interface="com.vmware.vic.services.ResourcePoolService" />
 

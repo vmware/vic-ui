@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.vmware.vic.services.EchoService;
 import com.vmware.vic.services.ResourcePoolService;
 import com.vmware.vic.services.VicUserSessionService;
+import com.vmware.vic.services.VicApplianceService;
 
 
 /**
@@ -54,14 +55,17 @@ public class ServicesController {
     private final EchoService _echoService;
     private final ResourcePoolService _resourcePoolService;
     private final VicUserSessionService _vicUserSessionService;
+    private final VicApplianceService _vicApplianceService;
 
     @Autowired
     public ServicesController(
             @Qualifier("echoService") EchoService echoService,
             @Qualifier("rpService") ResourcePoolService resourcePoolService,
-            @Qualifier("vicUserSessionService") VicUserSessionService vicUserSessionService) {
+            @Qualifier("vicUserSessionService") VicUserSessionService vicUserSessionService,
+            @Qualifier("vaService") VicApplianceService vicApplianceService) {
         _echoService = echoService;
         _resourcePoolService = resourcePoolService;
+        _vicApplianceService = vicApplianceService;
         _vicUserSessionService = vicUserSessionService;
     }
 
@@ -71,6 +75,7 @@ public class ServicesController {
         _echoService = null;
         _resourcePoolService = null;
         _vicUserSessionService = null;
+        _vicApplianceService = null;
     }
 
 
@@ -103,6 +108,12 @@ public class ServicesController {
     @ResponseBody
     public boolean isUserVsphereAdmin() {
         return _vicUserSessionService.isCurrentUserVsphereAdmin();
+    }
+
+    @RequestMapping(value = "/get-vic-appliances", method = RequestMethod.GET)
+    @ResponseBody
+    public String[] getVicAppliances() {
+        return _vicApplianceService.getVicAppliancesList();
     }
 
     /**

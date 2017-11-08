@@ -1,3 +1,5 @@
+import 'rxjs/add/observable/timer';
+
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -15,10 +17,11 @@
 */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/timer';
-import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { ipOrFqdnPattern, numberPattern, supportedCharsPattern } from '../../shared/utils/validators';
+
+import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { Observable } from 'rxjs/Observable';
+import { VIC_APPLIANCE_PORT } from '../../shared/constants/create-vch-wizard';
 
 @Component({
   selector: 'vic-vch-creation-general',
@@ -27,6 +30,7 @@ import { ipOrFqdnPattern, numberPattern, supportedCharsPattern } from '../../sha
 })
 export class VchCreationWizardGeneralComponent implements OnInit {
   public form: FormGroup;
+  public vicApplianceIp: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -74,9 +78,20 @@ export class VchCreationWizardGeneralComponent implements OnInit {
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    return this.createWzService.checkVchNameUniqueness(this.form.get('name').value)
-      .switchMap(isUnique => {
-        if (!isUnique) {
+    return Observable.zip(
+      this.createWzService.getVicApplianceIp(),
+      this.createWzService.checkVchNameUniqueness(this.form.get('name').value)
+    )
+    .catch(err => {
+      // if any failure occurrs, unset the vicApplianceIp var
+      this.vicApplianceIp = null;
+      return Observable.throw(err);
+    })
+    .switchMap((arr) => {
+      this.vicApplianceIp = arr[0];
+
+      const isUnique = arr[1];
+      if (!isUnique) {
           this.form.get('name').setErrors({
             resourcePoolExists: true
           });
@@ -86,7 +101,8 @@ export class VchCreationWizardGeneralComponent implements OnInit {
         const results = {
           general: {
             name: this.form.get('name').value,
-            debug: this.form.get('debug').value
+            debug: this.form.get('debug').value,
+            vchApplianceEndpoint: `https://${this.vicApplianceIp}:${VIC_APPLIANCE_PORT}`
           }
         };
 
@@ -106,6 +122,6 @@ export class VchCreationWizardGeneralComponent implements OnInit {
         }
 
         return Observable.of(results);
-      });
+    });
   }
 }

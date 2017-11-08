@@ -14,12 +14,13 @@
  limitations under the License.
 */
 
-import { Component, OnInit, ViewChild, ElementRef, Renderer } from '@angular/core';
-import { Wizard } from 'clarity-angular';
+import { Component, ElementRef, OnInit, Renderer, ViewChild } from '@angular/core';
+import { Headers, Http, RequestOptions } from '@angular/http';
+
 import { GlobalsService } from 'app/shared';
 import { Observable } from 'rxjs/Observable';
-import { Http, Headers, RequestOptions } from '@angular/http';
 import { RefreshService } from 'app/shared';
+import { Wizard } from 'clarity-angular';
 
 @Component({
   selector: 'vic-create-vch-wizard',
