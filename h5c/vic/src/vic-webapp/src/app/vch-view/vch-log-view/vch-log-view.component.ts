@@ -54,7 +54,6 @@ export class VicVchLogViewComponent implements OnInit {
       this.createWzService.getVicApplianceIp(),
       this.createWzService.acquireCloneTicket()
     ).catch(err => {
-      console.error(err);
       return Observable.throw(err);
     }).subscribe(([serviceHost, cloneTicket]) => {
       const vchId = this.vch.id.split(':')[3];
@@ -65,7 +64,6 @@ export class VicVchLogViewComponent implements OnInit {
       const url =
         `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/vch/${vchId}/log?thumbprint=${targetThumbprint}`;
 
-      console.log(url, cloneTicket);
       const headers  = new Headers({
         'Content-Type': 'application/json',
         'X-VMWARE-TICKET': cloneTicket
@@ -75,11 +73,9 @@ export class VicVchLogViewComponent implements OnInit {
       this.http.get(url, options)
         .map(response => response.json())
         .subscribe(response => {
-          console.log('success response:', response);
           this.log = response;
           this.loading = false;
         }, error => {
-          console.error('error response:', error);
           this.log = error.message || 'Error loading VCH log!';
           this.loading = false;
         });
