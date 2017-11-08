@@ -21,6 +21,8 @@ import { GlobalsService } from 'app/shared';
 import { Observable } from 'rxjs/Observable';
 import { RefreshService } from 'app/shared';
 import { Wizard } from 'clarity-angular';
+import { CreateVchWizardService } from './create-vch-wizard.service';
+import 'rxjs/add/operator/zip';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -33,6 +35,7 @@ export class CreateVchWizardComponent implements OnInit {
   public errorFlag = false;
   public errorMsgs: string[];
   private _cachedData: any = {};
+  private cloneTicket = '';
 
   // TODO: remove the following
   public testVal = 0;
@@ -42,7 +45,8 @@ export class CreateVchWizardComponent implements OnInit {
     private renderer: Renderer,
     private globalsService: GlobalsService,
     private refresher: RefreshService,
-    private http: Http
+    private http: Http,
+    private createWzService: CreateVchWizardService
   ) { }
 
   /**
@@ -133,47 +137,57 @@ export class CreateVchWizardComponent implements OnInit {
   onFinish(payloadObs: Observable<any> | null) {
     if (!this.loading && payloadObs) {
 
-      payloadObs.subscribe(payload => {
+        // Acquire a clone ticket from vsphere for auth
+        this.createWzService.acquireCloneTicket()
+        .combineLatest(
+          // Subscribe to payload observable
+          payloadObs
+        ).subscribe(([cloneTicket, payload]) => {
 
-        console.log('wizard payload: ', payload);
+        if (cloneTicket !== null || typeof cloneTicket !== 'undefined') {
+          this.cloneTicket = cloneTicket['_body'];
+        }
 
-        this.errorFlag = false;
+        if (payload !== null || typeof payload !== 'undefined') {
 
-        // TODO: replace api endpoint IP with OVA IP and target IP with current target VC IP
-        const url = 'https://10.160.131.87:31337/container/target/10.160.255.106/vch?' +
-          'thumbprint=' + payload.security.thumbprint;
+          this.errorFlag = false;
+          this.loading = true;
 
-        const body = this.processPayload(payload);
+          // TODO: replace api endpoint IP with OVA IP and target IP with current target VC IP
+          const url = 'https://10.160.131.87:31337/container/target/10.160.255.106/vch?' +
+              'thumbprint=' + payload.security.thumbprint;
 
-        console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
+          const body = this.processPayload(payload);
 
-        const options  = new RequestOptions({ headers: new Headers({
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic YWRtaW5pc3RyYXRvckB2c3BoZXJlLmxvY2FsOkFkbWluITIz'
-        })});
+          console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
 
-        this.loading = true;
-        this.http.post(url, JSON.stringify(body), options)
-          .map(response => response.json())
-          .subscribe(response => {
-            console.log('success response:', response);
-            this.loading = false;
-            this.refresher.refreshView();
-            this.wizard.forceFinish();
-            this.onCancel();
-          }, error => {
-            console.error('error response:', error);
-            this.loading = false;
-            try {
-              error = error._body ? JSON.parse(error._body) : error;
-            } catch (e) {
-              console.log('error parsing:', e);
-            }
-            this.errorFlag = true;
-            this.errorMsgs = [error.message || 'Error!'];
+          const options  = new RequestOptions({ headers: new Headers({
+              'Content-Type': 'application/json',
+              'X-VMWARE-TICKET': this.cloneTicket
+          })});
+
+          this.http.post(url, JSON.stringify(body), options)
+              .map(response => response.json())
+              .subscribe(response => {
+                console.log('success response:', response);
+                this.loading = false;
+                this.refresher.refreshView();
+                this.wizard.forceFinish();
+                this.onCancel();
+              }, error => {
+                console.error('error response:', error);
+                this.loading = false;
+                try {
+                  error = error._body ? JSON.parse(error._body) : error;
+                } catch (e) {
+                  console.log('error parsing:', e);
+                }
+                this.errorFlag = true;
+                this.errorMsgs = [error.message || 'Error creating VCH'];
           });
+        }
       }, errors => {
-        console.error('form validations error:', errors);
+        console.error('error:', errors);
         this.errorFlag = true;
         this.errorMsgs = errors;
       });

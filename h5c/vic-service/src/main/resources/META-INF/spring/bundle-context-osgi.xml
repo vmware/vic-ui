@@ -27,6 +27,9 @@
 
    <osgi:service id="ResourcePoolService" ref="ResourcePoolServiceImpl"
          interface="com.vmware.vic.services.ResourcePoolService" />
+         
+   <osgi:service id="CloneTicketService" ref="CloneTicketServiceImpl"
+         interface="com.vmware.vic.services.CloneTicketService" />
 
    <osgi:service id="SampleActionService" ref="SampleActionServiceImpl"
          interface="com.vmware.vic.services.SampleActionService" />

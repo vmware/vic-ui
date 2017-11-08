@@ -42,7 +42,7 @@ import com.vmware.vic.services.EchoService;
 import com.vmware.vic.services.ResourcePoolService;
 import com.vmware.vic.services.VicUserSessionService;
 import com.vmware.vic.services.VicApplianceService;
-
+import com.vmware.vic.services.CloneTicketService;
 
 /**
  * A controller to serve HTTP JSON GET/POST requests to the endpoint "/services".
@@ -56,17 +56,20 @@ public class ServicesController {
     private final ResourcePoolService _resourcePoolService;
     private final VicUserSessionService _vicUserSessionService;
     private final VicApplianceService _vicApplianceService;
+    private final CloneTicketService _cloneTicketService;
 
     @Autowired
     public ServicesController(
             @Qualifier("echoService") EchoService echoService,
             @Qualifier("rpService") ResourcePoolService resourcePoolService,
             @Qualifier("vicUserSessionService") VicUserSessionService vicUserSessionService,
-            @Qualifier("vaService") VicApplianceService vicApplianceService) {
+            @Qualifier("vaService") VicApplianceService vicApplianceService,
+            @Qualifier("cloneTicketService") CloneTicketService cloneTicketService) {
         _echoService = echoService;
         _resourcePoolService = resourcePoolService;
         _vicApplianceService = vicApplianceService;
         _vicUserSessionService = vicUserSessionService;
+        _cloneTicketService = cloneTicketService;
     }
 
     // Empty controller to avoid compiler warnings in vic's bundle-context.xml
@@ -76,8 +79,8 @@ public class ServicesController {
         _resourcePoolService = null;
         _vicUserSessionService = null;
         _vicApplianceService = null;
+        _cloneTicketService = null;
     }
-
 
     /**
      * Echo a message back to the client.
@@ -98,6 +101,16 @@ public class ServicesController {
     public boolean checkRpUniqueness(
             @RequestParam(value = "name", required = true) String name) throws Exception {
         return _resourcePoolService.isNameUnique(name);
+    }
+
+    /**
+     * Acquire a cloned session ticket from vSphere for auth
+     * @throws Exception
+     */
+    @RequestMapping(value = "/acquire-clone-ticket", method = RequestMethod.GET)
+    @ResponseBody
+    public String acquireCloneTicket() throws Exception {
+        return _cloneTicketService.acquireCloneTicket();
     }
 
     /**

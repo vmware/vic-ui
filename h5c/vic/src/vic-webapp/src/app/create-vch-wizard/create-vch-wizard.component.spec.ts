@@ -68,6 +68,7 @@ describe('CreateVchWizardComponent', () => {
             getVicApplianceIp: (): Observable<string> => {
               return Observable.of('10.20.250.255');
             },
+            getCloneTicket: () => Observable.of(''),
             getClustersList: () => Observable.of([]),
             getDatastores: () => Observable.of([])
           }
