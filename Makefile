@@ -44,6 +44,7 @@ vic-ui-plugins:
 	ant -f $(VICUI_SOURCE_PATH)/build-deployable.xml -Denv.VSPHERE_SDK_HOME=$(ENV_VSPHERE_SDK_HOME) -Denv.FLEX_HOME=$(ENV_FLEX_SDK_HOME)
 	tar -xzf /tmp/$(UI_INSTALLER_WIN_UTILS_ARCHIVE) -C $(UI_INSTALLER_WIN_PATH)
 	ant -f h5c/build-deployable.xml -Denv.VSPHERE_SDK_HOME=$(ENV_VSPHERE_SDK_HOME) -Denv.FLEX_HOME=$(ENV_FLEX_SDK_HOME) -Denv.VSPHERE_H5C_SDK_HOME=$(ENV_HTML_SDK_HOME) -Denv.BUILD_MODE=prod
+	ls -la scripts/
 	mkdir -p $(BIN)/ui
 	cp -rf scripts/* $(BIN)/ui
 	# cleanup
