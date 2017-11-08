@@ -73,7 +73,7 @@ ECHO.
 ECHO Please provide connection information to the vCenter Server.
 ECHO -------------------------------------------------------------
 IF [%target_vcenter_ip%] == [] (
-    SET /p target_vcenter_ip="Enter IP to target vCenter Server: "
+    SET /p target_vcenter_ip="Enter FQDN or IP to target vCenter Server: "
 )
 IF [%vcenter_username%] == [] (
     SET /p vcenter_username="Enter your vCenter Administrator Username: "
