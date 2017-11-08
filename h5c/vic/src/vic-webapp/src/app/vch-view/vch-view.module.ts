@@ -13,15 +13,17 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
-import { ClarityModule } from 'clarity-angular';
-import { VicVchViewComponent } from './vch-view.component';
-import { VicVchLogViewComponent } from './vch-log-view/vch-log-view.component';
-import { VicVmViewService } from '../services/vm-view.service';
-import { ExtendedUserSessionService } from '../services/extended-usersession.service';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
+
+import { ClarityModule } from 'clarity-angular';
+import { CommonModule } from '@angular/common';
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
+import { ExtendedUserSessionService } from '../services/extended-usersession.service';
+import { VicVchLogViewComponent } from './vch-log-view/vch-log-view.component';
+import { VicVchViewComponent } from './vch-view.component';
+import { VicVmViewService } from '../services/vm-view.service';
 
 const routes: Routes = [
     { path: '', component: VicVchViewComponent },
@@ -43,7 +45,8 @@ const routes: Routes = [
     ],
     providers: [
         VicVmViewService,
-        ExtendedUserSessionService
+        ExtendedUserSessionService,
+        CreateVchWizardService
     ],
     exports: [
       VicVchViewComponent
