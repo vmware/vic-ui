@@ -50,15 +50,13 @@ export class VicVchLogViewComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    Observable.zip(
+    Observable.combineLatest(
       this.createWzService.getVicApplianceIp(),
       this.createWzService.acquireCloneTicket()
     ).catch(err => {
       console.error(err);
       return Observable.throw(err);
-    }).subscribe(arr => {
-      const serviceHost = arr[0];
-      const cloneTicket = arr[1];
+    }).subscribe(([serviceHost, cloneTicket]) => {
       const vchId = this.vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
       const targetHost = this.extSessionService.getVcenterServersInfo()[0];
