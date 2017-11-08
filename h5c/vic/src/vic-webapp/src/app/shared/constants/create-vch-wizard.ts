@@ -23,3 +23,5 @@ export const WIZARD_MODAL_HEIGHT = 700;
 export const CHECK_RP_UNIQUENESS_URL = '/ui/vic/rest/services/check-rp-uniqueness';
 export const CPU_MIN_LIMIT_MHZ = 1;
 export const MEMORY_MIN_LIMIT_MB = 1;
+export const VIC_APPLIANCE_PORT = 8443;
+export const VIC_APPLIANCES_LOOKUP_URL = '/ui/vic/rest/services/get-vic-appliances';
