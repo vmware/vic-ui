@@ -22,7 +22,7 @@ import { Observable } from 'rxjs/Observable';
 import { RefreshService } from 'app/shared';
 import { Wizard } from 'clarity-angular';
 import { CreateVchWizardService } from './create-vch-wizard.service';
-import 'rxjs/add/operator/zip';
+import { VIC_APPLIANCE_PORT } from '../shared/constants';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -35,7 +35,6 @@ export class CreateVchWizardComponent implements OnInit {
   public errorFlag = false;
   public errorMsgs: string[];
   private _cachedData: any = {};
-  private cloneTicket = '';
 
   // TODO: remove the following
   public testVal = 0;
@@ -141,50 +140,54 @@ export class CreateVchWizardComponent implements OnInit {
         this.createWzService.acquireCloneTicket()
         .combineLatest(
           // Subscribe to payload observable
-          payloadObs
-        ).subscribe(([cloneTicket, payload]) => {
+          payloadObs,
+          this.createWzService.getVicApplianceIp()
+        ).subscribe(([cloneTicket, payload, applianceIp]) => {
 
-        if (cloneTicket !== null || typeof cloneTicket !== 'undefined') {
-          this.cloneTicket = cloneTicket['_body'];
-        }
-
-        if (payload !== null || typeof payload !== 'undefined') {
+        if (payload) {
 
           this.errorFlag = false;
           this.loading = true;
 
-          // TODO: replace api endpoint IP with OVA IP and target IP with current target VC IP
-          const url = 'https://10.160.131.87:31337/container/target/10.160.255.106/vch?' +
-              'thumbprint=' + payload.security.thumbprint;
+          const vcIp = this.globalsService.getWebPlatform().getUserSession().serversInfo[0].name;
 
-          const body = this.processPayload(payload);
+          if ((vcIp && applianceIp) && cloneTicket) {
 
-          console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
+              const url = 'https://' + applianceIp + ':' + VIC_APPLIANCE_PORT + '/container/target/' + vcIp + '/vch?' +
+                  'thumbprint=' + payload.security.thumbprint;
 
-          const options  = new RequestOptions({ headers: new Headers({
-              'Content-Type': 'application/json',
-              'X-VMWARE-TICKET': this.cloneTicket
-          })});
+              const body = this.processPayload(payload);
 
-          this.http.post(url, JSON.stringify(body), options)
-              .map(response => response.json())
-              .subscribe(response => {
-                console.log('success response:', response);
-                this.loading = false;
-                this.refresher.refreshView();
-                this.wizard.forceFinish();
-                this.onCancel();
-              }, error => {
-                console.error('error response:', error);
-                this.loading = false;
-                try {
-                  error = error._body ? JSON.parse(error._body) : error;
-                } catch (e) {
-                  console.log('error parsing:', e);
-                }
-                this.errorFlag = true;
-                this.errorMsgs = [error.message || 'Error creating VCH'];
-          });
+              console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
+
+              const options  = new RequestOptions({ headers: new Headers({
+                  'Content-Type': 'application/json',
+                  'X-VMWARE-TICKET': cloneTicket
+              })});
+
+              this.http.post(url, JSON.stringify(body), options)
+                  .map(response => response.json())
+                  .subscribe(response => {
+                    console.log('success response:', response);
+                    this.loading = false;
+                    this.refresher.refreshView();
+                    this.wizard.forceFinish();
+                    this.onCancel();
+                  }, error => {
+                    console.error('error response:', error);
+                    this.loading = false;
+                    try {
+                      error = error._body ? JSON.parse(error._body) : error;
+                    } catch (e) {
+                      console.log('error parsing:', e);
+                    }
+                    this.errorFlag = true;
+                    this.errorMsgs = [error.message || 'Error creating VCH'];
+              });
+          } else {
+            this.errorFlag = true;
+            this.errorMsgs = ['Error connecting to create VCH API'];
+          }
         }
       }, errors => {
         console.error('error:', errors);
