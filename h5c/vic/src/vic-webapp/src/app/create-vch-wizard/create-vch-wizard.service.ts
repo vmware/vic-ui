@@ -13,22 +13,25 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Injectable } from '@angular/core';
-import { Http, URLSearchParams } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+
 import 'rxjs/add/observable/timer';
 import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
+
 import {
-  VIC_APPLIANCE_PORT,
-  VIC_APPLIANCES_LOOKUP_URL,
   CHECK_RP_UNIQUENESS_URL,
-  GET_CLONE_TICKET_URL,
   CPU_MIN_LIMIT_MHZ,
-  MEMORY_MIN_LIMIT_MB
+  GET_CLONE_TICKET_URL,
+  MEMORY_MIN_LIMIT_MB,
+  VIC_APPLIANCES_LOOKUP_URL,
+  VIC_APPLIANCE_PORT
 } from '../shared/constants';
+import { Http, URLSearchParams } from '@angular/http';
+
 import { GlobalsService } from '../shared';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
 
 @Injectable()
@@ -81,9 +84,9 @@ export class CreateVchWizardService {
      */
     acquireCloneTicket(): Observable<string> {
       return this.http.get(GET_CLONE_TICKET_URL)
-        .catch(e => Observable.throw(e));
+        .catch(e => Observable.throw(e))
+        .map(response => response.text());
     }
-
 
     /**
      * Get user id
