@@ -46,4 +46,5 @@ export class ServerInfo {
     serviceGuid: string;
     serviceUrl: string;
     sessionId: string;
+    name: string;
 }

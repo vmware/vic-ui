@@ -84,8 +84,9 @@ export class CreateVchWizardService {
      */
     acquireCloneTicket(): Observable<string> {
       return this.http.get(GET_CLONE_TICKET_URL)
-        .catch(e => Observable.throw(e))
-        .map(response => response.text());
+          .catch(e => Observable.throw(e))
+          .map(response => response.text())
+          .catch(e => Observable.throw(e));
     }
 
     /**
