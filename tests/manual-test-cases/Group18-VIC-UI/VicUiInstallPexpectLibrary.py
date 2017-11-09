@@ -51,7 +51,7 @@ class VicUiInstallPexpectLibrary(object):
     def _common_prompts(
             self, vcenter_ip, vcenter_user, vcenter_password,
             trust_fingerprint, manual_entry):
-        self._pchild.expect('Enter IP to target vCenter Server: ')
+        self._pchild.expect('Enter FQDN or IP to target vCenter Server: ')
         self._pchild.sendline(vcenter_ip)
         self._pchild.expect('Enter your vCenter Administrator Username: ')
         self._pchild.sendline(vcenter_user)

@@ -54,17 +54,17 @@ TestCase-Attempt To Install With Manifest Missing
 
 TestCase-Be Prompted to Enter VC IP
     [Tags]    unixlike
-    Run Keyword And Continue On Failure  Interact With Script  install  None  Enter IP to target vCenter Server
+    Run Keyword And Continue On Failure  Interact With Script  install  None  Enter FQDN or IP to target vCenter Server
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter IP to target vCenter Server
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter FQDN or IP to target vCenter Server
     Run Keyword Unless  ${passed}  Move File  install.log  install-be-prompted-to-fail-enter-vc-ip.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Enter VC IP
     [Tags]    windows
-    Run Keyword And Continue On Failure  Interact With Script  install  -p pw  Enter IP to target vCenter Server
+    Run Keyword And Continue On Failure  Interact With Script  install  -p pw  Enter FQDN or IP to target vCenter Server
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter IP to target vCenter Server
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter FQDN or IP to target vCenter Server
     Run Keyword Unless  ${passed}  Move File  install.log  install-be-prompted-to-fail-enter-vc-ip.log
     Should Be True  ${passed}
 
