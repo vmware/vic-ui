@@ -54,17 +54,17 @@ TestCase-Attempt To Upgrade With Plugin Manifest Missing
 
 TestCase-Be Prompted to Enter VC IP
     [Tags]    unixlike
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  None  Enter IP to target vCenter Server
+    Run Keyword And Continue On Failure  Interact With Script  upgrade  None  Enter FQDN or IP to target vCenter Server
     ${output}=  OperatingSystem.GetFile  upgrade.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter IP to target vCenter Server
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter FQDN or IP to target vCenter Server
     Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-be-prompted-to-fail-enter-vc-ip.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Enter VC IP
     [Tags]    windows
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -p pw  Enter IP to target vCenter Server
+    Run Keyword And Continue On Failure  Interact With Script  upgrade  -p pw  Enter FQDN or IP to target vCenter Server
     ${output}=  OperatingSystem.GetFile  upgrade.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter IP to target vCenter Server
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter FQDN or IP to target vCenter Server
     Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-be-prompted-to-fail-enter-vc-ip.log
     Should Be True  ${passed}
 

@@ -345,7 +345,7 @@ Cleanup Testbed
 
     # Delete binaries
     Run  rm -rf vicui-test-report-*.zip
-    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL} ui-nightly-run-bin
+    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL} ${LATEST_VIC_UI_TARBALL} ui-nightly-run-bin
     Run  rm -rf tests/manual-test-cases/Group18-VIC-UI/*VCH-0*
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
