@@ -1,11 +1,11 @@
 <clr-alert *ngIf="vicApplianceIp === null"
-           [clrAlertType]="'alert-danger'"
+           [clrAlertType]="danger"
            [clrAlertClosable]="false">
-  <div class="alert-item">
-    <div class="alert-text">
-      VIC appliance VM was not found or unreachable. Please make sure you have deployed it correctly.
-    </div>
-  </div>
+    <clr-alert-item>
+      <div class="alert-text">
+        VIC appliance VM was not found or unreachable. Please make sure you have deployed it correctly.
+      </div>
+    </clr-alert-item>
 </clr-alert>
 <p>Provide the name and log configuration for this new Virtual Container Host (VCH).</p>
 
@@ -54,8 +54,8 @@
 
       </div>
 
-      <clr-signpost [clrSignpostPosition]="'bottom-left'">
-        <clr-signpost-content *clrIfOpen>
+      <clr-signpost>
+        <clr-signpost-content [clrPosition]="'bottom-left'" *clrIfOpen>
             <span>
               Virtual container host names can contain up to 80 characters and must be unique within each vCenter
             </span>
@@ -140,8 +140,8 @@
 
       </div>
 
-      <clr-signpost [clrSignpostPosition]="'top-left'">
-        <clr-signpost-content *clrIfOpen>
+      <clr-signpost>
+        <clr-signpost-content [clrPosition]="'top-left'" *clrIfOpen>
             <span>
               Deploy the VCH with more verbose levels of logging, an optionally modify the behavior of vic-machine
               for troubleshooting purposes.
@@ -205,8 +205,8 @@
 
       </div>
 
-      <clr-signpost [clrSignpostPosition]="'top-left'">
-        <clr-signpost-content *clrIfOpen>
+      <clr-signpost>
+        <clr-signpost-content [clrPosition]="'top-left'" *clrIfOpen>
             <span>
               Deploy the VCH with more verbose levels of logging, and optionally modify the behavior of vic-machine
               for troubleshooting purposes.

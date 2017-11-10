@@ -126,7 +126,7 @@
       <div class="form-group row mb-0"
            [formGroupName]="i"
            *ngFor="let volumeStore of form.controls.volumeStores.controls; let i=index">
-        <div class="col-xs">
+        <div class="col-xs-3">
 
           <label [ngClass]="{'required': form.get('enableAnonymousVolumes').value && i === 0}">
             Volume datastore
