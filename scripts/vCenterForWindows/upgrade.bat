@@ -123,7 +123,6 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 REM in case VIC_MACHINE_THUMBPRINT environment variable is set, use it
-TYPE scratch.tmp | findstr -c:"com.vmware.vic.noop is not registered" > NUL
 IF NOT "%VIC_MACHINE_THUMBPRINT%" == "" (
     SETLOCAL ENABLEDELAYEDEXPANSION
     SET vc_thumbprint=%VIC_MACHINE_THUMBPRINT%
@@ -131,6 +130,16 @@ IF NOT "%VIC_MACHINE_THUMBPRINT%" == "" (
     ECHO.
     ECHO SHA-1 key fingerprint of host '%target_vcenter_ip%' is '!vc_thumbprint!'
     GOTO validate_vc_thumbprint
+)
+
+TYPE scratch.tmp | findstr -i -c:"no such host" > NUL
+IF %ERRORLEVEL% EQU 0 (
+    TYPE scratch.tmp
+    ECHO -------------------------------------------------------------
+    ECHO Error! Could not register the plugin with vCenter Server. Please see the message above
+    DEL scratch*.tmp 2>NUL
+    ENDLOCAL
+    EXIT /b 1
 )
 
 :validate_vc_thumbprint
