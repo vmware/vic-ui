@@ -248,7 +248,7 @@ Run Script Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  ⭕️   ELSE  Set Variable  ❌ 
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[PASSED\]  ELSE  Set Variable  \[FAILED\]
     ${pf_string}=  Set Variable  ${pf} ${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
     Set To Dictionary  ${results_dict}  ${dict_key}  ${pf_string}
 
@@ -302,7 +302,7 @@ Run Plugin Test With Config
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
-    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ❌ Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[FAILED\] Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
     ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
@@ -313,7 +313,7 @@ Run Plugin Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  ⭕️   ELSE  Set Variable  ❌ 
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[PASSED\]  ELSE  Set Variable  \[FAILED\]
     ${pf_string}=  Set Variable  ${pf} Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ${pf_string}
 
