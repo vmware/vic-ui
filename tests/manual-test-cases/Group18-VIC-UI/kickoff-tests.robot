@@ -128,6 +128,15 @@ Get Latest Vic Engine Binary
 Setup Test Matrix
     # skip matrix
     @{skip_test_config_matrix}=  Create List
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Googlechrome,Chrome
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Firefox,Firefox
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Googlechrome,Chrome
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Firefox,Firefox
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,iexplore,IE11
+    # There's currently a version clash between the Selenium standalone binary and HSUIA project
+    Append To List  ${skip_test_config_matrix}  65,5310538,5318154,Windows,Firefox,Firefox
+    # There's a H5C bug in IE11 that appears only when automatically tested
+    Append To List  ${skip_test_config_matrix}  65,5310538,5318154,Windows,IExplorer,IE11
     Set Global Variable  ${SKIP_TEST_MATRIX}  ${skip_test_config_matrix}
 
     # installer test matrix
