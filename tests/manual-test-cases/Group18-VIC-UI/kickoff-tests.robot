@@ -126,6 +126,19 @@ Get Latest Vic Engine Binary
     Prepare VIC Engine Binaries
 
 Setup Test Matrix
+    # skip matrix
+    @{skip_test_config_matrix}=  Create List
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Googlechrome,Chrome
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Firefox,Firefox
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Googlechrome,Chrome
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Firefox,Firefox
+    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,iexplore,IE11
+    # There's currently a version clash between the Selenium standalone binary and HSUIA project
+    Append To List  ${skip_test_config_matrix}  65,5310538,5318154,Windows,Firefox,Firefox
+    # There's a H5C bug in IE11 that appears only when automatically tested
+    Append To List  ${skip_test_config_matrix}  65,5310538,5318154,Windows,IExplorer,IE11
+    Set Global Variable  ${SKIP_TEST_MATRIX}  ${skip_test_config_matrix}
+
     # installer test matrix
     @{installer_test_config_matrix}=  Create List
     &{installer_test_results_dict}=  Create Dictionary
@@ -210,18 +223,7 @@ Run Script Test With Config
     Set Environment Variable  TEST_ESX_BUILD  ${esx_build}
     Set Environment Variable  TEST_VCSA_BUILD  ${vc_build}
     Set Environment Variable  TEST_OS  ${os}
-
-    Log To Console  ${\n}........................................
-    Log To Console     ${title}
-    Log To Console  ........................................
-    Log To Console  vSphere version: ${vc_version}
-    Log To Console  ESX build: ${esx_build}
-    Log To Console  VCSA build: ${vc_build}
-    Log To Console  Operating System: ${os}
-    Log To Console  ........................................
-
-    Get Testbed Information
-    Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
+    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  ${title},${run_config}
 
     # prepare yml file
     ${dict_key}=  Set Variable  VC${vc_version}-${esx_build}-${vc_build}-${os}
@@ -231,6 +233,20 @@ Run Script Test With Config
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g"
     ...  -e "s|\#ROBOT_SCRIPT|${test_name}\.robot|g" > .drone.local.tests.yml
+
+    Log To Console  ${\n}........................................
+    Log To Console     ${title}
+    Log To Console  ........................................
+    Log To Console  vSphere version: ${vc_version}
+    Log To Console  ESX build: ${esx_build}
+    Log To Console  VCSA build: ${vc_build}
+    Log To Console  Operating System: ${os}
+    Run Keyword If  ${is_skipped}  Log To Console  Skipped...
+    Run Keyword If  ${is_skipped}  Set To Dictionary  ${results_dict}  ${dict_key}  \[ SKIPPED \]\t${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
+    Return From Keyword If  ${is_skipped}
+    Get Testbed Information
+    Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
+    Log To Console  ........................................
 
     # generate .drone.local.tests.yml
     Run  cat .drone.local.script.yml | ${sed-replace-command}
@@ -248,8 +264,8 @@ Run Script Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  ⭕️   ELSE  Set Variable  ❌ 
-    ${pf_string}=  Set Variable  ${pf} ${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
+    ${pf_string}=  Set Variable  ${pf}\t${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
     Set To Dictionary  ${results_dict}  ${dict_key}  ${pf_string}
 
     Log To Console  ${results.rc}
@@ -272,19 +288,7 @@ Run Plugin Test With Config
     Set Environment Variable  TEST_ESX_BUILD  ${esx_build}
     Set Environment Variable  TEST_VCSA_BUILD  ${vc_build}
     Set Environment Variable  TEST_OS  ${os}
-
-    Log To Console  ${\n}........................................
-    Log To Console     Plugin Test
-    Log To Console  ........................................
-    Log To Console  vSphere version: ${vc_version}
-    Log To Console  ESX build: ${esx_build}
-    Log To Console  VCSA build: ${vc_build}
-    Log To Console  Operating System: ${os}
-    Log To Console  Browser: ${selenium_browser}
-    Log To Console  ........................................
-
-    Get Testbed Information
-    Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
+    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  ${run_config}
 
     # prepare yml file
     ${dict_key}=  Set Variable  VC${vc_version}-${esx_build}-${vc_build}-${os}-${selenium_browser_normalized}
@@ -296,13 +300,28 @@ Run Plugin Test With Config
     ...  -e "s|\#BROWSER_NORMALIZED_NAME|${selenium_browser_normalized}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g" > .drone.local.tests.yml
 
+    Log To Console  ${\n}........................................
+    Log To Console     Plugin Test
+    Log To Console  ........................................
+    Log To Console  vSphere version: ${vc_version}
+    Log To Console  ESX build: ${esx_build}
+    Log To Console  VCSA build: ${vc_build}
+    Log To Console  Operating System: ${os}
+    Log To Console  Browser: ${selenium_browser}
+    Run Keyword If  ${is_skipped}  Log To Console  Skipped...
+    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Return From Keyword If  ${is_skipped}
+    Get Testbed Information
+    Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
+    Log To Console  ........................................
+
     # generate .drone.local.tests.yml
     Run  cat .drone.local.plugin.yml | ${sed-replace-command}
     OperatingSystem.File Should Exist  .drone.local.tests.yml
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
-    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ❌ Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \] Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
     ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
@@ -313,8 +332,8 @@ Run Plugin Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  ⭕️   ELSE  Set Variable  ❌ 
-    ${pf_string}=  Set Variable  ${pf} Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
+    ${pf_string}=  Set Variable  ${pf}\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ${pf_string}
 
     Log To Console  ${results.rc}
@@ -355,12 +374,13 @@ Send Email
     ${time_end}=  Get Current Date  result_format=epoch  exclude_millis=True
     ${elapsed_time}=  Evaluate  ${time_end} - ${time_start}
     # zip results
+    ${results_dir_exists}=  Run Keyword And Return Status  OperatingSystem.Directory Should Exist  ui-test-results
     ${now}=  Run  date +%m%d%y
     ${zip_filename}=  Set Variable  vicui-test-report-${now}.zip
     ${rc1}=  Run And Return Rc  zip -9 -r ${zip_filename} ui-test-results/
-    Should Be Equal As Integers  ${rc1}  0
     ${rc2}  ${testresults_base64}=  Run And Return Rc And Output  base64 "${zip_filename}"
-    Should Be Equal As Integers  ${rc2}  0
+    Run Keyword If  ${results_dir_exists}  Should Be Equal As Integers  ${rc1}  0
+    Run Keyword If  ${results_dir_exists}  Should Be Equal As Integers  ${rc2}  0
 
     ${head_commit}=  Run  git log -1 --pretty=format:%h
     ${email_title}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  vic ui nightly run ${buildNumber}  ELSE  Set Variable  vic integration test run ${head_commit}
@@ -445,7 +465,7 @@ Send Email
     ...    ${\n}${testresults_base64}${\n}
     ...    --${boundary}--
 
-    Append To File  email_body.txt  ${email_zip_section}
+    Run Keyword If  ${results_dir_exists}  Append To File  email_body.txt  ${email_zip_section}
     Log To Console  Emailing run report...
     ${rc}=  Run And Return Rc  /usr/sbin/sendmail -t < email_body.txt
     Should Be Equal As Integers  ${rc}  0
@@ -454,22 +474,26 @@ Send Email
 Launch Installer Tests
     :FOR  ${config}  IN  @{INSTALLER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Installer Test  18-1-VIC-UI-Installer  ${INSTALLER_TEST_RESULTS_DICT}
-    \    Uninstall VCH  ${TRUE}
+    \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Installer Test,${config}
+    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Launch Uninstaller Tests
     :FOR  ${config}  IN  @{UNINSTALLER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Uninstaller Test  18-2-VIC-UI-Uninstaller  ${UNINSTALLER_TEST_RESULTS_DICT}
-    \    Uninstall VCH  ${TRUE}
+    \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Uninstaller Test,${config}
+    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Launch Upgrader Tests
     :FOR  ${config}  IN  @{UPGRADER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Upgrader Test  18-3-VIC-UI-Upgrader  ${UPGRADER_TEST_RESULTS_DICT}
-    \    Uninstall VCH  ${TRUE}
+    \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Upgrader Test,${config}
+    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Launch Plugin Tests
     :FOR  ${config}  IN  @{PLUGIN_TEST_MATRIX}
     \    Run Plugin Test With Config  ${config}
-    \    Uninstall VCH  ${TRUE}
+    \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  ${config}
+    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Report Results
     Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Test Report
