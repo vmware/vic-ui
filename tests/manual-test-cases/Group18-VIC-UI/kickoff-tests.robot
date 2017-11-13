@@ -233,7 +233,7 @@ Run Script Test With Config
     Log To Console  VCSA build: ${vc_build}
     Log To Console  Operating System: ${os}
     Run Keyword If  ${is_skipped}  Log To Console  Skipped...
-    Run Keyword If  ${is_skipped}  Set To Dictionary  ${results_dict}  ${dict_key}  \[SKIPPED\] ${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
+    Run Keyword If  ${is_skipped}  Set To Dictionary  ${results_dict}  ${dict_key}  \[ SKIPPED \]\t${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
     Return From Keyword If  ${is_skipped}
     Get Testbed Information
     Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
@@ -255,8 +255,8 @@ Run Script Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[PASSED\]  ELSE  Set Variable  \[FAILED\]
-    ${pf_string}=  Set Variable  ${pf} ${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
+    ${pf_string}=  Set Variable  ${pf}\t${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
     Set To Dictionary  ${results_dict}  ${dict_key}  ${pf_string}
 
     Log To Console  ${results.rc}
@@ -300,7 +300,7 @@ Run Plugin Test With Config
     Log To Console  Operating System: ${os}
     Log To Console  Browser: ${selenium_browser}
     Run Keyword If  ${is_skipped}  Log To Console  Skipped...
-    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[SKIPPED\] Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Return From Keyword If  ${is_skipped}
     Get Testbed Information
     Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
@@ -312,7 +312,7 @@ Run Plugin Test With Config
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
-    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[FAILED\] Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \] Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
     ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
@@ -323,8 +323,8 @@ Run Plugin Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[PASSED\]  ELSE  Set Variable  \[FAILED\]
-    ${pf_string}=  Set Variable  ${pf} Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
+    ${pf_string}=  Set Variable  ${pf}\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ${pf_string}
 
     Log To Console  ${results.rc}
