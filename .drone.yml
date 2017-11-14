@@ -43,7 +43,9 @@ pipeline:
       - mkdir -p $BIN/ui
       - tar -czvf $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN/ui
       - mkdir bundle
+      - mkdir bundle-release
       - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle
+      - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle-release/vic_ui_`git describe --tags $(git rev-list --tags --max-count=1)`.tar.gz
       - rm -rf $BIN
       - ls -la bundle
     when:
@@ -62,7 +64,21 @@ pipeline:
     when:
       repo: vmware/vic-ui
       event: [ push ]
-      branch: [ master, releases/*, refs/tags/* ]
+      branch: [ master, releases/* ]
+      status: success
+
+  publish-gcs-releases:
+    image: maplain/drone-gcs:latest
+    pull: true
+    source: bundle-release
+    target: vic-ui-releases
+    acl:
+      - allUsers:READER
+    cache_control: public,max-age=3600
+    when:
+      repo: vmware/vic-ui
+      event: [ push, tag ]
+      branch: [ refs/tags/* ]
       status: success
 
 services:
