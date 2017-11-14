@@ -19,6 +19,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpModule } from '@angular/http';
 import { ClarityModule } from 'clarity-angular';
+import { AlertIconAndTypesService } from 'clarity-angular/emphasis/alert/providers/icon-and-types-service';
 
 import {
   Globals,
@@ -57,6 +58,7 @@ import { AppComponent } from './app.component';
     I18nService,
     Vic18nService,
     RefreshService,
+    AlertIconAndTypesService,
     { provide: ErrorHandler, useClass: AppErrorHandler }
   ],
   bootstrap: [AppComponent]
