@@ -17,12 +17,12 @@
 import { Component, ElementRef, OnInit, Renderer, ViewChild } from '@angular/core';
 import { Headers, Http, RequestOptions } from '@angular/http';
 
+import { CreateVchWizardService } from './create-vch-wizard.service';
 import { GlobalsService } from 'app/shared';
 import { Observable } from 'rxjs/Observable';
 import { RefreshService } from 'app/shared';
-import { Wizard } from 'clarity-angular';
-import { CreateVchWizardService } from './create-vch-wizard.service';
 import { VIC_APPLIANCE_PORT } from '../shared/constants';
+import { Wizard } from 'clarity-angular';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -170,7 +170,6 @@ export class CreateVchWizardComponent implements OnInit {
                   .subscribe(response => {
                     console.log('success response:', response);
                     this.loading = false;
-                    this.refresher.refreshView();
                     this.wizard.forceFinish();
                     this.onCancel();
                   }, error => {
@@ -203,7 +202,11 @@ export class CreateVchWizardComponent implements OnInit {
    */
   onCancel() {
     const webPlatform = this.globalsService.getWebPlatform();
+    const vchViewFrame = parent.frames[0];
     webPlatform.closeDialog();
+    vchViewFrame.postMessage({
+      eventType: 'datagridRefresh'
+    }, '*');
   }
 
   get cachedData(): any {
