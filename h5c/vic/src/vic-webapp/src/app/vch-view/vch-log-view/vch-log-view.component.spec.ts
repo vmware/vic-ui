@@ -112,7 +112,7 @@ describe('VicVchLogViewComponent', () => {
     fixture.componentInstance.ngOnInit();
 
     connection.mockRespond(new Response(new ResponseOptions({
-      body: `"${ response }"`
+      body: response
     })));
 
     fixture.detectChanges();
