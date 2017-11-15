@@ -20,7 +20,6 @@ import { Headers, Http, RequestOptions } from '@angular/http';
 
 import { CreateVchWizardService } from '../../create-vch-wizard/create-vch-wizard.service';
 import { ExtendedUserSessionService } from '../../services/extended-usersession.service';
-import { GlobalsService } from '../../shared';
 import { Observable } from 'rxjs/Observable';
 import { VIC_APPLIANCE_PORT } from '../../shared/constants/create-vch-wizard';
 import { VirtualContainerHost } from '../vch.model';
@@ -32,13 +31,12 @@ import { VirtualContainerHost } from '../vch.model';
 })
 export class VicVchLogViewComponent implements OnInit {
   public form: FormGroup;
-  public log: '';
+  public log: string;
   public loading = false;
   @Input() vch: VirtualContainerHost;
 
   constructor(
     private formBuilder: FormBuilder,
-    private globalsService: GlobalsService,
     private http: Http,
     private createWzService: CreateVchWizardService,
     private extSessionService: ExtendedUserSessionService
@@ -71,7 +69,7 @@ export class VicVchLogViewComponent implements OnInit {
 
       const options  = new RequestOptions({ headers: headers });
       this.http.get(url, options)
-        .map(response => response.json())
+        .map(response => response.text())
         .subscribe(response => {
           this.log = response;
           this.loading = false;
