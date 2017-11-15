@@ -72,7 +72,25 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
         public vicI18n: Vic18nService
     ) { }
 
+    /**
+     * Handles messages sent over postMessage()
+     * @param payload
+     */
+    private onMessage(payload: MessageEvent) {
+      const data = payload.data;
+      if (data.eventType === 'datagridRefresh') {
+        this.zone.run(() => {
+          this.reloadVchs();
+        });
+      }
+    }
+
     ngOnInit() {
+       // listens to a message event from an angular app from another iframe
+       // this is set up to handle refreshing the datagrid upon successful vch creation
+       // TODO: refactor this into a service
+        window.addEventListener('message', this.onMessage.bind(this));
+
         // subscribes to the global refresh event and calls the
         // reloadVchs() method to query the server for new data
         this.refreshSubscription = this.refreshService
@@ -101,6 +119,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
         if (this.refreshSubscription) {
             this.refreshSubscription.unsubscribe();
         }
+        window.removeEventListener('message', this.onMessage.bind(this));
     }
 
     /**
