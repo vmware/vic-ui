@@ -256,7 +256,8 @@ export class CreateVchWizardComponent implements OnInit {
           'port_group': {'name': payload.networks.publicNetwork}
         }
       },
-      'auth': {}
+      'auth': {},
+      'container': {}
     };
 
     // General ---------------------------------------------------------------------------------------------------------
@@ -269,6 +270,10 @@ export class CreateVchWizardComponent implements OnInit {
 
     if (payload.general.syslogAddress) {
       processedPayload['syslog_addr'] = payload.general.syslogAddress;
+    }
+
+    if (payload.general.containerNameConvention) {
+      processedPayload.container['name_convention'] = payload.general.containerNameConvention;
     }
 
     // Compute ---------------------------------------------------------------------------------------------------------
