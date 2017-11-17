@@ -39,6 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import com.vmware.utils.ssl.ThumbprintHostNameVerifier;
 import com.vmware.utils.ssl.ThumbprintTrustManager;
 import com.vmware.vic.model.ContainerVm;
+import com.vmware.vic.model.VicApplianceVm;
 import com.vmware.vic.model.VirtualContainerHostVm;
 import com.vmware.vic.model.constants.BaseVm;
 import com.vmware.vic.model.constants.Container;
@@ -419,10 +420,9 @@ public class PropFetcher implements ClientSessionEndListener {
 
                 if (props != null) {
                     for (ObjectContent objC : props.getObjects()) {
-                        String vmName = null;
-                        String vicApplId = null;
-                        String vicApplIp = null;
-
+                        VicApplianceVm applianceVm = new VicApplianceVm(objC);
+                        vicAppliancesList.add(
+                                applianceVm.getName() + ": " + applianceVm.getMoId() + "," + applianceVm.getIpAddress());
                     }
                 }
             } catch (RuntimeFaultFaultMsg | InvalidPropertyFaultMsg e) {
