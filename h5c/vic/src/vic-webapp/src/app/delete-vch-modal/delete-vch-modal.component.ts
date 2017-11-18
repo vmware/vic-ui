@@ -17,7 +17,7 @@
 import {Component, ElementRef, OnInit, Renderer, ViewChild} from '@angular/core';
 import {GlobalsService} from 'app/shared';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {Modal} from 'clarity-angular/src/modal/modal';
+import {Modal} from 'clarity-angular';
 import {ActivatedRoute} from '@angular/router';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from '../vch-view/vch.model';
