@@ -1,3 +1,23 @@
+<clr-alert *ngIf="error"
+           [clrAlertType]="'alert-danger'"
+           (clrAlertClosedChange)="error = '';">
+  <div class="alert-item">
+    <div class="alert-text">
+      {{ error }}
+    </div>
+  </div>
+</clr-alert>
+
+<clr-alert *ngIf="warning"
+           [clrAlertType]="'alert-warning'"
+           (clrAlertClosedChange)="warning = '';">
+  <div class="alert-item">
+    <div class="alert-text">
+      {{ warning }}
+    </div>
+  </div>
+</clr-alert>
+
 <clr-datagrid (clrDgRefresh)="refreshGrid($event)" [clrDgLoading]="isDgLoading">
   <clr-dg-action-bar *ngIf="isVsphereAdmin">
     <button class="btn btn-link btn-sm" (click)="launchCreateVchWizard()">
@@ -18,6 +38,9 @@
   </clr-dg-column>
 
   <clr-dg-row *ngFor="let item of vchs">
+    <clr-dg-action-overflow>
+      <button class="action-item" (click)="deleteVch(item)">Delete</button>
+    </clr-dg-action-overflow>
     <clr-dg-row-detail>
       <clr-dg-cell>
         <vic-vch-log-view *clrIfExpanded [vch]="item"></vic-vch-log-view>

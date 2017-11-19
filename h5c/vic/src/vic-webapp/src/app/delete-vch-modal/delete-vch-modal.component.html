@@ -1,0 +1,37 @@
+<div class="clr-wizard clr-wizard--inline">
+  <div class="spinner"></div>
+  <clr-modal #modal>
+    <h3 class="modal-title">
+      <div>Confirm Delete</div>
+      <div class="separator"></div>
+      <div class="subtitle">{{ vch?.name }}</div>
+    </h3>
+    <div class="modal-body">
+      <div class="clr-wizard-content">
+        <div class="clr-wizard-page">
+          <p>
+            The virtual container host, {{ vch?.name }}, manages {{ containersCount }} container VMs
+            ({{ stoppedContainersCount }} stopped and {{ suspendedContainersCount }} suspended). All this
+            containers VMs will be deleted. Clicking the option below will also permanently delete from disk all the
+            associated persistent and anonymous volumes. This action can not be undone.
+          </p>
+          <form [formGroup]="form" novalidate>
+            <div class="checkbox">
+              <input type="checkbox" id="delete-volumes" formControlName="deleteVolumes">
+              <label for="delete-volumes">Delete persistent and anonymous volumes</label>
+            </div>
+          </form>
+          <p>
+            Delete virtual container host, {{ vch?.name }}<span *ngIf="form.get('deleteVolumes').value"> and all associated persistent and anonymous volumes</span>?
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="clr-wizard-footer-buttons">
+        <button class="btn btn-outline" type="button" (click)="onCancel()">Cancel</button>
+        <button class="btn btn-danger" type="button" (click)="onDelete()">Delete</button>
+      </div>
+    </div>
+  </clr-modal>
+</div>
