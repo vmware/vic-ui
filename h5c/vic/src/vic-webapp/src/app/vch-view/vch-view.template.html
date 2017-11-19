@@ -19,7 +19,9 @@
 
   <clr-dg-row *ngFor="let item of vchs">
     <clr-dg-row-detail>
-      <vic-vch-log-view *clrIfExpanded [vch]="item"></vic-vch-log-view>
+      <clr-dg-cell>
+        <vic-vch-log-view *clrIfExpanded [vch]="item"></vic-vch-log-view>
+      </clr-dg-cell>
     </clr-dg-row-detail>
     <clr-dg-cell>
       <a href="#" (click)="navigateToObject(item.id)">
