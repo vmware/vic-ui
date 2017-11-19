@@ -15,179 +15,226 @@
 */
 
 import {
-    CREATE_VCH_WIZARD_URL,
-    DOCKER_ENGINE_PORT_NOTLS,
-    DOCKER_ENGINE_PORT_TLS,
-    VIC_ROOT_OBJECT_ID_WITH_NAME,
-    VSPHERE_SERVEROBJ_VIEWEXT_KEY,
-    VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY,
-    VSPHERE_VM_SUMMARY_KEY,
-    WIZARD_MODAL_HEIGHT,
-    WIZARD_MODAL_WIDTH,
-    WS_VCH
+  CREATE_VCH_WIZARD_URL,
+  DOCKER_ENGINE_PORT_NOTLS,
+  DOCKER_ENGINE_PORT_TLS,
+  VIC_ROOT_OBJECT_ID_WITH_NAME,
+  VSPHERE_SERVEROBJ_VIEWEXT_KEY,
+  VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY,
+  VSPHERE_VM_SUMMARY_KEY,
+  WIZARD_MODAL_HEIGHT,
+  WIZARD_MODAL_WIDTH,
+  WS_VCH,
+  DELETE_VCH_MODAL_WIDTH,
+  DELETE_VCH_MODAL_HEIGHT,
+  DELETE_VCH_MODAL_URL,
+  DELETE_VCH_MODAL_ERROR_MESSAGE
 } from '../shared/constants';
 import {
-    Component,
-    NgZone,
-    OnDestroy,
-    OnInit
+  Component,
+  NgZone,
+  OnDestroy,
+  OnInit
 } from '@angular/core';
 import {
-    GlobalsService,
-    RefreshService,
-    Vic18nService
+  GlobalsService,
+  RefreshService,
+  Vic18nService
 } from '../shared';
 
-import { ExtendedUserSessionService } from '../services/extended-usersession.service';
-import { State } from 'clarity-angular';
-import { Subscription } from 'rxjs/Subscription';
-import { VicVmViewService } from '../services/vm-view.service';
-import { VirtualContainerHost } from './vch.model';
+import {ExtendedUserSessionService} from '../services/extended-usersession.service';
+import {State} from 'clarity-angular';
+import {Subscription} from 'rxjs/Subscription';
+import {VicVmViewService} from '../services/vm-view.service';
+import {VirtualContainerHost} from './vch.model';
 
 @Component({
-    selector: 'vic-vch-view',
-    styleUrls: [],
-    templateUrl: './vch-view.template.html'
+  selector: 'vic-vch-view',
+  styleUrls: ['./vch-view.scss'],
+  templateUrl: './vch-view.template.html'
 })
 export class VicVchViewComponent implements OnInit, OnDestroy {
-    public readonly WS_VCH_CONSTANTS = WS_VCH;
-    private refreshSubscription: Subscription;
-    public isDgLoading = true;
-    public isVsphereAdmin: boolean;
-    public vchs: VirtualContainerHost[] = [];
-    public totalVchsCount = 0;
-    public currentState: {
-        offset: number;
-        sorting: string;
-        filter: string;
-    } = { offset: 0, sorting: 'id,asc', filter: '' };
-    public readonly maxResultCount: number = 10;
+  public readonly WS_VCH_CONSTANTS = WS_VCH;
+  private refreshSubscription: Subscription;
+  public isDgLoading = true;
+  public isVsphereAdmin: boolean;
+  public vchs: VirtualContainerHost[] = [];
+  public error = '';
+  public warning = '';
+  public currentState: {
+    offset: number;
+    sorting: string;
+    filter: string;
+  } = {offset: 0, sorting: 'id,asc', filter: ''};
+  public readonly maxResultCount: number = 10;
 
-    constructor(
-        private zone: NgZone,
-        private vmViewService: VicVmViewService,
-        private refreshService: RefreshService,
-        private globalsService: GlobalsService,
-        private sessionService: ExtendedUserSessionService,
-        public vicI18n: Vic18nService
-    ) { }
+  constructor(private zone: NgZone,
+              private vmViewService: VicVmViewService,
+              private refreshService: RefreshService,
+              private globalsService: GlobalsService,
+              private sessionService: ExtendedUserSessionService,
+              public vicI18n: Vic18nService) {
+  }
 
-    /**
-     * Handles messages sent over postMessage()
-     * @param payload
-     */
-    private onMessage(payload: MessageEvent) {
-      const data = payload.data;
-      if (data.eventType === 'datagridRefresh') {
+  ngOnInit() {
+    // subscribes to the global refresh event and calls the
+    // reloadVchs() method to query the server for new data
+    this.refreshSubscription = this.refreshService
+      .refreshObservable$.subscribe(() => {
         this.zone.run(() => {
           this.reloadVchs();
         });
-      }
+      });
+
+    // listens to an observable that gets the updated vchs data
+    // from the server, and updates this.vchs
+    this.vmViewService.vchs$.subscribe(vchs => {
+      this.vchs = vchs;
+      this.isDgLoading = false;
+    }, err => {
+      this.vchs = [];
+    });
+
+    // check if the current user is a vSphere Admin
+    this.sessionService.isVsphereAdmin$.subscribe(results => {
+      this.isVsphereAdmin = results;
+    });
+
+    // listens to a message event from an angular app from another iframe
+    // this is set up to handle refreshing the datagrid upon successful vch creation
+    // and messages from delete vch modal
+    // TODO: move the following to a service
+    window.addEventListener('message', this.onMessage.bind(this), false);
+  }
+
+  ngOnDestroy() {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
+    // TODO: move the following to a service
+    window.removeEventListener('message', this.onMessage.bind(this));
+  }
+
+  /**
+   * Builds and returns Docker API endpoint string
+   * @param item : VirtualContainerHost instance
+   * @return DOCKER_HOST environment variable
+   */
+  getDockerEndpointString(item: VirtualContainerHost): string {
+    return `DOCKER_HOST=${item.vchIp}:${item.isUsingTls ?
+      DOCKER_ENGINE_PORT_TLS : DOCKER_ENGINE_PORT_NOTLS}`;
+  }
+
+  /**
+   * Queries vic-service with the current Datagrid state
+   * @param state current Datagrid state
+   */
+  refreshGrid(state: State) {
+    this.currentState.filter = state.filters ? state.filters
+      .map(item => item['property'] + '=' + item['value'])
+      .join(',') : '';
+
+    if (state.sort) {
+      this.currentState.sorting = `${state.sort.by},${state.sort.reverse ? 'desc' : 'asc'}`;
     }
 
-    ngOnInit() {
-       // listens to a message event from an angular app from another iframe
-       // this is set up to handle refreshing the datagrid upon successful vch creation
-       // TODO: refactor this into a service
-        window.addEventListener('message', this.onMessage.bind(this));
+    this.currentState.offset = state.page.from;
+    this.reloadVchs();
+  }
 
-        // subscribes to the global refresh event and calls the
-        // reloadVchs() method to query the server for new data
-        this.refreshSubscription = this.refreshService
-            .refreshObservable$.subscribe(() => {
-                this.zone.run(() => {
-                    this.reloadVchs();
-                });
-            });
+  /**
+   * Calls vm-view service to reload VCHs
+   */
+  reloadVchs() {
+    this.isDgLoading = true;
+    this.vmViewService.getVchsData({
+      offset: this.currentState.offset,
+      maxResultCount: this.maxResultCount,
+      sorting: this.currentState.sorting,
+      filter: this.currentState.filter
+    });
+  }
 
-        // listens to an observable that gets the updated vchs data
-        // from the server, and updates this.vchs
-        this.vmViewService.vchs$.subscribe(vchs => {
-            this.vchs = vchs;
-            this.isDgLoading = false;
-        }, err => {
-            this.vchs = [];
-        });
-
-        // check if the current user is a vSphere Admin
-        this.sessionService.isVsphereAdmin$.subscribe(results => {
-          this.isVsphereAdmin = results;
-        });
+  /**
+   * Navigates to an object specified by objectId
+   * @param objectId Full vSphere objectId which starts with urn:
+   */
+  navigateToObject(objectId: string) {
+    if (objectId.indexOf('VirtualMachine') > -1) {
+      this.globalsService.getWebPlatform().sendNavigationRequest(
+        VSPHERE_VM_SUMMARY_KEY, objectId);
+    } else {
+      window.parent.location.href = '/ui/#?extensionId=' +
+        VSPHERE_SERVEROBJ_VIEWEXT_KEY + '&' +
+        'objectId=' + objectId + '&' +
+        'navigator=' + VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY;
     }
+  }
 
-    ngOnDestroy() {
-        if (this.refreshSubscription) {
-            this.refreshSubscription.unsubscribe();
-        }
-        window.removeEventListener('message', this.onMessage.bind(this));
-    }
+  /**
+   * Opens VCH Creation wizard
+   */
+  launchCreateVchWizard() {
+    const webPlatform = this.globalsService.getWebPlatform();
+    webPlatform.openModalDialog(
+      ' ',
+      CREATE_VCH_WIZARD_URL,
+      WIZARD_MODAL_WIDTH,
+      WIZARD_MODAL_HEIGHT,
+      VIC_ROOT_OBJECT_ID_WITH_NAME
+    );
+  }
 
-    /**
-     * Builds and returns Docker API endpoint string
-     * @param item : VirtualContainerHost instance
-     * @return DOCKER_HOST environment variable
-     */
-    getDockerEndpointString(item: VirtualContainerHost): string {
-        return `DOCKER_HOST=${item.vchIp}:${item.isUsingTls ?
-            DOCKER_ENGINE_PORT_TLS : DOCKER_ENGINE_PORT_NOTLS}`;
-    }
-
-    /**
-     * Queries vic-service with the current Datagrid state
-     * @param state current Datagrid state
-     */
-    refreshGrid(state: State) {
-        this.currentState.filter = state.filters ? state.filters
-            .map(item => item['property'] + '=' + item['value'])
-            .join(',') : '';
-
-        if (state.sort) {
-            this.currentState.sorting = `${state.sort.by},${state.sort.reverse ? 'desc' : 'asc'}`;
-        }
-
-        this.currentState.offset = state.page.from;
-        this.reloadVchs();
-    }
-
-    /**
-     * Calls vm-view service to reload VCHs
-     */
-    reloadVchs() {
-        this.isDgLoading = true;
-        this.vmViewService.getVchsData({
-            offset: this.currentState.offset,
-            maxResultCount: this.maxResultCount,
-            sorting: this.currentState.sorting,
-            filter: this.currentState.filter
-        });
-    }
-
-    /**
-     * Navigates to an object specified by objectId
-     * @param objectId Full vSphere objectId which starts with urn:
-     */
-    navigateToObject(objectId: string) {
-        if (objectId.indexOf('VirtualMachine') > -1) {
-            this.globalsService.getWebPlatform().sendNavigationRequest(
-                VSPHERE_VM_SUMMARY_KEY, objectId);
-        } else {
-            window.parent.location.href = '/ui/#?extensionId=' +
-                VSPHERE_SERVEROBJ_VIEWEXT_KEY + '&' +
-                'objectId=' + objectId + '&' +
-                'navigator=' + VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY;
-        }
-    }
-
-    /**
-     * Opens VCH Creation wizard
-     */
-    launchCreateVchWizard() {
+  /**
+   * Opens VCH delete modal
+   */
+  deleteVch(vch: VirtualContainerHost) {
+    const subscriber = this.vmViewService.containers$.subscribe(containers => {
+      if (containers.some(container => container.parentObjectName === vch.name && container.powerState === 'POWERED_ON')) {
+        this.warning = 'You must stop all running containers VMs before you can delete the VCH.';
+      } else {
         const webPlatform = this.globalsService.getWebPlatform();
         webPlatform.openModalDialog(
-            ' ',
-            CREATE_VCH_WIZARD_URL,
-            WIZARD_MODAL_WIDTH,
-            WIZARD_MODAL_HEIGHT,
-            VIC_ROOT_OBJECT_ID_WITH_NAME);
+          ' ',
+          `${DELETE_VCH_MODAL_URL}`,
+          DELETE_VCH_MODAL_WIDTH,
+          DELETE_VCH_MODAL_HEIGHT,
+          vch.id
+        );
+      }
+
+      subscriber.unsubscribe();
+    });
+
+    this.vmViewService.getContainersData({}); // TODO: filter containers for the vch
+  }
+
+  /**
+   * Window 'message' listener
+   * @param event
+   */
+  onMessage(event: MessageEvent) {
+    if (event.origin !== location.protocol + '//' + location.host) {
+      return;
     }
+
+    let data: any;
+
+    try {
+      data = JSON.parse(event.data);
+    } catch (e) {
+      console.log('error parsing message:', e);
+      return;
+    }
+
+    if (data.type === DELETE_VCH_MODAL_ERROR_MESSAGE) {
+      this.zone.run(() => {
+        this.error = data.payload.message || 'Error trying to delete the VCH';
+      });
+    } else if (data.eventType === 'datagridRefresh') {
+      this.zone.run(() => {
+        this.reloadVchs();
+      });
+    }
+  }
 }

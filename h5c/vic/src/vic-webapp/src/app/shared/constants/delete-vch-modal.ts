@@ -13,9 +13,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+import { environment } from '../../../environments/environment';
 
-export * from './resources.path';
-export * from './portlets.text';
-export * from './vicvms';
-export * from './create-vch-wizard';
-export * from './delete-vch-modal';
+export const DELETE_VCH_MODAL_URL =
+  `/ui/vic/resources/${environment.production ? 'dist' : 'build-dev'}/index.html?view=delete-vch`;
+export const DELETE_VCH_MODAL_WIDTH = 600;
+export const DELETE_VCH_MODAL_HEIGHT = 360;
+export const DELETE_VCH_MODAL_ERROR_MESSAGE = 'delete-vch-modal.error';
