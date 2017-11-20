@@ -220,36 +220,36 @@ export class SecurityComponent {
       } else {
         results['tlsCa'] = this.tlsCaContents;
       }
+
+      // Registry Access
+      const useWhitelistRegistryValue = this.form.get('useWhitelistRegistry').value;
+      const insecureRegistriesValue = this.form.get('insecureRegistries').value;
+      const whitelistRegistriesValue = this.form.get('whitelistRegistries').value;
+
+      if (!useWhitelistRegistryValue) {
+        results['whitelistRegistry'] = [];
+        results['insecureRegistry'] = insecureRegistriesValue.filter(val => {
+          return val['insecureRegistryIp'] && val['insecureRegistryPort'];
+        }).map(val => `${val['insecureRegistryIp']}:${val['insecureRegistryPort']}`);
+      } else {
+        const white = [];
+        const insecure = [];
+        whitelistRegistriesValue.filter(val => {
+          return val['whitelistRegistry'];
+        }).forEach(val => {
+          if (val['whitelistRegType'] === 'secure') {
+            white.push(val['whitelistRegistry']);
+          } else {
+            insecure.push(val['whitelistRegistry']);
+          }
+        });
+
+        results['whitelistRegistry'] = white;
+        results['insecureRegistry'] = insecure;
+      }
+
+      results['registryCa'] = this.registryCaContents;
     }
-
-    // Registry Access
-    const useWhitelistRegistryValue = this.form.get('useWhitelistRegistry').value;
-    const insecureRegistriesValue = this.form.get('insecureRegistries').value;
-    const whitelistRegistriesValue = this.form.get('whitelistRegistries').value;
-
-    if (!useWhitelistRegistryValue) {
-      results['whitelistRegistry'] = [];
-      results['insecureRegistry'] = insecureRegistriesValue.filter(val => {
-        return val['insecureRegistryIp'] && val['insecureRegistryPort'];
-      }).map(val => `${val['insecureRegistryIp']}:${val['insecureRegistryPort']}`);
-    } else {
-      const white = [];
-      const insecure = [];
-      whitelistRegistriesValue.filter(val => {
-        return val['whitelistRegistry'];
-      }).forEach(val => {
-        if (val['whitelistRegType'] === 'secure') {
-          white.push(val['whitelistRegistry']);
-        } else {
-          insecure.push(val['whitelistRegistry']);
-        }
-      });
-
-      results['whitelistRegistry'] = white;
-      results['insecureRegistry'] = insecure;
-    }
-
-    results['registryCa'] = this.registryCaContents;
 
     // user id, vc thumbprint and target
     results['user'] = this.createWzService.getUserId();
