@@ -71,6 +71,13 @@ Cleanup Testbed
     Cleanup VIC Product OVA  ${ova_name}
     Remove Environment Variable  GOVC_URL  GOVC_INSECURE  GOVC_USERNAME  GOVC_PASSWORD
 
+Run GOVC
+    [Arguments]  ${cmd_options}
+    ${rc}  ${output}=  Run And Return Rc And Output  govc ${cmd_options}
+    Log  ${output}
+    Should Be Equal As Integers  ${rc}  0
+    [Return]  ${rc}
+
 Install VIC Product OVA
     [Arguments]  ${ova-file}
     Log To Console  \nInstalling VIC appliance...
@@ -114,8 +121,8 @@ Download VIC Engine If Not Already
 Cleanup VIC Product OVA
     [Arguments]  ${ova_target_vm_name}
     Log To Console  \nCleaning up VIC appliance...
-    ${rc}=  Wait Until Keyword Succeeds  10x  5s  Run  govc vm.destroy ${ova_target_vm_name}
-    Run Keyword And Ignore Error  Run  govc datastore.rm "/datastore1 (4)/vm/${ova_target_vm_name}"
+    ${rc}=  Wait Until Keyword Succeeds  10x  5s  Run GOVC  vm.destroy ${ova_target_vm_name}
+    Run Keyword And Ignore Error  Run GOVC  datastore.rm "/datastore1 (4)/vm/${ova_target_vm_name}"
     Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${BUILD_5318154_IP}
 
 *** Test Cases ***
