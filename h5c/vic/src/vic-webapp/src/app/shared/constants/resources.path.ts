@@ -52,6 +52,14 @@ export const WS_VCH = {
                 'vic_workspace.vch.datagrid.columns.vchAdminPortal':
                 'VCH Admin Portal'
             }
+        },
+        MESSAGES: {
+          keys: {
+            WAITING_FOR_IP: 'vic_workspace.vch.datagrid.msg.waitingForIp'
+          },
+          defaults: {
+            'vic_workspace.vch.datagrid.msg.waitingForIp': 'Waiting...'
+          }
         }
     }
 };

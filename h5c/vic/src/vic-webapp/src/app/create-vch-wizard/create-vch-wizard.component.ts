@@ -158,8 +158,6 @@ export class CreateVchWizardComponent implements OnInit {
 
               const body = this.processPayload(payload);
 
-              console.log('processed payload: ', JSON.parse(JSON.stringify(body)));
-
               const options  = new RequestOptions({ headers: new Headers({
                   'Content-Type': 'application/json',
                   'X-VMWARE-TICKET': cloneTicket
@@ -168,7 +166,6 @@ export class CreateVchWizardComponent implements OnInit {
               this.http.post(url, JSON.stringify(body), options)
                   .map(response => response.json())
                   .subscribe(response => {
-                    console.log('success response:', response);
                     this.loading = false;
                     this.wizard.forceFinish();
                     this.onCancel();
@@ -178,7 +175,7 @@ export class CreateVchWizardComponent implements OnInit {
                     try {
                       error = error._body ? JSON.parse(error._body) : error;
                     } catch (e) {
-                      console.log('error parsing:', e);
+                      console.error('error parsing:', e);
                     }
                     this.errorFlag = true;
                     this.errorMsgs = [error.message || 'Error creating VCH'];
