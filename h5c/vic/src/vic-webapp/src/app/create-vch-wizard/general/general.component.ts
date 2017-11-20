@@ -110,8 +110,10 @@ export class VchCreationWizardGeneralComponent implements OnInit {
         const containerNameConventionValue = this.form.get('containerNameConvention').value;
         const containerNameConventionPostfixValue = this.form.get('containerNameConventionPostfix').value;
 
-        results['general']['containerNameConvention'] =
-          containerNameConventionPrefixValue + containerNameConventionValue + containerNameConventionPostfixValue;
+        if (containerNameConventionPrefixValue.trim() || containerNameConventionPostfixValue.trim()) {
+          results['general']['containerNameConvention'] =
+            containerNameConventionPrefixValue + containerNameConventionValue + containerNameConventionPostfixValue;
+        }
 
         const syslogTransportValue = this.form.get('syslogTransport').value;
         const syslogHostValue = this.form.get('syslogHost').value;

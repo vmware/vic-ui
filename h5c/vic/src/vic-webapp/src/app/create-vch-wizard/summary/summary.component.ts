@@ -133,33 +133,41 @@ export class SummaryComponent implements OnInit {
       // if there is only one entry in the section and it's of string type
       // add it to results array here
       if (typeof payload[section] === 'string') {
+        if (!payload[section].trim()) {
+          continue;
+        }
         results.push(`--${section} ${payload[section]}`);
         continue;
       }
 
       for (const key in payload[section]) {
-        if (!payload[section][key]) {
+        if (!(payload[section][key]) || payload[section][key] === '0') {
           continue;
         }
         const newKey = key.replace(camelCasePattern, '$1-$2').toLowerCase();
         const value = payload[section][key];
         if (typeof value === 'string') {
+          if (!value.trim()) {
+            continue;
+          }
           results.push(`--${newKey} ${value}`);
         } else if (typeof value === 'boolean') {
           results.push(`--${newKey}`);
         } else {
           // repeat adding multiple, optional fields with the same key
           for (const i in value) {
-            if (!value[i]) {
+            if (!value[i] || value === '0') {
               continue;
             }
 
             let stringValue;
             const rawValue = value[i];
             if (typeof rawValue === 'string') {
+              if (!rawValue.trim()) {
+                continue;
+              }
               stringValue = rawValue;
-            } else if (typeof rawValue === 'object' &&
-              isUploadableFileObject(rawValue)) {
+            } else if (typeof rawValue === 'object' && isUploadableFileObject(rawValue)) {
               stringValue = rawValue.name;
             }
 
@@ -179,6 +187,7 @@ export class SummaryComponent implements OnInit {
     const results = JSON.parse(JSON.stringify(this.payload));
 
     // transform image store entry
+
     results['storageCapacity']['imageStore'] =
       results['storageCapacity']['imageStore'] + (results['storageCapacity']['fileFolder'] || '');
     delete results['storageCapacity']['fileFolder'];
@@ -188,6 +197,7 @@ export class SummaryComponent implements OnInit {
     delete results['storageCapacity']['baseImageSizeUnit'];
 
     // transform each volume store entry
+
     const volumeStoresRef = results['storageCapacity']['volumeStores'];
     results['storageCapacity']['volumeStores'] =
       volumeStoresRef.map(volStoreObj => {
@@ -209,6 +219,7 @@ export class SummaryComponent implements OnInit {
     }
 
     // transform each container network entry
+
     const containerNetworksRef = results['networks']['containerNetworks'];
     results['networks']['containerNetworks'] =
       containerNetworksRef.map(containerNetObj => {
@@ -239,6 +250,12 @@ export class SummaryComponent implements OnInit {
 
     if (results['security']['tlsServerKey']) {
       results['security']['tlsServerKey'] = results['security']['tlsServerKey']['name']
+    }
+
+    // remove password
+
+    if (results['operations']['opsPassword']) {
+      results['operations']['opsPassword'] = '*';
     }
 
     return results;
