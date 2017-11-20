@@ -93,7 +93,7 @@ export class DeleteVchModalComponent implements OnInit {
           this.modal.open();
           subscription.unsubscribe();
         }, err => {
-          console.log(err);
+          console.error(err);
           subscription.unsubscribe();
         }
       )
@@ -189,7 +189,6 @@ export class DeleteVchModalComponent implements OnInit {
       this.http.delete(url, options)
         .map(response => response.json())
         .subscribe(response => {
-          console.log(response);
           this.loading = false;
           this.onCancel();
         }, error => {
