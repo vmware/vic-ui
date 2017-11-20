@@ -1,3 +1,8 @@
 :host ::ng-deep .datagrid-head .datagrid-row-actions {
   visibility: hidden;
 }
+
+a.pointer-with-no-href {
+  cursor: pointer;
+  color:#007cbb;
+}
