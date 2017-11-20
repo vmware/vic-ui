@@ -16,6 +16,11 @@
 
 import {
   CREATE_VCH_WIZARD_URL,
+  DATAGRID_REFRESH_EVENT,
+  DELETE_VCH_MODAL_ERROR_MESSAGE,
+  DELETE_VCH_MODAL_HEIGHT,
+  DELETE_VCH_MODAL_URL,
+  DELETE_VCH_MODAL_WIDTH,
   DOCKER_ENGINE_PORT_NOTLS,
   DOCKER_ENGINE_PORT_TLS,
   VIC_ROOT_OBJECT_ID_WITH_NAME,
@@ -24,11 +29,7 @@ import {
   VSPHERE_VM_SUMMARY_KEY,
   WIZARD_MODAL_HEIGHT,
   WIZARD_MODAL_WIDTH,
-  WS_VCH,
-  DELETE_VCH_MODAL_WIDTH,
-  DELETE_VCH_MODAL_HEIGHT,
-  DELETE_VCH_MODAL_URL,
-  DELETE_VCH_MODAL_ERROR_MESSAGE
+  WS_VCH
 } from '../shared/constants';
 import {
   Component,
@@ -218,20 +219,13 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    let data: any;
-
-    try {
-      data = JSON.parse(event.data);
-    } catch (e) {
-      console.log('error parsing message:', e);
-      return;
-    }
+    const data: any = event.data;
 
     if (data.type === DELETE_VCH_MODAL_ERROR_MESSAGE) {
       this.zone.run(() => {
         this.error = data.payload.message || 'Error trying to delete the VCH';
       });
-    } else if (data.eventType === 'datagridRefresh') {
+    } else if (data.eventType === DATAGRID_REFRESH_EVENT) {
       this.zone.run(() => {
         this.reloadVchs();
       });

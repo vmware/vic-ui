@@ -15,17 +15,18 @@
 */
 
 import {Component, ElementRef, OnInit, Renderer, ViewChild} from '@angular/core';
-import {GlobalsService} from 'app/shared';
+import {DELETE_VCH_MODAL_ERROR_MESSAGE, DELETE_VCH_MODAL_HEIGHT, VIC_APPLIANCE_PORT} from '../shared/constants';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {Modal} from 'clarity-angular';
-import {ActivatedRoute} from '@angular/router';
-import {VicVmViewService} from '../services/vm-view.service';
-import {VirtualContainerHost} from '../vch-view/vch.model';
-import {VIC_APPLIANCE_PORT, DELETE_VCH_MODAL_HEIGHT, DELETE_VCH_MODAL_ERROR_MESSAGE} from '../shared/constants';
 import {Headers, Http, RequestOptions} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+
+import {ActivatedRoute} from '@angular/router';
 import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
+import {GlobalsService} from 'app/shared';
+import {Modal} from 'clarity-angular';
+import {Observable} from 'rxjs/Observable';
+import {VicVmViewService} from '../services/vm-view.service';
+import {VirtualContainerHost} from '../vch-view/vch.model';
 
 @Component({
   selector: 'vic-delete-vch-modal',
@@ -140,7 +141,11 @@ export class DeleteVchModalComponent implements OnInit {
    */
   onCancel() {
     const webPlatform = this.globalsService.getWebPlatform();
+    const vchViewFrame = parent.frames[0];
     webPlatform.closeDialog();
+    vchViewFrame.postMessage({
+      eventType: 'datagridRefresh'
+    }, '*');
   }
 
   onError(error) {
