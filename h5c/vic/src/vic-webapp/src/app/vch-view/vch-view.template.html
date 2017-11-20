@@ -58,10 +58,14 @@
       <span *ngSwitchDefault>{{item.overallStatus}}</span>
     </clr-dg-cell>
     <clr-dg-cell>
-      <span>{{getDockerEndpointString(item)}}</span>
+      <span *ngIf="item.vchIp">{{ getDockerEndpointString(item) }}</span>
+      <span *ngIf="!item.vchIp">-</span>
     </clr-dg-cell>
     <clr-dg-cell>
-      <span><a href="https://{{item.vchIp}}:2378" target="_blank">https://{{item.vchIp}}:2378</a></span>
+      <span *ngIf="item.vchIp">
+        <a href="https://{{item.vchIp}}:2378" target="_blank">https://{{item.vchIp}}:2378</a>
+      </span>
+      <span *ngIf="!item.vchIp">-</span>
     </clr-dg-cell>
   </clr-dg-row>
 
