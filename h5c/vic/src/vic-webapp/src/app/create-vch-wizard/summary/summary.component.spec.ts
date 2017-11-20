@@ -66,7 +66,8 @@ describe('SummaryComponent', () => {
       networks: {
         containerNetworks: []
       },
-      security: {}
+      security: {},
+      operations: {}
     };
     // component.form.get('targetOS').setValue('windows');
     component.onPageLoad();
