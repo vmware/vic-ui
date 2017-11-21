@@ -162,6 +162,7 @@ register_plugin() {
     $PLUGIN_MANAGER_BIN install --key $plugin_key \
                                 $COMMONFLAGS $plugin_flags \
                                 --thumbprint $VC_THUMBPRINT \
+                                --url $VIC_UI_HOST_URL \
                                 --server-thumbprint $VIC_UI_HOST_THUMBPRINT \
                                 --name "$plugin_name" \
                                 --summary "Plugin for $plugin_name"
