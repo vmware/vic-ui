@@ -20,6 +20,17 @@
 
   <div class="spinner" *ngIf="loading"></div>
 
+  <clr-alert *ngIf="errorFlag"
+      [clrAlertType]="'alert-danger'"
+      [clrAlertClosable]="false">
+    <!-- errors -->
+    <div class="alert-item">
+      <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+      {{errMsg}}
+      </div>
+    </div>
+  </clr-alert>
+
   <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
