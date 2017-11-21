@@ -17,8 +17,6 @@
 div.summary-container {
   padding-top: 10px;
   font-size: 13px;
-  display: flex;
-  flex-direction: row;
   img.vic-summary-view-logo {
     padding-right: 2em;
     vertical-align: top;
@@ -39,4 +37,10 @@ ul.summary-items-list {
       padding-left: 10px;
     }
   }
+}
+
+p.summary-intro {
+  max-width: 600px;
+  font-size: small;
+  line-height: normal;
 }
