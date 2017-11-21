@@ -145,8 +145,9 @@ export class SummaryComponent implements OnInit {
           continue;
         }
         const newKey = key.replace(camelCasePattern, '$1-$2').toLowerCase();
-        const value = payload[section][key];
+        let value = payload[section][key];
         if (typeof value === 'string') {
+          value = this.escapeSpecialCharsForCLI(value);
           if (!value.trim()) {
             continue;
           }
@@ -253,12 +254,15 @@ export class SummaryComponent implements OnInit {
     }
 
     // remove password
-
     if (results['operations']['opsPassword']) {
-      results['operations']['opsPassword'] = '*';
+      delete results['operations']['opsPassword'];
     }
 
     return results;
+  }
+
+  escapeSpecialCharsForCLI(text) {
+    return text.replace(/([() ])/g, '\\$&');
   }
 
   /**
