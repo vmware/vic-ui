@@ -422,7 +422,7 @@ public class PropFetcher implements ClientSessionEndListener {
                     for (ObjectContent objC : props.getObjects()) {
                         VicApplianceVm applianceVm = new VicApplianceVm(objC);
                         vicAppliancesList.add(
-                                applianceVm.getName() + ": " + applianceVm.getMoId() + "," + applianceVm.getIpAddress());
+                                applianceVm.getName() + ": " + applianceVm.getVersionString() + "," + applianceVm.getIpAddress());
                     }
                 }
             } catch (RuntimeFaultFaultMsg | InvalidPropertyFaultMsg e) {

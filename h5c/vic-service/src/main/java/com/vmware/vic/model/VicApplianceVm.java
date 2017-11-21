@@ -21,6 +21,7 @@ import com.vmware.vic.model.constants.BaseVm;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.ObjectContent;
+import com.vmware.vim25.VAppProductInfo;
 import com.vmware.vim25.VirtualMachineConfigSummary;
 import com.vmware.vim25.VirtualMachineGuestSummary;
 import com.vmware.vim25.VirtualMachineSummary;
@@ -29,6 +30,7 @@ public class VicApplianceVm {
     private String name;
     private String moId;
     private String ipAddress;
+    private String versionString;
 
     public VicApplianceVm(ObjectContent objContent) {
         if (objContent == null) {
@@ -54,7 +56,8 @@ public class VicApplianceVm {
             VirtualMachineGuestSummary guestSummary = vmSummary.getGuest();
             ipAddress = guestSummary.getIpAddress();
             VirtualMachineConfigSummary summaryConfig = vmSummary.getConfig();
-            //                             VAppProductInfo vAppProductInfo = summaryConfig.getProduct();
+            VAppProductInfo vAppProductInfo = summaryConfig.getProduct();
+            versionString = vAppProductInfo.getVersion();
         }
     }
 
@@ -68,5 +71,9 @@ public class VicApplianceVm {
 
     public String getIpAddress() {
         return ipAddress;
+    }
+
+    public String getVersionString() {
+        return versionString;
     }
 }
