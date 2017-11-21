@@ -7,7 +7,7 @@
           <clr-alert-item *ngIf="error.type === 'ssl_cert'">
             <span class="alert-text">
               <!-- TODO: i18n -->
-              Failed to verify the VIC appliance at endpoint https://{{ error.payload }}:8443. Your browser may be blocking the connection because of the untrusted SSL certificate.
+              Failed to verify the VIC machine server at endpoint https://{{ error.payload }}:8443. Your browser may be blocking the connection because of the untrusted SSL certificate.
             </span>
             <div class="alert-actions">
               <a href="https://{{ error.payload }}:8443/container/version" target="_blank">Fix</a>
