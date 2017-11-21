@@ -11,6 +11,7 @@
             </span>
             <div class="alert-actions">
               <a href="https://{{ error.payload }}:8443/container/version" target="_blank">Fix</a>
+              <a href="javascript://" (click)="checkVicMachineServer()">Refresh</a>
             </div>
           </clr-alert-item>
           <clr-alert-item *ngIf="error.type === 'vm_not_found'">

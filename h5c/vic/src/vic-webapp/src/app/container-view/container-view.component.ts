@@ -124,14 +124,19 @@ export class VicContainerViewComponent implements OnInit, OnDestroy {
         });
 
         // verify the appliance endpoint
-        this.createWzService.verifyVicMachineApiEndpoint()
+        this.checkVicMachineServer();
+    }
+
+    checkVicMachineServer() {
+      this.createWzService.verifyVicMachineApiEndpoint()
         .subscribe(
           (ip: string) => {
             this.errorObj = null;
           },
           (err: {type: string; payload: any}) => {
             this.errorObj = err;
-          });
+          }
+        );
     }
 
     ngOnDestroy() {

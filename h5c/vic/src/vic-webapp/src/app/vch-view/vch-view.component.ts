@@ -111,6 +111,10 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     window.addEventListener('message', this.onMessage.bind(this), false);
 
     // verify the appliance endpoint
+    this.checkVicMachineServer();
+  }
+
+  checkVicMachineServer() {
     this.createWzService.verifyVicMachineApiEndpoint()
       .subscribe(
         (ip: string) => {
@@ -118,7 +122,8 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
         },
         (err: {type: string; payload: any}) => {
           this.errorObj = err;
-        });
+        }
+      );
   }
 
   ngOnDestroy() {

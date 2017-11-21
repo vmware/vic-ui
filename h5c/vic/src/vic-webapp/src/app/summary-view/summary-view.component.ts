@@ -89,14 +89,18 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
         this.fetchRootInfo();
 
         // verify the appliance endpoint
-        this.createWzService.verifyVicMachineApiEndpoint()
-        .subscribe(
-          (ip: string) => {
-            this.error = null;
-          },
-          (err: {type: string; payload: any}) => {
-            this.error = err;
-          });
+        this.checkVicMachineServer();
+    }
+
+    checkVicMachineServer() {
+      this.createWzService.verifyVicMachineApiEndpoint()
+      .subscribe(
+        (ip: string) => {
+          this.error = null;
+        },
+        (err: {type: string; payload: any}) => {
+          this.error = err;
+        });
     }
 
     ngOnDestroy() {
