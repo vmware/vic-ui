@@ -393,6 +393,7 @@ Send Email
     ...    To: mwilliamson@vmware.com
     ...    To: mikeh@vmware.com
     ...    To: mhagen@vmware.com
+    ...    To: carellie@vmware.com
     ${email_to}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  ${report_recipients}  ELSE  Set Variable  To: ${whoami}@vmware.com
     ${email_body}=  Catenate  SEPARATOR=\n
     ...    ${email_to}
