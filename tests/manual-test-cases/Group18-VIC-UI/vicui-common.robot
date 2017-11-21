@@ -61,7 +61,7 @@ Load Nimbus Testbed Env
     Set Suite Variable  ${TEST_VC_PASSWORD}  %{TEST_PASSWORD}
 
 Install VIC Appliance For VIC UI
-    [Arguments]  ${vic-machine}=ui-nightly-run-bin/vic-machine-linux  ${appliance-iso}=ui-nightly-run-bin/appliance.iso  ${bootstrap-iso}=ui-nightly-run-bin/bootstrap.iso  ${certs}=${true}  ${vol}=default
+    [Arguments]  ${vic-machine}=ui-nightly-run-bin/vic-machine-linux  ${appliance-iso}=ui-nightly-run-bin/appliance.iso  ${bootstrap-iso}=ui-nightly-run-bin/bootstrap.iso  ${certs}=${false}  ${vol}=default
     Set Test Environment Variables
     # disable firewall
     Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc host.esxcli network firewall set -e false

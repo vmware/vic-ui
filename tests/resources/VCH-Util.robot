@@ -35,8 +35,8 @@ Set Test Environment Variables
     Set Environment Variable  GOVC_URL  %{TEST_URL}
     Set Environment Variable  GOVC_USERNAME  %{TEST_USERNAME}
     Set Environment Variable  GOVC_PASSWORD  %{TEST_PASSWORD}
-    # TODO: need an integration/vic-test image update to include the about.cert command
-    #${rc}  ${thumbprint}=  Run And Return Rc And Output  govc about.cert -k | jq -r .ThumbprintSHA1
+
+    # ${rc}  ${thumbprint}=  Run And Return Rc And Output  govc about.cert -k | jq -r .ThumbprintSHA1
     ${rc}  ${thumbprint}=  Run And Return Rc And Output  openssl s_client -connect $(govc env -x GOVC_URL_HOST):443 </dev/null 2>/dev/null | openssl x509 -fingerprint -noout | cut -d= -f2
     Should Be Equal As Integers  ${rc}  0
     Set Environment Variable  TEST_THUMBPRINT  ${thumbprint}
@@ -90,6 +90,12 @@ Set List Of Env Variables
 
 Parse Environment Variables
     [Arguments]  ${line}
+    # If using the default logrus format
+    ${status}=  Run Keyword And Return Status  Should Match Regexp  ${line}  msg\="([^"]*)"
+    ${match}  ${vars}=  Run Keyword If  ${status}  Should Match Regexp  ${line}  msg\="([^"]*)"
+    Run Keyword If  ${status}  Set List Of Env Variables  ${vars}
+    Return From Keyword If  ${status}
+
     #  If using the old logging format
     ${status}=  Run Keyword And Return Status  Should Contain  ${line}  mINFO
     ${logdeco}  ${vars}=  Run Keyword If  ${status}  Split String  ${line}  ${SPACE}  1
@@ -128,11 +134,17 @@ Get Docker Params
     \   ${idx} =  Evaluate  ${index} + 1
     \   Run Keyword If  '${status}' == 'PASS'  Set Suite Variable  ${ext-ip}  @{output}[${idx}]
 
-    ${rest}  ${ext-ip} =  Split String From Right  ${ext-ip}  ${SPACE}  1
-    ${ext-ip} =  Strip String  ${ext-ip}
+
+    ${status}=             Run Keyword And Return Status  Should Match Regexp  ${ext-ip}  msg\=([^"]*)
+    ${ignore}  ${ext-ip}=  Run Keyword If      ${status}  Should Match Regexp  ${ext-ip}  msg\=([^"]*)
+                           ...  ELSE                      Split String From Right  ${ext-ip}  ${SPACE}  1
+    ${ext-ip}=  Strip String  ${ext-ip}
     Set Environment Variable  EXT-IP  ${ext-ip}
 
-    ${rest}  ${vic-admin}=  Split String From Right  ${line}  ${SPACE}  1
+
+    ${status}=                Run Keyword And Return Status  Should Match Regexp  ${line}  msg\="([^"]*)"
+    ${ignore}  ${vic-admin}=  Run Keyword If      ${status}  Should Match Regexp  ${line}  msg\="([^"]*)"
+                              ...  ELSE                      Split String From Right  ${line}  ${SPACE}  1
     Set Environment Variable  VIC-ADMIN  ${vic-admin}
 
     Run Keyword If  ${port} == 2376  Set Environment Variable  VCH-PARAMS  -H ${dockerHost} --tls
@@ -163,6 +175,11 @@ Get Docker Params
 Install VIC Appliance To Test Server
     [Arguments]  ${vic-machine}=bin/vic-machine-linux  ${appliance-iso}=bin/appliance.iso  ${bootstrap-iso}=bin/bootstrap.iso  ${certs}=${true}  ${vol}=default  ${cleanup}=${true}  ${debug}=1  ${additional-args}=${EMPTY}
     Set Test Environment Variables
+    ${output}=  Install VIC Appliance To Test Server With Current Environment Variables  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}  ${cleanup}  ${debug}  ${additional-args}
+    [Return]  ${output}
+
+Install VIC Appliance To Test Server With Current Environment Variables
+    [Arguments]  ${vic-machine}=bin/vic-machine-linux  ${appliance-iso}=bin/appliance.iso  ${bootstrap-iso}=bin/bootstrap.iso  ${certs}=${true}  ${vol}=default  ${cleanup}=${true}  ${debug}=1  ${additional-args}=${EMPTY}
     # disable firewall
     Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc host.esxcli network firewall set -e false
     # Attempt to cleanup old/canceled tests
@@ -242,15 +259,19 @@ Portlayer Log Should Match Regexp
 
 Gather Logs From Test Server
     [Tags]  secret
+    [Arguments]  ${name-suffix}=${EMPTY}
+
     Run Keyword And Continue On Failure  Run  zip %{VCH-NAME}-certs -r %{VCH-NAME}
     ${out}=  Run  curl -k -D vic-admin-cookies -Fusername=%{TEST_USERNAME} -Fpassword=%{TEST_PASSWORD} %{VIC-ADMIN}/authentication
     Log  ${out}
-    ${out}=  Run  curl -k -b vic-admin-cookies %{VIC-ADMIN}/container-logs.zip -o ${SUITE NAME}-%{VCH-NAME}-container-logs.zip
+    ${out}=  Run  curl -k -b vic-admin-cookies %{VIC-ADMIN}/container-logs.zip -o ${SUITE NAME}-%{VCH-NAME}-container-logs${name-suffix}.zip
     Log  ${out}
     Remove File  vic-admin-cookies
-    ${out}=  Run  govc datastore.download %{VCH-NAME}/vmware.log %{VCH-NAME}-vmware.log
+    ${out}=  Run  govc datastore.download %{VCH-NAME}/vmware.log %{VCH-NAME}-vmware${name-suffix}.log
     Should Contain  ${out}  OK
-    Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc logs -log=vmkernel -n=10000 > vmkernel.log
+    ${out}=  Run  govc datastore.download %{VCH-NAME}/tether.debug %{VCH-NAME}-tether${name-suffix}.debug
+    Should Contain  ${out}  OK
+    Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc logs -log=vmkernel -n=10000 > vmkernel${name-suffix}.log
 
 Check For The Proper Log Files
     [Arguments]  ${container}
@@ -284,6 +305,10 @@ Scrape Logs For the Password
 Cleanup VIC Appliance On Test Server
     Log To Console  Gathering logs from the test server %{VCH-NAME}
     Gather Logs From Test Server
+    Wait Until Keyword Succeeds  3x  5 seconds  Remove All Containers
+    # Exit from Cleanup if VCH-NAME is currently in exception list
+    ${exclude}=  Check If VCH Is In Exception  vch=%{VCH-NAME}
+    Return From Keyword If  ${exclude}
     Log To Console  Deleting the VCH appliance %{VCH-NAME}
     ${output}=  Run VIC Machine Delete Command
     Run Keyword And Ignore Error  Cleanup VCH Bridge Network  %{VCH-NAME}
@@ -415,12 +440,12 @@ Get VCH ID
 
 # VCH upgrade helpers
 Install VIC with version to Test Server
-    [Arguments]  ${version}=7315  ${insecureregistry}=
+    [Arguments]  ${version}=7315  ${insecureregistry}=  ${cleanup}=${true}
     Log To Console  \nDownloading vic ${version} from gcp...
     ${rc}  ${output}=  Run And Return Rc And Output  wget https://storage.googleapis.com/vic-engine-builds/vic_${version}.tar.gz -O vic.tar.gz
     ${rc}  ${output}=  Run And Return Rc And Output  tar zxvf vic.tar.gz
     Set Environment Variable  TEST_TIMEOUT  20m0s
-    Install VIC Appliance To Test Server  vic-machine=./vic/vic-machine-linux  appliance-iso=./vic/appliance.iso  bootstrap-iso=./vic/bootstrap.iso  certs=${false}  vol=default ${insecureregistry}
+    Install VIC Appliance To Test Server  vic-machine=./vic/vic-machine-linux  appliance-iso=./vic/appliance.iso  bootstrap-iso=./vic/bootstrap.iso  certs=${false}  cleanup=${cleanup}  vol=default ${insecureregistry}
 
     Set Environment Variable  VIC-ADMIN  %{VCH-IP}:2378
     Set Environment Variable  INITIAL-VERSION  ${version}
