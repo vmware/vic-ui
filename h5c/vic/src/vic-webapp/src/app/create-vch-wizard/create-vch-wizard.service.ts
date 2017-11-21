@@ -343,9 +343,9 @@ export class CreateVchWizardService {
     }
 
     /**
-     * Verify VIC Appliance VM is reachable and communicatable with the browser
+     * Verify VIC Appliance VM is reachable and API server is communicatable with the browser
      */
-    public verifyApplianceEndpoint(): Observable<any | null> {
+    public verifyVicMachineApiEndpoint(): Observable<any | null> {
       return this.getVicApplianceIp()
         .catch(err => {
           return Observable.throw(err);

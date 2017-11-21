@@ -66,7 +66,7 @@ describe('VIC object view: Summary tab', () => {
                 Vic18nService,
                 RefreshService,
                 { provide: CreateVchWizardService, useValue: {
-                  verifyApplianceEndpoint() {
+                  verifyVicMachineApiEndpoint() {
                     return Observable.of('10.10.10.10');
                   }
                 }}

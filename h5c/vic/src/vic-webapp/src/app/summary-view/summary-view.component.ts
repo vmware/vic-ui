@@ -89,7 +89,7 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
         this.fetchRootInfo();
 
         // verify the appliance endpoint
-        this.createWzService.verifyApplianceEndpoint()
+        this.createWzService.verifyVicMachineApiEndpoint()
         .subscribe(
           (ip: string) => {
             this.error = null;

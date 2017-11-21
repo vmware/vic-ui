@@ -109,7 +109,7 @@ describe('VicVchViewComponent', () => {
                 { provide: ConnectionBackend, useClass: MockBackend },
                 { provide: RequestOptions, useClass: BaseRequestOptions },
                 { provide: CreateVchWizardService, useValue: {
-                  verifyApplianceEndpoint() {
+                  verifyVicMachineApiEndpoint() {
                     return Observable.of('10.10.10.10');
                   }
                 }}
