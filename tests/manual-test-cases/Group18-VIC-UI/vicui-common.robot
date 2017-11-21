@@ -18,7 +18,7 @@ Resource  ../../resources/Util.robot
 Library  VicUiInstallPexpectLibrary.py
 
 *** Variables ***
-${MACOS_HOST_IP}                      10.20.121.192
+${MACOS_HOST_IP}                      10.20.121.66
 ${UBUNTU_HOST_IP}                     10.20.121.145
 ${WINDOWS_HOST_IP}                    10.25.200.225
 ${BUILD_3620759_IP}                   10.25.200.237
@@ -32,7 +32,7 @@ ${MACOS_HOST_USER}                    browseruser
 ${MACOS_HOST_PASSWORD}                ca*hc0w
 ${WINDOWS_HOST_USER}                  IEUser
 ${WINDOWS_HOST_PASSWORD}              Passw0rd!
-${vic_macmini_fileserver_url}         https://10.20.121.192:3443/vsphere-plugins/
+${vic_macmini_fileserver_url}         https://10.20.121.66:3443/vsphere-plugins/
 ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:8B:86:5F:AD:79:CE
 ${GCP_DOWNLOAD_PATH}                  https://storage.googleapis.com/vic-engine-builds/
 ${SDK_PACKAGE_ARCHIVE}                vic-ui-sdk.tar.gz
