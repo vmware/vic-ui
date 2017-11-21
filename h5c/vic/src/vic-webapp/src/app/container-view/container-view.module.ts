@@ -13,10 +13,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+
 import { ClarityModule } from 'clarity-angular';
+import { CommonModule } from '@angular/common';
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { VicContainerViewComponent } from './container-view.component';
 import { VicVmViewService } from '../services/vm-view.service';
 
@@ -34,7 +36,8 @@ const routes: Routes = [
     ],
     declarations: [VicContainerViewComponent],
     providers: [
-        VicVmViewService
+        VicVmViewService,
+        CreateVchWizardService
     ],
     exports: [VicContainerViewComponent]
 })
