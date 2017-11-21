@@ -20,7 +20,7 @@
 
 <clr-datagrid (clrDgRefresh)="refreshGrid($event)" [clrDgLoading]="isDgLoading">
   <clr-dg-action-bar *ngIf="isVsphereAdmin">
-    <button class="btn btn-link btn-sm" (click)="launchCreateVchWizard()">
+    <button class="btn btn-link btn-sm new-vch" (click)="launchCreateVchWizard()">
       <clr-icon shape="add"></clr-icon> New Virtual Container Host
     </button>
   </clr-dg-action-bar>
@@ -38,8 +38,8 @@
   </clr-dg-column>
 
   <clr-dg-row *ngFor="let item of vchs">
-    <clr-dg-action-overflow>
-      <button class="action-item" (click)="deleteVch(item)">Delete</button>
+    <clr-dg-action-overflow class="{{item.name}}">
+      <button class="action-item" (click)="deleteVch(item)" class="{{item.name}}">Delete</button>
     </clr-dg-action-overflow>
     <clr-dg-row-detail>
       <clr-dg-cell>
@@ -74,8 +74,8 @@
   </clr-dg-row>
 
   <clr-dg-footer>
-    {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{vchs.length}} VCHs
-    <clr-dg-pagination [clrDgPageSize]="maxResultCount" #pagination [clrDgTotalItems]="vchs.length">
+    {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{totalVchsCount}} VCHs
+    <clr-dg-pagination [clrDgPageSize]="maxResultCount" #pagination [clrDgTotalItems]="totalVchsCount">
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
