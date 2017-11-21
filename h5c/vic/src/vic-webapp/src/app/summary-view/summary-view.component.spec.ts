@@ -15,24 +15,25 @@
  limitations under the License.
 */
 
-import { async, TestBed, ComponentFixture } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { HttpModule } from '@angular/http';
-import { Observable, Subject } from 'rxjs/Rx';
-
 import {
     AppAlertService,
     Globals,
     GlobalsService,
     I18nService,
-    Vic18nService,
     RefreshService,
+    Vic18nService,
 } from '../shared/index';
-import { DataPropertyService } from '../services/data-property.service';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { Observable, Subject } from 'rxjs/Rx';
+
 import { AppErrorHandler } from '../shared/appErrorHandler';
-import { VicSummaryViewComponent } from './summary-view.component';
+import { By } from '@angular/platform-browser';
 import { ClarityModule } from 'clarity-angular';
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
+import { DataPropertyService } from '../services/data-property.service';
+import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
+import { VicSummaryViewComponent } from './summary-view.component';
 
 describe('VIC object view: Summary tab', () => {
     let fixture: ComponentFixture<VicSummaryViewComponent>;
@@ -63,10 +64,16 @@ describe('VIC object view: Summary tab', () => {
                 GlobalsService,
                 I18nService,
                 Vic18nService,
-                RefreshService
+                RefreshService,
+                { provide: CreateVchWizardService, useValue: {
+                  verifyApplianceEndpoint() {
+                    return Observable.of('10.10.10.10');
+                  }
+                }}
             ],
             imports: [
-                HttpModule
+                HttpModule,
+                ClarityModule.forRoot()
             ],
             declarations: [
                 VicSummaryViewComponent

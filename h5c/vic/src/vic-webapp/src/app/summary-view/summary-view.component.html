@@ -1,4 +1,28 @@
 <div class="summary-container">
+  <div class="col-xs-12 mb-2" *ngIf="error">
+    <div class="row">
+      <div class="col-xs-12">
+        <clr-alert [clrAlertType]="'danger'"
+                   [clrAlertClosable]="false">
+          <clr-alert-item *ngIf="error.type === 'ssl_cert'">
+            <span class="alert-text">
+              <!-- TODO: i18n -->
+              Failed to verify the VIC appliance at endpoint https://{{ error.payload }}:8443. Your browser may be blocking the connection because of the untrusted SSL certificate.
+            </span>
+            <div class="alert-actions">
+              <a href="https://{{ error.payload }}:8443/container/version" target="_blank">Fix</a>
+            </div>
+          </clr-alert-item>
+          <clr-alert-item *ngIf="error.type === 'vm_not_found'">
+            <span class="alert-text">
+              <!-- TODO: i18n -->
+              Could not determine IP for the VIC Appliance
+            </span>
+          </clr-alert-item>
+        </clr-alert>
+      </div>
+    </div>
+  </div>
   <div class="col-xs-12">
     <img class="vic-summary-view-logo" src="{{ vicLogoPath }}">
     <ul class="summary-items-list">
@@ -28,17 +52,15 @@
       </li>
     </ul>
   </div>
-  <div class="row">
-    <div class="col-xs">
-      <p class="summary-intro mt-3">
-        vSphere Integrated Containers Engine is a container runtime for vSphere. It allows developers familiar with
-        Docker to develop in containers and deploy them alongside traditional VM-based workloads on vSphere clusters,
-        and allowing for these workloads to be managed through the vSphere UI in a way familiar to existing vSphere
-        admins.
-      </p>
-      <a href="https://vmware.github.io/vic-product/assets/files/html/1.3/vic_overview/introduction.html"
-         target="_blank"
-         class="btn btn-link btn-sm px-0">Read more...</a>
-    </div>
+  <div class="col-xs">
+    <p class="summary-intro mt-3">
+      vSphere Integrated Containers Engine is a container runtime for vSphere. It allows developers familiar with
+      Docker to develop in containers and deploy them alongside traditional VM-based workloads on vSphere clusters,
+      and allowing for these workloads to be managed through the vSphere UI in a way familiar to existing vSphere
+      admins.
+    </p>
+    <a href="https://vmware.github.io/vic-product/assets/files/html/1.3/vic_overview/introduction.html"
+       target="_blank"
+       class="btn btn-link btn-sm px-0">Read more...</a>
   </div>
 </div>

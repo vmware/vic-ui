@@ -14,16 +14,18 @@
  limitations under the License.
 */
 
-import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { GlobalsService, RefreshService } from '../shared/index';
-import { Vic18nService } from '../shared/vic-i18n.service';
-import { DataPropertyService } from '../services/data-property.service';
-import { Subscription } from 'rxjs/Rx';
-
 import {
     VIC_LOGO_100X100,
     WS_SUMMARY
 } from '../shared/constants/index';
+
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
+import { DataPropertyService } from '../services/data-property.service';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Rx';
+import { Vic18nService } from '../shared/vic-i18n.service';
 
 @Component({
     selector: 'vic-summary-view',
@@ -38,13 +40,15 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
     public readonly WS_SUMMARY_CONSTANTS = WS_SUMMARY;
     private rootInfoSubscription: Subscription;
     private refreshSubscription: Subscription;
+    public error: any;
 
     constructor(
         private zone: NgZone,
         private globalsService: GlobalsService,
         public vicI18n: Vic18nService,
         private refreshService: RefreshService,
-        private dataPropertyService: DataPropertyService
+        private dataPropertyService: DataPropertyService,
+        private createWzService: CreateVchWizardService
     ) {
         this.vicLogoPath = this.isPluginMode() ?
             this.globalsService.getWebContextPath() + VIC_LOGO_100X100 :
@@ -83,6 +87,16 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.fetchRootInfo();
+
+        // verify the appliance endpoint
+        this.createWzService.verifyApplianceEndpoint()
+        .subscribe(
+          (ip: string) => {
+            this.error = null;
+          },
+          (err: {type: string; payload: any}) => {
+            this.error = err;
+          });
     }
 
     ngOnDestroy() {
