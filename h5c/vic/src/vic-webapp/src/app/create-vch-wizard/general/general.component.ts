@@ -101,8 +101,7 @@ export class VchCreationWizardGeneralComponent implements OnInit {
         const results = {
           general: {
             name: this.form.get('name').value,
-            debug: this.form.get('debug').value,
-            vchApplianceEndpoint: `https://${this.vicApplianceIp}:${VIC_APPLIANCE_PORT}`
+            debug: this.form.get('debug').value
           }
         };
 
