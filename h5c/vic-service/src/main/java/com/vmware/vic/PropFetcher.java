@@ -39,16 +39,12 @@ import org.apache.commons.logging.LogFactory;
 import com.vmware.utils.ssl.ThumbprintHostNameVerifier;
 import com.vmware.utils.ssl.ThumbprintTrustManager;
 import com.vmware.vic.model.ContainerVm;
+import com.vmware.vic.model.VicApplianceVm;
 import com.vmware.vic.model.VirtualContainerHostVm;
 import com.vmware.vic.model.constants.BaseVm;
 import com.vmware.vic.model.constants.Container;
 import com.vmware.vic.model.constants.Vch;
 import com.vmware.vic.model.constants.VsphereObjects;
-import com.vmware.vim25.ArrayOfCustomFieldDef;
-import com.vmware.vim25.ArrayOfCustomFieldValue;
-import com.vmware.vim25.CustomFieldDef;
-import com.vmware.vim25.CustomFieldStringValue;
-import com.vmware.vim25.CustomFieldValue;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.InvalidPropertyFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
@@ -67,7 +63,6 @@ import com.vmware.vim25.UserSearchResult;
 import com.vmware.vim25.VimPortType;
 import com.vmware.vim25.VimService;
 import com.vmware.vim25.VirtualMachineConfigInfo;
-import com.vmware.vim25.VirtualMachineSummary;
 import com.vmware.vise.data.query.PropertyValue;
 import com.vmware.vise.data.query.ResultItem;
 import com.vmware.vise.security.ClientSessionEndListener;
@@ -93,13 +88,12 @@ public class PropFetcher implements ClientSessionEndListener {
             new String[]{
                     "Photon - Container", "Redhat - Container", "Windows - Container"};
     private static final String GROUP_ADMINISTRATORS = "Administrators";
-    private static final String VIC_OVA_IDENTIFIER_KEY = "vic-ova-identifier";
+    private static final String VICUI_H5C_EXTENSION_KEY = "com.vmware.vic";
     private final UserSessionService _userSessionService;
     private final VimObjectReferenceService _vimObjectReferenceService;
     private Object _rpMorValueToVchLock = new Object();
     private Map<String, String> _rpMorValueVchEndpointNameMap = new HashMap<String, String>();
     private Map<String, String> _rpMorValueVchMorValueMap = new HashMap<String, String>();
-    private Map<String, CustomFieldDef> _vicApplianceCustomFieldDefMap = new HashMap<String, CustomFieldDef>();
 
     private static VimPortType initializeVimPort() {
         VimService vimService = new VimService();
@@ -184,43 +178,6 @@ public class PropFetcher implements ClientSessionEndListener {
             }
         }
         return false;
-    }
-
-    /*
-     * Get the CustomFieldDef of a given type. If it's being set for the first time,
-     * it will look for a CustomFieldDef object matching the provided type
-     * from the availableField array, and then cache the value.
-     * Because we don't expect custom field definitions for VIC appliance
-     * to change frequently, it makes sense to cache them.
-     * @param customFieldType
-     * @param availableField
-     * @return CustomFieldDef of given type customField from availableField
-     */
-    private CustomFieldDef getVicApplCustomFieldDef(
-            String customFieldType,
-            ArrayOfCustomFieldDef availableField) {
-        if (_vicApplianceCustomFieldDefMap.containsKey(customFieldType) &&
-                _vicApplianceCustomFieldDefMap.get(customFieldType) != null) {
-            return _vicApplianceCustomFieldDefMap.get(customFieldType);
-        }
-
-        // if no availableField array is passed we simply return null, as at this point,
-        // the cached value _vicApplianceCustomFieldDef is also null, implying that
-        // we haven't yet found the definition for vic appliance
-        if (availableField == null) {
-            return null;
-        }
-
-        for (CustomFieldDef cfd : availableField.getCustomFieldDef()) {
-            if (cfd.getName().equals(customFieldType)) {
-                _vicApplianceCustomFieldDefMap.put(customFieldType, cfd);
-                return _vicApplianceCustomFieldDefMap.get(customFieldType);
-            }
-        }
-
-        // failed to find a matching CustomFieldDef. return null
-        _vicApplianceCustomFieldDefMap.put(customFieldType, null);
-        return _vicApplianceCustomFieldDefMap.get(customFieldType);
     }
 
     /**
@@ -433,42 +390,29 @@ public class PropFetcher implements ClientSessionEndListener {
 
                 List<String> vmList = new ArrayList<String>();
                 vmList.add(VsphereObjects.VirtualMachine);
-                ManagedObjectReference viewMgrRef = service.getViewManager();
-                ManagedObjectReference cViewRef = _vimPort.createContainerView(
-                        viewMgrRef,
-                        service.getRootFolder(),
-                        vmList,
-                        true);
 
                 PropertySpec propertySpec = new PropertySpec();
                 propertySpec.setType(VsphereObjects.VirtualMachine);
                 List<String> pSpecPathSet = propertySpec.getPathSet();
-                pSpecPathSet.add(BaseVm.VM_AVAILABLE_FIELD);
                 pSpecPathSet.add(BaseVm.VM_NAME);
                 pSpecPathSet.add(BaseVm.VM_SUMMARY);
-                pSpecPathSet.add(BaseVm.VM_CUSTOM_VALUE);
 
-                // set the root traversal spec
-                TraversalSpec tSpec = new TraversalSpec();
-                tSpec.setName("traverseEntities");
-                tSpec.setPath("view");
-                tSpec.setSkip(false);
-                tSpec.setType("ContainerView");
-
-                // set objectspec and attach the root traversal spec
-                ObjectSpec objectSpec = new ObjectSpec();
-                objectSpec.setObj(cViewRef);
-                objectSpec.setSkip(Boolean.TRUE);
-                objectSpec.getSelectSet().add(tSpec);
-
-                PropertyFilterSpec propertyFilterSpec = new PropertyFilterSpec();
-                propertyFilterSpec.getPropSet().add(propertySpec);
-                propertyFilterSpec.getObjectSet().add(objectSpec);
-
+                List<ManagedObjectReference> applianceVms =
+                        _vimPort.queryManagedBy(service.getExtensionManager(), VICUI_H5C_EXTENSION_KEY);
                 List<PropertyFilterSpec> propertyFilterSpecs = new ArrayList<PropertyFilterSpec>();
-                propertyFilterSpecs.add(propertyFilterSpec);
-                RetrieveOptions ro = new RetrieveOptions();
 
+                for (ManagedObjectReference mor : applianceVms) {
+                    ObjectSpec objectSpec = new ObjectSpec();
+                    objectSpec.setObj(mor);
+                    objectSpec.setSkip(Boolean.FALSE);
+
+                    PropertyFilterSpec propertyFilterSpec = new PropertyFilterSpec();
+                    propertyFilterSpec.getPropSet().add(propertySpec);
+                    propertyFilterSpec.getObjectSet().add(objectSpec);
+                    propertyFilterSpecs.add(propertyFilterSpec);
+                }
+
+                RetrieveOptions ro = new RetrieveOptions();
                 RetrieveResult props = _vimPort.retrievePropertiesEx(
                         service.getPropertyCollector(),
                         propertyFilterSpecs,
@@ -476,57 +420,9 @@ public class PropFetcher implements ClientSessionEndListener {
 
                 if (props != null) {
                     for (ObjectContent objC : props.getObjects()) {
-                        String vmName = null;
-                        String vicApplId = null;
-                        String vicApplIp = null;
-                        CustomFieldDef cfdForVicApplId = null;
-                        List<CustomFieldValue> customFieldsList = null;
-
-                        for (DynamicProperty dp : objC.getPropSet()) {
-                            if (dp.getName().equals(BaseVm.VM_AVAILABLE_FIELD)) {
-                                // get CustomField definition for VIC appliance ID among the
-                                // provided array of available definitions for the VirtualMachine object
-                                cfdForVicApplId = getVicApplCustomFieldDef(
-                                        VIC_OVA_IDENTIFIER_KEY, (ArrayOfCustomFieldDef) dp.getVal());
-                            }
-
-                            if (dp.getName().equals(BaseVm.VM_CUSTOM_VALUE)) {
-                                ArrayOfCustomFieldValue value = (ArrayOfCustomFieldValue) dp.getVal();
-                                customFieldsList = value.getCustomFieldValue();
-                            }
-
-                            if (dp.getName().equals(BaseVm.VM_NAME)) {
-                                vmName = (String) dp.getVal();
-                            }
-
-                            if (dp.getName().equals(BaseVm.VM_SUMMARY)) {
-                                VirtualMachineSummary vmSummary = (VirtualMachineSummary) dp.getVal();
-                                vicApplIp = vmSummary.getGuest().getIpAddress();
-                            }
-                        }
-
-                        if (cfdForVicApplId == null) {
-                            // this should not be the case, but if this is the case, it means
-                            // object VirtualMachine did not find a custom field def for vic appliance id
-                            // TODO: throw a proper exception here
-                            _logger.error("VirtualMachine failed to find a corresponding CustomFieldDef for the VIC Appliance ID!");
-                        }
-
-
-                        for (CustomFieldValue cfv : customFieldsList) {
-                            CustomFieldStringValue cfsStrValue = (CustomFieldStringValue) cfv;
-                            int cfvKey = cfsStrValue.getKey();
-                            if (cfvKey == cfdForVicApplId.getKey()) {
-                                vicApplId = cfsStrValue.getValue();
-                                if (vicApplId == null) {
-                                    _logger.warn("ID is empty for this VIC appliance VM. No version and build information available.");
-                                }
-                            }
-                        }
-
-                        if (vicApplId != null) {
-                            vicAppliancesList.add(vmName + ": " + vicApplId + ", " + vicApplIp);
-                        }
+                        VicApplianceVm applianceVm = new VicApplianceVm(objC);
+                        vicAppliancesList.add(
+                                applianceVm.getName() + ": " + applianceVm.getVersionString() + "," + applianceVm.getIpAddress());
                     }
                 }
             } catch (RuntimeFaultFaultMsg | InvalidPropertyFaultMsg e) {
@@ -830,9 +726,9 @@ public class PropFetcher implements ClientSessionEndListener {
                 } catch (RuntimeFaultFaultMsg e) {
                     e.printStackTrace();
                 }
-             }
-         };
+            }
+        };
 
-         return acquireCloneTicket;
-     }
+        return acquireCloneTicket;
+    }
 }
