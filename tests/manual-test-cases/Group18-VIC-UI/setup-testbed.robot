@@ -325,6 +325,7 @@ Deploy VCH
     ${is_macos}=  Run Keyword And Return Status  Should Contain  ${uname_v}  Darwin
     ${vic-machine-binary}=  Run Keyword If  ${is_macos}  Set Variable  vic-machine-darwin  ELSE  Set Variable  vic-machine-linux
     ${vic-ui-binary}=  Run Keyword If  ${is_macos}  Set Variable  vic-ui-darwin  ELSE  Set Variable  vic-ui-linux
+    Set Environment Variable  TEST_RESOURCE  ${TEST_RESOURCE}
     Install VIC Appliance For VIC UI  ui-nightly-run-bin/${vic-machine-binary}  ui-nightly-run-bin/appliance.iso  ui-nightly-run-bin/bootstrap.iso
     Append To File  testbed-information  VCH-PARAMS=%{VCH-PARAMS}\n
 
