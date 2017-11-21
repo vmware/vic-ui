@@ -28,45 +28,7 @@ import {
 @Component({
     selector: 'vic-summary-view',
     styleUrls: ['vic-summary-view.scss'],
-    template: `
-    <div class="summary-container">
-        <div class="col-xs-12">
-            <img class="vic-summary-view-logo" src="{{vicLogoPath}}">
-            <ul class="summary-items-list">
-                <li id="vendor">
-                    <span class="summary-label">
-                        {{vicI18n.translate(
-                            this.WS_SUMMARY_CONSTANTS,
-                            'VENDOR')}}
-                    </span>
-                    <span class="summary-value">
-                        VMware
-                    </span>
-                </li>
-                <li id="version">
-                    <span class="summary-label">
-                        {{vicI18n.translate(
-                            this.WS_SUMMARY_CONSTANTS,
-                            'VERSION')}}
-                    </span>
-                    <span class="summary-value">
-                        {{ pluginVersion }}
-                    </span>
-                </li>
-                <li id="vch_len">
-                    <span class="summary-label">
-                        {{vicI18n.translate(
-                            this.WS_SUMMARY_CONSTANTS,
-                            'VCH')}}
-                    </span>
-                    <span class="summary-value">
-                        {{ vchVmsLen }}
-                    </span>
-                </li>
-            </ul>
-        </div>
-    </div>
-    `
+    templateUrl: './summary-view.component.html'
 })
 
 export class VicSummaryViewComponent implements OnInit, OnDestroy {
