@@ -27,11 +27,15 @@
         <clr-alert-item *ngIf="errorObj.type === 'ssl_cert'">
           <span class="alert-text">
             <!-- TODO: i18n -->
-            Failed to verify the VIC machine server at endpoint https://{{ errorObj.payload }}:8443. Your browser may be blocking the connection because of the untrusted SSL certificate.
+            Failed to verify the VIC machine server at endpoint https://{{ errorObj.payload }}:8443. Please check the following:<br/>
+            1. VIC appliance VM is up, but unreachable due to network misconfigurations<br/>
+            2. VIC appliance VM is up and reachable, but API endpoint is unreachable due to possible issues that include, but not limited to:<br/>
+            &nbsp;&nbsp;- Network misconfiguration<br/>
+            &nbsp;&nbsp;- Firewall rules<br/>
+            &nbsp;&nbsp;- Endpoint being down<br/>
+            3. Your browser may be blocking the connection because of the untrusted SSL certificate. Click <a href="https://{{ errorObj.payload }}:8443/container/hello" target="_blank">here</a> to fix it<br/>
           </span>
           <div class="alert-actions">
-            <a href="https://{{ errorObj.payload }}:8443/container/hello" target="_blank">Fix</a>
-            <span> | </span>
             <a href="javascript://" (click)="checkVicMachineServer()">Refresh</a>
           </div>
         </clr-alert-item>
