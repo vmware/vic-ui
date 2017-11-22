@@ -14,29 +14,30 @@
  limitations under the License.
 */
 
-import { async, TestBed, ComponentFixture } from '@angular/core/testing';
-import { HttpModule } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { By } from '@angular/platform-browser';
-
-import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import {
-    RefreshService,
-    GlobalsService,
-    Globals,
     AppAlertService,
-    Vic18nService,
-    I18nService
+    Globals,
+    GlobalsService,
+    I18nService,
+    RefreshService,
+    Vic18nService
 } from '../shared';
-import { VicVmViewService } from '../services/vm-view.service';
-import { VicContainerViewComponent } from './container-view.component';
-import { ContainerVm } from './container.model';
-import { ClarityModule } from 'clarity-angular';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import {
     getContainerResponseStub,
     getMalformedContainerResponseStub
 } from '../services/mocks/container.response';
+
+import { By } from '@angular/platform-browser';
+import { ClarityModule } from 'clarity-angular';
+import { ContainerVm } from './container.model';
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
+import { HttpModule } from '@angular/http';
+import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { VicContainerViewComponent } from './container-view.component';
+import { VicVmViewService } from '../services/vm-view.service';
 import { WS_CONTAINER } from '../shared/constants';
 
 let responseProperlyFormatted = true;
@@ -85,7 +86,12 @@ describe('VicContainerViewComponent', () => {
                 RefreshService,
                 AppAlertService,
                 I18nService,
-                Vic18nService
+                Vic18nService,
+                { provide: CreateVchWizardService, useValue: {
+                  verifyVicMachineApiEndpoint() {
+                    return Observable.of('10.10.10.10');
+                  }
+                }}
             ],
             declarations: [
                 VicContainerViewComponent

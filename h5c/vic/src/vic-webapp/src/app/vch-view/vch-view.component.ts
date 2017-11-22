@@ -43,6 +43,7 @@ import {
   Vic18nService
 } from '../shared';
 
+import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
 import {State} from 'clarity-angular';
 import {Subscription} from 'rxjs/Subscription';
@@ -61,6 +62,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
   public isVsphereAdmin: boolean;
   public vchs: VirtualContainerHost[] = [];
   public error = '';
+  public errorObj: {type: string; payload: any};
   public warning = '';
   public currentState: {
     offset: number;
@@ -74,6 +76,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
               private refreshService: RefreshService,
               private globalsService: GlobalsService,
               private sessionService: ExtendedUserSessionService,
+              private createWzService: CreateVchWizardService,
               public vicI18n: Vic18nService) {
   }
 
@@ -106,6 +109,21 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     // and messages from delete vch modal
     // TODO: move the following to a service
     window.addEventListener('message', this.onMessage.bind(this), false);
+
+    // verify the appliance endpoint
+    this.checkVicMachineServer();
+  }
+
+  checkVicMachineServer() {
+    this.createWzService.verifyVicMachineApiEndpoint()
+      .subscribe(
+        (ip: string) => {
+          this.errorObj = null;
+        },
+        (err: {type: string; payload: any}) => {
+          this.errorObj = err;
+        }
+      );
   }
 
   ngOnDestroy() {
