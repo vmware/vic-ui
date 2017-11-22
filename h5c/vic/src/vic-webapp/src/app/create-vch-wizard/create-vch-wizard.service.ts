@@ -347,17 +347,13 @@ export class CreateVchWizardService {
      */
     public verifyVicMachineApiEndpoint(): Observable<any | null> {
       return this.getVicApplianceIp()
-        .catch(err => {
-          return Observable.throw(err);
+        .catch((err: Error) => {
+          return Observable.throw({
+            type: 'vm_not_found'
+          });
         })
         .switchMap(ip => {
-          if (!ip) {
-            return Observable.throw({
-              type: 'vm_not_found',
-              payload: ip
-            });
-          }
-          return this.http.get(`https://${ip}:8443/container/version`)
+          return this.http.get(`https://${ip}:8443/container/hello`)
             .catch((err: Response) => {
               console.error(err);
               // network error. details are not visible in the browser level
@@ -370,7 +366,7 @@ export class CreateVchWizardService {
                 });
               }
               return Observable.throw({
-                type: 'unknown',
+                type: 'other',
                 payload: err
               });
             })

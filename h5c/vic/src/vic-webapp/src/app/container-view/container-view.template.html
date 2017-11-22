@@ -14,10 +14,17 @@
               <a href="javascript://" (click)="checkVicMachineServer()">Refresh</a>
             </div>
           </clr-alert-item>
+          <!-- vic appliance was not found -->
           <clr-alert-item *ngIf="errorObj.type === 'vm_not_found'">
             <span class="alert-text">
               <!-- TODO: i18n -->
-              Could not determine IP for the VIC Appliance
+              Could not find any VIC Appliance VM
+            </span>
+          </clr-alert-item>
+          <!-- other http failures -->
+          <clr-alert-item *ngIf="errorObj.type === 'other'">
+            <span class="alert-text">
+              {{ errorObj.payload }}
             </span>
           </clr-alert-item>
         </clr-alert>
