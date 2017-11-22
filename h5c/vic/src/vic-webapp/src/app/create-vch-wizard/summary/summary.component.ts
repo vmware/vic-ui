@@ -161,18 +161,24 @@ export class SummaryComponent implements OnInit {
               continue;
             }
 
-            let stringValue;
             const rawValue = value[i];
             if (typeof rawValue === 'string') {
               if (!rawValue.trim()) {
                 continue;
               }
-              stringValue = rawValue;
-            } else if (typeof rawValue === 'object' && isUploadableFileObject(rawValue)) {
-              stringValue = rawValue.name;
+              results.push(`--${newKey} ${rawValue}`);
+            } else if (typeof rawValue === 'object') {
+              if (isUploadableFileObject(rawValue)) {
+                results.push(`--${newKey} ${rawValue.name}`);
+              } else {
+                for (const j in rawValue) {
+                  if (!rawValue[j] || rawValue === '0') {
+                    continue;
+                  }
+                  results.push(`--${j.replace(camelCasePattern, '$1-$2').toLowerCase()} ${this.escapeSpecialCharsForCLI(rawValue[j])}`);
+                }
+              }
             }
-
-            results.push(`--${newKey} ${stringValue}`);
           }
         }
       }
@@ -227,7 +233,11 @@ export class SummaryComponent implements OnInit {
         if (containerNetObj['containerNetworkType'] === 'dhcp') {
           return {
             containerNetwork: containerNetObj['containerNetwork'] +
-            ':' + containerNetObj['containerNetworkLabel']
+            ':' + containerNetObj['containerNetworkLabel'],
+            containerNetworkDns: containerNetObj['containerNetwork'] +
+            ':' + containerNetObj['containerNetworkDns'],
+            containerNetworkFirewall: containerNetObj['containerNetwork'] +
+            ':' + containerNetObj['containerNetworkFirewall']
           };
         } else {
           return {
@@ -238,7 +248,9 @@ export class SummaryComponent implements OnInit {
             containerNetworkGateway: containerNetObj['containerNetwork'] +
             ':' + containerNetObj['containerNetworkGateway'],
             containerNetworkDns: containerNetObj['containerNetwork'] +
-            ':' + containerNetObj['containerNetworkDns']
+            ':' + containerNetObj['containerNetworkDns'],
+            containerNetworkFirewall: containerNetObj['containerNetwork'] +
+            ':' + containerNetObj['containerNetworkFirewall']
           };
         }
       });
