@@ -36,6 +36,7 @@ export class VicVmViewService {
     private containersSubj: Subject<ContainerVm[]>;
     public vchs$: Observable<VirtualContainerHost[]>;
     public containers$: Observable<ContainerVm[]>;
+    public totalVchsCount: number;
 
     constructor(
         private http: Http,
@@ -90,7 +91,7 @@ export class VicVmViewService {
                     this.vchsSubj.error(e);
                     return;
                 }
-
+                this.totalVchsCount = data.totalResultCount;
                 this.vchsSubj.next(vchsArray);
             });
     }
