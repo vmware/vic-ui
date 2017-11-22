@@ -1,4 +1,31 @@
-<clr-datagrid (clrDgRefresh)="refreshGrid($event)" [clrDgLoading]="isDgLoading">
+<div class="col-xs-12 mb-2" *ngIf="errorObj">
+    <div class="row">
+      <div class="col-xs-12">
+        <clr-alert [clrAlertType]="'danger'"
+                  [clrAlertClosable]="false">
+          <clr-alert-item *ngIf="errorObj.type === 'ssl_cert'">
+            <span class="alert-text">
+              <!-- TODO: i18n -->
+              Failed to verify the VIC machine server at endpoint https://{{ errorObj.payload }}:8443. Your browser may be blocking the connection because of the untrusted SSL certificate.
+            </span>
+            <div class="alert-actions">
+              <a href="https://{{ errorObj.payload }}:8443/container/hello" target="_blank">Fix</a>
+              <span> | </span>
+              <a href="javascript://" (click)="checkVicMachineServer()">Refresh</a>
+            </div>
+          </clr-alert-item>
+          <clr-alert-item *ngIf="errorObj.type === 'vm_not_found'">
+            <span class="alert-text">
+              <!-- TODO: i18n -->
+              Could not determine IP for the VIC Appliance
+            </span>
+          </clr-alert-item>
+        </clr-alert>
+      </div>
+    </div>
+  </div>
+
+  <clr-datagrid (clrDgRefresh)="refreshGrid($event)" [clrDgLoading]="isDgLoading">
     <clr-dg-column [clrDgField]="'containerName'">
         {{vicI18n.translate(this.WS_CONTAINER_CONSTANTS.DG.COLUMNS, 'CONTAINER_NAME')}}
     </clr-dg-column>

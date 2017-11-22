@@ -14,30 +14,32 @@
  limitations under the License.
 */
 
+import { Comparator, State } from 'clarity-angular';
 import {
     Component,
-    OnInit,
+    NgZone,
     OnDestroy,
-    NgZone
+    OnInit
 } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
-import { State, Comparator } from 'clarity-angular';
-import { ContainerVm } from './container.model';
 import {
     GlobalsService,
     RefreshService,
     Vic18nService
 } from '../shared';
-import { VicVmViewService } from '../services/vm-view.service';
 import {
     VM_COMMITTEDSTORAGE,
     VM_GUESTMEMORYUSAGE,
     VM_OVERALLCPUUSAGE,
-    VSPHERE_VM_SUMMARY_KEY,
     VSPHERE_SERVEROBJ_VIEWEXT_KEY,
     VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY,
+    VSPHERE_VM_SUMMARY_KEY,
     WS_CONTAINER
 } from '../shared/constants';
+
+import { ContainerVm } from './container.model';
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
+import { Subscription } from 'rxjs/Subscription';
+import { VicVmViewService } from '../services/vm-view.service';
 
 class GuestMemoryUsageComparator implements Comparator<any> {
     compare(a: any, b: any) {
@@ -88,6 +90,7 @@ export class VicContainerViewComponent implements OnInit, OnDestroy {
         sorting: string;
         filter: string;
     } = { offset: 0, sorting: 'id,asc', filter: '' };
+    public errorObj: {type: string; payload: any};
     public readonly maxResultCount: number = 10;
     public readonly MEGABYTE: number = Math.pow(1024, 2);
     public readonly GIGABYTE: number = Math.pow(1024, 3);
@@ -97,7 +100,8 @@ export class VicContainerViewComponent implements OnInit, OnDestroy {
         private vmViewService: VicVmViewService,
         private refreshService: RefreshService,
         private globalsService: GlobalsService,
-        public vicI18n: Vic18nService
+        public vicI18n: Vic18nService,
+        private createWzService: CreateVchWizardService
     ) { }
 
     ngOnInit() {
@@ -118,6 +122,21 @@ export class VicContainerViewComponent implements OnInit, OnDestroy {
         }, err => {
             this.containers = [];
         });
+
+        // verify the appliance endpoint
+        this.checkVicMachineServer();
+    }
+
+    checkVicMachineServer() {
+      this.createWzService.verifyVicMachineApiEndpoint()
+        .subscribe(
+          (ip: string) => {
+            this.errorObj = null;
+          },
+          (err: {type: string; payload: any}) => {
+            this.errorObj = err;
+          }
+        );
     }
 
     ngOnDestroy() {

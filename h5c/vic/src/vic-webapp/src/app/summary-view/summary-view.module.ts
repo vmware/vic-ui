@@ -13,11 +13,14 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { VicSummaryViewComponent } from './summary-view.component';
+
+import { ClarityModule } from 'clarity-angular';
+import { CommonModule } from '@angular/common';
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { DataPropertyService } from '../services/data-property.service';
+import { NgModule } from '@angular/core';
+import { VicSummaryViewComponent } from './summary-view.component';
 
 const routes: Routes = [
     { path: '', component: VicSummaryViewComponent },
@@ -27,10 +30,14 @@ const routes: Routes = [
 @NgModule({
     imports: [
         CommonModule,
+        ClarityModule.forChild(),
         RouterModule.forChild(routes)
     ],
     declarations: [VicSummaryViewComponent],
-    providers: [DataPropertyService],
+    providers: [
+      DataPropertyService,
+      CreateVchWizardService
+    ],
     exports: [VicSummaryViewComponent]
 })
 export class VicSummaryViewModule { }

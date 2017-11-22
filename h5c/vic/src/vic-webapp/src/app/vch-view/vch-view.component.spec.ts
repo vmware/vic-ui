@@ -1,4 +1,3 @@
-import { Subscription } from 'rxjs/Subscription';
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -23,11 +22,6 @@ import {
     RefreshService,
     Vic18nService,
 } from '../shared';
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import {
-    getMalformedVchResponseStub,
-    getVchResponseStub
-} from '../services/mocks/vch.response';
 import {
   BaseRequestOptions,
   ConnectionBackend,
@@ -40,14 +34,22 @@ import {
   ResponseType,
   XHRBackend
 } from '@angular/http';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { MockBackend, MockConnection } from '@angular/http/testing';
+import {
+    getMalformedVchResponseStub,
+    getVchResponseStub
+} from '../services/mocks/vch.response';
+
 import { By } from '@angular/platform-browser';
 import { ClarityModule } from 'clarity-angular';
+import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { ExtendedUserSessionService } from '../services/extended-usersession.service';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
 import { VicVchViewComponent } from './vch-view.component';
 import { VicVmViewService } from '../services/vm-view.service';
 import { VirtualContainerHost } from './vch.model';
@@ -105,7 +107,12 @@ describe('VicVchViewComponent', () => {
                 I18nService,
                 Http,
                 { provide: ConnectionBackend, useClass: MockBackend },
-                { provide: RequestOptions, useClass: BaseRequestOptions }
+                { provide: RequestOptions, useClass: BaseRequestOptions },
+                { provide: CreateVchWizardService, useValue: {
+                  verifyVicMachineApiEndpoint() {
+                    return Observable.of('10.10.10.10');
+                  }
+                }}
             ],
             declarations: [
                 VicVchViewComponent
