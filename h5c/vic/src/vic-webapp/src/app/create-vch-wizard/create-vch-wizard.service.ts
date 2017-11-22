@@ -359,12 +359,13 @@ export class CreateVchWizardService {
               // network error. details are not visible in the browser level
               // however, we are fairly confident in most cases that this is caused by the
               // self-signed SSL certificate being blocked by the browser
-              if (!err.ok && !err.status) {
+              if (err.status === 0) {
                 return Observable.throw({
                   type: 'ssl_cert',
                   payload: ip
                 });
               }
+              // handle http response status codes such as 404, 500, etc.
               return Observable.throw({
                 type: 'other',
                 payload: err
