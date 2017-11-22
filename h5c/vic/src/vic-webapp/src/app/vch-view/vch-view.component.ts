@@ -69,6 +69,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     sorting: string;
     filter: string;
   } = {offset: 0, sorting: 'id,asc', filter: ''};
+  public totalVchsCount: number;
   public readonly maxResultCount: number = 10;
 
   constructor(private zone: NgZone,
@@ -95,6 +96,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     this.vmViewService.vchs$.subscribe(vchs => {
       this.vchs = vchs;
       this.isDgLoading = false;
+      this.totalVchsCount = this.vmViewService.totalVchsCount;
     }, err => {
       this.vchs = [];
     });
