@@ -157,7 +157,7 @@ export class SummaryComponent implements OnInit {
         } else {
           // repeat adding multiple, optional fields with the same key
           for (const i in value) {
-            if (!value[i] || value === '0') {
+            if (!value[i] || value[i] === '0') {
               continue;
             }
 
@@ -172,7 +172,7 @@ export class SummaryComponent implements OnInit {
                 results.push(`--${newKey} ${rawValue.name}`);
               } else {
                 for (const j in rawValue) {
-                  if (!rawValue[j] || rawValue === '0') {
+                  if (!rawValue[j] || rawValue[j] === '0') {
                     continue;
                   }
                   results.push(`--${j.replace(camelCasePattern, '$1-$2').toLowerCase()} ${this.escapeSpecialCharsForCLI(rawValue[j])}`);
@@ -231,14 +231,19 @@ export class SummaryComponent implements OnInit {
     results['networks']['containerNetworks'] =
       containerNetworksRef.map(containerNetObj => {
         if (containerNetObj['containerNetworkType'] === 'dhcp') {
-          return {
+          const net = {
             containerNetwork: containerNetObj['containerNetwork'] +
             ':' + containerNetObj['containerNetworkLabel'],
-            containerNetworkDns: containerNetObj['containerNetwork'] +
-            ':' + containerNetObj['containerNetworkDns'],
             containerNetworkFirewall: containerNetObj['containerNetwork'] +
             ':' + containerNetObj['containerNetworkFirewall']
           };
+
+          if (containerNetObj['containerNetworkDns']) {
+            net['containerNetworkDns'] = containerNetObj['containerNetwork'] +
+              ':' + containerNetObj['containerNetworkDns'];
+          }
+
+          return net;
         } else {
           return {
             containerNetwork: containerNetObj['containerNetwork'] +

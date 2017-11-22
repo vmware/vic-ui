@@ -257,7 +257,7 @@ export class NetworksComponent implements OnInit {
             ]);
           }
 
-          dnsControl.updateValueAndValidity({onlySelf: true, emitEvent: false});
+          dnsControl.updateValueAndValidity({onlySelf: false, emitEvent: false});
         });
       });
 
