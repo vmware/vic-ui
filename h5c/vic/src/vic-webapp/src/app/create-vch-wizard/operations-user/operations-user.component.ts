@@ -30,7 +30,8 @@ export class OperationsUserComponent implements OnInit {
   ) {
     this.form = formBuilder.group({
       opsUser: ['', Validators.required],
-      opsPassword: ['', Validators.required]
+      opsPassword: ['', Validators.required],
+      opsGrantPerms: false
     });
   }
 
@@ -39,11 +40,19 @@ export class OperationsUserComponent implements OnInit {
   onPageLoad() { }
 
   onCommit(): Observable<any> {
-    return Observable.of({
+    const result = {
       'operations': {
         opsUser: this.form.get('opsUser').value,
         opsPassword: this.form.get('opsPassword').value,
       }
-    });
+    };
+
+    const opsGrantPermsValue = this.form.get('opsGrantPerms').value;
+
+    if (opsGrantPermsValue) {
+      result.operations['opsGrantPerms'] = opsGrantPermsValue;
+    }
+
+    return Observable.of(result);
   }
 }

@@ -301,6 +301,10 @@ export class CreateVchWizardComponent implements OnInit {
       }
     };
 
+    if (payload.operations.opsGrantPerms) {
+      processedPayload['endpoint']['operations_credentials']['grant_permissions'] = payload.operations.opsGrantPerms;
+    }
+
     if (payload.computeCapacity.endpointCpu) {
       processedPayload['endpoint']['cpu'] = {
         sockets: parseInt(payload.computeCapacity.endpointCpu, 10)
