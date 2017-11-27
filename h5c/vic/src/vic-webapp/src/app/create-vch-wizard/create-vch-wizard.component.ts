@@ -71,6 +71,7 @@ export class CreateVchWizardComponent implements OnInit {
       if (clrModalEl === null) {
         return;
       }
+      const pluginIframeEl = <HTMLElement>clrModalEl.querySelector('plugin-iframe');
       const targetIframeEl = <HTMLElement>clrModalEl.querySelector('iframe');
       const modalContentEl = <HTMLElement>clrModalEl.querySelector('.modal-content');
       const modalHeaderEl = <HTMLElement>clrModalEl.querySelector('.modal-header');
@@ -86,6 +87,11 @@ export class CreateVchWizardComponent implements OnInit {
       this.renderer.setElementStyle(modalBodyEl, 'max-height', '75vh');
       this.renderer.setElementStyle(targetIframeEl, 'width', '100%');
       this.renderer.setElementStyle(targetIframeEl, 'height', '100%');
+      // wrapper element that encapsulates iframe tag
+      // available from 6.5u1
+      if (pluginIframeEl !== null) {
+        this.renderer.setElementStyle(pluginIframeEl, 'height', '100%');
+      }
       this.renderer.setElementStyle(
         this.elRef.nativeElement.querySelector('clr-wizard'),
         'height',

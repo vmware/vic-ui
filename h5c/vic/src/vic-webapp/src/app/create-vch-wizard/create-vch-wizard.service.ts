@@ -145,7 +145,7 @@ export class CreateVchWizardService {
         } else {
             const serverGuid = this.getServerGuid();
             return this.http.get('/ui/tree/children?nodeTypeId=VcRoot' +
-                `&objRef=urn:vmomi:Folder:group-d1:${serverGuid}&treeId=VmFoldersTree`)
+                `&objRef=urn:vmomi:Folder:group-d1:${serverGuid}&treeId=vsphere.core.physicalInventorySpec`)
                 .catch(e => Observable.throw(e))
                 .map(response => response.json())
                 .catch(e => Observable.throw(e))
