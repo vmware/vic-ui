@@ -253,7 +253,7 @@ ECHO.
 ECHO -------------------------------------------------------------
 ECHO Preparing to register vCenter Extension %name:"=%-H5Client...
 ECHO -------------------------------------------------------------
-SET plugin_reg_flags=%vcenter_reg_common_flags% --name "%name:"=%-H5Client" %thumbprint_string% --version %version:"=% --summary "Plugin for %name:"=%-H5Client" --company %company% --key %key_h5c:"=% --url %vic_ui_host_url%files/%key_h5c:"=%-v%version:"=%.zip --server-thumbprint %vic_ui_host_thumbprint%
+SET plugin_reg_flags=%vcenter_reg_common_flags% --name "%name:"=%-H5Client" %thumbprint_string% --version %version:"=% --summary "Plugin for %name:"=%-H5Client" --company %company% --key %key_h5c:"=% --url %vic_ui_host_url%files/%key_h5c:"=%-v%version:"=%.zip --server-thumbprint %vic_ui_host_thumbprint% --configure-ova --type VicApplianceVM
 IF [%force_set%] == [1] (
     SET plugin_reg_flags=%plugin_reg_flags% --force
 )
