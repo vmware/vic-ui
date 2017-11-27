@@ -124,6 +124,16 @@ Build Flex And H5 Plugins
 
 Get Latest Vic Engine Binary
     Log  Fetching the latest VIC Engine tar ball...
+    ##
+    # Log To Console  \nDownloading VIC engine...
+    # ${target_dir}=  Set Variable  bin/
+    # ${download_file}=  Run command and Return output  curl -sLk https://%{OVA_IP}:9443/files | grep -m 1 -o "vic_[[:digit:]]\+.tar.gz" | tail -1
+    # ${download_url}=  Set Variable  https://%{OVA_IP}:9443/files/${download_file}
+    # Run command and Return output  mkdir -p ${target_dir}
+    # Run command and Return output  curl -k ${download_url} --output /tmp/vic.tar.gz
+    # Run command and Return output  tar -xvzf /tmp/vic.tar.gz --strip-components=1 --directory=${target_dir}
+    ##
+
     ${input}=  Run  gsutil ls -l gs://vic-engine-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
     Set Suite Variable  ${buildNumber}  ${input}
     Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${input}
