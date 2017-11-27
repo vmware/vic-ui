@@ -20,19 +20,26 @@ Resource         ../../resources/Util.robot
 Resource         ./vicui-common.robot
 
 *** Variables ***
-${TEST_SCRIPTS_ROOT}     tests/manual-test-cases/Group18-VIC-UI/
-${VICTEST2XL}            ${TEST_SCRIPTS_ROOT}/victest2xl.py
-${IS_NIGHTLY_TEST}       ${TRUE}
+${TEST_SCRIPTS_ROOT}           tests/manual-test-cases/Group18-VIC-UI/
+${VICTEST2XL}                  ${TEST_SCRIPTS_ROOT}/victest2xl.py
+${IS_NIGHTLY_TEST}             ${TRUE}
 ${BUILD_VER_ISSUE_WORKAROUND}  ${TRUE}
 ${ALL_TESTS_PASSED}            ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
+    # ova url is checked here. should be taken in runtime as a variable
+    # e.g. robot --variable ova_url:https://storage.googleapis.com/vic-product-ova-builds/build-to-test.ova
+    Variable Should Exist  ${ova_url}
+
     ${ts}=  Get Current Date  result_format=epoch  exclude_millis=True
     Set Suite Variable  ${time_start}  ${ts}
     Cleanup Previous Test Logs
     Check Working Dir
     Check Drone
+    Check Govc
+    Install VIC Product OVA  ${BUILD_5318154_IP}
+    # TODO: update
     Get Latest Vic Engine Binary
     Setup Test Matrix
 
@@ -50,6 +57,10 @@ Check Drone
     Log  return code: ${rc}, output: ${drone_ver}  DEBUG
     Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
     Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
+
+Check Govc
+    ${rc}=  Run And Return Rc  govc
+    Should Be True  ${rc} != 127
 
 Cleanup Previous Test Logs
     Log  Removing UI test result directories if present...

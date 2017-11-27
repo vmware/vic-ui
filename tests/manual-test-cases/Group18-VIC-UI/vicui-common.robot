@@ -39,6 +39,8 @@ ${SDK_PACKAGE_ARCHIVE}                vic-ui-sdk.tar.gz
 ${ENV_VSPHERE_SDK_HOME}               /tmp/sdk/vc_sdk_min
 ${ENV_FLEX_SDK_HOME}                  /tmp/sdk/flex_sdk_min
 ${ENV_HTML_SDK_HOME}                  /tmp/sdk/html-client-sdk
+${OVA_ESX_HOST}                       10.160.217.137
+${OVA_ESX_DATASTORE}                  datastore1 (4)
 
 *** Keywords ***
 Set Fileserver And Thumbprint In Configs
@@ -216,3 +218,77 @@ Cleanup Windows Testbed
 
     ${output}=  Run  rm -rf ${files_to_remove} 2>&1
     Log  Cleaning up Windows testbed...\n${output}
+
+Run GOVC
+    [Arguments]  ${cmd_options}
+    ${rc}  ${output}=  Run And Return Rc And Output  govc ${cmd_options}
+    Log  ${output}
+    Should Be Equal As Integers  ${rc}  0
+    [Return]  ${rc}
+
+Install VIC Product OVA
+    [Arguments]  ${target-vc-ip}
+    Variable Should Exist  ${ova_url}
+    ${ova-name}=  Fetch From Right  ${ova_url}  /
+    Log  OVA filename is: ${ova-name}
+    Log  Target vSphere is located at: ${target-vc-ip}
+
+    # set ova name global
+    Set Global Variable  ${ova_name}  ${ova-name}
+
+    # set the local path to ova global
+    Set Global Variable  ${ova_local_path}  /tmp/${ova-name}
+
+    Set Environment Variable  GOVC_URL  ${target-vc-ip}
+    Set Environment Variable  GOVC_INSECURE  1
+    Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
+    Set Environment Variable  GOVC_PASSWORD  Admin!23
+    ${rc}  ${ova_ip}=  Run And Return Rc And Output  govc vm.ip ${ova-name}
+    ${ova_found}=  Run Keyword And Return Status  Should Be True  ${rc} == 0
+
+    # if ova is already found in the target VC, get IP and break out of the keyword
+    Run Keyword If  ${ova_found}  Set Environment Variable  OVA_IP  ${ova_ip}
+    Return From Keyword If  ${ova_found}
+
+    # check if OVA file is locally available already and download if there's none
+    ${ova_exists}=  Run Keyword And Return Status  OperatingSystem.File Should Exist  ${ova_local_path}
+    Run Keyword If  ${ova_exists}  Log To Console  OVA file is already found at ${ova_local_path}
+    Run Keyword Unless  ${ova_exists}  Download VIC OVA  ${ova_url}  ${ova_local_path}    
+
+    Log To Console  \nInstalling VIC appliance...
+    Log To Console  \novftool --datastore='${OVA_ESX_DATASTORE}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${OVA_ESX_HOST}'\n
+    ${output}=  Run  ovftool --datastore='${OVA_ESX_DATASTORE}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${OVA_ESX_HOST}'
+    Should Contain  ${output}  Completed successfully
+    Should Contain  ${output}  Received IP address:
+
+    ${output}=  Split To Lines  ${output} 
+    :FOR  ${line}  IN  @{output}
+    \   ${status}=  Run Keyword And Return Status  Should Contain  ${line}  Received IP address:
+    \   ${ip}=  Run Keyword If  ${status}  Fetch From Right  ${line}  ${SPACE}
+    \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP  ${ip}
+
+    Log To Console  \nWaiting for Getting Started Page to Come Up...
+    :FOR  ${i}  IN RANGE  10
+    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP}:9443/register 2>/dev/null
+    \   Exit For Loop If  '200' in '''${out}'''
+    \   Sleep  5s
+    Log To Console  ${rc}
+    Log To Console  ${out}
+    Should Contain  ${out}  200
+
+    Log  %{OVA_IP}
+
+Download VIC OVA
+    [Arguments]  ${url}  ${local_path}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk ${url} -o ${local_path}
+    Log  ${out}
+    Should Be True  ${rc} == 0
+    OperatingSystem.File Should Exist  ${local_path}
+    Log To Console  OVA successfully downloaded
+
+Cleanup VIC Product OVA
+    [Arguments]  ${target-vc-ip}  ${ova_target_vm_name}
+    Log To Console  \nCleaning up VIC appliance...
+    ${rc}=  Wait Until Keyword Succeeds  10x  5s  Run GOVC  vm.destroy ${ova_target_vm_name}
+    Run Keyword And Ignore Error  Run GOVC  datastore.rm "/${OVA_ESX_DATASTORE}/vm/${ova_target_vm_name}"
+    Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${target-vc-ip}
