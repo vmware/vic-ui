@@ -195,18 +195,16 @@ Run Testcases On Mac
     Put File  ../../../ui-nightly-run-bin/vic-ui-darwin  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${MACOS_HOST_USER}@${MACOS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
-    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../tests/* ${MACOS_HOST_USER}@${MACOS_HOST_IP}:${remote_vic_root}/tests/ 2>&1
-    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     # update local repo
-    # ${update_repo_command}=  Catenate
-    # ...  mkdir -p ${REMOTE_RESULTS_FOLDER} &&
-    # ...  cd ${remote_vic_root} &&
-    # ...  git remote update &&
-    # ...  git checkout -f master &&
-    # ...  git rebase vmware/master
-    # ${stdout}  ${stderr}  ${rc}=  Execute Command  ${update_repo_command}  return_stderr=True  return_rc=True
-    # Run Keyword Unless  ${rc} == 0  Log To Console  ${stderr}
+    ${update_repo_command}=  Catenate
+    ...  mkdir -p ${REMOTE_RESULTS_FOLDER} &&
+    ...  cd ${remote_vic_root} &&
+    ...  git remote update &&
+    ...  git checkout -f master &&
+    ...  git rebase vmware/master
+    ${stdout}  ${stderr}  ${rc}=  Execute Command  ${update_repo_command}  return_stderr=True  return_rc=True
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${stderr}
 
     # copy binaries
     ${stdout}  ${stderr}  ${rc}=  Execute Command  cp -rvf ${remote_scratch_folder}/scripts ${remote_vic_root}/  return_stderr=True  return_rc=True
@@ -216,9 +214,7 @@ Run Testcases On Mac
     # remotely run robot test
     ${run_tests_command}=  Catenate
     ...  cd ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI 2>&1 &&
-    ...  echo TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} &&
-    ...  export TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} &&
-    ...  /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${rc}=  Execute Command  ${run_tests_command}  return_rc=True
 
     # Store whether the run was successful
@@ -266,8 +262,7 @@ Run Testcases On Windows
     ...  git checkout -f master &&
     ...  git rebase vmware/master &&
     ...  cd tests/manual-test-cases/Group18-VIC-UI &&
-    ...  export TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} &&
-    ...  robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
 
     # Store whether the run was successful, print out any error message
