@@ -5,7 +5,7 @@
   </p>
 
   <a class="btn btn-link pl-0"
-     href="https://vmware.github.io/vic-product/assets/files/html/1.1/vic_vsphere_admin/networks.html"
+     href="https://vmware.github.io/vic-product/assets/files/html/1.3/vic_vsphere_admin/vch_networking.html"
      target="_blank"
   >
     View Network Requirements
@@ -608,14 +608,14 @@
            *ngFor="let containerNetwork of form.get('containerNetworks').controls; let i=index">
 
         <div class="form-group row mb-0" [formGroupName]="i">
-          <div class="col-xs-3">
+          <div class="col-xs">
 
             <label for="container-network-selector">
               Container network
             </label>
 
           </div>
-          <div class="col-xs-3">
+          <div class="col-xs">
 
             <div class="select form-control">
               <select id="container-network-selector" formControlName="containerNetwork">
@@ -642,7 +642,7 @@
                      value="static"
                      formControlName="containerNetworkType"
                      [attr.id]="'cont-static-' + i">
-              <label [attr.for]="'cont-static-' + i">Range</label>
+              <label [attr.for]="'cont-static-' + i">IP Range</label>
             </div>
 
           </div>
@@ -657,7 +657,7 @@
               <input class="form-control"
                      id="container-network-ip-range"
                      type="text"
-                     placeholder="IP or CIDR"
+                     placeholder="IP range or CIDR"
                      formControlName="containerNetworkIpRange">
 
               <span class="tooltip-content" *ngIf="form.get('containerNetworks').controls[i].controls.containerNetworkIpRange.hasError('required')">
@@ -684,14 +684,14 @@
         </div>
 
         <div class="form-group row mb-0" [formGroupName]="i">
-          <div class="col-xs-3 text-right">
+          <div class="col-xs text-right">
 
             <label for="container-network-dns">
               DNS
             </label>
 
           </div>
-          <div class="col-xs-3">
+          <div class="col-xs">
 
             <label for="container-network-dns"
                    aria-haspopup="true"
@@ -752,14 +752,14 @@
         </div>
 
         <div class="form-group row mb-0" [formGroupName]="i">
-          <div class="col-xs-3 text-right">
+          <div class="col-xs text-right">
 
             <label for="container-network-label">
               Label
             </label>
 
           </div>
-          <div class="col-xs-3">
+          <div class="col-xs">
 
             <label for="container-network-label"
                    aria-haspopup="true"
@@ -785,19 +785,19 @@
 
           </div>
           <!-- To set previous columns widths, we need to set space for 2 dynamic width column and 1 fixed width column -->
-          <div class="col-xs offset-xs-1"></div>
           <div class="col-xs"></div>
+          <div class="col-xs offset-xs-1"></div>
         </div>
 
         <div class="form-group row mb-0" [formGroupName]="i">
-          <div class="col-xs-3 text-right">
+          <div class="col-xs text-right">
 
             <label for="container-network-firewall">
               Firewall policy
             </label>
 
           </div>
-          <div class="col-xs-3">
+          <div class="col-xs">
 
             <div class="select form-control">
               <select id="container-network-firewall" formControlName="containerNetworkFirewall">
@@ -811,8 +811,8 @@
 
           </div>
           <!-- To set previous columns widths, we need to set space for 2 dynamic width column and 1 fixed width column -->
-          <div class="col-xs offset-xs-1"></div>
           <div class="col-xs"></div>
+          <div class="col-xs offset-xs-1"></div>
         </div>
 
       </div>
