@@ -38,9 +38,9 @@ Prepare Testbed
     Check Working Dir
     Check Drone
     Check Govc
-    Install VIC Product OVA  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
-    Install VIC Product OVA  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
-    Get Vic Engine Binary
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
+    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
+    Get Vic Engine Binaries
     Setup Test Matrix
 
 Check Working Dir
@@ -68,12 +68,12 @@ Cleanup Previous Test Logs
     Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
 
 Download VIC Engine Tarball From OVA
-    [Arguments]  ${filename}
-    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP}:9443/files
+    [Arguments]  ${vcenter-build}  ${filename}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_${vcenter-build}}:9443/files
     Should Be Equal As Integers  ${rc}  0
     ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz)
     Should Not Be Empty  ${tarball_file}
-    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP}:9443/files/${tarball_file} -O ${filename}
+    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_${vcenter-build}}:9443/files/${tarball_file} -O ${filename}
     Should Be Equal As Integers  ${rc}  0
     OperatingSystem.File Should Exist  ${filename}
     Set Suite Variable  ${buildNumber}  ${tarball_file}
@@ -81,6 +81,7 @@ Download VIC Engine Tarball From OVA
     [Return]  ${rc} == 0
 
 Prepare VIC Engine Binaries
+    [Arguments]  ${vc-build}
     Log  Extracting binary files...
     ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
     ${rc2}=  Run And Return Rc  tar xvzf /tmp/vic.tar.gz -C ui-nightly-run-bin --strip 1
@@ -91,13 +92,8 @@ Prepare VIC Engine Binaries
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
-    # TODO: if this works for VC6.0 and VC6.5 make a PR that updates all sh and bat files
-    ${rc}  ${out}=  Run And Return Rc And Output  sed 's/local plugin_flags=.*/local plugin_flags="--version \$version --company \$company --url \$plugin_url\$plugin_key-v\$version\.zip --configure-ova --type=VicApplianceVM --debug 3"/' scripts/VCSA/install.sh > /tmp/install.sh
-    Should Be Equal As Integers  ${rc}  0
-    Run  cp /tmp/install.sh scripts/VCSA/install.sh
-    Log  ${out}
-    # TODO: fix up non nightly tests (check)
-    #Prepare Flex And H5 Plugins For Testing
+    Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
+    Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
 
 Prepare Flex And H5 Plugins For Testing
     Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build Flex And H5 Plugins
@@ -134,27 +130,21 @@ Build Flex And H5 Plugins
     Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build H5 Client plugin! ${out}
     Log To Console  Successfully built H5 Client plugin.\n
 
-Get Vic Engine Binary
+Get Vic Engine Binaries
     Log  Fetching the latest VIC Engine tar ball...
-    Log To Console  \nDownloading VIC engine...
+    Log To Console  \nDownloading VIC engine for VCSA 6.0u2...
     ${target_dir}=  Set Variable  bin    
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  /tmp/vic.tar.gz
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.0u2  /tmp/vic.tar.gz
     Should Be True  ${results}
-    # Run  mkdir -p ${target_dir}/${LATEST_VIC_ENGINE_TARBALL}
-    # ${rc}  ${out}=  Run And Return Rc And Output  tar -xvzf /tmp/vic.tar.gz --strip-components=1 --directory=${target_dir}/${LATEST_VIC_ENGINE_TARBALL}
-    # Should Be Equal As Integers  ${rc}  0
-    # Run Keyword Unless  ${rc} == 0  Log  ${out}
-    Prepare VIC Engine Binaries
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.0 instance
+    Prepare VIC Engine Binaries  3634791
 
-    # ${input}=  Run  gsutil ls -l gs://vic-engine-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    # Log  Fetching the latest VIC UI tar ball...
-    # ${input2}=  Run  gsutil ls -l gs://vic-ui-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    # Set Suite Variable  ${LATEST_VIC_UI_TARBALL}  ${input2}
-    # ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-engine-builds/${input}  ${LATEST_VIC_ENGINE_TARBALL}
-    # Should Be True  ${results}
-    # ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-ui-builds/${input2}  ${LATEST_VIC_UI_TARBALL}
-    # Should Be True  ${results}
-    # Prepare VIC Engine Binaries
+    Log To Console  \nDownloading VIC engine for VCSA 6.5d...
+    ${target_dir}=  Set Variable  bin
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5d  /tmp/vic.tar.gz
+    Should Be True  ${results}
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.5 instance
+    Prepare VIC Engine Binaries  5318154
 
 Setup Test Matrix
     # skip matrix
@@ -261,6 +251,7 @@ Run Script Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/${test_name}-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g"
     ...  -e "s|\#ROBOT_SCRIPT|${test_name}\.robot|g" > .drone.local.tests.yml
@@ -326,6 +317,7 @@ Run Plugin Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/18-4-VIC-UI-Plugin-tests-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#SELENIUM_BROWSER|${selenium_browser}|g"
     ...  -e "s|\#BROWSER_NORMALIZED_NAME|${selenium_browser_normalized}|g"

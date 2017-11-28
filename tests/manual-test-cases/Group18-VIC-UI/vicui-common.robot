@@ -105,7 +105,7 @@ Set Absolute Script Paths
     ${UI_INSTALLERS_ROOT}=  Set Variable  ../../../scripts
     Run Keyword If  ${is_windows}  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/vCenterForWindows  ELSE  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/VCSA
     Should Exist  ${UI_INSTALLER_PATH}
-    ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs
+    ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs-%{TEST_VCSA_BUILD}
     Set Suite Variable  ${configs}  ${configs_content}
     Run Keyword If  %{TEST_VSPHERE_VER} == 65  Set Suite Variable  ${plugin_folder}  plugin-packages  ELSE  Set Suite Variable  ${plugin_folder}  vsphere-client-serenity
 
@@ -228,7 +228,7 @@ Run GOVC
     [Return]  ${rc}
 
 Install VIC Product OVA
-    [Arguments]  ${target-vc-ip}  ${ova-esx-host-ip}  ${ova-esx-datastore}
+    [Arguments]  ${vcenter-build}  ${target-vc-ip}  ${ova-esx-host-ip}  ${ova-esx-datastore}
     Variable Should Exist  ${ova_url}
     ${ova-name}=  Fetch From Right  ${ova_url}  /
     Log  OVA filename is: ${ova-name}
@@ -248,7 +248,7 @@ Install VIC Product OVA
     ${ova_found}=  Run Keyword And Return Status  Should Be True  ${rc} == 0
 
     # if ova is already found in the target VC, get IP and break out of the keyword
-    Run Keyword If  ${ova_found}  Set Environment Variable  OVA_IP  ${ova_ip}
+    Run Keyword If  ${ova_found}  Set Environment Variable  OVA_IP_${vcenter-build}  ${ova_ip}
     Return From Keyword If  ${ova_found}
 
     # check if OVA file is locally available already and download if there's none
@@ -266,7 +266,7 @@ Install VIC Product OVA
     :FOR  ${line}  IN  @{output}
     \   ${status}=  Run Keyword And Return Status  Should Contain  ${line}  Received IP address:
     \   ${ip}=  Run Keyword If  ${status}  Fetch From Right  ${line}  ${SPACE}
-    \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP  ${ip}
+    \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP_${vcenter-build}  ${ip}
 
     Log To Console  \nWaiting for Getting Started Page to Come Up...
     :FOR  ${i}  IN RANGE  10
