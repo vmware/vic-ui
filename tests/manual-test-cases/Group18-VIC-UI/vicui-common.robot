@@ -45,8 +45,11 @@ ${OVA_ESX_DATASTORE}                  datastore1 (4)
 *** Keywords ***
 Set Fileserver And Thumbprint In Configs
     [Arguments]  ${fake}=${FALSE}
-    ${fileserver_url}=  Run Keyword If  ${fake} == ${TRUE}  Set Variable  https://256.256.256.256/  ELSE  Set Variable  ${vic_macmini_fileserver_url}
-    ${fileserver_thumbprint}=  Run Keyword If  ${fake} == ${TRUE}  Set Variable  ab:cd:ef  ELSE  Set Variable  ${vic_macmini_fileserver_thumbprint}
+    Run Keyword If  ${fake} == ${FALSE}  Create File  ${UI_INSTALLER_PATH}/configs  ${configs}
+    Return From Keyword If  ${fake} == ${FALSE}
+
+    ${fileserver_url}=  Set Variable  https://256.256.256.256/
+    ${fileserver_thumbprint}=  Set Variable  ab:cd:ef
     ${results}=  Replace String Using Regexp  ${configs}  VIC_UI_HOST_URL=.*  VIC_UI_HOST_URL=\"${fileserver_url}\"
     ${results}=  Replace String Using Regexp  ${results}  VIC_UI_HOST_THUMBPRINT=.*  VIC_UI_HOST_THUMBPRINT=\"${fileserver_thumbprint}\"
     Create File  ${UI_INSTALLER_PATH}/configs  ${results}
