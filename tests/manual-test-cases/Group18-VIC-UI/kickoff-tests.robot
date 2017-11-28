@@ -38,9 +38,8 @@ Prepare Testbed
     Check Working Dir
     Check Drone
     Check Govc
-    Install VIC Product OVA  ${BUILD_3634791_IP}
-    Install VIC Product OVA  ${BUILD_5318154_IP}
-    # TODO: update
+    Install VIC Product OVA  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
+    Install VIC Product OVA  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
     Get Vic Engine Binary
     Setup Test Matrix
 

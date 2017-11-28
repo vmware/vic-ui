@@ -39,8 +39,6 @@ ${SDK_PACKAGE_ARCHIVE}                vic-ui-sdk.tar.gz
 ${ENV_VSPHERE_SDK_HOME}               /tmp/sdk/vc_sdk_min
 ${ENV_FLEX_SDK_HOME}                  /tmp/sdk/flex_sdk_min
 ${ENV_HTML_SDK_HOME}                  /tmp/sdk/html-client-sdk
-${OVA_ESX_HOST}                       10.160.217.137
-${OVA_ESX_DATASTORE}                  datastore1 (4)
 
 *** Keywords ***
 Set Fileserver And Thumbprint In Configs
@@ -230,7 +228,7 @@ Run GOVC
     [Return]  ${rc}
 
 Install VIC Product OVA
-    [Arguments]  ${target-vc-ip}
+    [Arguments]  ${target-vc-ip}  ${ova-esx-host-ip}  ${ova-esx-datastore}
     Variable Should Exist  ${ova_url}
     ${ova-name}=  Fetch From Right  ${ova_url}  /
     Log  OVA filename is: ${ova-name}
@@ -259,8 +257,8 @@ Install VIC Product OVA
     Run Keyword Unless  ${ova_exists}  Download VIC OVA  ${ova_url}  ${ova_local_path}    
 
     Log To Console  \nInstalling VIC appliance...
-    Log To Console  \novftool --datastore='${OVA_ESX_DATASTORE}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${OVA_ESX_HOST}'\n
-    ${output}=  Run  ovftool --datastore='${OVA_ESX_DATASTORE}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${OVA_ESX_HOST}'
+    Log To Console  \novftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'\n
+    ${output}=  Run  ovftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'
     Should Contain  ${output}  Completed successfully
     Should Contain  ${output}  Received IP address:
 
@@ -290,8 +288,8 @@ Download VIC OVA
     Log To Console  OVA successfully downloaded
 
 Cleanup VIC Product OVA
-    [Arguments]  ${target-vc-ip}  ${ova_target_vm_name}
+    [Arguments]  ${target-vc-ip}  ${ova-esx-datastore}  ${ova_target_vm_name}
     Log To Console  \nCleaning up VIC appliance...
     ${rc}=  Wait Until Keyword Succeeds  10x  5s  Run GOVC  vm.destroy ${ova_target_vm_name}
-    Run Keyword And Ignore Error  Run GOVC  datastore.rm "/${OVA_ESX_DATASTORE}/vm/${ova_target_vm_name}"
+    Run Keyword And Ignore Error  Run GOVC  datastore.rm "/${ova-esx-datastore}/vm/${ova_target_vm_name}"
     Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${target-vc-ip}
