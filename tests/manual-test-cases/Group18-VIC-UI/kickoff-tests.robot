@@ -40,7 +40,7 @@ Prepare Testbed
     Check Govc
     Install VIC Product OVA  ${BUILD_5318154_IP}
     # TODO: update
-    Get Latest Vic Engine Binary
+    Get Vic Engine Binary
     Setup Test Matrix
 
 Check Working Dir
@@ -67,29 +67,35 @@ Cleanup Previous Test Logs
     Run  rm -rf ui-test-results 2>/dev/null
     Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
 
-Download VIC Engine Tarball
-    [Arguments]  ${url}  ${filename}
-    Log  Downloading ${url}...
-    ${rc}=  Run And Return Rc  wget ${url} -O ${filename}
+Download VIC Engine Tarball From OVA
+    [Arguments]  ${filename}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP}:9443/files
+    Should Be Equal As Integers  ${rc}  0
+    ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz)
+    Should Not Be Empty  ${tarball_file}
+    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP}:9443/files/${tarball_file} -O ${filename}
     Should Be Equal As Integers  ${rc}  0
     OperatingSystem.File Should Exist  ${filename}
+    Set Suite Variable  ${buildNumber}  ${tarball_file}
+    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${tarball_file}
     [Return]  ${rc} == 0
 
 Prepare VIC Engine Binaries
     Log  Extracting binary files...
     ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
-    ${rc2}=  Run And Return Rc  tar xvzf ${LATEST_VIC_ENGINE_TARBALL} -C ui-nightly-run-bin --strip 1
-    ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
+    ${rc2}=  Run And Return Rc  tar xvzf /tmp/vic.tar.gz -C ui-nightly-run-bin --strip 1
+    # ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
     Should Be Equal As Integers  ${rc1}  0
     Should Be Equal As Integers  ${rc2}  0
-    Should Be Equal As Integers  ${rc3}  0
+    # Should Be Equal As Integers  ${rc3}  0
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
-    Prepare Flex And H5 Plugins For Testing
+    # TODO: fix up non nightly tests (check)
+    #Prepare Flex And H5 Plugins For Testing
 
 Prepare Flex And H5 Plugins For Testing
     Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build Flex And H5 Plugins
-    Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND}  Sync Vic Ui Version With Vic Repo
+    Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND} and not ${IS_NIGHTLY_TEST}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
@@ -122,29 +128,27 @@ Build Flex And H5 Plugins
     Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build H5 Client plugin! ${out}
     Log To Console  Successfully built H5 Client plugin.\n
 
-Get Latest Vic Engine Binary
+Get Vic Engine Binary
     Log  Fetching the latest VIC Engine tar ball...
-    ##
-    # Log To Console  \nDownloading VIC engine...
-    # ${target_dir}=  Set Variable  bin/
-    # ${download_file}=  Run command and Return output  curl -sLk https://%{OVA_IP}:9443/files | grep -m 1 -o "vic_[[:digit:]]\+.tar.gz" | tail -1
-    # ${download_url}=  Set Variable  https://%{OVA_IP}:9443/files/${download_file}
-    # Run command and Return output  mkdir -p ${target_dir}
-    # Run command and Return output  curl -k ${download_url} --output /tmp/vic.tar.gz
-    # Run command and Return output  tar -xvzf /tmp/vic.tar.gz --strip-components=1 --directory=${target_dir}
-    ##
-
-    ${input}=  Run  gsutil ls -l gs://vic-engine-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    Set Suite Variable  ${buildNumber}  ${input}
-    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${input}
-    Log  Fetching the latest VIC UI tar ball...
-    ${input2}=  Run  gsutil ls -l gs://vic-ui-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    Set Suite Variable  ${LATEST_VIC_UI_TARBALL}  ${input2}
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-engine-builds/${input}  ${LATEST_VIC_ENGINE_TARBALL}
+    Log To Console  \nDownloading VIC engine...
+    ${target_dir}=  Set Variable  bin    
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  /tmp/vic.tar.gz
     Should Be True  ${results}
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-ui-builds/${input2}  ${LATEST_VIC_UI_TARBALL}
-    Should Be True  ${results}
+    # Run  mkdir -p ${target_dir}/${LATEST_VIC_ENGINE_TARBALL}
+    # ${rc}  ${out}=  Run And Return Rc And Output  tar -xvzf /tmp/vic.tar.gz --strip-components=1 --directory=${target_dir}/${LATEST_VIC_ENGINE_TARBALL}
+    # Should Be Equal As Integers  ${rc}  0
+    # Run Keyword Unless  ${rc} == 0  Log  ${out}
     Prepare VIC Engine Binaries
+
+    # ${input}=  Run  gsutil ls -l gs://vic-engine-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
+    # Log  Fetching the latest VIC UI tar ball...
+    # ${input2}=  Run  gsutil ls -l gs://vic-ui-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
+    # Set Suite Variable  ${LATEST_VIC_UI_TARBALL}  ${input2}
+    # ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-engine-builds/${input}  ${LATEST_VIC_ENGINE_TARBALL}
+    # Should Be True  ${results}
+    # ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-ui-builds/${input2}  ${LATEST_VIC_UI_TARBALL}
+    # Should Be True  ${results}
+    # Prepare VIC Engine Binaries
 
 Setup Test Matrix
     # skip matrix
@@ -385,7 +389,7 @@ Cleanup Testbed
 
     # Delete binaries
     Run  rm -rf vicui-test-report-*.zip
-    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL} ${LATEST_VIC_UI_TARBALL} ui-nightly-run-bin
+    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL} ui-nightly-run-bin
     Run  rm -rf tests/manual-test-cases/Group18-VIC-UI/*VCH-0*
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
