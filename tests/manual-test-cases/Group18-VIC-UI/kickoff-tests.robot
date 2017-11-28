@@ -38,6 +38,7 @@ Prepare Testbed
     Check Working Dir
     Check Drone
     Check Govc
+    Install VIC Product OVA  ${BUILD_3634791_IP}
     Install VIC Product OVA  ${BUILD_5318154_IP}
     # TODO: update
     Get Vic Engine Binary
