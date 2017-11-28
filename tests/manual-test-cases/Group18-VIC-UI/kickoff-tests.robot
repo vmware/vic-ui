@@ -90,6 +90,15 @@ Prepare VIC Engine Binaries
     # Should Be Equal As Integers  ${rc3}  0
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
+    Run  cp -rf ui-nightly-run-bin/ui/* scripts/
+    ${sed_cmd}=  Catenate  SEPARATOR=\n
+    ...  sed '/\$CFLAGS \$plugin_flags/a \\
+    ...  --debug 3 \\\\
+    ...  ' scripts/VCSA/install.sh > /tmp/install.sh
+    ${rc}  ${out}=  Run And Return Rc And Output  ${sed_cmd}
+    Should Be Equal As Integers  ${rc}  0
+    Run  cp /tmp/install.sh scripts/VCSA/install.sh
+    Log  ${out}
     # TODO: fix up non nightly tests (check)
     #Prepare Flex And H5 Plugins For Testing
 
