@@ -91,11 +91,8 @@ Prepare VIC Engine Binaries
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
-    ${sed_cmd}=  Catenate  SEPARATOR=\n
-    ...  sed '/\$CFLAGS \$plugin_flags/a \\
-    ...  --debug 3 \\\\
-    ...  ' scripts/VCSA/install.sh > /tmp/install.sh
-    ${rc}  ${out}=  Run And Return Rc And Output  ${sed_cmd}
+    # TODO: if this works for VC6.0 and VC6.5 make a PR that updates all sh and bat files
+    ${rc}  ${out}=  Run And Return Rc And Output  sed 's/local plugin_flags=.*/local plugin_flags="--version \$version --company \$company --url \$plugin_url\$plugin_key-v\$version\.zip --configure-ova --type=VicApplianceVM --debug 3"/' scripts/VCSA/install.sh > /tmp/install.sh
     Should Be Equal As Integers  ${rc}  0
     Run  cp /tmp/install.sh scripts/VCSA/install.sh
     Log  ${out}

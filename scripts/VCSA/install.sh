@@ -159,14 +159,8 @@ register_plugin() {
     echo "Preparing to register vCenter Extension $1..."
     echo "-------------------------------------------------------------"
 
-    if [ $plugin_key == "com.vmware.vic" ]; then
-        CFLAGS="$COMMONFLAGS --configure-ova --type=VicApplianceVM"
-    else
-        CFLAGS=$COMMONFLAGS
-    fi
-
     $PLUGIN_MANAGER_BIN install --key $plugin_key \
-                                $CFLAGS $plugin_flags \
+                                $COMMONFLAGS $plugin_flags \
                                 --thumbprint $VC_THUMBPRINT \
                                 --server-thumbprint $VIC_UI_HOST_THUMBPRINT \
                                 --name "$plugin_name" \
