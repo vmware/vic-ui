@@ -55,45 +55,21 @@ if [ ! -f $VIC_MACHINE_BIN_PATH ] ; then
     exit 1
 fi
 
-# get version strings
-FULL_VER_STRING=$($VIC_MACHINE_BIN_PATH version | awk '{print $3}' | sed -e 's/\-rc[[:digit:]]//g')
-MAJOR_MINOR_PATCH=$(echo $FULL_VER_STRING | awk -F- '{print $1}' | cut -c 2-)
-BUILD_NUMBER=$(echo $FULL_VER_STRING | awk -F- '{print $2}')
-
 if [ ! -d ${VIC_BIN_ROOT}ui ] ; then
     echo "${VIC_BIN_ROOT}ui was not found!" >&2
     exit 1
 fi
 
+# get version strings
+FULL_VER_STRING=$($VIC_MACHINE_BIN_PATH version | awk '{print $3}' | sed -e 's/\-rc[[:digit:]]//g')
+MAJOR_MINOR_PATCH=$(echo $FULL_VER_STRING | awk -F- '{print $1}' | cut -c 2-)
+BUILD_NUMBER=$(echo $FULL_VER_STRING | awk -F- '{print $2}')
+VIC_ENGINE_VER_STRING=${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}
+VIC_UI_VER_STRING=$(ls -l ${VIC_BIN_ROOT}ui/plugin-packages | grep '^d' | head -1 | awk '{print $9}' | awk -F- '{print $2}')
+
 # update plugin-manifest
-sed "s/version=.*/version=\"${MAJOR_MINOR_PATCH}\.${BUILD_NUMBER}\"/" ${VIC_BIN_ROOT}ui/plugin-manifest > /tmp/plugin-manifest
+sed "s/summary=.*/summary=\"vSphere Client Plugin for vSphere Integrated Containers Engine (v${VIC_ENGINE_VER_STRING})\"/" ${VIC_BIN_ROOT}ui/plugin-manifest > /tmp/plugin-manifest
 mv /tmp/plugin-manifest ${VIC_BIN_ROOT}ui/plugin-manifest
 
-# update plugin-package.xml for flex and h5 client plugins
-VIC_UI_VER_STRING=$(ls -l ${VIC_BIN_ROOT}ui/plugin-packages | grep '^d' | head -1 | awk '{print $9}' | awk -F- '{print $2}')
-sed "s/vic\" version=\".*[[:digit:]]\"/vic\" version=\"$MAJOR_MINOR_PATCH\.$BUILD_NUMBER\"/" ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-${VIC_UI_VER_STRING}/plugin-package.xml > /tmp/h5c-plugin-package.xml
-sed "s/vic\.ui\" version=\".*[[:digit:]]\"/vic\.ui\" version=\"$MAJOR_MINOR_PATCH\.$BUILD_NUMBER\"/" ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-${VIC_UI_VER_STRING}/plugin-package.xml > /tmp/flex-plugin-package.xml
-mv /tmp/h5c-plugin-package.xml ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-${VIC_UI_VER_STRING}/plugin-package.xml
-mv /tmp/flex-plugin-package.xml ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-${VIC_UI_VER_STRING}/plugin-package.xml
-
-# update configs.properties in vic-service.jar with correct version info (h5 client plugin only)
-cd ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-${VIC_UI_VER_STRING}/plugins
-unzip -o -d tmp vic-service.jar >/dev/null && cd tmp
-sed "s/uiVersion\=.*/uiVersion=v${MAJOR_MINOR_PATCH}\.${BUILD_NUMBER}/" configs.properties > /tmp/vic-service-configs.properties
-mv /tmp/vic-service-configs.properties configs.properties
-rm ../vic-service.jar
-jar cfm ../vic-service.jar META-INF/MANIFEST.MF * >/dev/null
-cd .. && rm -rf tmp && cd $CURRENT_WORKING_DIR
-
 echo version from the vic-ui repo is "${VIC_UI_VER_STRING}"
-echo version from vic-machine binary is "v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}"
-echo
-
-# rename the plugin root folders
-if [ ! $(echo $VIC_UI_VER_STRING | grep -o "v[[:digit:]]\.[[:digit:]]\.[[:digit:]]\.[[:digit:]]\+" | grep -o "v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}") ] ; then
-    mv ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-${VIC_UI_VER_STRING} ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}
-    mv ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-${VIC_UI_VER_STRING} ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}
-fi
-
-cd ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER} && rm ../*.zip && zip -9 -r ../com.vmware.vic-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}.zip * && cd ${CURRENT_WORKING_DIR}
-cd ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER} && rm ../*.zip && zip -9 -r ../com.vmware.vic.ui-v${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}.zip * && cd ${CURRENT_WORKING_DIR}
+echo version from vic-machine binary is "${VIC_ENGINE_VER_STRING}"
