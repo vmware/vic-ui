@@ -147,9 +147,6 @@ describe('VicVchViewComponent', () => {
             expect(cellElements[4].nativeElement.textContent).toContain('10.17.109.80:2376');
             expect(cellElements[5].nativeElement.textContent).toContain('10.17.109.80:2378');
         }
-        connection.mockRespond(new Response(new ResponseOptions({
-          body: true
-        })));
     }));
 
     it('should render zero row for malformed data', async(() => {
@@ -164,10 +161,6 @@ describe('VicVchViewComponent', () => {
             const rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
             const rowElementsLength = rowElements.length;
             expect(rowElementsLength).toBe(0);
-
-            connection.mockRespond(new Response(new ResponseOptions({
-              body: true
-            })));
         }
     }));
 
@@ -203,37 +196,15 @@ describe('VicVchViewComponent', () => {
             WS_VCH.DG.COLUMNS.defaults[
             WS_VCH.DG.COLUMNS.keys.VCH_ADMIN_PORTAL
             ]);
-
-        connection.mockRespond(new Response(new ResponseOptions({
-          body: true
-        })));
     }));
 
-    it('should render the new VCH button for an admin user', async(() => {
+    it('should render the new VCH button', async(() => {
         fixture.componentInstance.ngOnInit();
         fixture.componentInstance.reloadVchs();
         fixture.detectChanges();
-        fixture.componentInstance.isVsphereAdmin = true;
         fixture.detectChanges();
         const actionBarEl = fixture.debugElement.query(
             By.css('clr-dg-action-bar'));
         expect(actionBarEl).toBeTruthy();
-        connection.mockRespond(new Response(new ResponseOptions({
-          body: true
-        })));
-    }));
-
-    it('should not render the new VCH button for a non-admin user', async(() => {
-        fixture.componentInstance.ngOnInit();
-        fixture.componentInstance.reloadVchs();
-        fixture.detectChanges();
-        fixture.componentInstance.isVsphereAdmin = false;
-        fixture.detectChanges();
-        const actionBarEl = fixture.debugElement.query(
-            By.css('clr-dg-action-bar'));
-        expect(actionBarEl).toBeNull();
-        connection.mockRespond(new Response(new ResponseOptions({
-          body: true
-        })));
     }));
 });
