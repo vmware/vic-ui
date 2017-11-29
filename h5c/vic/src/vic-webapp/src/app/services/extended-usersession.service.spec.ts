@@ -57,63 +57,6 @@ describe('ExtendedUserSessionService', () => {
         };
     };
 
-    it('should return true for isVsphereAdmin for an admin user ', async(() => {
-        let backend: MockBackend;
-        let connection: MockConnection;
-        TestBed.configureTestingModule({
-            providers: [
-                {
-                    provide: GlobalsService,
-                    useValue: getMockedGlobalsService([])
-                },
-                ExtendedUserSessionService,
-                Http,
-                { provide: ConnectionBackend, useClass: MockBackend },
-                { provide: RequestOptions, useClass: BaseRequestOptions }
-            ]
-        }).compileComponents();
-        service = TestBed.get(ExtendedUserSessionService);
-        backend = TestBed.get(ConnectionBackend);
-        backend.connections.subscribe((c: MockConnection) => connection = c);
-
-        service.isVsphereAdmin$.subscribe(results => {
-            expect(results).toBeTruthy();
-        });
-
-        connection.mockRespond(new Response(new ResponseOptions({
-          body: true
-        })));
-
-    }));
-
-    it('should return false for isVsphereAdmin for a non-admin user', async(() => {
-        let backend: MockBackend;
-        let connection: MockConnection;
-        TestBed.configureTestingModule({
-            providers: [
-                {
-                    provide: GlobalsService,
-                    useValue: getMockedGlobalsService([])
-                },
-                ExtendedUserSessionService,
-                Http,
-                { provide: ConnectionBackend, useClass: MockBackend },
-                { provide: RequestOptions, useClass: BaseRequestOptions }
-            ]
-        }).compileComponents();
-        service = TestBed.get(ExtendedUserSessionService);
-        backend = TestBed.get(ConnectionBackend);
-        backend.connections.subscribe((c: MockConnection) => connection = c);
-
-        service.isVsphereAdmin$.subscribe(results => {
-            expect(results).toBeFalsy();
-        });
-
-        connection.mockRespond(new Response(new ResponseOptions({
-          body: false
-        })));
-    }));
-
     it('should return locale, samlTokenXml and ServerInfos', async(() => {
         TestBed.configureTestingModule({
             imports: [ HttpModule ],
