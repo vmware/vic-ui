@@ -20,20 +20,27 @@ Resource         ../../resources/Util.robot
 Resource         ./vicui-common.robot
 
 *** Variables ***
-${TEST_SCRIPTS_ROOT}     tests/manual-test-cases/Group18-VIC-UI/
-${VICTEST2XL}            ${TEST_SCRIPTS_ROOT}/victest2xl.py
-${IS_NIGHTLY_TEST}       ${TRUE}
+${TEST_SCRIPTS_ROOT}           tests/manual-test-cases/Group18-VIC-UI/
+${VICTEST2XL}                  ${TEST_SCRIPTS_ROOT}/victest2xl.py
+${IS_NIGHTLY_TEST}             ${TRUE}
 ${BUILD_VER_ISSUE_WORKAROUND}  ${TRUE}
 ${ALL_TESTS_PASSED}            ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
+    # ova url is checked here. should be taken in runtime as a variable
+    # e.g. robot --variable ova_url:https://storage.googleapis.com/vic-product-ova-builds/build-to-test.ova
+    Variable Should Exist  ${ova_url}
+
     ${ts}=  Get Current Date  result_format=epoch  exclude_millis=True
     Set Suite Variable  ${time_start}  ${ts}
     Cleanup Previous Test Logs
     Check Working Dir
     Check Drone
-    Get Latest Vic Engine Binary
+    Check Govc
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
+    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
+    Get Vic Engine Binaries
     Setup Test Matrix
 
 Check Working Dir
@@ -51,34 +58,46 @@ Check Drone
     Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
     Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
 
+Check Govc
+    ${rc}=  Run And Return Rc  govc
+    Should Be True  ${rc} != 127
+
 Cleanup Previous Test Logs
     Log  Removing UI test result directories if present...
     Run  rm -rf ui-test-results 2>/dev/null
     Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
 
-Download VIC Engine Tarball
-    [Arguments]  ${url}  ${filename}
-    Log  Downloading ${url}...
-    ${rc}=  Run And Return Rc  wget ${url} -O ${filename}
+Download VIC Engine Tarball From OVA
+    [Arguments]  ${vcenter-build}  ${filename}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_${vcenter-build}}:9443/files
+    Should Be Equal As Integers  ${rc}  0
+    ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz)
+    Should Not Be Empty  ${tarball_file}
+    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_${vcenter-build}}:9443/files/${tarball_file} -O ${filename}
     Should Be Equal As Integers  ${rc}  0
     OperatingSystem.File Should Exist  ${filename}
+    Set Suite Variable  ${buildNumber}  ${tarball_file}
+    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${tarball_file}
     [Return]  ${rc} == 0
 
 Prepare VIC Engine Binaries
+    [Arguments]  ${vc-build}
     Log  Extracting binary files...
     ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
-    ${rc2}=  Run And Return Rc  tar xvzf ${LATEST_VIC_ENGINE_TARBALL} -C ui-nightly-run-bin --strip 1
-    ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
+    ${rc2}=  Run And Return Rc  tar xvzf /tmp/vic.tar.gz -C ui-nightly-run-bin --strip 1
+    # ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
     Should Be Equal As Integers  ${rc1}  0
     Should Be Equal As Integers  ${rc2}  0
-    Should Be Equal As Integers  ${rc3}  0
+    # Should Be Equal As Integers  ${rc3}  0
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
-    Prepare Flex And H5 Plugins For Testing
+    Run  cp -rf ui-nightly-run-bin/ui/* scripts/
+    Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
+    Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
 
 Prepare Flex And H5 Plugins For Testing
     Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build Flex And H5 Plugins
-    Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND}  Sync Vic Ui Version With Vic Repo
+    Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND} and not ${IS_NIGHTLY_TEST}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
@@ -111,19 +130,21 @@ Build Flex And H5 Plugins
     Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build H5 Client plugin! ${out}
     Log To Console  Successfully built H5 Client plugin.\n
 
-Get Latest Vic Engine Binary
+Get Vic Engine Binaries
     Log  Fetching the latest VIC Engine tar ball...
-    ${input}=  Run  gsutil ls -l gs://vic-engine-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    Set Suite Variable  ${buildNumber}  ${input}
-    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${input}
-    Log  Fetching the latest VIC UI tar ball...
-    ${input2}=  Run  gsutil ls -l gs://vic-ui-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    Set Suite Variable  ${LATEST_VIC_UI_TARBALL}  ${input2}
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-engine-builds/${input}  ${LATEST_VIC_ENGINE_TARBALL}
+    Log To Console  \nDownloading VIC engine for VCSA 6.0u2...
+    ${target_dir}=  Set Variable  bin    
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.0u2  /tmp/vic.tar.gz
     Should Be True  ${results}
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-ui-builds/${input2}  ${LATEST_VIC_UI_TARBALL}
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.0 instance
+    Prepare VIC Engine Binaries  3634791
+
+    Log To Console  \nDownloading VIC engine for VCSA 6.5d...
+    ${target_dir}=  Set Variable  bin
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5d  /tmp/vic.tar.gz
     Should Be True  ${results}
-    Prepare VIC Engine Binaries
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.5 instance
+    Prepare VIC Engine Binaries  5318154
 
 Setup Test Matrix
     # skip matrix
@@ -230,6 +251,7 @@ Run Script Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/${test_name}-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g"
     ...  -e "s|\#ROBOT_SCRIPT|${test_name}\.robot|g" > .drone.local.tests.yml
@@ -295,6 +317,7 @@ Run Plugin Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/18-4-VIC-UI-Plugin-tests-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#SELENIUM_BROWSER|${selenium_browser}|g"
     ...  -e "s|\#BROWSER_NORMALIZED_NAME|${selenium_browser_normalized}|g"
@@ -364,7 +387,7 @@ Cleanup Testbed
 
     # Delete binaries
     Run  rm -rf vicui-test-report-*.zip
-    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL} ${LATEST_VIC_UI_TARBALL} ui-nightly-run-bin
+    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL} ui-nightly-run-bin
     Run  rm -rf tests/manual-test-cases/Group18-VIC-UI/*VCH-0*
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
