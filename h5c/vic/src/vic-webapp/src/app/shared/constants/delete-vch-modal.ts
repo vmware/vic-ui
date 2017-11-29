@@ -19,4 +19,4 @@ export const DELETE_VCH_MODAL_URL =
   `/ui/vic/resources/${environment.production ? 'dist' : 'build-dev'}/index.html?view=delete-vch`;
 export const DELETE_VCH_MODAL_WIDTH = 600;
 export const DELETE_VCH_MODAL_HEIGHT = 360;
-export const DELETE_VCH_MODAL_ERROR_MESSAGE = 'delete-vch-modal.error';
+export const DELETE_VCH_MODAL_ERROR_EVENT = 'delete-vch-modal.error';

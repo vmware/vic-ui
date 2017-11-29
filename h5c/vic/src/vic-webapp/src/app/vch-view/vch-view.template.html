@@ -67,7 +67,7 @@
 
   <clr-dg-row *ngFor="let item of vchs">
     <clr-dg-action-overflow class="{{item.name}}">
-      <button class="action-item" (click)="deleteVch(item)" class="{{item.name}}">Delete</button>
+      <button class="action-item {{item.name}}" (click)="deleteVch(item)">Delete</button>
     </clr-dg-action-overflow>
     <clr-dg-row-detail>
       <clr-dg-cell>
