@@ -68,7 +68,7 @@ VIC_ENGINE_VER_STRING=${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}
 VIC_UI_VER_STRING=$(ls -l ${VIC_BIN_ROOT}ui/plugin-packages | grep '^d' | head -1 | awk '{print $9}' | awk -F- '{print $2}')
 
 # update plugin-manifest
-sed "s/summary=.*/summary=\"Flex Client Plugin for vSphere Integrated Containers Engine (v${VIC_ENGINE_VER_STRING})\"/" ${VIC_BIN_ROOT}ui/plugin-manifest > /tmp/plugin-manifest
+sed "s/summary=.*/summary=\"vSphere Client Plugin for vSphere Integrated Containers Engine (v${VIC_ENGINE_VER_STRING})\"/" ${VIC_BIN_ROOT}ui/plugin-manifest > /tmp/plugin-manifest
 mv /tmp/plugin-manifest ${VIC_BIN_ROOT}ui/plugin-manifest
 
 echo version from the vic-ui repo is "${VIC_UI_VER_STRING}"
