@@ -15,7 +15,7 @@
 */
 
 import {Component, ElementRef, OnInit, Renderer, ViewChild} from '@angular/core';
-import {DELETE_VCH_MODAL_ERROR_MESSAGE, DELETE_VCH_MODAL_HEIGHT, VIC_APPLIANCE_PORT} from '../shared/constants';
+import {DELETE_VCH_MODAL_ERROR_EVENT, DELETE_VCH_MODAL_HEIGHT, VIC_APPLIANCE_PORT} from '../shared/constants';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Headers, Http, RequestOptions} from '@angular/http';
 
@@ -151,10 +151,11 @@ export class DeleteVchModalComponent implements OnInit {
   onError(error) {
     const frames = window.parent.frames;
     for (let i = 0; i < frames.length; i++) {
-      frames[i].postMessage(JSON.stringify({
-        type: DELETE_VCH_MODAL_ERROR_MESSAGE,
-        payload: error
-      }), location.protocol + '//' + location.host);
+      frames[i].postMessage({
+        eventType: DELETE_VCH_MODAL_ERROR_EVENT,
+        // We need to stringify here since deep nesting and recursive objects produce an error
+        payload: JSON.stringify(error)
+      }, location.protocol + '//' + location.host);
     }
     this.onCancel();
   }
