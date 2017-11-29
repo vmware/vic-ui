@@ -17,7 +17,7 @@
 import {
   CREATE_VCH_WIZARD_URL,
   DATAGRID_REFRESH_EVENT,
-  DELETE_VCH_MODAL_ERROR_MESSAGE,
+  DELETE_VCH_MODAL_ERROR_EVENT,
   DELETE_VCH_MODAL_HEIGHT,
   DELETE_VCH_MODAL_URL,
   DELETE_VCH_MODAL_WIDTH,
@@ -241,9 +241,13 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
 
     const data: any = event.data;
 
-    if (data.type === DELETE_VCH_MODAL_ERROR_MESSAGE) {
+    if (data.eventType === DELETE_VCH_MODAL_ERROR_EVENT) {
       this.zone.run(() => {
-        this.error = data.payload.message || 'Error trying to delete the VCH';
+        let payload;
+        try {
+          payload = JSON.parse(data.payload)
+        } catch (e) {}
+        this.error = payload.message || 'Error trying to delete the VCH';
       });
     } else if (data.eventType === DATAGRID_REFRESH_EVENT) {
       this.zone.run(() => {
