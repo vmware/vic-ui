@@ -214,7 +214,7 @@ Run Testcases On Mac
     # remotely run robot test
     ${run_tests_command}=  Catenate
     ...  cd ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI 2>&1 &&
-    ...  /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${rc}=  Execute Command  ${run_tests_command}  return_rc=True
 
     # Store whether the run was successful
@@ -249,6 +249,8 @@ Run Testcases On Windows
     Put File  ../../../vic-ui-windows.exe  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     Execute Command  rm -rf ${REMOTE_RESULTS_FOLDER}
     Execute Command  mkdir -p ${REMOTE_RESULTS_FOLDER}
@@ -260,7 +262,7 @@ Run Testcases On Windows
     ...  git checkout -f master &&
     ...  git rebase vmware/master &&
     ...  cd tests/manual-test-cases/Group18-VIC-UI &&
-    ...  robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
 
     # Store whether the run was successful, print out any error message
