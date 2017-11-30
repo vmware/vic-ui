@@ -59,23 +59,6 @@ export class ExtendedUserSessionService {
     }
 
     /**
-     * Return if the current user is a vSphere admin
-     * @returns {boolean}
-     */
-    get isVsphereAdmin$(): Observable<boolean> {
-        if (this._isUserVsphereAdmin !== undefined) {
-            return Observable.of(this._isUserVsphereAdmin);
-        }
-
-        return this.http.get(this.IS_VSPHERE_ADMIN_QUERY_URL)
-            .catch(err => Observable.throw(err))
-            .map(response => response.json())
-            .do(response => {
-                this._isUserVsphereAdmin = response;
-            });
-    }
-
-    /**
      * Return SAML token
      * @returns {string}
      */
