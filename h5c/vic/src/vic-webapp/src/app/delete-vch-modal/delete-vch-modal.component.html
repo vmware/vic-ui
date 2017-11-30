@@ -10,10 +10,10 @@
       <div class="clr-wizard-content">
         <div class="clr-wizard-page">
           <p>
-            The virtual container host, {{ vch?.name }}, manages {{ containersCount }} container VMs
-            ({{ stoppedContainersCount }} stopped and {{ suspendedContainersCount }} suspended). All this
-            containers VMs will be deleted. Clicking the option below will also permanently delete from disk all the
-            associated persistent and anonymous volumes. This action can not be undone.
+            The virtual container host "{{ vch?.name }}" manages {{ containersCount }} container VMs
+            ({{ stoppedContainersCount }} stopped and {{ suspendedContainersCount }} suspended). All of these container
+            VMs will be deleted. Clicking the option below will also permanently delete from disk all the associated
+            persistent and anonymous volumes. This action can not be undone.
           </p>
           <form [formGroup]="form" novalidate>
             <div class="checkbox">
@@ -22,7 +22,7 @@
             </div>
           </form>
           <p>
-            Delete virtual container host, {{ vch?.name }}<span *ngIf="form.get('deleteVolumes').value"> and all associated persistent and anonymous volumes</span>?
+            Delete virtual container host "{{ vch?.name }}"<span *ngIf="form.get('deleteVolumes').value"> and all associated persistent and anonymous volumes</span>?
           </p>
         </div>
       </div>
