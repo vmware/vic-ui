@@ -306,6 +306,12 @@
                   {{ containerNetwork.containerNetworkLabel }}
                 </clr-stack-content>
               </clr-stack-block>
+              <clr-stack-block>
+                <clr-stack-label>Firewall policy</clr-stack-label>
+                <clr-stack-content>
+                  {{ containerNetwork.containerNetworkFirewall }}
+                </clr-stack-content>
+              </clr-stack-block>
             </clr-stack-block>
           </div>
           <clr-stack-block *ngIf="payload?.storageCapacity?.hasOwnProperty('baseImageSize')">
