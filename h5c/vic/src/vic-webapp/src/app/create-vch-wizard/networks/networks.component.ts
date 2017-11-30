@@ -120,7 +120,6 @@ export class NetworksComponent implements OnInit {
       containerNetworkIpRange: [{ value: '', disabled: true }, Validators.required],
       containerNetworkType: [{ value: 'dhcp', disabled: true }],
       containerNetworkDns: [{ value: '', disabled: true }, [
-        Validators.required,
         Validators.pattern(ipPattern)
       ]],
       containerNetworkGateway: [{ value: '', disabled: true }, [
@@ -130,7 +129,8 @@ export class NetworksComponent implements OnInit {
       containerNetworkLabel: [{ value: '', disabled: true }, [
         Validators.required,
         Validators.pattern(supportedCharsPattern)
-      ]]
+      ]],
+      containerNetworkFirewall: [{ value: 'published', disabled: true }]
     });
   }
 
@@ -196,6 +196,7 @@ export class NetworksComponent implements OnInit {
           const ipRangeControl = controls['containerNetworkIpRange'];
           const gatewayControl = controls['containerNetworkGateway'];
           const dnsControl = controls['containerNetworkDns'];
+          const firewallControl = controls['containerNetworkFirewall'];
 
           if (networkControl.value) {
             if (labelControl.disabled) {
@@ -204,6 +205,12 @@ export class NetworksComponent implements OnInit {
             if (networkTypeControl.disabled) {
               networkTypeControl.enable();
             }
+            if (dnsControl.disabled) {
+              dnsControl.enable();
+            }
+            if (firewallControl.disabled) {
+              firewallControl.enable();
+            }
             if (networkTypeControl.value === 'static') {
               if (ipRangeControl.disabled) {
                 ipRangeControl.enable();
@@ -211,9 +218,10 @@ export class NetworksComponent implements OnInit {
               if (gatewayControl.disabled) {
                 gatewayControl.enable();
               }
-              if (dnsControl.disabled) {
-                dnsControl.enable();
-              }
+              dnsControl.setValidators([
+                Validators.required,
+                Validators.pattern(ipPattern)
+              ]);
             } else {
               if (ipRangeControl.enabled) {
                 ipRangeControl.disable();
@@ -221,9 +229,9 @@ export class NetworksComponent implements OnInit {
               if (gatewayControl.enabled) {
                 gatewayControl.disable();
               }
-              if (dnsControl.enabled) {
-                dnsControl.disable();
-              }
+              dnsControl.setValidators([
+                Validators.pattern(ipPattern)
+              ]);
             }
           } else {
             if (labelControl.enabled) {
@@ -241,7 +249,15 @@ export class NetworksComponent implements OnInit {
             if (dnsControl.enabled) {
               dnsControl.disable();
             }
+            if (firewallControl.enabled) {
+              firewallControl.disable();
+            }
+            dnsControl.setValidators([
+              Validators.pattern(ipPattern)
+            ]);
           }
+
+          dnsControl.updateValueAndValidity({onlySelf: false, emitEvent: false});
         });
       });
 

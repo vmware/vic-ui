@@ -177,7 +177,6 @@ describe('NetworksComponent', () => {
     controls['containerNetworkType'].setValue('dhcp');
     expect(controls['containerNetworkIpRange'].disabled).toBeTruthy();
     expect(controls['containerNetworkGateway'].disabled).toBeTruthy();
-    expect(controls['containerNetworkDns'].disabled).toBeTruthy();
 
     // Should disable after enable
     controls['containerNetworkType'].setValue('static');
