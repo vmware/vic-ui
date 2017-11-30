@@ -16,13 +16,14 @@
 Documentation  Test 1-01 - Basic VCH Create
 Resource  ../../resources/Util.robot
 Resource  ../Group18-VIC-UI/vicui-common.robot
-Suite Teardown  Cleanup Testbed
 Suite Setup  Prepare Testbed
+Test Teardown  Cleanup Testbed
 
 *** Variables ***
 ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
 ${TMP_OVA_LOCATION}  /tmp/vic-product-ova-for-test.ova
-${OVA_ESX_HOST}  10.160.217.137
+${OVA_ESX_HOST_6.5d}  10.160.217.137
+${OVA_ESX_HOST_6.5u2}  10.161.27.49}
 
 *** Keywords ***
 Prepare Testbed
@@ -44,87 +45,75 @@ Prepare Testbed
     # Check govc
     ${rc}=  Run And Return Rc  govc
     Should Be True  ${rc} != 127
-    Set Environment Variable  GOVC_URL  ${BUILD_5318154_IP}
-    Set Environment Variable  GOVC_INSECURE  1
-    Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
-    Set Environment Variable  GOVC_PASSWORD  Admin!23
 
-    Variable Should Exist  ${ova_url}
-    Log To Console  Downloading VIC Product OVA at ${ova_url}
-    # TODO: uncomment the following 3 lines
-    #${rc}=  Run And Return Rc  curl -sLk ${ova_url} -o ${TMP_OVA_LOCATION}
-    #Should Be True  ${rc} == 0
-    #OperatingSystem.File Should Exist  ${TMP_OVA_LOCATION}
-    Log To Console  OVA successfully downloaded
-    Log To Console  Target vSphere is 6.5 (ob5318154): ${BUILD_5318154_IP}
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
+    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
+    Get Vic Engine Binaries
 
-    # make sure to run robot with the ${ova_url} variable specified as in
-    # robot --variable ova_url:https://storage.googleapis.com/vic-product-ova-builds/build-to-test.ova
-    Install VIC Product OVA  ${TMP_OVA_LOCATION}
+Reboot vSphere Client
+    # reboot vsphere client after installing the plugin
+    Open Connection  ${BUILD_5318154_IP}  prompt=#
+    Login  root  vmware
+    Execute Command  service-control --stop vsphere-ui
+    Execute Command  service-control --start vsphere-ui
 
-    # install VCH and VIC UI plugin
+    # wait until vsphere-ui service is up and running
+    Wait Until Keyword Succeeds  20x  30s  Is vSphere Client Ready
+    Log To Console  vSphere Client has booted.
+    Close connection
+
+Is vSphere Client Ready
+    Log To Console  Waiting until vSphere Client is up and ready...
+    ${out}=  Run  curl -sL https://${TEST_VC_IP}/ui/ -k
+    ${out_len}=  Get Length  ${out}
+    Should Be True  ${out_len} > 0
+    Should Not Contain  ${out}  Service Unavailable
+    Should Not Contain  ${out}  is still initializing
 
 Cleanup Testbed
     Close All Browsers
-    Log To Console  Cleaning up
-    # OperatingSystem.Remove Files  ${TMP_OVA_LOCATION}
-    Cleanup VIC Product OVA  ${ova_name}
-    Remove Environment Variable  GOVC_URL  GOVC_INSECURE  GOVC_USERNAME  GOVC_PASSWORD
+    Log To Console  Removing VIC UI plugins from %{TEST_VCSA_BUILD}...
+    # remove plugins
+    ${vic-ui-binary}=  Set Variable  ../../../vic-ui-linux
+    Run  ${vic-ui-binary} remove --thumbprint %{VC_FINGERPRINT} --target ${TEST_VC_IP} --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --key com.vmware.vic.ui
+    Run  ${vic-ui-binary} remove --thumbprint %{VC_FINGERPRINT} --target ${TEST_VC_IP} --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --key com.vmware.vic
 
-Run GOVC
-    [Arguments]  ${cmd_options}
-    ${rc}  ${output}=  Run And Return Rc And Output  govc ${cmd_options}
-    Log  ${output}
-    Should Be Equal As Integers  ${rc}  0
-    [Return]  ${rc}
+    # revert protractor.conf.js
+    OperatingSystem.Create File  ./h5c/vic/src/vic-webapp/protractor.conf.js  ${original_protractor_conf}
 
-Install VIC Product OVA
-    [Arguments]  ${ova-file}
-    Log To Console  \nInstalling VIC appliance...
-    ${OVA_NAME}=  Evaluate  'OVA-' + str(random.randint(1000,9999))  modules=random 
-    ${output}=  Run  ovftool --datastore='datastore1 (4)' --noSSLVerify --acceptAllEulas --name=${OVA_NAME} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova-file} 'vi://administrator@vsphere.local:Admin!23@${BUILD_5318154_IP}${TEST_DATACENTER}/host/${OVA_ESX_HOST}'
-    Should Contain  ${output}  Completed successfully
-    Should Contain  ${output}  Received IP address:
-    Set Global Variable  ${ova_name}  ${OVA_NAME}
-
-    ${output}=  Split To Lines  ${output} 
-    :FOR  ${line}  IN  @{output}
-    \   ${status}=  Run Keyword And Return Status  Should Contain  ${line}  Received IP address:
-    \   ${ip}=  Run Keyword If  ${status}  Fetch From Right  ${line}  ${SPACE}
-    \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP  ${ip}
-
-    Log To Console  \nWaiting for Getting Started Page to Come Up...
-    :FOR  ${i}  IN RANGE  10
-    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${BUILD_5318154_IP}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP}:9443/register 2>/dev/null
-    \   Exit For Loop If  '200' in '''${out}'''
-    \   Sleep  5s
-    Log To Console  ${rc}
-    Log To Console  ${out}
-    Should Contain  ${out}  200
-
-    Log  %{OVA_IP}
-
-Download VIC Engine
-    [Arguments]  ${target_dir}=bin
-    Log To Console  \nDownloading VIC engine...
-    ${download_file}=  Run command and Return output  curl -sLk https://%{OVA_IP}:9443/files | grep -m 1 -o "vic_[[:digit:]]\+.tar.gz" | tail -1
-    ${download_url}=  Set Variable  https://%{OVA_IP}:9443/files/${download_file}
-    Run command and Return output  mkdir -p ${target_dir}
-    Run command and Return output  curl -k ${download_url} --output ${target_dir}/vic.tar.gz
-    Run command and Return output  tar -xvzf ${target_dir}/vic.tar.gz --strip-components=1 --directory=${target_dir}
-
-Download VIC Engine If Not Already
-    [Arguments]  ${target_dir}=bin
-    ${status}=  Run Keyword And Return Status  Directory Should Not Be Empty  ${target_dir}
-    Run Keyword Unless  ${status}  Download VIC engine
-
-Cleanup VIC Product OVA
-    [Arguments]  ${ova_target_vm_name}
-    Log To Console  \nCleaning up VIC appliance...
-    ${rc}=  Wait Until Keyword Succeeds  10x  5s  Run GOVC  vm.destroy ${ova_target_vm_name}
-    Run Keyword And Ignore Error  Run GOVC  datastore.rm "/datastore1 (4)/vm/${ova_target_vm_name}"
-    Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${BUILD_5318154_IP}
+    # revert app.po.ts
+    OperatingSystem.Create File  ./h5c/vic/src/vic-webapp/e2e/app.po.ts  ${original_app_po_ts}
 
 *** Test Cases ***
-Test
-    Log To Console  OVA IP is %{OVA_IP}
+Test On vSphere 6.5d
+    # install VCH and VIC UI plugin
+    Set Environment Variable  TEST_VCSA_BUILD  5318154
+    Set Environment Variable  TEST_VSPHERE_VER  65
+    Set Environment Variable  VC_FINGERPRINT  ${VC_FINGERPRINT_5318154}
+    Set Global Variable  ${TEST_VC_IP}  ${BUILD_5318154_IP}
+    Set Global Variable  ${TEST_VC_USERNAME}  administrator@vsphere.local
+    Set Global Variable  ${TEST_VC_PASSWORD}  Admin!23
+
+    Set Absolute Script Paths  ./scripts
+    Force Install Vicui Plugin
+    Reboot vSphere Client
+
+    Log To Console  OVA IP is %{OVA_IP_6.5d}
+    ${protractor_conf}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
+    Set Global Variable  ${original_protractor_conf}  ${protractor_conf}
+    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*baseUrl.*|baseUrl: 'https:\/\/${BUILD_5318154_IP}\/ui',|" -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${WINDOWS_HOST_IP}:4444\/wd\/hub',|" h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
+    Should Be Equal As Integers  ${rc}  0
+    Run Keyword Unless  ${rc} == 0  Log  ${out}
+    Run  cp /tmp/protractor.conf.js ./h5c/vic/src/vic-webapp/
+
+    ${app_po_ts}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/e2e/app.po.ts
+    Set Global Variable  ${original_app_po_ts}  ${app_po_ts}
+    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*return browser\.get\(.*|return browser\.get\('https:\/\/${BUILD_5318154_IP}\/ui'\);|" h5c/vic/src/vic-webapp/e2e/app.po.ts > /tmp/app.po.ts
+    Should Be Equal As Integers  ${rc}  0
+    Run Keyword Unless  ${rc} == 0  Log  ${out}
+    Run  cp /tmp/app.po.ts ./h5c/vic/src/vic-webapp/e2e/
+
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && ng e2e
+    Log  ${out}
+    Log To Console  ${out}
+    Should Be Equal As Integers  ${rc}  0
