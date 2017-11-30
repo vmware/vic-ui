@@ -1,37 +1,8 @@
 <div class="col-xs-12 mb-2" *ngIf="errorObj">
     <div class="row">
       <div class="col-xs-12">
-        <clr-alert [clrAlertType]="'danger'"
-                  [clrAlertClosable]="false">
-          <clr-alert-item *ngIf="errorObj.type === 'ssl_cert'">
-            <span class="alert-text">
-              <!-- TODO: i18n -->
-              Failed to verify the VIC machine server at endpoint https://{{ errorObj.payload }}:8443. Please check the following:<br/>
-              1. VIC appliance VM is up, but unreachable due to network misconfigurations<br/>
-              2. VIC appliance VM is up and reachable, but API endpoint is unreachable due to possible issues that include, but not limited to:<br/>
-              &nbsp;&nbsp;- Network misconfiguration<br/>
-              &nbsp;&nbsp;- Firewall rules<br/>
-              &nbsp;&nbsp;- Endpoint being down<br/>
-              3. Your browser may be blocking the connection because of the untrusted SSL certificate. Click <a href="https://{{ errorObj.payload }}:8443/container/hello" target="_blank">here</a> to fix it<br/>
-            </span>
-            <div class="alert-actions">
-              <a href="javascript://" (click)="checkVicMachineServer()">Refresh</a>
-            </div>
-          </clr-alert-item>
-          <!-- vic appliance was not found -->
-          <clr-alert-item *ngIf="errorObj.type === 'vm_not_found'">
-            <span class="alert-text">
-              <!-- TODO: i18n -->
-              Could not find any VIC Appliance VM
-            </span>
-          </clr-alert-item>
-          <!-- other http failures -->
-          <clr-alert-item *ngIf="errorObj.type === 'other'">
-            <span class="alert-text">
-              {{ errorObj.payload }}
-            </span>
-          </clr-alert-item>
-        </clr-alert>
+        <vic-ova-verification [errorObj]="errorObj" (refreshEvent)="checkVicMachineServer()">
+        </vic-ova-verification>
       </div>
     </div>
   </div>

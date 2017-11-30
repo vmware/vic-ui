@@ -20,6 +20,7 @@ import { ClarityModule } from 'clarity-angular';
 import { CommonModule } from '@angular/common';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { VicContainerViewComponent } from './container-view.component';
+import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
 import { VicVmViewService } from '../services/vm-view.service';
 
 const routes: Routes = [
@@ -34,7 +35,10 @@ const routes: Routes = [
         ClarityModule,
         RouterModule.forChild(routes)
     ],
-    declarations: [VicContainerViewComponent],
+    declarations: [
+      VicContainerViewComponent,
+      VicOvaVerificationComponent
+    ],
     providers: [
         VicVmViewService,
         CreateVchWizardService
