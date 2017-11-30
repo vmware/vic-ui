@@ -409,8 +409,16 @@ export class CreateVchWizardComponent implements OnInit {
           }
         };
 
+        if (net.containerNetworkDns) {
+          network['nameservers'] = [net.containerNetworkDns];
+        }
+
         if (net.containerNetworkLabel) {
           network['alias'] = net.containerNetworkLabel;
+        }
+
+        if (net.containerNetworkFirewall) {
+          network['firewall'] = [net.containerNetworkFirewall];
         }
 
         if (net.containerNetworkIpRange) {
@@ -419,8 +427,6 @@ export class CreateVchWizardComponent implements OnInit {
           network['gateway'] = {
             address: net.containerNetworkGateway
           };
-
-          network['nameservers'] = [net.containerNetworkDns];
         }
 
         return network;
