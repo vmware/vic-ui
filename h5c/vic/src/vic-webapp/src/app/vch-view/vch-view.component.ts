@@ -59,7 +59,6 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
   public readonly WS_VCH_CONSTANTS = WS_VCH;
   private refreshSubscription: Subscription;
   public isDgLoading = true;
-  public isVsphereAdmin: boolean;
   public vchs: VirtualContainerHost[] = [];
   public error = '';
   public errorObj: {type: string; payload: any};
@@ -101,10 +100,6 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
       this.vchs = [];
     });
 
-    // check if the current user is a vSphere Admin
-    this.sessionService.isVsphereAdmin$.subscribe(results => {
-      this.isVsphereAdmin = results;
-    });
 
     // listens to a message event from an angular app from another iframe
     // this is set up to handle refreshing the datagrid upon successful vch creation
