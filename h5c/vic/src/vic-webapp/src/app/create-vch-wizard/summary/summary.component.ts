@@ -157,22 +157,28 @@ export class SummaryComponent implements OnInit {
         } else {
           // repeat adding multiple, optional fields with the same key
           for (const i in value) {
-            if (!value[i] || value === '0') {
+            if (!value[i] || value[i] === '0') {
               continue;
             }
 
-            let stringValue;
             const rawValue = value[i];
             if (typeof rawValue === 'string') {
               if (!rawValue.trim()) {
                 continue;
               }
-              stringValue = rawValue;
-            } else if (typeof rawValue === 'object' && isUploadableFileObject(rawValue)) {
-              stringValue = rawValue.name;
+              results.push(`--${newKey} ${rawValue}`);
+            } else if (typeof rawValue === 'object') {
+              if (isUploadableFileObject(rawValue)) {
+                results.push(`--${newKey} ${rawValue.name}`);
+              } else {
+                for (const j in rawValue) {
+                  if (!rawValue[j] || rawValue[j] === '0') {
+                    continue;
+                  }
+                  results.push(`--${j.replace(camelCasePattern, '$1-$2').toLowerCase()} ${this.escapeSpecialCharsForCLI(rawValue[j])}`);
+                }
+              }
             }
-
-            results.push(`--${newKey} ${stringValue}`);
           }
         }
       }
@@ -225,10 +231,19 @@ export class SummaryComponent implements OnInit {
     results['networks']['containerNetworks'] =
       containerNetworksRef.map(containerNetObj => {
         if (containerNetObj['containerNetworkType'] === 'dhcp') {
-          return {
+          const net = {
             containerNetwork: containerNetObj['containerNetwork'] +
-            ':' + containerNetObj['containerNetworkLabel']
+            ':' + containerNetObj['containerNetworkLabel'],
+            containerNetworkFirewall: containerNetObj['containerNetwork'] +
+            ':' + containerNetObj['containerNetworkFirewall']
           };
+
+          if (containerNetObj['containerNetworkDns']) {
+            net['containerNetworkDns'] = containerNetObj['containerNetwork'] +
+              ':' + containerNetObj['containerNetworkDns'];
+          }
+
+          return net;
         } else {
           return {
             containerNetwork: containerNetObj['containerNetwork'] +
@@ -238,7 +253,9 @@ export class SummaryComponent implements OnInit {
             containerNetworkGateway: containerNetObj['containerNetwork'] +
             ':' + containerNetObj['containerNetworkGateway'],
             containerNetworkDns: containerNetObj['containerNetwork'] +
-            ':' + containerNetObj['containerNetworkDns']
+            ':' + containerNetObj['containerNetworkDns'],
+            containerNetworkFirewall: containerNetObj['containerNetwork'] +
+            ':' + containerNetObj['containerNetworkFirewall']
           };
         }
       });
