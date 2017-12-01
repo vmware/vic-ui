@@ -67,34 +67,6 @@ Cleanup Previous Test Logs
     Run  rm -rf ui-test-results 2>/dev/null
     Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
 
-Download VIC Engine Tarball From OVA
-    [Arguments]  ${vcenter-build}  ${filename}
-    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_${vcenter-build}}:9443/files
-    Should Be Equal As Integers  ${rc}  0
-    ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz)
-    Should Not Be Empty  ${tarball_file}
-    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_${vcenter-build}}:9443/files/${tarball_file} -O ${filename}
-    Should Be Equal As Integers  ${rc}  0
-    OperatingSystem.File Should Exist  ${filename}
-    Set Suite Variable  ${buildNumber}  ${tarball_file}
-    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${tarball_file}
-    [Return]  ${rc} == 0
-
-Prepare VIC Engine Binaries
-    [Arguments]  ${vc-build}
-    Log  Extracting binary files...
-    ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
-    ${rc2}=  Run And Return Rc  tar xvzf /tmp/vic.tar.gz -C ui-nightly-run-bin --strip 1
-    # ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
-    Should Be Equal As Integers  ${rc1}  0
-    Should Be Equal As Integers  ${rc2}  0
-    # Should Be Equal As Integers  ${rc3}  0
-    # copy vic-ui-linux and plugin binaries to where test scripts will access them
-    Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
-    Run  cp -rf ui-nightly-run-bin/ui/* scripts/
-    Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
-    Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
-
 Prepare Flex And H5 Plugins For Testing
     Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build Flex And H5 Plugins
     Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND} and not ${IS_NIGHTLY_TEST}  Sync Vic Ui Version With Vic Repo
@@ -129,22 +101,6 @@ Build Flex And H5 Plugins
     ${rc}  ${out}=  Run And Return Rc And Output  ant -f h5c/build-deployable.xml -Denv.VSPHERE_SDK_HOME=${ENV_VSPHERE_SDK_HOME} -Denv.FLEX_HOME=${ENV_FLEX_SDK_HOME} -Denv.VSPHERE_H5C_SDK_HOME=${ENV_HTML_SDK_HOME} -Denv.BUILD_MODE=prod 2>&1
     Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build H5 Client plugin! ${out}
     Log To Console  Successfully built H5 Client plugin.\n
-
-Get Vic Engine Binaries
-    Log  Fetching the latest VIC Engine tar ball...
-    Log To Console  \nDownloading VIC engine for VCSA 6.0u2...
-    ${target_dir}=  Set Variable  bin    
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.0u2  /tmp/vic.tar.gz
-    Should Be True  ${results}
-    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.0 instance
-    Prepare VIC Engine Binaries  3634791
-
-    Log To Console  \nDownloading VIC engine for VCSA 6.5d...
-    ${target_dir}=  Set Variable  bin
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5d  /tmp/vic.tar.gz
-    Should Be True  ${results}
-    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.5 instance
-    Prepare VIC Engine Binaries  5318154
 
 Setup Test Matrix
     # skip matrix

@@ -23,8 +23,10 @@ ${UBUNTU_HOST_IP}                     10.20.121.145
 ${WINDOWS_HOST_IP}                    10.25.200.225
 ${BUILD_3620759_IP}                   10.25.200.237
 ${BUILD_3634791_IP}                   10.25.200.245
+${VC_FINGERPRINT_3634791}             48:8D:8F:52:FC:67:8E:E6:41:A5:DC:B1:0A:0D:E9:8B:DD:DF:18:B0
 ${BUILD_5310538_IP}                   10.25.200.231
 ${BUILD_5318154_IP}                   10.25.200.243
+${VC_FINGERPRINT_5318154}             C4:08:36:41:FE:38:9A:FB:B9:50:CB:A2:FE:CF:04:F8:B7:99:E9:80
 ${TEST_DATASTORE}                     datastore1
 ${TEST_DATACENTER}                    /Datacenter
 ${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
@@ -100,9 +102,9 @@ Cleanup Dangling VMs On VIC UI Test Server
     \   ${rc}  ${output}=  Delete VIC Machine  ${vm}  ${vic-machine-binary}
 
 Set Absolute Script Paths
+    [Arguments]  ${UI_INSTALLERS_ROOT}=../../../scripts
     ${rc}  ${out}=  Run And Return Rc And Output  ver
     ${is_windows}=  Run Keyword And Return Status  Should Contain  ${out}  Windows
-    ${UI_INSTALLERS_ROOT}=  Set Variable  ../../../scripts
     Run Keyword If  ${is_windows}  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/vCenterForWindows  ELSE  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/VCSA
     Should Exist  ${UI_INSTALLER_PATH}
     ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs-%{TEST_VCSA_BUILD}
@@ -293,3 +295,48 @@ Cleanup VIC Product OVA
     ${rc}=  Wait Until Keyword Succeeds  10x  5s  Run GOVC  vm.destroy ${ova_target_vm_name}
     Run Keyword And Ignore Error  Run GOVC  datastore.rm "/${ova-esx-datastore}/vm/${ova_target_vm_name}"
     Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${target-vc-ip}
+
+Get Vic Engine Binaries
+    Log  Fetching the latest VIC Engine tar ball...
+    Log To Console  \nDownloading VIC engine for VCSA 6.0u2...
+    ${target_dir}=  Set Variable  bin    
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.0u2  /tmp/vic.tar.gz
+    Should Be True  ${results}
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.0 instance
+    Prepare VIC Engine Binaries  3634791
+
+    Log To Console  \nDownloading VIC engine for VCSA 6.5d...
+    ${target_dir}=  Set Variable  bin
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5d  /tmp/vic.tar.gz
+    Should Be True  ${results}
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.5 instance
+    Prepare VIC Engine Binaries  5318154
+
+Download VIC Engine Tarball From OVA
+    [Arguments]  ${vcenter-build}  ${filename}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_${vcenter-build}}:9443/files
+    Should Be Equal As Integers  ${rc}  0
+    ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz)
+    Should Not Be Empty  ${tarball_file}
+    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_${vcenter-build}}:9443/files/${tarball_file} -O ${filename}
+    Should Be Equal As Integers  ${rc}  0
+    OperatingSystem.File Should Exist  ${filename}
+    Set Suite Variable  ${buildNumber}  ${tarball_file}
+    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${tarball_file}
+    [Return]  ${rc} == 0
+
+Prepare VIC Engine Binaries
+    [Arguments]  ${vc-build}
+    Log  Extracting binary files...
+    ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
+    ${rc2}=  Run And Return Rc  tar xvzf /tmp/vic.tar.gz -C ui-nightly-run-bin --strip 1
+    # ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
+    Should Be Equal As Integers  ${rc1}  0
+    Should Be Equal As Integers  ${rc2}  0
+    # Should Be Equal As Integers  ${rc3}  0
+    # copy vic-ui-linux and plugin binaries to where test scripts will access them
+    Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
+    Run  cp -rf ui-nightly-run-bin/ui/* scripts/
+    Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
+    Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
+

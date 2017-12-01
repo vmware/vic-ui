@@ -37,6 +37,7 @@ export class VicWebappPage {
   private submit = '#submit';
   private defaultTimeout = 5000;
   private extendedTimeout = 10000;
+  private opsTimeout = 60000;
 
   navigateTo() {
     browser.waitForAngularEnabled(false);
@@ -55,6 +56,14 @@ export class VicWebappPage {
     this.sendKeys(this.inputPassword, this.password);
     // submit
     this.clickByCSS(this.submit);
+  }
+
+  waitUntilStable() {
+    browser.wait(() => {
+      return browser.getCurrentUrl().then(url => {
+        return url.indexOf('/ui') > -1;
+      });
+    }, this.opsTimeout);
   }
 
   navigateToHome() {
@@ -95,17 +104,18 @@ export class VicWebappPage {
 
   selectDatastore() {
     this.waitForElementToBePresent(this.selectorImageStore);
-    this.clickByCSS(this.selectorImageStore + ' option:nth-child(3)');
+    this.clickByText(this.selectorImageStore + ' option', 'datastore1');
+    // this.clickByCSS(this.selectorImageStore + ' option:nth-child(3)');
   }
 
   selectBridgeNetwork() {
     this.waitForElementToBePresent(this.selectorBridgeNetwork);
-    this.clickByCSS(this.selectorBridgeNetwork + ' option:nth-child(2)');
+    this.clickByText(this.selectorBridgeNetwork + ' option', 'bridge');
   }
 
   selectPublicNetwork() {
     this.waitForElementToBePresent(this.selectorPublicNetwork);
-    this.clickByCSS(this.selectorPublicNetwork + ' option:nth-child(3)');
+    this.clickByText(this.selectorPublicNetwork + ' option', 'network');
   }
 
   disableSecureAccess() {
@@ -114,7 +124,6 @@ export class VicWebappPage {
   }
 
   enterOpsUserCreds() {
-    browser.waitForAngularEnabled(false);
     // username
     this.clickByCSS(this.inputOpsUser);
     this.sendKeys(this.inputOpsUser, this.username);
@@ -125,11 +134,10 @@ export class VicWebappPage {
 
   createVch() {
     this.clickByText('Button', 'Finish');
-    browser.sleep(this.extendedTimeout);
-    this.clickByText('Button', 'Cancel');
+    this.waitForElementToBePresent('.spinner', this.defaultTimeout);
     browser.switchTo().defaultContent();
+    this.waitForElementToBeGone(this.iframeModal, this.extendedTimeout * 3);
     this.switchFrame(this.iframeTabs);
-    browser.sleep(this.extendedTimeout);
   }
 
   deleteVch(vch) {
@@ -137,11 +145,10 @@ export class VicWebappPage {
     this.waitForElementToBePresent(this.actionBar + vch);
     this.clickByCSS(this.actionBar + vch);
     this.clickByCSS('button.' + vch);
-    browser.sleep(this.defaultTimeout);
     browser.switchTo().defaultContent();
+    this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
     this.clickByCSS(this.labelDeleteVolumes);
-    browser.sleep(this.defaultTimeout);
     this.clickByText('Button', 'Delete');
     browser.sleep(this.defaultTimeout);
   }
@@ -198,10 +205,17 @@ export class VicWebappPage {
     });
   }
 
-  waitForElementToBePresent(element) {
+  waitForElementToBePresent(el, timeout = this.opsTimeout) {
     browser.wait(function () {
-      return browser.isElementPresent(by.css(element));
-    }, this.defaultTimeout);
+      return browser.isElementPresent(by.css(el));
+    }, timeout);
   };
 
+  waitForElementToBeGone(el, timeout = this.opsTimeout) {
+    browser.wait(function () {
+      return element(by.css(el)).isPresent().then(function(present) {
+        return !present;
+      });
+    }, timeout);
+  };
 }
