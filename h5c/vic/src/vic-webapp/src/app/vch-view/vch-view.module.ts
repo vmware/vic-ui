@@ -21,7 +21,7 @@ import { ClarityModule } from 'clarity-angular';
 import { CommonModule } from '@angular/common';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { ExtendedUserSessionService } from '../services/extended-usersession.service';
-import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
+import { SharedModule } from '../shared/shared.module';
 import { VicVchLogViewComponent } from './vch-log-view/vch-log-view.component';
 import { VicVchViewComponent } from './vch-view.component';
 import { VicVmViewService } from '../services/vm-view.service';
@@ -38,12 +38,12 @@ const routes: Routes = [
         FormsModule,
         ReactiveFormsModule,
         ClarityModule,
-        RouterModule.forChild(routes)
+        RouterModule.forChild(routes),
+        SharedModule
     ],
     declarations: [
       VicVchViewComponent,
-      VicVchLogViewComponent,
-      VicOvaVerificationComponent
+      VicVchLogViewComponent
     ],
     providers: [
         VicVmViewService,
