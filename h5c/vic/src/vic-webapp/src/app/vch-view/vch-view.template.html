@@ -65,7 +65,7 @@
       <clr-icon shape="success" [style.color]="'#1D5100'" *ngSwitchCase="'GREEN'"></clr-icon>
       <clr-icon shape="warning" [style.color]="'#EB8D00'" *ngSwitchCase="'YELLOW'"></clr-icon>
       <clr-icon shape="error" [style.color]="'#A32100'" *ngSwitchCase="'RED'"></clr-icon>
-      <span *ngSwitchDefault>{{item.overallStatus}}</span>
+      <clr-icon shape="unknown-status" *ngSwitchDefault></clr-icon>
     </clr-dg-cell>
     <clr-dg-cell>
       <span *ngIf="item.vchIp">{{ getDockerEndpointString(item) }}</span>
