@@ -14,10 +14,13 @@
  limitations under the License.
 */
 
-import { VicWebappPage } from './app.po';
 import { browser, by, element } from 'protractor';
 
+import { JASMINE_TIMEOUT } from '../src/app/testing/jasmine.constants';
+import { VicWebappPage } from './app.po';
+
 describe('vic-webapp', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 2;
   let page: VicWebappPage;
   let specRunId: number;
   const defaultTimeout = 5000;
@@ -47,12 +50,12 @@ describe('vic-webapp', () => {
 
   it('should login', () => {
     page.login();
-    browser.sleep(10000);
-    browser.waitForAngularEnabled(true);
+    page.waitUntilStable();
     expect(browser.getCurrentUrl()).toContain('/ui');
   });
 
   it('should navigate to vsphere home', () => {
+    browser.waitForAngularEnabled(true);
     page.navigateToHome();
     expect(browser.getCurrentUrl()).toContain('vsphere');
   });
@@ -176,9 +179,7 @@ describe('vic-webapp', () => {
     let vchFound = false;
     browser.switchTo().defaultContent();
     page.switchFrame(iframeTabs);
-    browser.sleep(defaultTimeout);
     page.waitForElementToBePresent(dataGridCell);
-    browser.sleep(defaultTimeout);
     const deletedVch = new RegExp(namePrefix + specRunId);
     element.all(by.css(dataGridCell)).each(function(element, index) {
       element.getText().then(function(text) {
