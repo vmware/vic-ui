@@ -14,6 +14,8 @@
  limitations under the License.
 */
 
+import { Headers, Http, RequestOptions } from '@angular/http';
+
 import {
   CREATE_VCH_WIZARD_URL,
   DATAGRID_REFRESH_EVENT,
@@ -45,6 +47,8 @@ import {
 
 import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
+import { Observable } from 'rxjs/Observable';
+import { VIC_APPLIANCE_PORT } from '../shared/constants/create-vch-wizard';
 import {State} from 'clarity-angular';
 import {Subscription} from 'rxjs/Subscription';
 import {VicVmViewService} from '../services/vm-view.service';
@@ -77,6 +81,8 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
               private globalsService: GlobalsService,
               private sessionService: ExtendedUserSessionService,
               private createWzService: CreateVchWizardService,
+              private http: Http,
+              private extSessionService: ExtendedUserSessionService,
               public vicI18n: Vic18nService) {
   }
 
@@ -223,6 +229,50 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     });
 
     this.vmViewService.getContainersData({}); // TODO: filter containers for the vch
+  }
+
+   /**
+   * Download Certificate for VCH
+   */
+  downloadVchCert(vch: VirtualContainerHost) {
+    this.isDgLoading = true;
+    Observable.combineLatest(
+      this.createWzService.getVicApplianceIp(),
+      this.createWzService.acquireCloneTicket()
+    ).catch(err => {
+      return Observable.throw(err);
+    }).subscribe(([serviceHost, cloneTicket]) => {
+      const vchId = vch.id.split(':')[3];
+      const servicePort = VIC_APPLIANCE_PORT;
+      const targetHost = this.extSessionService.getVcenterServersInfo()[0];
+      const targetHostname = targetHost.name;
+      const targetThumbprint = targetHost.thumbprint;
+      const url =
+        `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/vch/${vchId}/certificate?thumbprint=${targetThumbprint}`;
+
+      const headers  = new Headers({
+        'Content-Type': 'application/json',
+        'X-VMWARE-TICKET': cloneTicket
+      });
+
+      const options  = new RequestOptions({ headers: headers });
+      this.http.get(url, options)
+        .map(response => response.text())
+        .subscribe(response => {
+          const uriContent = 'data:application/octet-stream,' + encodeURIComponent(response);
+          const link = document.createElement('a');
+          document.body.appendChild(link);
+          link.setAttribute('type', 'hidden');
+          link.download = vch.name + '-certificate.pem';
+          link.href = uriContent;
+          link.click();
+          link.remove();
+          this.isDgLoading = false;
+        }, error => {
+          this.error = error.message || 'Error downloading VCH certificate!';
+          this.isDgLoading = false;
+        });
+    });
   }
 
   /**
