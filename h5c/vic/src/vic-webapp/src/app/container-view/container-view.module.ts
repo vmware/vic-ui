@@ -19,6 +19,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ClarityModule } from 'clarity-angular';
 import { CommonModule } from '@angular/common';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
+import { SharedModule } from '../shared/shared.module';
 import { VicContainerViewComponent } from './container-view.component';
 import { VicVmViewService } from '../services/vm-view.service';
 
@@ -32,9 +33,12 @@ const routes: Routes = [
     imports: [
         CommonModule,
         ClarityModule,
-        RouterModule.forChild(routes)
+        RouterModule.forChild(routes),
+        SharedModule
     ],
-    declarations: [VicContainerViewComponent],
+    declarations: [
+      VicContainerViewComponent
+    ],
     providers: [
         VicVmViewService,
         CreateVchWizardService

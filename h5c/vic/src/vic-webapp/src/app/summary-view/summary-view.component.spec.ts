@@ -33,6 +33,7 @@ import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.s
 import { DataPropertyService } from '../services/data-property.service';
 import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
+import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
 import { VicSummaryViewComponent } from './summary-view.component';
 
 describe('VIC object view: Summary tab', () => {
@@ -76,7 +77,8 @@ describe('VIC object view: Summary tab', () => {
                 ClarityModule.forRoot()
             ],
             declarations: [
-                VicSummaryViewComponent
+                VicSummaryViewComponent,
+                VicOvaVerificationComponent
             ]
         }).compileComponents();
     }));
