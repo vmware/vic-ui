@@ -401,6 +401,11 @@ public class PropFetcher implements ClientSessionEndListener {
                         _vimPort.queryManagedBy(service.getExtensionManager(), VICUI_H5C_EXTENSION_KEY);
                 List<PropertyFilterSpec> propertyFilterSpecs = new ArrayList<PropertyFilterSpec>();
 
+                if (applianceVms.size() == 0) {
+                    _logger.warn("No VIC appliance was found");
+                    return vicAppliancesList;
+                }
+
                 for (ManagedObjectReference mor : applianceVms) {
                     ObjectSpec objectSpec = new ObjectSpec();
                     objectSpec.setObj(mor);

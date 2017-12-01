@@ -15,13 +15,6 @@
  limitations under the License.
 */
 
-import { async, TestBed, ComponentFixture } from '@angular/core/testing';
-
-import { By } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { HttpModule } from '@angular/http';
-import { APP_BASE_HREF } from '@angular/common';
-
 import {
     AppAlertComponent,
     AppAlertService,
@@ -30,14 +23,20 @@ import {
     I18nService,
     RefreshService
 } from './shared/index';
-import { ActionDevService } from './services/action-dev.service';
-import { ClarityModule } from 'clarity-angular';
 import { AppRoutingModule, routedComponents } from './app-routing.module';
-import { VchPortletComponent } from './summary-portlet/vch-portlet/vch-portlet.component';
-import { ContainerPortletComponent } from './summary-portlet/container-portlet/container-portlet.component';
-import { VicSummaryViewComponent } from './summary-view/summary-view.component';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+
+import { APP_BASE_HREF } from '@angular/common';
+import { ActionDevService } from './services/action-dev.service';
 import { AppComponent } from './app.component';
+import { ClarityModule } from 'clarity-angular';
+import { ContainerPortletComponent } from './summary-portlet/container-portlet/container-portlet.component';
+import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from './testing/jasmine.constants';
+import { RouterModule } from '@angular/router';
+import { VchPortletComponent } from './summary-portlet/vch-portlet/vch-portlet.component';
+import { VicOvaVerificationComponent } from './shared/vic-ova-verification.component';
+import { VicSummaryViewComponent } from './summary-view/summary-view.component';
 
 describe('VIC UI Unit Tests', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -51,6 +50,7 @@ describe('VIC UI Unit Tests', () => {
           VchPortletComponent,
           ContainerPortletComponent,
           VicSummaryViewComponent,
+          VicOvaVerificationComponent,
           routedComponents,
           AppAlertComponent
         ],

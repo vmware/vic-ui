@@ -50,6 +50,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
+import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
 import { VicVchViewComponent } from './vch-view.component';
 import { VicVmViewService } from '../services/vm-view.service';
 import { VirtualContainerHost } from './vch.model';
@@ -115,7 +116,8 @@ describe('VicVchViewComponent', () => {
                 }}
             ],
             declarations: [
-                VicVchViewComponent
+                VicVchViewComponent,
+                VicOvaVerificationComponent
             ],
             imports: [
                 ClarityModule.forRoot(),
