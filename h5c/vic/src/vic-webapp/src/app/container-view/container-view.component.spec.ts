@@ -37,6 +37,7 @@ import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { VicContainerViewComponent } from './container-view.component';
+import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
 import { VicVmViewService } from '../services/vm-view.service';
 import { WS_CONTAINER } from '../shared/constants';
 
@@ -94,7 +95,8 @@ describe('VicContainerViewComponent', () => {
                 }}
             ],
             declarations: [
-                VicContainerViewComponent
+                VicContainerViewComponent,
+                VicOvaVerificationComponent
             ],
             imports: [
                 ClarityModule.forRoot(),
