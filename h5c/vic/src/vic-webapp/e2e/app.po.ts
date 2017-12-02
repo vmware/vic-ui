@@ -17,6 +17,7 @@ export class VicWebappPage {
 
   private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
+  private datacenterTreenodeCaret = 'button.clr-treenode-caret';
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
@@ -98,8 +99,8 @@ export class VicWebappPage {
   }
 
   selectComputeResource() {
-    this.waitForElementToBePresent('button.clr-treenode-caret');
-    this.clickByCSS('button.clr-treenode-caret');
+    this.waitForElementToBePresent(this.datacenterTreenodeCaret);
+    this.clickByCSS(this.datacenterTreenodeCaret);
     this.clickByCSS(this.buttonComputeResource);
   }
 

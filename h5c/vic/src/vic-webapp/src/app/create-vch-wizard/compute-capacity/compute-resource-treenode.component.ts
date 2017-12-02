@@ -34,45 +34,7 @@ export interface ComputeResource {
 @Component({
   selector: 'vic-compute-resource-treenode',
   styleUrls: ['./compute-capacity.scss'],
-  template: `
-  <ng-template [clrIfExpanded]="false">
-    <ng-container>
-      <!-- cluster and clusterhostsystems -->
-      <clr-tree-node *ngFor="let cluster of clusters"
-                     [clrLoading]="loading">
-        <button class="clr-treenode-link cc-resource"
-                [class.active]="selectedResourceObj && selectedResourceObj.objRef === cluster['objRef']"
-                (click)="selectResource(cluster)">
-          <clr-icon shape="cluster"></clr-icon>
-          {{ cluster['text'] }}
-        </button>
-
-        <ng-template [clrIfExpanded]="false">
-          <ng-container>
-            <clr-tree-node *ngFor="let clHost of clusterHostSystemsMap[cluster.objRef]">
-              <button class="clr-treenode-link cc-resource"
-                      [class.active]="selectedResourceObj && selectedResourceObj.objRef === clHost['objRef']"
-                      (click)="selectResource(clHost, cluster)">
-                <clr-icon shape="host"></clr-icon>
-                {{ clHost['text'] }}
-              </button>
-            </clr-tree-node>
-          </ng-container>
-        </ng-template>
-      </clr-tree-node>
-
-      <!-- standalone hosts -->
-      <clr-tree-node *ngFor="let host of standaloneHosts">
-        <button class="clr-treenode-link cc-resource"
-                [class.active]="selectedResourceObj && selectedResourceObj.objRef === host['objRef']"
-                (click)="selectResource(host)">
-          <clr-icon shape="host"></clr-icon>
-          {{ host['text'] }}
-        </button>
-      </clr-tree-node>
-    </ng-container>
-  </ng-template>
-  `
+  templateUrl: './compute-resource-treenode.template.html'
 })
 export class ComputeResourceTreenodeComponent implements OnInit {
   @Input() datacenter: ComputeResource;
