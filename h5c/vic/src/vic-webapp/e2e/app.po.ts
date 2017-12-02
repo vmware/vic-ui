@@ -98,7 +98,8 @@ export class VicWebappPage {
   }
 
   selectComputeResource() {
-    this.waitForElementToBePresent(this.buttonComputeResource);
+    this.waitForElementToBePresent('button.clr-treenode-caret');
+    this.clickByCSS('button.clr-treenode-caret');
     this.clickByCSS(this.buttonComputeResource);
   }
 
@@ -141,13 +142,13 @@ export class VicWebappPage {
   }
 
   deleteVch(vch) {
-    browser.ignoreSynchronization = true;
     this.waitForElementToBePresent(this.actionBar + vch);
     this.clickByCSS(this.actionBar + vch);
     this.clickByCSS('button.' + vch);
     browser.switchTo().defaultContent();
     this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
+    this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
     browser.sleep(this.defaultTimeout);
