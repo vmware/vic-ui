@@ -143,8 +143,9 @@ export class VicWebappPage {
   deleteVch(vch) {
     browser.ignoreSynchronization = true;
     this.waitForElementToBePresent(this.actionBar + vch);
-    this.clickByCSS(this.actionBar + vch);
-    this.clickByCSS('button.' + vch);
+    const vchActionMenu = this.actionBar + vch;
+    this.clickByCSS(vchActionMenu);
+    this.clickByCSS(vchActionMenu + ' button.action-item-delete');
     browser.switchTo().defaultContent();
     this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
