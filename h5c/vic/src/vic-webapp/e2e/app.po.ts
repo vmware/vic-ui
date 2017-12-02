@@ -17,7 +17,6 @@ export class VicWebappPage {
 
   private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
-  private datacenterTreenodeCaret = 'button.clr-treenode-caret';
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
@@ -99,8 +98,7 @@ export class VicWebappPage {
   }
 
   selectComputeResource() {
-    this.waitForElementToBePresent(this.datacenterTreenodeCaret);
-    this.clickByCSS(this.datacenterTreenodeCaret);
+    this.waitForElementToBePresent(this.buttonComputeResource);
     this.clickByCSS(this.buttonComputeResource);
   }
 
@@ -143,13 +141,14 @@ export class VicWebappPage {
   }
 
   deleteVch(vch) {
-    this.waitForElementToBePresent(this.actionBar + vch);
-    this.clickByCSS(this.actionBar + vch);
-    this.clickByCSS('button.' + vch);
+    browser.ignoreSynchronization = true;
+    const vchActionMenu = this.actionBar + vch;
+    this.waitForElementToBePresent(vchActionMenu);
+    this.clickByCSS(vchActionMenu);
+    this.clickByCSS(vchActionMenu + ' button.action-item-delete');
     browser.switchTo().defaultContent();
     this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
-    this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
     browser.sleep(this.defaultTimeout);
