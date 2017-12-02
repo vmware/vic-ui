@@ -1290,17 +1290,17 @@ clap@^1.0.9:
   dependencies:
     chalk "^1.1.3"
 
-clarity-angular@0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/clarity-angular/-/clarity-angular-0.10.5.tgz#53ec6c11ca89554967a439b823ae837e71edf0bd"
+clarity-angular@0.10.7:
+  version "0.10.7"
+  resolved "https://registry.yarnpkg.com/clarity-angular/-/clarity-angular-0.10.7.tgz#e92adc50508da5c8ba59ec9a80baedd758708619"
 
-clarity-icons@0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/clarity-icons/-/clarity-icons-0.10.5.tgz#a141090bbd75880b0fc5d293a9d0a2d8467688b6"
+clarity-icons@0.10.7:
+  version "0.10.7"
+  resolved "https://registry.yarnpkg.com/clarity-icons/-/clarity-icons-0.10.7.tgz#ef9fba4944c376b0e0e41b4ead697af748f55f5d"
 
-clarity-ui@0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/clarity-ui/-/clarity-ui-0.10.5.tgz#c3424e334460a3896b5cb5f6c6f745a948ffd80c"
+clarity-ui@0.10.7:
+  version "0.10.7"
+  resolved "https://registry.yarnpkg.com/clarity-ui/-/clarity-ui-0.10.7.tgz#3357eb158ace005a81c411ea1678fbe042cfc382"
 
 classlist.js@^1.1.20150312:
   version "1.1.20150312"
