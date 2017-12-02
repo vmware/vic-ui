@@ -14,6 +14,7 @@
  limitations under the License.
 */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { DC_CLUSTER, DC_STANDALONE_HOST } from '../../shared/constants';
 
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { Observable } from 'rxjs/Observable';
@@ -24,6 +25,11 @@ export interface ComputeResource {
   objRef: string;
   aliases: string[];
 }
+
+/**
+ * Component that renders a tree view of the inventory items on the selected Datacenter
+ * where Clusters, ClusterHostSystems and sstandalone hosts are displayed and selectable
+ */
 
 @Component({
   selector: 'vic-compute-resource-treenode',
@@ -36,7 +42,7 @@ export interface ComputeResource {
                      [clrLoading]="loading">
         <button class="clr-treenode-link cc-resource"
                 [class.active]="selectedResourceObj && selectedResourceObj.objRef === cluster['objRef']"
-                (click)="select(cluster)">
+                (click)="selectResource(cluster)">
           <clr-icon shape="cluster"></clr-icon>
           {{ cluster['text'] }}
         </button>
@@ -46,7 +52,7 @@ export interface ComputeResource {
             <clr-tree-node *ngFor="let clHost of clusterHostSystemsMap[cluster.objRef]">
               <button class="clr-treenode-link cc-resource"
                       [class.active]="selectedResourceObj && selectedResourceObj.objRef === clHost['objRef']"
-                      (click)="select(clHost, cluster)">
+                      (click)="selectResource(clHost, cluster)">
                 <clr-icon shape="host"></clr-icon>
                 {{ clHost['text'] }}
               </button>
@@ -59,7 +65,7 @@ export interface ComputeResource {
       <clr-tree-node *ngFor="let host of standaloneHosts">
         <button class="clr-treenode-link cc-resource"
                 [class.active]="selectedResourceObj && selectedResourceObj.objRef === host['objRef']"
-                (click)="select(host)">
+                (click)="selectResource(host)">
           <clr-icon shape="host"></clr-icon>
           {{ host['text'] }}
         </button>
@@ -100,16 +106,9 @@ export class ComputeResourceTreenodeComponent implements OnInit {
     this.createWzService
       .getClustersList()
       .subscribe(val => {
-        this.clusters = val.filter(v => v.nodeTypeId === 'DcCluster');
-        this.standaloneHosts = val.filter(v => v.nodeTypeId === 'DcStandaloneHost');
-
-        // TODO: move these to service
-        const clusterHostsObs = Observable.from(this.clusters)
-          .concatMap((cluster: ComputeResource) => {
-            return this.createWzService.getHostsAndResourcePools(cluster.objRef);
-          });
-
-        clusterHostsObs
+        this.clusters = val.filter(v => v.nodeTypeId === DC_CLUSTER);
+        this.standaloneHosts = val.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
+        this.createWzService.getAllClusterHostSystems(this.clusters)
           .subscribe(clusterHostSystems => {
             // since we use concatMap the order in which we get results is guaranteed
             for (let i = 0; i < this.clusters.length; i++) {
@@ -120,7 +119,7 @@ export class ComputeResourceTreenodeComponent implements OnInit {
       });
   }
 
-  select(obj: ComputeResource, clusterObj?: ComputeResource) {
+  selectResource(obj: ComputeResource, clusterObj?: ComputeResource) {
     this.selectedResourceObj = obj;
     if (clusterObj) {
       this.resourceSelected.emit({

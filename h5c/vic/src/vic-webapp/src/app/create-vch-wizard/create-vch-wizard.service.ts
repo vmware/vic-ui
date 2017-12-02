@@ -29,6 +29,7 @@ import {
 } from '../shared/constants';
 import { Http, URLSearchParams } from '@angular/http';
 
+import { ComputeResource } from './compute-capacity/compute-resource-treenode.component';
 import { GlobalsService } from '../shared';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
@@ -184,6 +185,17 @@ export class CreateVchWizardService {
                    .catch(e => Observable.throw(e))
                    .map(response => response.filter(
                        item => item['nodeTypeId'] !== 'ClusterResPool'));
+    }
+
+    /**
+     * Queries the H5 Client for ClusterHostSystems for all DcClusters
+     * @param clusters
+     */
+    getAllClusterHostSystems(clusters: ComputeResource[]): Observable<any[]> {
+      return Observable.from(clusters)
+        .concatMap((cluster: ComputeResource) => {
+          return this.getHostsAndResourcePools(cluster.objRef);
+        });
     }
 
     getResourceAllocationsInfo(resourceObjId: string, isCluster: boolean): Observable<any> {

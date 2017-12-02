@@ -24,6 +24,7 @@ import {
 
 import { ComputeResource } from './compute-resource-treenode.component';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { DC_CLUSTER } from '../../shared/constants';
 import { Observable } from 'rxjs/Observable';
 
 const endpointMemoryDefaultValue = 2048;
@@ -127,7 +128,7 @@ export class ComputeCapacityComponent implements OnInit {
   }) {
     const dcName = payload.datacenterObj.text;
     const nodeTypeId = payload.obj.nodeTypeId
-    const isCluster = nodeTypeId === 'DcCluster';
+    const isCluster = nodeTypeId === DC_CLUSTER;
 
     let computeResource = `/${dcName}/host`;
     let resourceObj;
