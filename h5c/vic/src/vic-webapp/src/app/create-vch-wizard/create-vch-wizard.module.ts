@@ -13,20 +13,22 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
+
 import { ClarityModule } from 'clarity-angular';
-import { CreateVchWizardComponent } from './create-vch-wizard.component';
-import { VchCreationWizardGeneralComponent } from './general/general.component';
+import { CommonModule } from '@angular/common';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
-import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
-import { NetworksComponent } from './networks/networks.component';
-import { SecurityComponent } from './security/security.component';
-import { OperationsUserComponent } from './operations-user/operations-user.component';
-import { SummaryComponent } from './summary/summary.component';
+import { ComputeResourceTreenodeComponent } from './compute-capacity/compute-resource-treenode.component';
+import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
+import { NetworksComponent } from './networks/networks.component';
+import { NgModule } from '@angular/core';
+import { OperationsUserComponent } from './operations-user/operations-user.component';
+import { SecurityComponent } from './security/security.component';
+import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
+import { SummaryComponent } from './summary/summary.component';
+import { VchCreationWizardGeneralComponent } from './general/general.component';
 
 const routes: Routes = [
   { path: '', component: CreateVchWizardComponent },
@@ -45,6 +47,7 @@ const routes: Routes = [
     CreateVchWizardComponent,
     VchCreationWizardGeneralComponent,
     ComputeCapacityComponent,
+    ComputeResourceTreenodeComponent,
     StorageCapacityComponent,
     NetworksComponent,
     SecurityComponent,
@@ -58,6 +61,7 @@ const routes: Routes = [
     CreateVchWizardComponent,
     VchCreationWizardGeneralComponent,
     ComputeCapacityComponent,
+    ComputeResourceTreenodeComponent,
     StorageCapacityComponent,
     SecurityComponent,
     OperationsUserComponent,

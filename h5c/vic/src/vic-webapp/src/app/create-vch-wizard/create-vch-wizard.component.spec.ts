@@ -20,6 +20,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClarityModule } from 'clarity-angular';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
+import { ComputeResourceTreenodeComponent } from './compute-capacity/compute-resource-treenode.component';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { GlobalsService } from 'app/shared';
@@ -83,6 +84,7 @@ describe('CreateVchWizardComponent', () => {
         CreateVchWizardComponent,
         VchCreationWizardGeneralComponent,
         ComputeCapacityComponent,
+        ComputeResourceTreenodeComponent,
         StorageCapacityComponent,
         NetworksComponent,
         SecurityComponent,

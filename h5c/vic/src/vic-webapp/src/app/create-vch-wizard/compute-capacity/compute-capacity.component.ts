@@ -1,3 +1,5 @@
+import 'rxjs/add/observable/timer';
+
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -15,13 +17,14 @@
 */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/timer';
-import { CreateVchWizardService } from '../create-vch-wizard.service';
 import {
-  unlimitedPattern,
-  getNumericValidatorsArray
+  getNumericValidatorsArray,
+  unlimitedPattern
 } from '../../shared/utils/validators';
+
+import { ComputeResource } from './compute-resource-treenode.component';
+import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { Observable } from 'rxjs/Observable';
 
 const endpointMemoryDefaultValue = 2048;
 
@@ -96,7 +99,6 @@ export class ComputeCapacityComponent implements OnInit {
       .getClustersList()
       .subscribe(val => {
         this.clusters = val;
-        this.isTreeLoading = false;
       });
   }
 
@@ -116,85 +118,86 @@ export class ComputeCapacityComponent implements OnInit {
 
   /**
    * Set the compute resource selected by the user.
-   * @param {any} resource
-   * @param {any?} cluster
+   * @param {obj: ComputeResource; parentClusterObj?: ComputeResource; datacenterObj: ComputeResource}
    */
-  selectComputeResource(resource: any, cluster?: any) {
-    // TODO: improve
-    this.createWzService.getDatacenter().subscribe(dcs => {
-      const datacenterName = dcs[0]['text'];
-      const nodeTypeId = resource['nodeTypeId'];
-      const isCluster = nodeTypeId === 'DcCluster';
-      let resourceObj;
-      let computeResource = `/${datacenterName}/host`;
-      if (isCluster) {
-        computeResource = `${computeResource}/${resource['text']}`;
-        resourceObj = resource['aliases'][0];
+  selectComputeResource(payload: {
+    obj: ComputeResource | any;
+    parentClusterObj?: ComputeResource | any;
+    datacenterObj: ComputeResource | any
+  }) {
+    const dcName = payload.datacenterObj.text;
+    const nodeTypeId = payload.obj.nodeTypeId
+    const isCluster = nodeTypeId === 'DcCluster';
 
+    let computeResource = `/${dcName}/host`;
+    let resourceObj;
+    if (isCluster) {
+      computeResource = `${computeResource}/${payload.obj.text}`;
+      resourceObj = payload.obj.aliases[0];
+    } else {
+      computeResource = payload.parentClusterObj ?
+        `${computeResource}/${payload.parentClusterObj.text}/${payload.obj.text}` :
+        `${computeResource}/${payload.obj.text}`;
+      resourceObj = payload.obj.objRef;
+    }
+
+    this.selectedResourceObjRef = resourceObj;
+    this.selectedObjectName = payload.obj.text;
+    this._selectedComputeResource = computeResource;
+
+    // update resource limit & reservation info
+    this.createWzService.getResourceAllocationsInfo(resourceObj, isCluster)
+    .subscribe(response => {
+      const cpu = response['cpu'];
+      const memory = response['memory'];
+      this.resourceLimits = response;
+
+      // set max limit validator for cpu maxUsage
+      this.form.get('cpuLimit').setValidators([
+        ...getNumericValidatorsArray(true),
+        Validators.max(cpu['maxUsage'])
+      ]);
+
+      // set max limit validator for memory maxUsage
+      this.form.get('memoryLimit').setValidators([
+        ...getNumericValidatorsArray(true),
+        Validators.max(memory['maxUsage'])
+      ]);
+
+      if (this.inAdvancedMode) {
+        // set max limit validator for endpointMemory
+        this.form.get('endpointMemory').setValidators([
+          ...getNumericValidatorsArray(false),
+          Validators.max(memory['maxUsage'])
+        ]);
+
+        // set max limit validator for cpu unreservedForPool
+        this.form.get('cpuReservation').setValidators([
+          ...getNumericValidatorsArray(false),
+          Validators.max(cpu['unreservedForPool'])
+        ]);
+
+        // set max limit validator for memory unreservedForPool
+        this.form.get('memoryReservation').setValidators([
+          ...getNumericValidatorsArray(false),
+          Validators.max(memory['unreservedForPool'])
+        ]);
+
+        // This prevents the next button from getting disabled when the user selects a host or cluster that has less RAM
+        // available for VM endpoint than the default value. As a solution, we set the smaller value between the default
+        // value and memory['maxUsage']
+        this.form.get('endpointMemory').setValue(Math.min(memory['maxUsage'], endpointMemoryDefaultValue) + '');
       } else {
-        computeResource = cluster ?
-          `${computeResource}/${cluster['text']}/${resource['text']}` :
-          `${computeResource}/${resource['text']}`;
-        resourceObj = resource['objRef'];
+        this.form.get('endpointMemory').setValidators([]);
+        this.form.get('cpuReservation').setValidators([]);
+        this.form.get('memoryReservation').setValidators([]);
       }
-      this.selectedResourceObjRef = resource['objRef'];
-      this.selectedObjectName = resource['text'];
-      this._selectedComputeResource = computeResource;
 
-      // update resource limit & reservation info
-      this.createWzService.getResourceAllocationsInfo(resourceObj, isCluster)
-        .subscribe(response => {
-          const cpu = response['cpu'];
-          const memory = response['memory'];
-          this.resourceLimits = response;
-
-          // set max limit validator for cpu maxUsage
-          this.form.get('cpuLimit').setValidators([
-            ...getNumericValidatorsArray(true),
-            Validators.max(cpu['maxUsage'])
-          ]);
-
-          // set max limit validator for memory maxUsage
-          this.form.get('memoryLimit').setValidators([
-            ...getNumericValidatorsArray(true),
-            Validators.max(memory['maxUsage'])
-          ]);
-
-          if (this.inAdvancedMode) {
-            // set max limit validator for endpointMemory
-            this.form.get('endpointMemory').setValidators([
-              ...getNumericValidatorsArray(false),
-              Validators.max(memory['maxUsage'])
-            ]);
-
-            // set max limit validator for cpu unreservedForPool
-            this.form.get('cpuReservation').setValidators([
-              ...getNumericValidatorsArray(false),
-              Validators.max(cpu['unreservedForPool'])
-            ]);
-
-            // set max limit validator for memory unreservedForPool
-            this.form.get('memoryReservation').setValidators([
-              ...getNumericValidatorsArray(false),
-              Validators.max(memory['unreservedForPool'])
-            ]);
-
-            // This prevents the next button from getting disabled when the user selects a host or cluster that has less RAM
-            // available for VM endpoint than the default value. As a solution, we set the smaller value between the default
-            // value and memory['maxUsage']
-            this.form.get('endpointMemory').setValue(Math.min(memory['maxUsage'], endpointMemoryDefaultValue) + '');
-          } else {
-            this.form.get('endpointMemory').setValidators([]);
-            this.form.get('cpuReservation').setValidators([]);
-            this.form.get('memoryReservation').setValidators([]);
-          }
-
-          this.form.get('cpuLimit').updateValueAndValidity();
-          this.form.get('memoryLimit').updateValueAndValidity();
-          this.form.get('endpointMemory').updateValueAndValidity();
-          this.form.get('cpuReservation').updateValueAndValidity();
-          this.form.get('memoryReservation').updateValueAndValidity();
-        });
+      this.form.get('cpuLimit').updateValueAndValidity();
+      this.form.get('memoryLimit').updateValueAndValidity();
+      this.form.get('endpointMemory').updateValueAndValidity();
+      this.form.get('cpuReservation').updateValueAndValidity();
+      this.form.get('memoryReservation').updateValueAndValidity();
     });
   }
 
@@ -211,8 +214,6 @@ export class ComputeCapacityComponent implements OnInit {
     this.createWzService.getDatacenter().subscribe(dcs => {
       this.datacenter = dcs;
     });
-
-    this.loadClusters();
   }
 
   onCommit(): Observable<any> {
