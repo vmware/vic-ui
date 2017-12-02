@@ -1,5 +1,3 @@
-import 'rxjs/add/observable/timer';
-
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -26,6 +24,7 @@ import { ComputeResource } from './compute-resource-treenode.component';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { DC_CLUSTER } from '../../shared/constants';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/timer';
 
 const endpointMemoryDefaultValue = 2048;
 

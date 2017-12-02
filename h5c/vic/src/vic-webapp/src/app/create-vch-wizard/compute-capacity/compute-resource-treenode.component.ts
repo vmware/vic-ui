@@ -70,13 +70,28 @@ export class ComputeResourceTreenodeComponent implements OnInit {
       .subscribe(val => {
         this.clusters = val.filter(v => v.nodeTypeId === DC_CLUSTER);
         this.standaloneHosts = val.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
+
+        // pointer to the current cluster object
+        // since we use concatMap the order in which we get results is guaranteed
+        let idx = 0;
         this.createWzService.getAllClusterHostSystems(this.clusters)
           .subscribe(clusterHostSystems => {
-            // since we use concatMap the order in which we get results is guaranteed
-            for (let i = 0; i < this.clusters.length; i++) {
-              this.clusterHostSystemsMap[this.clusters[i].objRef] = clusterHostSystems;
+            // if this is the last emission set loading var to false
+            if (idx === this.clusters.length - 1) {
+              this.loading = false;
             }
-            this.loading = false;
+
+            // no host is attached to the cluster. at this point it does not make sense
+            // to display the cluster to the user, and trying to utilize the empty cluster
+            // would surely cause an error, so it makes sense to remove the cluster node from view
+            if (!clusterHostSystems.length) {
+              this.clusters = [...this.clusters.slice(0, idx), ...this.clusters.slice(idx + 1)];
+              idx++;
+              return;
+            }
+
+            this.clusterHostSystemsMap[this.clusters[idx].objRef] = clusterHostSystems;
+            idx++;
           });
       });
   }
