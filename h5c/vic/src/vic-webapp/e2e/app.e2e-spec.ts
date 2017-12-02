@@ -14,10 +14,13 @@
  limitations under the License.
 */
 
-import { VicWebappPage } from './app.po';
 import { browser, by, element } from 'protractor';
 
+import { JASMINE_TIMEOUT } from '../src/app/testing/jasmine.constants';
+import { VicWebappPage } from './app.po';
+
 describe('vic-webapp', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 2;
   let page: VicWebappPage;
   let specRunId: number;
   const defaultTimeout = 5000;
@@ -47,12 +50,12 @@ describe('vic-webapp', () => {
 
   it('should login', () => {
     page.login();
-    browser.sleep(10000);
-    browser.waitForAngularEnabled(true);
+    page.waitUntilStable();
     expect(browser.getCurrentUrl()).toContain('/ui');
   });
 
   it('should navigate to vsphere home', () => {
+    browser.waitForAngularEnabled(true);
     page.navigateToHome();
     expect(browser.getCurrentUrl()).toContain('vsphere');
   });
@@ -79,11 +82,11 @@ describe('vic-webapp', () => {
   });
 
   it('should input vch name', () => {
-    browser.driver.findElement(by.css('#nameInput')).sendKeys('-' + specRunId);
+    page.sendKeys('#nameInput', '-' + specRunId);
   });
 
   it('should complete general step', () => {
-    page.clickButton('Next');
+    page.clickByText('Button', 'Next');
     // check if we made it to compute capacity section
     page.waitForElementToBePresent(sectionCompute);
     expect(element(by.css(sectionCompute)).isPresent()).toBe(true);
@@ -94,7 +97,7 @@ describe('vic-webapp', () => {
   });
 
   it('should complete compute capacity step', () => {
-    page.clickButton('Next');
+    page.clickByText('Button', 'Next');
     // check if we made it to storage capacity section
     page.waitForElementToBePresent(sectionStorage);
     expect(element(by.css(sectionStorage)).isPresent()).toBe(true);
@@ -105,7 +108,7 @@ describe('vic-webapp', () => {
   });
 
   it('should complete storage capacity step', () => {
-    page.clickButton('Next');
+    page.clickByText('Button', 'Next');
     // check if we made it to networks section
     page.waitForElementToBePresent(sectionNetworks);
     expect(element(by.css(sectionNetworks)).isPresent()).toBe(true);
@@ -120,18 +123,14 @@ describe('vic-webapp', () => {
   });
 
   it('should complete networks step', () => {
-    page.clickButton('Next');
+    page.clickByText('Button', 'Next');
     // check if we made it to security section
     page.waitForElementToBePresent(sectionSecurity);
     expect(element(by.css(sectionSecurity)).isPresent()).toBe(true);
   });
 
-  /*it('should disable secure access', () => {
-    page.disableSecureAccess();
-  });*/
-
   it('should complete security step', () => {
-    page.clickButton('Next');
+    page.clickByText('Button', 'Next');
     // check if we made it to ops user section
     page.waitForElementToBePresent(sectionOpsUser);
     expect(element(by.css(sectionOpsUser)).isPresent()).toBe(true);
@@ -142,7 +141,7 @@ describe('vic-webapp', () => {
   });
 
   it('should complete ops user step', () => {
-    page.clickButton('Next');
+    page.clickByText('Button', 'Next');
     // check if we made it to summary section
     page.waitForElementToBePresent(sectionSummary);
     expect(element(by.css(sectionSummary)).isPresent()).toBe(true);
@@ -179,10 +178,8 @@ describe('vic-webapp', () => {
     browser.ignoreSynchronization = true;
     let vchFound = false;
     browser.switchTo().defaultContent();
-    browser.switchTo().frame(browser.driver.findElement(by.css(iframeTabs)));
-    browser.sleep(defaultTimeout);
+    page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
-    browser.sleep(defaultTimeout);
     const deletedVch = new RegExp(namePrefix + specRunId);
     element.all(by.css(dataGridCell)).each(function(element, index) {
       element.getText().then(function(text) {

@@ -26,6 +26,7 @@ export class VicWebappPage {
   private inputOpsUser = 'input#ops-user';
   private inputOpsPassword = 'input#ops-password';
   private labelEnableSecure = 'label[for=enable-secure-access]';
+  private labelDeleteVolumes = 'label[for=delete-volumes]';
   private selectorImageStore = 'select#image-store-selector';
   private selectorBridgeNetwork = 'select#bridge-network-selector';
   private selectorPublicNetwork = 'select#public-network-selector';
@@ -35,6 +36,8 @@ export class VicWebappPage {
   private password = 'Admin!23';
   private submit = '#submit';
   private defaultTimeout = 5000;
+  private extendedTimeout = 10000;
+  private opsTimeout = 60000;
 
   navigateTo() {
     browser.waitForAngularEnabled(false);
@@ -44,112 +47,128 @@ export class VicWebappPage {
   login() {
     browser.waitForAngularEnabled(false);
     // username
-    browser.driver.findElement(by.css(this.inputUsername)).click();
-    browser.driver.findElement(by.css(this.inputUsername)).clear();
-    browser.driver.findElement(by.css(this.inputUsername)).sendKeys(this.username);
+    this.clickByCSS(this.inputUsername);
+    this.clear(this.inputUsername);
+    this.sendKeys(this.inputUsername, this.username);
     // password
-    browser.driver.findElement(by.css(this.inputPassword)).click();
-    browser.driver.findElement(by.css(this.inputPassword)).clear();
-    browser.driver.findElement(by.css(this.inputPassword)).sendKeys(this.password);
+    this.clickByCSS(this.inputPassword);
+    this.clear(this.inputPassword);
+    this.sendKeys(this.inputPassword, this.password);
     // submit
-    browser.driver.findElement(by.css(this.submit)).click();
+    this.clickByCSS(this.submit);
+  }
+
+  waitUntilStable() {
+    browser.wait(() => {
+      return browser.getCurrentUrl().then(url => {
+        return url.indexOf('/ui') > -1;
+      });
+    }, this.opsTimeout);
   }
 
   navigateToHome() {
     // click top left vmware logo
     this.waitForElementToBePresent(this.iconVsphereHome);
-    browser.driver.findElement(by.css(this.iconVsphereHome)).click();
+    this.clickByCSS(this.iconVsphereHome);
   }
 
   navigateToVicPlugin() {
     // click vic shortcut icon
-    browser.driver.findElement(by.css(this.iconVicShortcut)).click();
+    this.waitForElementToBePresent(this.iconVicShortcut);
+    this.clickByCSS(this.iconVicShortcut);
   }
 
   navigateToSummaryTab() {
     // click vic link
     this.waitForElementToBePresent(this.iconVicRoot);
-    browser.driver.findElement(by.css(this.iconVicRoot)).click();
+    this.clickByCSS(this.iconVicRoot);
   }
 
   navigateToVchTab() {
     // click vch tab
-    element(by.cssContainingText('a', 'Virtual Container Hosts')).click();
+    this.clickByText('a', 'Virtual Container Hosts');
   }
 
   openVchWizard() {
-    browser.switchTo().frame(browser.driver.findElement(by.css(this.iframeTabs)));
+    this.switchFrame(this.iframeTabs);
     this.waitForElementToBePresent(this.buttonNewVch);
-    browser.driver.findElement(by.css(this.buttonNewVch)).click();
+    this.clickByCSS(this.buttonNewVch);
     browser.switchTo().defaultContent();
-    browser.switchTo().frame(browser.driver.findElement(by.css(this.iframeModal)));
+    this.switchFrame(this.iframeModal);
   }
 
   selectComputeResource() {
     this.waitForElementToBePresent(this.buttonComputeResource);
-    browser.driver.findElement(by.css(this.buttonComputeResource)).click();
+    this.clickByCSS(this.buttonComputeResource);
   }
 
   selectDatastore() {
     this.waitForElementToBePresent(this.selectorImageStore);
-    browser.driver.findElement(by.css(this.selectorImageStore + ' option:nth-child(3)')).click();
+    this.clickByText(this.selectorImageStore + ' option', 'datastore1');
+    // this.clickByCSS(this.selectorImageStore + ' option:nth-child(3)');
   }
 
   selectBridgeNetwork() {
     this.waitForElementToBePresent(this.selectorBridgeNetwork);
-    browser.driver.findElement(by.css(this.selectorBridgeNetwork + ' option:nth-child(2)')).click();
+    this.clickByText(this.selectorBridgeNetwork + ' option', 'bridge');
   }
 
   selectPublicNetwork() {
     this.waitForElementToBePresent(this.selectorPublicNetwork);
-    browser.driver.findElement(by.css(this.selectorPublicNetwork + ' option:nth-child(3)')).click();
+    this.clickByText(this.selectorPublicNetwork + ' option', 'network');
   }
 
   disableSecureAccess() {
     this.waitForElementToBePresent(this.labelEnableSecure);
-    browser.driver.findElement(by.css(this.labelEnableSecure)).click();
+    this.clickByCSS(this.labelEnableSecure);
   }
 
   enterOpsUserCreds() {
-    browser.waitForAngularEnabled(false);
     // username
-    browser.driver.findElement(by.css(this.inputOpsUser)).click();
-    browser.driver.findElement(by.css(this.inputOpsUser)).sendKeys(this.username);
+    this.clickByCSS(this.inputOpsUser);
+    this.sendKeys(this.inputOpsUser, this.username);
     // password
-    browser.driver.findElement(by.css(this.inputOpsPassword)).click();
-    browser.driver.findElement(by.css(this.inputOpsPassword)).sendKeys(this.password);
+    this.clickByCSS(this.inputOpsPassword);
+    this.sendKeys(this.inputOpsPassword, this.password);
   }
 
   createVch() {
-    this.clickButton('Finish');
-    browser.sleep(10000);
-    this.clickButton('Cancel');
+    this.clickByText('Button', 'Finish');
+    this.waitForElementToBePresent('.spinner', this.defaultTimeout);
     browser.switchTo().defaultContent();
-    browser.switchTo().frame(browser.driver.findElement(by.css(this.iframeTabs)));
-    browser.sleep(10000);
+    this.waitForElementToBeGone(this.iframeModal, this.extendedTimeout * 3);
+    this.switchFrame(this.iframeTabs);
   }
 
   deleteVch(vch) {
     browser.ignoreSynchronization = true;
-    this.waitForElementToBePresent(this.actionBar + vch);
-    browser.driver.findElement(by.css(this.actionBar + vch)).click();
-    browser.driver.findElement(by.css('button.' + vch)).click();
-    browser.sleep(this.defaultTimeout);
+    const vchActionMenu = this.actionBar + vch;
+    this.waitForElementToBePresent(vchActionMenu);
+    this.clickByCSS(vchActionMenu);
+    this.clickByCSS(vchActionMenu + ' button.action-item-delete');
     browser.switchTo().defaultContent();
-    browser.switchTo().frame(browser.driver.findElement(by.css(this.iframeModal)));
-    browser.sleep(this.defaultTimeout);
-    this.clickButton('Delete');
+    this.waitForElementToBePresent(this.iframeModal);
+    this.switchFrame(this.iframeModal);
+    this.clickByCSS(this.labelDeleteVolumes);
+    this.clickByText('Button', 'Delete');
     browser.sleep(this.defaultTimeout);
   }
 
-  clickButton(text) {
-    browser.sleep(1000);
-    element(by.cssContainingText('button', text)).click();
+  /* Utility functions */
+
+  clickByText(el, text) {
+    element(by.cssContainingText(el, text)).isPresent().then(function(result) {
+      if (result) {
+        element(by.cssContainingText(el, text)).click();
+      } else {
+        return false;
+      }
+    });
   }
 
   clickByCSS(el) {
     element(by.css(el)).isPresent().then(function(result) {
-      if ( result ) {
+      if (result) {
         browser.driver.findElement(by.css(el)).click();
       } else {
         return false;
@@ -157,10 +176,47 @@ export class VicWebappPage {
     });
   }
 
-  waitForElementToBePresent(element) {
+  clear(el) {
+    element(by.css(el)).isPresent().then(function(result) {
+      if (result) {
+        browser.driver.findElement(by.css(el)).clear();
+      } else {
+        return false;
+      }
+    });
+  }
+
+  sendKeys(el, keys) {
+    element(by.css(el)).isPresent().then(function(result) {
+      if (result) {
+        browser.driver.findElement(by.css(el)).sendKeys(keys);
+      } else {
+        return false;
+      }
+    });
+  }
+
+  switchFrame(el) {
+    element(by.css(el)).isPresent().then(function(result) {
+      if (result) {
+        browser.switchTo().frame(browser.driver.findElement(by.css(el)));
+      } else {
+        return false;
+      }
+    });
+  }
+
+  waitForElementToBePresent(el, timeout = this.opsTimeout) {
     browser.wait(function () {
-      return browser.isElementPresent(by.css(element));
-    }, 5000);
+      return browser.isElementPresent(by.css(el));
+    }, timeout);
   };
 
+  waitForElementToBeGone(el, timeout = this.opsTimeout) {
+    browser.wait(function () {
+      return element(by.css(el)).isPresent().then(function(present) {
+        return !present;
+      });
+    }, timeout);
+  };
 }
