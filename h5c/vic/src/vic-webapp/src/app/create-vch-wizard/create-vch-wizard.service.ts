@@ -29,6 +29,7 @@ import {
 } from '../shared/constants';
 import { Http, URLSearchParams } from '@angular/http';
 
+import { ComputeResource } from './compute-capacity/compute-resource-treenode.component';
 import { GlobalsService } from '../shared';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
@@ -160,20 +161,15 @@ export class CreateVchWizardService {
      * Queries the H5 Client for clusters
      */
     getClustersList(): Observable<any[]> {
-        // TODO: refactor. e.g. move constants to constant file
-        if (this._clusters !== null) {
-            // if there is a cache for clusters, return immediately
-            return Observable.of(this._clusters);
-        } else {
-            return this.getDatacenter()
-                .switchMap(dc => {
-                    return this.http.get('/ui/tree/children?nodeTypeId=RefAsRoot' +
-                        `&objRef=${dc[0]['objRef']}` +
-                        '&treeId=DcHostsAndClustersTree');
-                }).catch(e => Observable.throw(e))
-                .map(response => response.json())
-                .catch(e => Observable.throw(e));
-        }
+        return this.getDatacenter()
+                   .switchMap(dc => {
+                     return this.http.get('/ui/tree/children?nodeTypeId=RefAsRoot' +
+                     `&objRef=${dc[0]['objRef']}` +
+                     '&treeId=DcHostsAndClustersTree');
+                    })
+                    .catch(e => Observable.throw(e))
+                    .map(response => response.json())
+                    .catch(e => Observable.throw(e));
     }
 
     /**
@@ -181,24 +177,25 @@ export class CreateVchWizardService {
      * for the given cluster object id
      */
     getHostsAndResourcePools(clusterObjId: string): Observable<any[]> {
-        // TODO: refactor. e.g. move constants to constant file
-        if (this._clusterToHostRpsMap[clusterObjId]) {
-            // if there is a cache for the provided cluster object id, return immediately
-            return Observable.of(this._clusterToHostRpsMap[clusterObjId]);
-        } else {
-            return this.http.get('/ui/tree/children?nodeTypeId=DcCluster' +
-                `&objRef=${clusterObjId}` +
-                '&treeId=DcHostsAndClustersTree')
-                .catch(e => Observable.throw(e))
-                .map(response => response.json())
-                .catch(e => Observable.throw(e))
-                .map(response => response.filter(
-                    item => item['nodeTypeId'] !== 'ClusterResPool'))
-                .do(response => {
-                    // cache the results
-                    this._clusterToHostRpsMap[clusterObjId] = response;
-                });
-        }
+        return this.http.get('/ui/tree/children?nodeTypeId=DcCluster' +
+                   `&objRef=${clusterObjId}` +
+                   '&treeId=DcHostsAndClustersTree')
+                   .catch(e => Observable.throw(e))
+                   .map(response => response.json())
+                   .catch(e => Observable.throw(e))
+                   .map(response => response.filter(
+                       item => item['nodeTypeId'] !== 'ClusterResPool'));
+    }
+
+    /**
+     * Queries the H5 Client for ClusterHostSystems for all DcClusters
+     * @param clusters
+     */
+    getAllClusterHostSystems(clusters: ComputeResource[]): Observable<any[]> {
+      return Observable.from(clusters)
+        .concatMap((cluster: ComputeResource) => {
+          return this.getHostsAndResourcePools(cluster.objRef);
+        });
     }
 
     getResourceAllocationsInfo(resourceObjId: string, isCluster: boolean): Observable<any> {
@@ -256,6 +253,10 @@ export class CreateVchWizardService {
             .map(response => response.json())
             .catch(e => Observable.throw(e))
             .switchMap(response => {
+                if (!response.hasOwnProperty('datastore') || response['datastore'] === null) {
+                  return Observable.of([]);
+                }
+
                 const refs = response['datastore'].map(ref => {
                     return `urn:vmomi:Datastore:${ref['value']}:${ref['serverGuid']}`;
                 });

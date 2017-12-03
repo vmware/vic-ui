@@ -16,42 +16,22 @@
 
       </div>
       <div class="col-xs-6">
-
-        <clr-tree-node  id="compute-resource-selector"
-                        class="form-control"
-                        [class.invalid]="form.invalid && form.getError('invalidComputeResource')"
-                        [clrLoading]="isTreeLoading"
-                        (clrIfExpandedChange)="loadClusters()">
+        <ng-container>
+          <clr-tree-node id="compute-resource-selector"
+                         class="form-control"
+                         [class.invalid]="form.invalid && form.getError('invalidComputeResource')"
+                         [clrLoading]="isTreeLoading || crTreenode?.loading"
+                         *ngFor="let dc of datacenter">
             <button class="clr-treenode-link">
-                <clr-icon shape="building"></clr-icon>
-                {{ datacenter.length ? datacenter[0]['text'] : '' }}
+              <clr-icon shape="building"></clr-icon>
+              {{ dc.text }}
             </button>
-            <ng-template [clrIfExpanded]="true">
-                <clr-tree-node *ngFor="let cluster of clusters"
-                  [clrLoading]="isTreeLoading"
-                  (clrIfExpandedChange)="loadResources(cluster.objRef)">
-                  <button class="clr-treenode-link cc-resource"
-                      [class.active]="selectedObjectName === cluster['text']"
-                      (click)="selectComputeResource(cluster)">
-                    <clr-icon shape="cluster"></clr-icon>
-                    {{ cluster['text'] }}
-                  </button>
-
-                    <ng-template [clrIfExpanded]="true">
-                        <clr-tree-node *ngFor="let resource of resources">
-                            <button class="clr-treenode-link cc-resource"
-                                  [class.active]="selectedObjectName === resource['text']"
-                                  (click)="selectComputeResource(resource, cluster)">
-                            <clr-icon shape="host"></clr-icon>
-                            {{ resource['text'] }}
-                            </button>
-                        </clr-tree-node>
-
-                    </ng-template>
-                </clr-tree-node>
-            </ng-template>
-        </clr-tree-node>
-
+            <vic-compute-resource-treenode #crTreenode
+                                           [datacenter]="dc"
+                                           (resourceSelected)="selectComputeResource($event)">
+            </vic-compute-resource-treenode>
+          </clr-tree-node>
+        </ng-container>
       </div>
     </div>
 

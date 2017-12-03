@@ -95,7 +95,8 @@ export class VchCreationWizardGeneralComponent implements OnInit {
           this.form.get('name').setErrors({
             resourcePoolExists: true
           });
-          return Observable.throw(null);
+          return Observable.throw(
+            ['There is already a VirtualApp or ResourcePool that exists with the same name']);
         }
 
         const results = {

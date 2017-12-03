@@ -14,12 +14,14 @@
  limitations under the License.
 */
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {ReactiveFormsModule} from '@angular/forms';
+
 import {ClarityModule} from 'clarity-angular';
-import {HttpModule} from '@angular/http';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
-import {Observable} from 'rxjs/Observable';
 import {ComputeCapacityComponent} from './compute-capacity.component';
+import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
+import {CreateVchWizardService} from '../create-vch-wizard.service';
+import {HttpModule} from '@angular/http';
+import {Observable} from 'rxjs/Observable';
+import {ReactiveFormsModule} from '@angular/forms';
 import {TestScheduler} from 'rxjs/Rx';
 
 describe('ComputeCapacityComponent', () => {
@@ -32,7 +34,7 @@ describe('ComputeCapacityComponent', () => {
 
   function setDefaultRequiredValues() {
     component.loadResources(component.clusters[0].text);
-    component.selectComputeResource(component.resources[0]);
+    component.selectComputeResource({datacenterObj: component.datacenter, obj: component.resources[0]});
   }
 
   beforeEach(() => {
@@ -79,7 +81,8 @@ describe('ComputeCapacityComponent', () => {
         }
       ],
       declarations: [
-        ComputeCapacityComponent
+        ComputeCapacityComponent,
+        ComputeResourceTreenodeComponent
       ]
     });
   });
@@ -87,6 +90,14 @@ describe('ComputeCapacityComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ComputeCapacityComponent);
     component = fixture.componentInstance;
+
+    spyOn(component, 'onPageLoad').and.callFake(() => {
+      component.clusters = [{
+        text: 'cluster',
+        nodeTypeId: 'DcCluster',
+        aliases: ['cluster']
+      }];
+    });
     component.onPageLoad();
 
     service = fixture.debugElement.injector.get(CreateVchWizardService);
@@ -188,7 +199,7 @@ describe('ComputeCapacityComponent', () => {
 
   it('should validate advanced fields defaults values', () => {
     component.toggleAdvancedMode();
-    component.selectComputeResource({text: ''});
+    component.selectComputeResource({datacenterObj: component.datacenter, obj: {text: ''}});
     component.onCommit();
     expect(component.form.valid).toBe(true);
 

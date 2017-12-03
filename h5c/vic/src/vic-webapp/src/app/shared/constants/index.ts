@@ -19,3 +19,4 @@ export * from './portlets.text';
 export * from './vicvms';
 export * from './create-vch-wizard';
 export * from './delete-vch-modal';
+export * from './nodetype';
