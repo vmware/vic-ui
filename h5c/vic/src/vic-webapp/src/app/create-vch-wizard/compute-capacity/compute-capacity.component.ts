@@ -128,17 +128,17 @@ export class ComputeCapacityComponent implements OnInit {
     const dcName = payload.datacenterObj.text;
     const nodeTypeId = payload.obj.nodeTypeId
     const isCluster = nodeTypeId === DC_CLUSTER;
+    const resourceObj = payload.obj.objRef;
 
     let computeResource = `/${dcName}/host`;
-    let resourceObj;
+    let resourceObjForResourceAllocations = resourceObj;
     if (isCluster) {
       computeResource = `${computeResource}/${payload.obj.text}`;
-      resourceObj = payload.obj.aliases[0];
+      resourceObjForResourceAllocations = payload.obj.aliases[0];
     } else {
       computeResource = payload.parentClusterObj ?
         `${computeResource}/${payload.parentClusterObj.text}/${payload.obj.text}` :
         `${computeResource}/${payload.obj.text}`;
-      resourceObj = payload.obj.objRef;
     }
 
     this.selectedResourceObjRef = resourceObj;
@@ -146,7 +146,7 @@ export class ComputeCapacityComponent implements OnInit {
     this._selectedComputeResource = computeResource;
 
     // update resource limit & reservation info
-    this.createWzService.getResourceAllocationsInfo(resourceObj, isCluster)
+    this.createWzService.getResourceAllocationsInfo(resourceObjForResourceAllocations, isCluster)
     .subscribe(response => {
       const cpu = response['cpu'];
       const memory = response['memory'];
