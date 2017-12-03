@@ -253,6 +253,10 @@ export class CreateVchWizardService {
             .map(response => response.json())
             .catch(e => Observable.throw(e))
             .switchMap(response => {
+                if (!response.hasOwnProperty('datastore') || response['datastore'] === null) {
+                  return Observable.of([]);
+                }
+
                 const refs = response['datastore'].map(ref => {
                     return `urn:vmomi:Datastore:${ref['value']}:${ref['serverGuid']}`;
                 });
