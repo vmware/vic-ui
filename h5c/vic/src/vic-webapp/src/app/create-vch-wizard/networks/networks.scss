@@ -8,7 +8,13 @@
   width: 6em;
 }
 
-:host ::ng-deep clr-signpost .signpost-action {
-  margin-top: 0;
-  margin-bottom: 0;
+:host ::ng-deep clr-signpost {
+  .signpost-action {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+.bridge-network-signpost {
+  width: 480px;
 }

@@ -67,8 +67,10 @@
         <div class="col-xs-1 px-0">
 
           <clr-signpost>
-            <clr-signpost-content [clrPosition]="'bottom-left'" *clrIfOpen>
-              Only change this IP range if you are using this range elsewhere in your datacenter
+            <clr-signpost-content [clrPosition]="'bottom-left'" *clrIfOpen class="bridge-network-signpost">
+              Bridge networks are the network or networks that container VMs use to communicate with each other.
+              Every virtual container host (VCH) must have a unique bridge network.
+              Do not use the bridge network for any other VM workloads, or as a bridge for more than one VCH.
             </clr-signpost-content>
           </clr-signpost>
 

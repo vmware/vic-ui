@@ -55,8 +55,9 @@
     <div class="form-group row">
       <div class="col-xs-3">
 
-        <label>
-          Base image size
+        <label class="image-size-label">
+          Max Container VM<br>
+          image size
         </label>
 
       </div>
@@ -98,6 +99,16 @@
         </div>
 
       </div>
+
+      <clr-signpost>
+        <clr-signpost-content [clrPosition]="'top-left'" *clrIfOpen>
+          <span>
+            The size of the base image from which to create other images. You do not normally need to change this value.
+            The default size is 8GB, but images are thin-provisioned so they do not usually consume 8GB of space.
+          </span>
+        </clr-signpost-content>
+      </clr-signpost>
+
     </div>
 
   </section>
