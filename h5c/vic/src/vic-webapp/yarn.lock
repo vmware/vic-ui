@@ -6466,9 +6466,9 @@ yn@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
 
-zone.js@0.8.8:
-  version "0.8.8"
-  resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.8.8.tgz#354f02bb7241af834bb83b310308a89ad012d3af"
+zone.js@0.8.9:
+  version "0.8.9"
+  resolved "https://build-artifactory.eng.vmware.com/artifactory/api/npm/npm/zone.js/-/zone.js-0.8.9.tgz#34aaa9a3ec6d0e4acebd1b761adafa590473638b"
 
 zone.js@^0.8.14:
   version "0.8.18"
