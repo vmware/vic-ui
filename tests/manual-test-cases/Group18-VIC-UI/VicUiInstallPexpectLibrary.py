@@ -110,7 +110,7 @@ class VicUiInstallPexpectLibrary(object):
             self._pchild.expect(
                 '.*Are you sure you trust the authenticity of this host (yes/no)?.*')
             self._pchild.sendline('yes')
-            self._pchild.expect('.*exited successfully')
+            self._pchild.expect('.*Exited successfully')
             self._pchild.expect(pexpect.EOF)
 
         if force is True:
@@ -183,7 +183,7 @@ class VicUiInstallPexpectLibrary(object):
                 '.*Are you sure you trust the authenticity of this host (yes/no)?.*')
             self._pchild.sendline('yes')
             self._pchild.expect(
-                ['.*exited successfully', 'Error! Could not unregister.*'])
+                ['.*Exited successfully', 'Error! Could not unregister.*'])
             # self._pchild.interact()
             self._pchild.expect(pexpect.EOF)
 
