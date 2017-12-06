@@ -21,7 +21,6 @@ Test Teardown  Cleanup Testbed
 
 *** Variables ***
 ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
-${TMP_OVA_LOCATION}  /tmp/vic-product-ova-for-test.ova
 ${OVA_ESX_HOST_6.5d}  10.160.217.137
 ${OVA_ESX_HOST_6.5u2}  10.161.27.49
 
@@ -113,7 +112,7 @@ Test On vSphere 6.5d
     Run Keyword Unless  ${rc} == 0  Log  ${out}
     Run  cp /tmp/app.po.ts ./h5c/vic/src/vic-webapp/e2e/
 
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && ng e2e
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
     Log  ${out}
     Log To Console  ${out}
     Should Be Equal As Integers  ${rc}  0

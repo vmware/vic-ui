@@ -240,7 +240,7 @@ Install VIC Product OVA
     Set Global Variable  ${ova_name}  ${ova-name}
 
     # set the local path to ova global
-    Set Global Variable  ${ova_local_path}  /tmp/${ova-name}
+    Set Global Variable  ${ova_local_path}  /vic/${ova-name}
 
     Set Environment Variable  GOVC_URL  ${target-vc-ip}
     Set Environment Variable  GOVC_INSECURE  1
