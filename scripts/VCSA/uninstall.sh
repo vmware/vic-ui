@@ -173,5 +173,6 @@ check_prerequisite
 parse_and_unregister_plugins
 
 echo "--------------------------------------------------------------"
-echo "VIC Engine UI uninstaller exited successfully"
+echo "Uninstallation successful. Restart the vSphere Client services."
+echo "Exited successfully"
 echo ""

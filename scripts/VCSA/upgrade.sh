@@ -76,7 +76,7 @@ done < ./configs
 
 read_vc_information $*
 
-# replace space delimiters with colon delimiters 
+# replace space delimiters with colon delimiters
 VIC_UI_HOST_THUMBPRINT=$(echo $VIC_UI_HOST_THUMBPRINT | sed -e 's/[[:space:]]/\:/g')
 
 # load plugin manifest into env
@@ -322,5 +322,6 @@ check_existing_plugins
 parse_and_upgrade_plugins
 
 echo "--------------------------------------------------------------"
-echo "VIC Engine UI upgrader exited successfully"
+echo "Upgrade successful. Restart the vSphere Client services. All vSphere Client users must log out and log back in again to see the vSphere Integrated Containers plug-in."
+echo "Exited successfully"
 echo ""

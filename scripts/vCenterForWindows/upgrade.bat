@@ -306,5 +306,6 @@ GOTO end
 :end
 DEL scratch*.tmp 2>NUL
 ECHO --------------------------------------------------------------
-ECHO VIC Engine UI upgrader exited successfully
+ECHO Upgrade successful. Restart the vSphere Client services. All vSphere Client users must log out and log back in again to see the vSphere Integrated Containers plug-in.
+ECHO Exited successfully
 ENDLOCAL

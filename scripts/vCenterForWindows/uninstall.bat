@@ -177,5 +177,6 @@ IF %uninstall_successful% NEQ 1 (
     EXIT /b 1
 )
 ECHO --------------------------------------------------------------
-ECHO VIC Engine UI uninstaller exited successfully
+ECHO Uninstallation successful. Restart the vSphere Client services.
+ECHO Exited successfully
 ENDLOCAL

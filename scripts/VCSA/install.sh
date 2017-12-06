@@ -79,7 +79,7 @@ done < ./configs
 
 read_vc_information $*
 
-# replace space delimiters with colon delimiters 
+# replace space delimiters with colon delimiters
 VIC_UI_HOST_THUMBPRINT=$(echo $VIC_UI_HOST_THUMBPRINT | sed -e 's/[[:space:]]/\:/g')
 
 # load plugin manifest into env
@@ -276,5 +276,6 @@ verify_plugin_url $key_h5c
 parse_and_register_plugins
 
 echo "--------------------------------------------------------------"
-echo "VIC Engine UI installer exited successfully"
+echo "Installation successful. Restart the vSphere Client services. All vSphere Client users must log out and log back in again to see the vSphere Integrated Containers plug-in."
+echo "Exited successfully"
 echo ""
