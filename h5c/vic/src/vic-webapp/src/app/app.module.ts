@@ -17,7 +17,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpModule } from '@angular/http';
+import { HttpModule, XSRFStrategy } from '@angular/http';
 import { ClarityModule } from 'clarity-angular';
 import { AlertIconAndTypesService } from 'clarity-angular/emphasis/alert/providers/icon-and-types-service';
 
@@ -35,6 +35,7 @@ import { AppErrorHandler } from './shared/appErrorHandler';
 
 import { AppRoutingModule, routedComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { DisableCookieXSRFStrategy } from './shared/utils/disable-cookie-xsrf-strategy';
 
 @NgModule({
   imports: [
@@ -54,6 +55,7 @@ import { AppComponent } from './app.component';
     AppAlertService,
     AppErrorHandler,
     Globals,
+    { provide: XSRFStrategy, useClass: DisableCookieXSRFStrategy },
     GlobalsService,
     I18nService,
     Vic18nService,
