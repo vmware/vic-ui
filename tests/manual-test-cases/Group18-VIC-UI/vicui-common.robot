@@ -18,15 +18,15 @@ Resource  ../../resources/Util.robot
 Library  VicUiInstallPexpectLibrary.py
 
 *** Variables ***
-${MACOS_HOST_IP}                      10.20.121.66
+${MACOS_HOST_IP}                      10.25.201.232
 ${UBUNTU_HOST_IP}                     10.20.121.145
 ${WINDOWS_HOST_IP}                    10.25.200.225
 ${BUILD_3620759_IP}                   10.25.200.237
-${BUILD_3634791_IP}                   10.25.200.245
-${VC_FINGERPRINT_3634791}             48:8D:8F:52:FC:67:8E:E6:41:A5:DC:B1:0A:0D:E9:8B:DD:DF:18:B0
+${BUILD_3634791_IP}                   10.25.201.233
+${VC_FINGERPRINT_3634791}             39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
 ${BUILD_5310538_IP}                   10.25.200.231
-${BUILD_5318154_IP}                   10.25.200.243
-${VC_FINGERPRINT_5318154}             C4:08:36:41:FE:38:9A:FB:B9:50:CB:A2:FE:CF:04:F8:B7:99:E9:80
+${BUILD_5318154_IP}                   10.25.201.234
+${VC_FINGERPRINT_5318154}             87:1A:3A:15:BA:EB:6B:9E:AA:1F:45:98:8D:C5:6D:BB:45:FE:18:2F
 ${TEST_DATASTORE}                     datastore1
 ${TEST_DATACENTER}                    /Datacenter
 ${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
@@ -34,7 +34,7 @@ ${MACOS_HOST_USER}                    browseruser
 ${MACOS_HOST_PASSWORD}                ca*hc0w
 ${WINDOWS_HOST_USER}                  IEUser
 ${WINDOWS_HOST_PASSWORD}              Passw0rd!
-${vic_macmini_fileserver_url}         https://10.20.121.66:3443/vsphere-plugins/
+${vic_macmini_fileserver_url}         https://${MACOS_HOST_IP}:3443/vsphere-plugins/
 ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:8B:86:5F:AD:79:CE
 ${GCP_DOWNLOAD_PATH}                  https://storage.googleapis.com/vic-engine-builds/
 ${SDK_PACKAGE_ARCHIVE}                vic-ui-sdk.tar.gz
@@ -272,14 +272,14 @@ Install VIC Product OVA
 
     Log To Console  \nWaiting for Getting Started Page to Come Up...
     :FOR  ${i}  IN RANGE  10
-    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP}:9443/register 2>/dev/null
+    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP_${vcenter-build}}:9443/register 2>/dev/null
     \   Exit For Loop If  '200' in '''${out}'''
     \   Sleep  5s
     Log To Console  ${rc}
     Log To Console  ${out}
     Should Contain  ${out}  200
 
-    Log  %{OVA_IP}
+    Log  %{OVA_IP_${vcenter-build}}
 
 Download VIC OVA
     [Arguments]  ${url}  ${local_path}
