@@ -23,7 +23,6 @@ VICUI_H5_UI_PATH = "h5c/vic"
 VICUI_H5_SERVICE_PATH = "h5c/vic-service"
 GCP_DOWNLOAD_PATH = "https://storage.googleapis.com/vic-engine-builds/"
 SDK_PACKAGE_ARCHIVE = "vic-ui-sdk.tar.gz"
-UI_INSTALLER_WIN_UTILS_ARCHIVE = "vic-installation-utils-win.tgz"
 UI_INSTALLER_WIN_PATH = "scripts/vCenterForWindows"
 ENV_VSPHERE_SDK_HOME = "/tmp/sdk/vc_sdk_min"
 ENV_FLEX_SDK_HOME = "/tmp/sdk/flex_sdk_min"
@@ -39,10 +38,8 @@ vic-ui-plugins:
 	mv ./$(VICUI_H5_UI_PATH)/new_plugin-package.xml ./$(VICUI_H5_UI_PATH)/plugin-package.xml
 	mv ./$(VICUI_H5_SERVICE_PATH)/src/main/resources/new_configs.properties ./$(VICUI_H5_SERVICE_PATH)/src/main/resources/configs.properties
 	wget -nv $(GCP_DOWNLOAD_PATH)$(SDK_PACKAGE_ARCHIVE) -O /tmp/$(SDK_PACKAGE_ARCHIVE)
-	wget -nv $(GCP_DOWNLOAD_PATH)$(UI_INSTALLER_WIN_UTILS_ARCHIVE) -O /tmp/$(UI_INSTALLER_WIN_UTILS_ARCHIVE)
 	tar -xzf /tmp/$(SDK_PACKAGE_ARCHIVE) -C /tmp/
 	ant -f $(VICUI_SOURCE_PATH)/build-deployable.xml -Denv.VSPHERE_SDK_HOME=$(ENV_VSPHERE_SDK_HOME) -Denv.FLEX_HOME=$(ENV_FLEX_SDK_HOME)
-	tar -xzf /tmp/$(UI_INSTALLER_WIN_UTILS_ARCHIVE) -C $(UI_INSTALLER_WIN_PATH)
 	ant -f h5c/build-deployable.xml -Denv.VSPHERE_SDK_HOME=$(ENV_VSPHERE_SDK_HOME) -Denv.FLEX_HOME=$(ENV_FLEX_SDK_HOME) -Denv.VSPHERE_H5C_SDK_HOME=$(ENV_HTML_SDK_HOME) -Denv.BUILD_MODE=prod
 	ls -la scripts/
 	mkdir -p $(BIN)/ui
@@ -50,8 +47,6 @@ vic-ui-plugins:
 	# cleanup
 	rm -rf $(VICUI_H5_UI_PATH)/src/vic-app/aot
 	rm -f $(VICUI_H5_UI_PATH)/src/vic-app/yarn.lock
-	rm -rf $(UI_INSTALLER_WIN_PATH)/utils
-	rm -f $(UI_INSTALLER_WIN_PATH)/._utils
 	rm -rf $(VICUI_H5_UI_PATH)/src/vic-app/node_modules
 
 clean:
