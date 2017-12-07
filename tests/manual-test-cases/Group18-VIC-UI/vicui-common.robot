@@ -137,7 +137,7 @@ Force Install Vicui Plugin
     Run Keyword If  ${is_windows}  Interact With Script  install  -f -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True  ELSE  Install Plugin Successfully  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}  None  ${TRUE}
     Run Keyword Unless  ${is_windows}  Reset Configs
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  install.log  fail-force-install-vicui-plugin.log
     Should Be True  ${passed}
 
