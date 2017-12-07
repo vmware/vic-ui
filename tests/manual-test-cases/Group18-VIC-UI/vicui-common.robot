@@ -337,6 +337,7 @@ Prepare VIC Engine Binaries
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
+    Run  cp -rf scripts/ui/vCenterForWindows/utils* 2>/dev/null
     Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
     Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
 
