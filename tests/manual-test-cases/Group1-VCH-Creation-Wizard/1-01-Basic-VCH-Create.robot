@@ -22,7 +22,7 @@ Test Teardown  Cleanup Testbed
 *** Variables ***
 ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
 ${OVA_ESX_HOST_6.5d}  10.160.217.137
-${OVA_ESX_HOST_6.5u2}  10.161.27.49
+${OVA_ESX_HOST_6.0u2}  10.161.27.49
 
 *** Keywords ***
 Prepare Testbed

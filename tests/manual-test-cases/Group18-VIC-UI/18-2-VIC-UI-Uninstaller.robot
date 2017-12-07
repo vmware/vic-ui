@@ -159,7 +159,7 @@ TestCase-Uninstall Successfully
     Set Fileserver And Thumbprint In Configs
     Run Keyword And Continue On Failure  Uninstall Vicui  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
     ${output}=  OperatingSystem.GetFile  uninstall.log
-    ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-uninstall-successfully.log
     Should Be True  ${passed}
 
@@ -168,7 +168,7 @@ TestCase-Uninstall Plugin Successfully
     Remove Environment Variable  VIC_MACHINE_THUMBPRINT  target_vcenter_ip  vcenter_username  vcenter_password
     Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True
     ${output}=  OperatingSystem.GetFile  uninstall.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-ensure-vicui-is-installed-before-testing.log
     Should Be True  ${passed}
 

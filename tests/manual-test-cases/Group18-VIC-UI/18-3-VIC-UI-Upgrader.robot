@@ -169,7 +169,7 @@ TestCase-Upgrade When No Plugin Is Installed
     Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}
     ${output}=  OperatingSystem.GetFile  upgrade.log
     ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Do you want to install
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  exited successfully
+    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
     Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-no-plugin-is-installed.log
     Should Be True  ${passed} and ${passed2}
 
@@ -179,7 +179,7 @@ TestCase-Upgrade When No Plugin Is Installed
     Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  ${TRUE}  ${TRUE}
     ${output}=  OperatingSystem.GetFile  upgrade.log
     ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Do you want to install
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  exited successfully
+    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
     Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-no-plugin-is-installed.log
     Should Be True  ${passed} and ${passed2}
 
@@ -189,7 +189,7 @@ TestCase-Upgrade When Plugins Are Already Installed
     Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}
     ${output}=  OperatingSystem.GetFile  upgrade.log
     ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Are you sure you want to continue
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  exited successfully
+    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
     Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-plugins-are-already-installed.log
     Should Be True  ${passed} and ${passed2}
 
@@ -199,7 +199,7 @@ TestCase-Upgrade When Plugins Are Already Installed
     Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  ${TRUE}  ${TRUE}
     ${output}=  OperatingSystem.GetFile  upgrade.log
     ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Are you sure you want to continue
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  exited successfully
+    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
     Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-plugins-are-already-installed.log
     Should Be True  ${passed} and ${passed2}
 

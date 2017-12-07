@@ -167,7 +167,7 @@ TestCase-Install Plugin Successfully
     Set Fileserver And Thumbprint In Configs
     Run Keyword And Continue On Failure  Install Plugin Successfully  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  install.log  install-fail-ensure-vicui-is-installed-before-testing.log
     Should Be True  ${passed}
 
@@ -176,7 +176,7 @@ TestCase-Install Plugin Successfully
     Remove Environment Variable  VIC_MACHINE_THUMBPRINT  target_vcenter_ip  vcenter_username  vcenter_password
     Run Keyword And Continue On Failure  Interact With Script  install  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  install.log  install-fail-ensure-vicui-is-installed-before-testing.log
     Should Be True  ${passed}
 
