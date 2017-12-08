@@ -289,10 +289,13 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     if (data.eventType === DELETE_VCH_MODAL_ERROR_EVENT) {
       this.zone.run(() => {
         let payload;
+        let body;
         try {
-          payload = JSON.parse(data.payload)
+          payload = JSON.parse(data.payload);
+          body = JSON.parse(payload._body);
         } catch (e) {}
-        this.error = payload.message || 'Error trying to delete the VCH';
+        const errMsg = 'Error trying to delete the VCH.';
+        this.error = body.message ? errMsg + ' ' + body.message : errMsg;
       });
     } else if (data.eventType === DATAGRID_REFRESH_EVENT) {
       this.zone.run(() => {
