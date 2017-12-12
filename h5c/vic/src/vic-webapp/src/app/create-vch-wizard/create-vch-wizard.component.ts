@@ -418,7 +418,7 @@ export class CreateVchWizardComponent implements OnInit {
         }
 
         if (net.containerNetworkFirewall) {
-          network['firewall'] = [net.containerNetworkFirewall];
+          network['firewall'] = net.containerNetworkFirewall;
         }
 
         if (net.containerNetworkIpRange) {
