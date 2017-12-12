@@ -46,6 +46,7 @@ export class ComputeCapacityComponent implements OnInit {
   };
   public selectedObjectName: string;
   public selectedResourceObjRef: string;
+  public dcName: string;
   private _selectedComputeResource: string;
 
   constructor(
@@ -125,12 +126,12 @@ export class ComputeCapacityComponent implements OnInit {
     parentClusterObj?: ComputeResource | any;
     datacenterObj: ComputeResource | any
   }) {
-    const dcName = payload.datacenterObj.text;
-    const nodeTypeId = payload.obj.nodeTypeId
+    const nodeTypeId = payload.obj.nodeTypeId;
     const isCluster = nodeTypeId === DC_CLUSTER;
     const resourceObj = payload.obj.objRef;
+    this.dcName = payload.datacenterObj.text;
 
-    let computeResource = `/${dcName}/host`;
+    let computeResource = `/${this.dcName}/host`;
     let resourceObjForResourceAllocations = resourceObj;
     if (isCluster) {
       computeResource = `${computeResource}/${payload.obj.text}`;
