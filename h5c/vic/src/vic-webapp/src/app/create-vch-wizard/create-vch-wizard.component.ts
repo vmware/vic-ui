@@ -336,9 +336,7 @@ export class CreateVchWizardComponent implements OnInit {
     // Networks --------------------------------------------------------------------------------------------------------
 
     if (payload.networks.publicNetworkIp) {
-      processedPayload.network.public['static'] = {
-        ip: payload.networks.publicNetworkIp
-      };
+      processedPayload.network.public['static'] = payload.networks.publicNetworkIp;
 
       processedPayload.network.public['gateway'] = {
         address: payload.networks.publicNetworkGateway
