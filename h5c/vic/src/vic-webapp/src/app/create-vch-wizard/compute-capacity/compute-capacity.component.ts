@@ -36,6 +36,7 @@ const endpointMemoryDefaultValue = 2048;
 export class ComputeCapacityComponent implements OnInit {
   public form: FormGroup;
   public datacenter: any[] = [];
+  public dcId: string;
   public clusters: any[] = [];
   public resources: any[] = [];
   public isTreeLoading = false;
@@ -129,9 +130,20 @@ export class ComputeCapacityComponent implements OnInit {
     const nodeTypeId = payload.obj.nodeTypeId
     const isCluster = nodeTypeId === DC_CLUSTER;
     const resourceObj = payload.obj.objRef;
+    const dcObj = payload.datacenterObj.objRef;
+
+    // get the datacenter moid
+    if (resourceObj !== undefined) {
+        const dcIds = dcObj.split(':');
+        if (dcIds[2] === 'Datacenter') {
+          const dcId = dcIds[3];
+          this.dcId = dcId;
+        }
+    }
 
     let computeResource = `/${dcName}/host`;
     let resourceObjForResourceAllocations = resourceObj;
+
     if (isCluster) {
       computeResource = `${computeResource}/${payload.obj.text}`;
       resourceObjForResourceAllocations = payload.obj.aliases[0];
@@ -234,6 +246,7 @@ export class ComputeCapacityComponent implements OnInit {
       const cpuLimitValue = this.form.get('cpuLimit').value;
       const memoryLimitValue = this.form.get('memoryLimit').value;
 
+      results['dcId'] = this.dcId;
       results['computeResource'] = this.selectedComputeResource;
       results['cpu'] = unlimitedPattern.test(cpuLimitValue) ? '0' : cpuLimitValue;
       results['memory'] = unlimitedPattern.test(memoryLimitValue) ? '0' : memoryLimitValue;

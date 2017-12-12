@@ -159,8 +159,9 @@ export class CreateVchWizardComponent implements OnInit {
 
           if ((vcIp && applianceIp) && cloneTicket) {
 
-              const url = 'https://' + applianceIp + ':' + VIC_APPLIANCE_PORT + '/container/target/' + vcIp + '/vch?' +
-                  'thumbprint=' + payload.security.thumbprint;
+              const url = 'https://' + applianceIp + ':' + VIC_APPLIANCE_PORT +
+              '/container/target/' + vcIp + '/datacenter/' + payload.computeCapacity.dcId +
+              '/vch?' + 'thumbprint=' + payload.security.thumbprint;
 
               const body = this.processPayload(payload);
 
