@@ -23,6 +23,7 @@ import { Observable } from 'rxjs/Observable';
 import { RefreshService } from 'app/shared';
 import { VIC_APPLIANCE_PORT } from '../shared/constants';
 import { Wizard } from 'clarity-angular';
+import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -31,6 +32,7 @@ import { Wizard } from 'clarity-angular';
 })
 export class CreateVchWizardComponent implements OnInit {
   @ViewChild('wizardlg') wizard: Wizard;
+  @ViewChild('computeCapacityStep') computeCapacity: ComputeCapacityComponent;
   public loading = false;
   public errorFlag = false;
   public errorMsgs: string[];
@@ -160,7 +162,7 @@ export class CreateVchWizardComponent implements OnInit {
           if ((vcIp && applianceIp) && cloneTicket) {
 
               const url = 'https://' + applianceIp + ':' + VIC_APPLIANCE_PORT +
-              '/container/target/' + vcIp + '/datacenter/' + payload.computeCapacity.dcId +
+              '/container/target/' + vcIp + (this.computeCapacity.dcId ? '/datacenter/' + this.computeCapacity.dcId : '') +
               '/vch?' + 'thumbprint=' + payload.security.thumbprint;
 
               const body = this.processPayload(payload);
