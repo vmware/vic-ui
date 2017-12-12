@@ -119,6 +119,7 @@ export class VicContainerViewComponent implements OnInit, OnDestroy {
         this.vmViewService.containers$.subscribe(vms => {
             this.containers = vms;
             this.isDgLoading = false;
+            this.totalContainersCount = this.vmViewService.totalContainersCount;
         }, err => {
             this.containers = [];
         });
