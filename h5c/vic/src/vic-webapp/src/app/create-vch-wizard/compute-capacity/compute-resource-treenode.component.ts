@@ -71,6 +71,10 @@ export class ComputeResourceTreenodeComponent implements OnInit {
         this.clusters = val.filter(v => v.nodeTypeId === DC_CLUSTER);
         this.standaloneHosts = val.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
 
+        if (!this.clusters.length) {
+          this.loading = false;
+        }
+
         // pointer to the current cluster object
         // since we use concatMap the order in which we get results is guaranteed
         let idx = 0;
