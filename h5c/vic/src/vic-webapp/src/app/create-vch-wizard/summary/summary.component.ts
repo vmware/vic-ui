@@ -222,7 +222,7 @@ export class SummaryComponent implements OnInit {
     if (results['networks']['managementNetworkRouting']) {
       results['networks']['managementNetworkGateway'] =
         results['networks']['managementNetworkRouting'].join(',') + ':' + results['networks']['managementNetworkGateway'];
-      delete results['networks']['clientNetworkRouting'];
+      delete results['networks']['managementNetworkRouting'];
     }
 
     // transform each container network entry
