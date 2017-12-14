@@ -375,4 +375,28 @@ export class CreateVchWizardService {
             .map(response => ip);
         });
     }
+
+    /**
+     * Recursively queries the H5 Client for a datacenter associated with the resource
+     * @param resourceObjRef
+     */
+    getDatacenterForResource(resourceObjRef: string) {
+      if (resourceObjRef.split(':')[2] === 'Datacenter') {
+        return this.http.get(`/ui/data/properties/${resourceObjRef}?properties=name`)
+          .catch(e => Observable.throw(e))
+          .map(response => response.json())
+      } else {
+        return this.http.get(`/ui/data/properties/${resourceObjRef}?properties=parent`)
+          .catch(e => Observable.throw(e))
+          .map(response => response.json())
+          .switchMap((response) => {
+            if (typeof response.parent === 'object') {
+              return this.getDatacenterForResource(
+                `urn:vmomi:${response.parent.type}:${response.parent.value}:${response.parent.serverGuid}`
+              );
+            }
+            return Observable.throw(`Error getting Datacenter for resource '${resourceObjRef}'`);
+          });
+      }
+    }
 }
