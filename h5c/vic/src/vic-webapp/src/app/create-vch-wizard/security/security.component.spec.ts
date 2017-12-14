@@ -72,8 +72,8 @@ describe('SecurityComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should start with a valid form',  () => {
-    expect(component.form.valid).toBe(true);
+  it('should start with a invalid form',  () => {
+    expect(component.form.invalid).toBe(true);
   });
 
   it('should validate advanced fields changes', () => {
