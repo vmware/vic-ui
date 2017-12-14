@@ -74,6 +74,11 @@ describe('VicVchLogViewComponent', () => {
             },
             acquireCloneTicket(): Observable<string> {
               return Observable.of('ticket');
+            },
+            getDatacenterForResource(): Observable<any> {
+              return Observable.of({
+                id: 'urn:vmomi:Datacenter:dc-test:00000000-0000-0000-0000-000000000000'
+              })
             }
           }
         },

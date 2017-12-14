@@ -50,17 +50,20 @@ export class VicVchLogViewComponent implements OnInit {
     this.loading = true;
     Observable.combineLatest(
       this.createWzService.getVicApplianceIp(),
-      this.createWzService.acquireCloneTicket()
-    ).catch(err => {
+      this.createWzService.acquireCloneTicket(),
+      this.createWzService.getDatacenterForResource(this.vch.id)
+  ).catch(err => {
       return Observable.throw(err);
-    }).subscribe(([serviceHost, cloneTicket]) => {
+    }).subscribe(([serviceHost, cloneTicket, datacenter]) => {
       const vchId = this.vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
       const targetHost = this.extSessionService.getVcenterServersInfo()[0];
       const targetHostname = targetHost.name;
       const targetThumbprint = targetHost.thumbprint;
+      const targetDatacenter = datacenter.id.split(':')[3];
       const url =
-        `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/vch/${vchId}/log?thumbprint=${targetThumbprint}`;
+        `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/datacenter/${targetDatacenter}` +
+        `/vch/${vchId}/log?thumbprint=${targetThumbprint}`;
 
       const headers  = new Headers({
         'Content-Type': 'application/json',
@@ -69,12 +72,10 @@ export class VicVchLogViewComponent implements OnInit {
 
       const options  = new RequestOptions({ headers: headers });
       this.http.get(url, options)
+        .catch(error => Observable.of(error))
         .map(response => response.text())
         .subscribe(response => {
           this.log = response;
-          this.loading = false;
-        }, error => {
-          this.log = error.message || 'Error loading VCH log!';
           this.loading = false;
         });
     });
