@@ -130,6 +130,7 @@ describe('vic-webapp', () => {
   });
 
   it('should complete security step', () => {
+    page.disableSecureAccess();
     page.clickByText('Button', 'Next');
     // check if we made it to ops user section
     page.waitForElementToBePresent(sectionOpsUser);

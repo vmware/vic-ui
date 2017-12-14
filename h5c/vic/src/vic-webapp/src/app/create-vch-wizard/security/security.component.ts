@@ -78,6 +78,14 @@ export class SecurityComponent {
 
     // Since useWhitelistRegistry is false by default, disable whitelistRegistries validations
     this.form.get('whitelistRegistries').disable();
+
+    this.ensureFirstTlsCaIsRequired();
+  }
+
+  ensureFirstTlsCaIsRequired() {
+    const firstTlsCa = (this.form.get('tlsCas') as FormArray).at(0).get('tlsCa');
+    firstTlsCa.setValidators([Validators.required]);
+    firstTlsCa.updateValueAndValidity();
   }
 
   addNewFormArrayEntry(controlName: string) {
@@ -136,6 +144,7 @@ export class SecurityComponent {
         this.tlsCaContents.shift();
         control.controls[index].reset();
       }
+      this.ensureFirstTlsCaIsRequired();
     } else if (controlName === 'registryCas') {
       if (index > 0 || (index === 0 && control.controls.length > 1)) {
         control.removeAt(index);
@@ -177,6 +186,15 @@ export class SecurityComponent {
           this.form.get('whitelistRegistries').enable();
         } else {
           this.form.get('whitelistRegistries').disable();
+        }
+      });
+
+    this.form.get('useClientAuth').valueChanges
+      .subscribe(v => {
+        if (v) {
+          this.form.get('tlsCas').enable();
+        } else {
+          this.form.get('tlsCas').disable();
         }
       });
 
@@ -345,6 +363,10 @@ export class SecurityComponent {
             targetArray[index] = value;
           } else {
             targetArray.push(value);
+          }
+
+          if (targetField === 'tlsCas') {
+            (this.form.get('tlsCas') as FormArray).at(index).get('tlsCa').setValue(filename);
           }
         };
       }
