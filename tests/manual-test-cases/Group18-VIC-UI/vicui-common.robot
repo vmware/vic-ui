@@ -341,3 +341,8 @@ Prepare VIC Engine Binaries
     Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
     Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
 
+Open SSH Connection
+  [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
+  Open Connection  ${host}  port=${port}  
+  Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
+
