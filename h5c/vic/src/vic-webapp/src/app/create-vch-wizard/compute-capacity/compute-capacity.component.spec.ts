@@ -197,6 +197,11 @@ describe('ComputeCapacityComponent', () => {
     });
   });
 
+  it('should extract the datacenter moid from the object reference string', () => {
+    const dc = component.getDataCenterId('urn:vmomi:Datacenter:dc-test:00000000-0000-0000-0000-000000000000');
+    expect(dc).toEqual('dc-test');
+  });
+
   it('should validate advanced fields defaults values', () => {
     component.toggleAdvancedMode();
     component.selectComputeResource({datacenterObj: component.datacenter, obj: {text: ''}});

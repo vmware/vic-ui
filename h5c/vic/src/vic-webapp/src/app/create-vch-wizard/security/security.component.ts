@@ -43,6 +43,7 @@ export class SecurityComponent {
   public registryCaError: string = null;
   private _isSetup = false;
   @Input() vchName: string;
+  @Input() datacenter: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -254,7 +255,7 @@ export class SecurityComponent {
     // user id, vc thumbprint and target
     results['user'] = this.createWzService.getUserId();
     results['thumbprint'] = this.createWzService.getServerThumbprint();
-    results['target'] = this.createWzService.getVcHostname();
+    results['target'] = this.createWzService.getVcHostname() + (this.datacenter ? '/' + this.datacenter : '');
 
     return Observable.of({ security: results });
   }

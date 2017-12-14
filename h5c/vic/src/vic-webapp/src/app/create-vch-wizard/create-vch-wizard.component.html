@@ -130,7 +130,10 @@
     </ng-template>
     <ng-template clrPageNavTitle>Security</ng-template>
 
-    <vic-vch-creation-security [vchName]="generalStep.form.get('name').value" #securityStep></vic-vch-creation-security>
+    <vic-vch-creation-security [vchName]="generalStep.form.get('name').value"
+                               [datacenter]="computeCapacityStep.dcName"
+                               #securityStep>
+    </vic-vch-creation-security>
 
   </clr-wizard-page>
 

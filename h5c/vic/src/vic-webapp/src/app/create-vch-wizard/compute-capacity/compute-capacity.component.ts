@@ -36,6 +36,8 @@ const endpointMemoryDefaultValue = 2048;
 export class ComputeCapacityComponent implements OnInit {
   public form: FormGroup;
   public datacenter: any[] = [];
+  public dcId: string;
+  public dcName: string;
   public clusters: any[] = [];
   public resources: any[] = [];
   public isTreeLoading = false;
@@ -117,6 +119,17 @@ export class ComputeCapacityComponent implements OnInit {
   }
 
   /**
+   * extract the datacenter moid from the object reference string
+   *
+   */
+  getDataCenterId (dcObj: string) {
+      const dcIds = dcObj.split(':');
+      if (dcIds[2] === 'Datacenter') {
+        // e.g: urn:vmomi:Datacenter:dc-test:00000000-0000-0000-0000-000000000000
+        return dcIds[3];
+      }
+  }
+  /**
    * Set the compute resource selected by the user.
    * @param {obj: ComputeResource; parentClusterObj?: ComputeResource; datacenterObj: ComputeResource}
    */
@@ -125,13 +138,19 @@ export class ComputeCapacityComponent implements OnInit {
     parentClusterObj?: ComputeResource | any;
     datacenterObj: ComputeResource | any
   }) {
-    const dcName = payload.datacenterObj.text;
-    const nodeTypeId = payload.obj.nodeTypeId
+    const nodeTypeId = payload.obj.nodeTypeId;
     const isCluster = nodeTypeId === DC_CLUSTER;
     const resourceObj = payload.obj.objRef;
+    const dcObj = payload.datacenterObj.objRef;
+    this.dcName = payload.datacenterObj.text;
 
-    let computeResource = `/${dcName}/host`;
+    if (dcObj) {
+      this.dcId = this.getDataCenterId(dcObj);
+    }
+
+    let computeResource = `/${this.dcName}/host`;
     let resourceObjForResourceAllocations = resourceObj;
+
     if (isCluster) {
       computeResource = `${computeResource}/${payload.obj.text}`;
       resourceObjForResourceAllocations = payload.obj.aliases[0];
