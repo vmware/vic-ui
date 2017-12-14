@@ -119,6 +119,17 @@ export class ComputeCapacityComponent implements OnInit {
   }
 
   /**
+   * extract the datacenter moid from the object reference string
+   *
+   */
+  getDataCenterId (dcObj: string) {
+      const dcIds = dcObj.split(':');
+      if (dcIds[2] === 'Datacenter') {
+        // e.g: urn:vmomi:Datacenter:dc-test:00000000-0000-0000-0000-000000000000
+        return dcIds[3];
+      }
+  }
+  /**
    * Set the compute resource selected by the user.
    * @param {obj: ComputeResource; parentClusterObj?: ComputeResource; datacenterObj: ComputeResource}
    */
@@ -133,13 +144,8 @@ export class ComputeCapacityComponent implements OnInit {
     const dcObj = payload.datacenterObj.objRef;
     this.dcName = payload.datacenterObj.text;
 
-    // get the datacenter moid
-    if (resourceObj !== undefined) {
-        const dcIds = dcObj.split(':');
-        if (dcIds[2] === 'Datacenter') {
-          const dcId = dcIds[3];
-          this.dcId = dcId;
-        }
+    if (dcObj) {
+      this.dcId = this.getDataCenterId(dcObj);
     }
 
     let computeResource = `/${this.dcName}/host`;
