@@ -273,16 +273,18 @@
                 <div [formGroupName]="i" class="form-group row mb-0">
                   <div class="col-xs-6 text-truncate">
 
-                    <span class="text-muted" *ngIf="!tlsCaContents[i]">Select certificate pem file</span>
+                    <span class="text-muted" *ngIf="!tlsCaContents[i]" [ngClass]="{'required': i === 0}">
+                      Select certificate pem file
+                    </span>
                     <span *ngIf="tlsCaContents[i]">
-                          {{ tlsCaContents[i].name }}, expires: {{ tlsCaContents[i].expires | date : 'mediumDate'}}
-                        </span>
+                      {{ tlsCaContents[i].name }}, expires: {{ tlsCaContents[i].expires | date : 'mediumDate'}}
+                    </span>
 
                     <input id="tls-ca-{{i}}"
                           class="hidden-xs-up"
                           type="file"
-                          formControlName="tlsCa"
                           (change)="addFileContent($event, 'tlsCas', i, isLast)">
+                    <input type="hidden" formControlName="tlsCa">
 
                   </div>
                   <div class="col-xs px-0 add-remove-actions">
