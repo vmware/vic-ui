@@ -39,8 +39,7 @@ Deploy Nimbus ESXi Server
     [Arguments]  ${user}  ${password}  ${version}=${ESX_VERSION}  ${tls_disabled}=True
     ${name}=  Evaluate  'ESX-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     Log To Console  \nDeploying Nimbus ESXi server: ${name}
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
 
     :FOR  ${IDX}  IN RANGE  1  5
     \   ${out}=  Execute Command  nimbus-esxdeploy ${name} --disk=48000000 --ssd=24000000 --memory=8192 --lease=1 --nics 2 ${version}
@@ -90,8 +89,7 @@ Deploy Multiple Nimbus ESXi Servers in Parallel
     \     ${name}=  Evaluate  'ESX-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     \     Append To List  ${names}  ${name}
 
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
 
     @{processes}=  Create List
     :FOR  ${name}  IN  @{names}
@@ -123,8 +121,8 @@ Deploy Nimbus vCenter Server
     [Arguments]  ${user}  ${password}  ${version}=${VC_VERSION}
     ${name}=  Evaluate  'VC-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     Log To Console  \nDeploying Nimbus vCenter server: ${name}
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
+
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
 
     :FOR  ${IDX}  IN RANGE  1  5
     \   ${out}=  Execute Command  nimbus-vcvadeploy --lease=1 --vcvaBuild ${version} ${name}
@@ -173,8 +171,7 @@ Deploy Nimbus vCenter Server Async
 
 Deploy Nimbus Testbed
     [Arguments]  ${user}  ${password}  ${testbed}
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
 
     :FOR  ${IDX}  IN RANGE  1  5
     \   ${out}=  Execute Command  nimbus-testbeddeploy --lease=1 ${testbed}
@@ -187,15 +184,13 @@ Deploy Nimbus Testbed
 
 Kill Nimbus Server
     [Arguments]  ${user}  ${password}  ${name}
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
     ${out}=  Execute Command  nimbus-ctl kill ${name}
     Close connection
 
 Cleanup Nimbus PXE folder
     [Arguments]  ${user}  ${password}
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
     ${out}=  Execute Command  rm -rf public_html/pxe/*
     Close connection
 
@@ -279,8 +274,7 @@ Create a Simple VC Cluster
     ${output}=  Wait For Process  ${pid}
     Should Contain  ${output.stdout}  Overall Status: Succeeded
 
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
     ${vc_ip}=  Get IP  ${vc}
     Close Connection
 
@@ -380,8 +374,8 @@ Deploy Nimbus NFS Datastore
     [Arguments]  ${user}  ${password}  ${additional-args}=
     ${name}=  Evaluate  'NFS-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     Log To Console  \nDeploying Nimbus NFS server: ${name}
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
+
+    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
 
     ${out}=  Execute Command  nimbus-nfsdeploy ${name} ${additional-args}
     # Make sure the deploy actually worked

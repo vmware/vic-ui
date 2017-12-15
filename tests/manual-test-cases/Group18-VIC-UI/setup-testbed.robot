@@ -26,8 +26,7 @@ Check If Nimbus VMs Exist
 
     ${nimbus_machines}=  Set Variable  %{NIMBUS_USER}-UITEST-*
     Log To Console  \nFinding Nimbus machines for UI tests
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
 
     Execute Command  rm -rf public_html/pxe/*
     ${out}=  Execute Command  nimbus-ctl list | grep -i "${nimbus_machines}"
@@ -67,8 +66,7 @@ Load Testbed
 
 Extract BrowserVm Info
     [Arguments]  @{vm_fields}
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     ${vm_name}=  Evaluate  '@{vm_fields}[1]'.strip()
     ${out}=  Execute Command  NIMBUS=@{vm_fields}[0] nimbus-ctl ip ${vm_name} | grep -i ".*: %{NIMBUS_USER}-.*"
     @{out}=  Split String  ${out}  :
@@ -78,8 +76,7 @@ Extract BrowserVm Info
 
 Extract Esx Info
     [Arguments]  @{vm_fields}
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     ${vm_name}=  Evaluate  '@{vm_fields}[1]'.strip()
     ${out}=  Execute Command  NIMBUS=@{vm_fields}[0] nimbus-ctl ip ${vm_name} | grep -i ".*: %{NIMBUS_USER}-.*"
     @{out}=  Split String  ${out}  :
@@ -91,8 +88,7 @@ Extract Esx Info
 
 Extract Vcsa Info
     [Arguments]  @{vm_fields}
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     ${vm_name}=  Evaluate  '@{vm_fields}[1]'.strip()
     ${out}=  Execute Command  NIMBUS=@{vm_fields}[0] nimbus-ctl ip ${vm_name} | grep -i ".*: %{NIMBUS_USER}-.*"
     @{out}=  Split String  ${out}  :
@@ -123,8 +119,7 @@ Deploy Esx
 
     Log To Console  \nDeploying Nimbus ESXi server: ${name}
 
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
     # run nimbus command and make sure deployment was successful
     ${output}=  Execute Command  nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${buildnum}
     Run Keyword If  ${logfile} is not None  Create File  ${logfile}  ${output}
@@ -152,8 +147,7 @@ Deploy Vcsa
 
     Log To Console  \nDeploying Nimbus VC server: ${name}
 
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
     # run nimbus command and make sure deployment was successful
     ${output}=  Execute Command  nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${buildnum} ${name}
     Run Keyword If  ${logfile} is not None  Create File  ${logfile}  ${output}
@@ -224,8 +218,7 @@ Deploy Windows BrowserVm
     ${os}=  Set Variable  WINDOWS
     ${name}=  Evaluate  'UITEST-BROWSERVM-${os}-' + str(random.randint(1000,9999))  modules=random
     Log To Console  \nDeploying Browser VM: ${name}
-    Open Connection  %{NIMBUS_GW}
-    Login  ${user}  ${password}
+    Open SSH Connection  %{NIMBUS_GW}  ${user}  ${password}
 
     ${out}=  Execute Command  nimbus-genericdeploy --type ${vm-template} ${name} --lease 1
     # Make sure the deploy actually worked
