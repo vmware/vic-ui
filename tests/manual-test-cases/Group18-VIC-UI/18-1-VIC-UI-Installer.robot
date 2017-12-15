@@ -188,8 +188,7 @@ Run Testcases On Mac
     OperatingSystem.Create Directory  ${results_folder}
 
     # log into macOS host and copy required files
-    Open Connection  ${MACOS_HOST_IP}
-    Login  ${MACOS_HOST_USER}  ${MACOS_HOST_PASSWORD}
+    Open SSH Connection  ${MACOS_HOST_IP}  ${MACOS_HOST_USER}  ${MACOS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  testbed-information  ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI/  mode=0700
     Put File  ../../../ui-nightly-run-bin/vic-ui-darwin  ${remote_vic_root}/
@@ -241,8 +240,7 @@ Run Testcases On Windows
     OperatingSystem.Create Directory  ${results_folder}
 
     # log into Windows host and copy required files
-    Open Connection  ${WINDOWS_HOST_IP}
-    Login  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
+    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  testbed-information  ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI/
     Put File  ../../../scripts/plugin-manifest  ${remote_vic_root}/scripts/
