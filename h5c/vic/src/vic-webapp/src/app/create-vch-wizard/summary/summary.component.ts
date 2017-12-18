@@ -205,8 +205,8 @@ export class SummaryComponent implements OnInit {
 
     // transform each volume store entry
 
-    const volumeStoresRef = results['storageCapacity']['volumeStores'];
-    results['storageCapacity']['volumeStores'] =
+    const volumeStoresRef = results['storageCapacity']['volumeStore'];
+    results['storageCapacity']['volumeStore'] =
       volumeStoresRef.map(volStoreObj => {
         return `${volStoreObj['volDatastore']}${volStoreObj['volFileFolder']}:${volStoreObj['dockerVolName']}`;
       });

@@ -164,10 +164,10 @@ export class StorageCapacityComponent implements OnInit {
     results['baseImageSizeUnit'] = this.form.get('baseImageSizeUnit').value;
 
     // filter ones with empty datastore
-    results['volumeStores'] = this.form.get('volumeStores').value
+    results['volumeStore'] = this.form.get('volumeStores').value
       .filter(vol => vol['volDatastore']);
 
-    results['volumeStores'].forEach(vol => {
+    results['volumeStore'].forEach(vol => {
       // if volume file folder doesn't start with '/', prepend the value with '/'
       if (vol['volFileFolder'].length && vol['volFileFolder'].charAt(0) !== '/') {
         vol['volFileFolder'] = '/' + vol['volFileFolder'];
