@@ -327,8 +327,8 @@ export class CreateVchWizardComponent implements OnInit {
 
     // Storage ---------------------------------------------------------------------------------------------------------
 
-    if (payload.storageCapacity.volumeStores.length) {
-      processedPayload.storage['volume_stores'] = payload.storageCapacity.volumeStores.map(vol => {
+    if (payload.storageCapacity.volumeStore.length) {
+      processedPayload.storage['volume_stores'] = payload.storageCapacity.volumeStore.map(vol => {
         return {
           datastore: vol.volDatastore + (vol.volFileFolder || ''),
           label: vol.dockerVolName
