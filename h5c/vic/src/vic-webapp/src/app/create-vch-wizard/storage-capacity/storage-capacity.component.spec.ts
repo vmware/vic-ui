@@ -117,7 +117,7 @@ describe('StorageCapacityComponent', () => {
 
     component.onCommit().subscribe( r => {
       expect(r.storageCapacity.fileFolder).toBe(expectedFolderName);
-      expect(r.storageCapacity.volumeStores[0].volFileFolder).toBe(expectedFolderName);
+      expect(r.storageCapacity.volumeStore[0].volFileFolder).toBe(expectedFolderName);
     });
 
     // should not add an extra slash
@@ -126,7 +126,7 @@ describe('StorageCapacityComponent', () => {
 
     component.onCommit().subscribe( r => {
       expect(r.storageCapacity.fileFolder).toBe(expectedFolderName);
-      expect(r.storageCapacity.volumeStores[0].volFileFolder).toBe(expectedFolderName);
+      expect(r.storageCapacity.volumeStore[0].volFileFolder).toBe(expectedFolderName);
     });
   });
 });

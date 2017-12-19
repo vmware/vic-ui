@@ -61,7 +61,7 @@ describe('SummaryComponent', () => {
       storageCapacity: {
         imageStore: 'datastore',
         baseImageSizeUnit: 'GiB',
-        volumeStores: []
+        volumeStore: []
       },
       networks: {
         containerNetworks: []
