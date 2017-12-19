@@ -125,8 +125,8 @@
             </clr-stack-content>
           </clr-stack-block>
           <!-- volume datastores -->
-          <div *ngIf="payload?.storageCapacity?.hasOwnProperty('volumeStores')">
-            <clr-stack-block *ngFor="let volStore of payload.storageCapacity.volumeStores; let i = index">
+          <div *ngIf="payload?.storageCapacity?.hasOwnProperty('volumeStore')">
+            <clr-stack-block *ngFor="let volStore of payload.storageCapacity.volumeStore; let i = index">
               <clr-stack-label>Volume datastore {{ i + 1 }}</clr-stack-label>
               <clr-stack-content>
                 {{ volStore.volDatastore }}{{ volStore.volFileFolder }}
