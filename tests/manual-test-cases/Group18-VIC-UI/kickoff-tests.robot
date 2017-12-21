@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+# TODO externalize vars
+
 *** Settings ***
 Documentation    vSphere Integrated Containers UI Integration Tests Runner
 Suite Setup      Prepare Testbed
@@ -38,8 +40,13 @@ Prepare Testbed
     Check Working Dir
     Check Drone
     Check Govc
-    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
-    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
+
+    # TODO clean
+    # Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
+    # Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  ${OVA_ESX_HOST_60_IP}  ${OVA_ESX_60_DS}
+    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  ${OVA_ESX_HOST_65_IP}  ${OVA_ESX_65_DS}
+
     Get Vic Engine Binaries
     Setup Test Matrix
 
@@ -368,10 +375,11 @@ Send Email
     ...    To: kjosh@vmware.com
     ...    To: joshuak@vmware.com
     ...    To: cfalcone@vmware.com
-    ...    To: kmacdonell@vmware.com
-    ...    To: mwilliamson@vmware.com
-    ...    To: mikeh@vmware.com
-    ...    To: mhagen@vmware.com
+    # TODO re-enable managers emails once infra gets stable again
+    # ...    To: kmacdonell@vmware.com
+    # ...    To: mwilliamson@vmware.com
+    # ...    To: mikeh@vmware.com
+    # ...    To: mhagen@vmware.com
     ...    To: carellie@vmware.com
     ${email_to}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  ${report_recipients}  ELSE  Set Variable  To: ${whoami}@vmware.com
     ${email_body}=  Catenate  SEPARATOR=\n

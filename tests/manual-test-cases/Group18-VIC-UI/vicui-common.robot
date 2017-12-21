@@ -18,15 +18,15 @@ Resource  ../../resources/Util.robot
 Library  VicUiInstallPexpectLibrary.py
 
 *** Variables ***
-${MACOS_HOST_IP}                      10.25.201.232
-${UBUNTU_HOST_IP}                     10.20.121.145
-${WINDOWS_HOST_IP}                    10.25.200.225
-${BUILD_3620759_IP}                   10.25.200.237
-${BUILD_3634791_IP}                   10.25.201.233
-${VC_FINGERPRINT_3634791}             39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
-${BUILD_5310538_IP}                   10.25.200.231
-${BUILD_5318154_IP}                   10.25.201.234
-${VC_FINGERPRINT_5318154}             87:1A:3A:15:BA:EB:6B:9E:AA:1F:45:98:8D:C5:6D:BB:45:FE:18:2F
+# ${MACOS_HOST_IP}                      10.25.201.232
+# ${UBUNTU_HOST_IP}                     10.20.121.145
+# ${WINDOWS_HOST_IP}                    10.25.200.225
+# ${BUILD_3620759_IP}                   10.25.200.237
+# ${BUILD_3634791_IP}                   10.25.201.233
+# ${VC_FINGERPRINT_3634791}             39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
+# ${BUILD_5310538_IP}                   10.25.200.231
+# ${BUILD_5318154_IP}                   10.25.201.234
+# ${VC_FINGERPRINT_5318154}             87:1A:3A:15:BA:EB:6B:9E:AA:1F:45:98:8D:C5:6D:BB:45:FE:18:2F
 ${TEST_DATASTORE}                     datastore1
 ${TEST_DATACENTER}                    /Datacenter
 ${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
