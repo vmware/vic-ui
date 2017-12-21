@@ -50,7 +50,7 @@ Prepare Testbed
     # Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
     # Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
     Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  ${OVA_ESX_HOST_60_IP}  ${OVA_ESX_60_DS}
-    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  ${OVA_ESX_HOST_65_IP}  ${OVA_ESX_65_
+    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  ${OVA_ESX_HOST_65_IP}  ${OVA_ESX_65_DS}
 
     Get Vic Engine Binaries
 
