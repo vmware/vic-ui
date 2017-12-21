@@ -28,19 +28,3 @@ OVA_ESX_HOST_60_IP = '10.192.42.90'
 OVA_ESX_HOST_65_IP = '10.160.75.194'
 OVA_ESX_60_DS = 'datastore1 (3)'
 OVA_ESX_65_DS = 'datastore1 (1)'
-
-
-
-    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  ${OVA_ESX_HOST_60_IP}  ${OVA_ESX_60_DS}
-    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  ${OVA_ESX_HOST_65_IP}  ${OVA_ESX_65_DS}
-
-
-
-Install VIC Product OVA
-    [Arguments]  ${vcenter-build}  ${target-vc-ip}  ${ova-esx-host-ip}  ${ova-esx-datastore}
-    
-    
-    
-
-
-${ova-esx-host-ip}
