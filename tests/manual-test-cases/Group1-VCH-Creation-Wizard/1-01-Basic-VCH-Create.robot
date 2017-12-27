@@ -21,8 +21,6 @@ Test Teardown  Cleanup Testbed
 
 *** Variables ***
 ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
-${OVA_ESX_HOST_6.5d}  10.160.217.137
-${OVA_ESX_HOST_6.0u2}  10.161.27.49
 
 *** Keywords ***
 Prepare Testbed
@@ -45,8 +43,8 @@ Prepare Testbed
     ${rc}=  Run And Return Rc  govc
     Should Be True  ${rc} != 127
 
-    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.161.27.49  datastore1 (1)
-    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.217.137  datastore1 (4)
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.192.42.90  datastore1 (3)
+    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.75.194  datastore1 (1)
     Get Vic Engine Binaries
 
 Reboot vSphere Client
