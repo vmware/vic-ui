@@ -160,16 +160,28 @@ export class CreateVchWizardService {
     /**
      * Queries the H5 Client for clusters
      */
-    getClustersList(): Observable<any[]> {
+    getClustersList(): Observable<any> {
         return this.getDatacenter()
                    .switchMap(dc => {
-                     return this.http.get('/ui/tree/children?nodeTypeId=RefAsRoot' +
-                     `&objRef=${dc[0]['objRef']}` +
-                     '&treeId=DcHostsAndClustersTree');
+                     const obsArr = dc.map(v => {
+                         return this.http.get('/ui/tree/children?nodeTypeId=RefAsRoot' +
+                                    `&objRef=${v.objRef}` +
+                                    '&treeId=DcHostsAndClustersTree')
+                                    .catch(e => Observable.throw(e))
+                                    .map(response => {
+                                      const rsp = response.json();
+                                      rsp.forEach((cluster, i) => rsp[i]['datacenterObjRef'] = v.objRef);
+                                      return rsp;
+                                    })
+                                    .catch(e => Observable.throw(e));
+                     });
+                     return Observable.zip.apply(null, obsArr);
                     })
-                    .catch(e => Observable.throw(e))
-                    .map(response => response.json())
-                    .catch(e => Observable.throw(e));
+                    .map((clustersArr: any[]) => {
+                      let flattened = [];
+                      clustersArr.forEach(arr => flattened = flattened.concat(arr));
+                      return flattened;
+                    });
     }
 
     /**

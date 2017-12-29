@@ -15,10 +15,9 @@
         </label>
 
       </div>
-      <div class="col-xs-6">
+      <div class="col-xs-6" id="compute-resource-selector">
         <ng-container>
-          <clr-tree-node id="compute-resource-selector"
-                         class="form-control"
+          <clr-tree-node class="form-control"
                          [class.invalid]="form.invalid && form.getError('invalidComputeResource')"
                          [clrLoading]="isTreeLoading || crTreenode?.loading"
                          *ngFor="let dc of datacenter">

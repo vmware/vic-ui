@@ -13,14 +13,14 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   getNumericValidatorsArray,
   unlimitedPattern
 } from '../../shared/utils/validators';
 
-import { ComputeResource } from './compute-resource-treenode.component';
+import { ComputeResource, ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { DC_CLUSTER } from '../../shared/constants';
 import { Observable } from 'rxjs/Observable';
@@ -49,6 +49,9 @@ export class ComputeCapacityComponent implements OnInit {
   public selectedObjectName: string;
   public selectedResourceObjRef: string;
   private _selectedComputeResource: string;
+
+  @ViewChildren(ComputeResourceTreenodeComponent)
+  treenodeComponents: QueryList<ComputeResourceTreenodeComponent>;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -163,6 +166,16 @@ export class ComputeCapacityComponent implements OnInit {
     this.selectedResourceObjRef = resourceObj;
     this.selectedObjectName = payload.obj.text;
     this._selectedComputeResource = computeResource;
+
+    // set active class on the treenodecomponent whose datacenter object reference is
+    // the same as datacenterObj.objRef
+    if (this.treenodeComponents) {
+      this.treenodeComponents
+        .filter(component => component.datacenter.objRef !== dcObj)
+        .forEach(component => {
+          component.unselectComputeResource();
+        });
+    }
 
     // update resource limit & reservation info
     this.createWzService.getResourceAllocationsInfo(resourceObjForResourceAllocations, isCluster)
