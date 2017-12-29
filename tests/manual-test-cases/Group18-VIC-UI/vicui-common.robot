@@ -271,7 +271,7 @@ Install VIC Product OVA
     \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP_${vcenter-build}  ${ip}
 
     Log To Console  \nWaiting for Getting Started Page to Come Up...
-    :FOR  ${i}  IN RANGE  10
+    :FOR  ${i}  IN RANGE  24
     \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP_${vcenter-build}}:9443/register 2>/dev/null
     \   Exit For Loop If  '200' in '''${out}'''
     \   Sleep  5s
