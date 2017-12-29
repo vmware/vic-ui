@@ -13,7 +13,17 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChildren,
+  QueryList,
+  ElementRef,
+  Renderer
+} from '@angular/core';
 import { DC_CLUSTER, DC_STANDALONE_HOST } from '../../shared/constants';
 
 import { CreateVchWizardService } from '../create-vch-wizard.service';
@@ -49,8 +59,11 @@ export class ComputeResourceTreenodeComponent implements OnInit {
     datacenterObj: ComputeResource
   }>;
 
+  @ViewChildren('btnEl') computeResourceBtns: QueryList<any>;
+
   constructor(
-    private createWzService: CreateVchWizardService
+    private createWzService: CreateVchWizardService,
+    private renderer: Renderer
   ) {
     this.resourceSelected = new EventEmitter<{
       obj: ComputeResource,
@@ -68,8 +81,9 @@ export class ComputeResourceTreenodeComponent implements OnInit {
     this.createWzService
       .getClustersList()
       .subscribe(val => {
-        this.clusters = val.filter(v => v.nodeTypeId === DC_CLUSTER);
-        this.standaloneHosts = val.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
+        const filteredByDc = val.filter(v => v['datacenterObjRef'] === dc.objRef);
+        this.clusters = filteredByDc.filter(v => v.nodeTypeId === DC_CLUSTER);
+        this.standaloneHosts = filteredByDc.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
 
         if (!this.clusters.length) {
           this.loading = false;
@@ -100,7 +114,7 @@ export class ComputeResourceTreenodeComponent implements OnInit {
       });
   }
 
-  selectResource(obj: ComputeResource, clusterObj?: ComputeResource) {
+  selectResource(event: Event, obj: ComputeResource, clusterObj?: ComputeResource) {
     this.selectedResourceObj = obj;
     if (clusterObj) {
       this.resourceSelected.emit({
@@ -111,5 +125,14 @@ export class ComputeResourceTreenodeComponent implements OnInit {
     } else {
       this.resourceSelected.emit({ obj: obj, datacenterObj: this.datacenter });
     }
+
+    this.unselectComputeResource();
+    this.renderer.setElementClass(event.target, 'active', true);
+  }
+
+  unselectComputeResource() {
+    this.computeResourceBtns.forEach((elRef: ElementRef) => {
+      this.renderer.setElementClass(elRef.nativeElement, 'active', false);
+    })
   }
 }
