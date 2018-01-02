@@ -150,6 +150,8 @@ export class VicWebappPage {
     browser.switchTo().defaultContent();
     this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
+    // wait for modal to set position
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
@@ -163,6 +165,7 @@ export class VicWebappPage {
       if (result) {
         element(by.cssContainingText(el, text)).click();
       } else {
+        console.log(text + ' not found');
         return false;
       }
     });
@@ -173,6 +176,7 @@ export class VicWebappPage {
       if (result) {
         browser.driver.findElement(by.css(el)).click();
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
@@ -183,6 +187,7 @@ export class VicWebappPage {
       if (result) {
         browser.driver.findElement(by.css(el)).clear();
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
@@ -193,6 +198,7 @@ export class VicWebappPage {
       if (result) {
         browser.driver.findElement(by.css(el)).sendKeys(keys);
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
@@ -203,6 +209,7 @@ export class VicWebappPage {
       if (result) {
         browser.switchTo().frame(browser.driver.findElement(by.css(el)));
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
