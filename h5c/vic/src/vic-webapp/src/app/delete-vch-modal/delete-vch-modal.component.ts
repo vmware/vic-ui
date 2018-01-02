@@ -168,15 +168,18 @@ export class DeleteVchModalComponent implements OnInit {
     this.loading = true;
     Observable.combineLatest(
       this.createWzService.getVicApplianceIp(),
-      this.createWzService.acquireCloneTicket()
-    ).subscribe(([serviceHost, cloneTicket]) => {
+      this.createWzService.acquireCloneTicket(),
+      this.createWzService.getDatacenterForResource(this.vch.id)
+    ).subscribe(([serviceHost, cloneTicket, datacenter]) => {
       const vchId = this.vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
       const targetHost = this.extSessionService.getVcenterServersInfo()[0];
       const targetHostname = targetHost.name;
       const targetThumbprint = targetHost.thumbprint;
+      const targetDatacenter = datacenter.id.split(':')[3];
       const url =
-        `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/vch/${vchId}?thumbprint=${targetThumbprint}`;
+        `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/datacenter/${targetDatacenter}` +
+        `/vch/${vchId}?thumbprint=${targetThumbprint}`;
 
       const headers = new Headers({
         'Content-Type': 'application/json',
