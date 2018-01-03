@@ -50,3 +50,81 @@ Navigate To VCH Creation Wizard
     Wait Until Page Contains  Summary
     Wait Until Page Contains  Virtual Container Hosts
     Wait Until Page Contains  Containers
+
+Prepare Testbed For Protractor Tests
+    # Force the WD to be vic-ui/
+    ${wd}=  Run  pwd
+    @{wd_split}=  Split String  ${wd}  /
+    ${wd_level_len}=  Get Length  ${wd_split}
+    ${last_level_idx}=  Evaluate  ${wd_level_len} - 1
+    ${current_folder}=  Get From List  ${wd_split}  ${last_level_idx}
+    Run Keyword Unless  '${current_folder}' == 'vic-ui'  Fatal Error  Test script should be run from vic-ui/
+
+    # Check drone CLI
+    ${rc}  ${drone_ver}=  Run And Return Rc And Output  drone --version 2>&1
+    Log  Checking Drone version...
+    Log  return code: ${rc}, output: ${drone_ver}  DEBUG
+    Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
+    Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
+
+    # Check govc
+    ${rc}=  Run And Return Rc  govc
+    Should Be True  ${rc} != 127
+
+    # Ensure product OVA is deployed and ready
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.192.42.90  datastore1 (3)
+    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.75.194  datastore1 (1)
+    # TODO: use 6.5u1 instance
+    # Install VIC Product OVA  6.5u1  ${BUILD_5973321_IP}  ?  ?
+    Get Vic Engine Binaries
+
+Prepare Protractor
+    [Arguments]  ${VCSA_IP}  ${SELENIUM_GRID_IP}
+    # cache the original content of the protractor configuration file
+    ${protractor_conf}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
+    Set Global Variable  ${original_protractor_conf}  ${protractor_conf}
+
+    # point the protractor to use the provided selenium grid host
+    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*baseUrl.*|baseUrl: 'https:\/\/${VCSA_IP}\/ui',|" -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|" h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
+    Should Be Equal As Integers  ${rc}  0
+    Run Keyword Unless  ${rc} == 0  Log  ${out}
+    Run  cp /tmp/protractor.conf.js ./h5c/vic/src/vic-webapp/
+
+    # update app.po.ts to set the correct baseUrl
+    ${app_po_ts}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/e2e/app.po.ts
+    Set Global Variable  ${original_app_po_ts}  ${app_po_ts}
+    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*return browser\.get\(.*|return browser\.get\('https:\/\/${VCSA_IP}\/ui'\);|" h5c/vic/src/vic-webapp/e2e/app.po.ts > /tmp/app.po.ts
+    Should Be Equal As Integers  ${rc}  0
+    Run Keyword Unless  ${rc} == 0  Log  ${out}
+    Run  cp /tmp/app.po.ts ./h5c/vic/src/vic-webapp/e2e/
+
+Reboot vSphere Client
+    [Arguments]  ${VCSA_IP}
+    # reboot vsphere client after installing the plugin
+    Open Connection  ${VCSA_IP}  prompt=#
+    Login  root  vmware
+    Execute Command  service-control --stop vsphere-ui
+    Execute Command  service-control --start vsphere-ui
+
+    # wait until vsphere-ui service is up and running
+    Wait Until Keyword Succeeds  20x  30s  Is vSphere Client Ready  ${VCSA_IP}
+    Log To Console  vSphere Client has booted.
+    Close connection
+
+Is vSphere Client Ready
+    [Arguments]  ${VCSA_IP}
+    Log To Console  Waiting until vSphere Client is up and ready...
+    ${out}=  Run  curl -sL https://${VCSA_IP}/ui/ -k
+    ${out_len}=  Get Length  ${out}
+    Should Be True  ${out_len} > 0
+    Should Not Contain  ${out}  Service Unavailable
+    Should Not Contain  ${out}  is still initializing
+
+Cleanup Plugins From VC
+    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}  ${VC_PASSWORD}
+    Close All Browsers
+    Log To Console  Removing VIC UI plugins from ${VC_TARGET}...
+    # remove plugins
+    ${vic-ui-binary}=  Set Variable  ../../../vic-ui-linux
+    Run  ${vic-ui-binary} remove --thumbprint ${VCSA_FINGERPRINT} --target ${VC_TARGET} --user ${VC_USERNAME} --password ${VC_PASSWORD} --key com.vmware.vic.ui
+    Run  ${vic-ui-binary} remove --thumbprint ${VCSA_FINGERPRINT} --target ${VC_TARGET} --user ${VC_USERNAME} --password ${VC_PASSWORD} --key com.vmware.vic
