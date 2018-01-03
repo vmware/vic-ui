@@ -121,10 +121,37 @@ Is vSphere Client Ready
     Should Not Contain  ${out}  is still initializing
 
 Cleanup Plugins From VC
-    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}  ${VC_PASSWORD}
+    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Admin!23
     Close All Browsers
     Log To Console  Removing VIC UI plugins from ${VC_TARGET}...
     # remove plugins
-    ${vic-ui-binary}=  Set Variable  ../../../vic-ui-linux
-    Run  ${vic-ui-binary} remove --thumbprint ${VCSA_FINGERPRINT} --target ${VC_TARGET} --user ${VC_USERNAME} --password ${VC_PASSWORD} --key com.vmware.vic.ui
-    Run  ${vic-ui-binary} remove --thumbprint ${VCSA_FINGERPRINT} --target ${VC_TARGET} --user ${VC_USERNAME} --password ${VC_PASSWORD} --key com.vmware.vic
+    ${rc}  ${uname_v}=  Run And Return Rc And Output  uname -v
+    ${is_darwin}=  Run Keyword And Return Status  Should Contain  ${uname_v}  Darwin
+    ${vic-ui-binary}=  Set Variable If  ${is_darwin}  ./vic-ui-darwin  ./vic-ui-linux
+    ${rc1}  ${out1}=  Run And Return Rc And Output  ${vic-ui-binary} remove --thumbprint ${VCSA_FINGERPRINT} --target ${VC_TARGET} --user ${VC_USERNAME} --password ${VC_PASSWORD} --key com.vmware.vic.ui
+    ${rc2}  ${out2}=  Run And Return Rc And Output  ${vic-ui-binary} remove --thumbprint ${VCSA_FINGERPRINT} --target ${VC_TARGET} --user ${VC_USERNAME} --password ${VC_PASSWORD} --key com.vmware.vic
+    Log To Console  ${out1}
+    Log To Console  ${out2}
+
+Destroy Dangling VCHs Created By Protractor
+    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Admin!23
+    Set Environment Variable  GOVC_URL  ${VC_TARGET}
+    Set Environment Variable  GOVC_INSECURE  1
+    Set Environment Variable  GOVC_USERNAME  ${VC_USERNAME}
+    Set Environment Variable  GOVC_PASSWORD  ${VC_PASSWORD}
+
+    ${rc}  ${uname_v}=  Run And Return Rc And Output  uname -v
+    ${is_darwin}=  Run Keyword And Return Status  Should Contain  ${uname_v}  Darwin
+    ${vic-machine-binary}=  Set Variable If  ${is_darwin}  ./ui-nightly-run-bin/vic-machine-darwin  ./ui-nightly-run-bin/vic-machine-linux
+
+    # get a list of dangling VMs created by protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  govc vm.info -json true "virtual-container-host-*" | jq -r '.VirtualMachines[].Name'
+
+    # if there are any dangling VCHs, delete them. if not, exit the keyword
+    Run Keyword Unless  ${rc} == 0  Log To Console  VC inventory is clean. No need to clean up dangling VCHs
+    Run Keyword Unless  ${rc} == 0  Return From Keyword
+    @{vms}=  Split String  ${out}  \n
+    :FOR  ${vm}  IN  @{vms}
+    \  Log To Console  Destroying VCH: ${vm}
+    \  ${rc}  ${out}=  Run And Return Rc And Output  ${vic-machine-binary} delete --name ${vm} --target ${VC_TARGET} --user ${VC_USERNAME} --password '${VC_PASSWORD}' --compute-resource Cluster --force --thumbprint ${VCSA_FINGERPRINT}
+    \  Log To Console  ${out}

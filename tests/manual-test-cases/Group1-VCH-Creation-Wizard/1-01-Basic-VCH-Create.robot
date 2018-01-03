@@ -33,6 +33,9 @@ Cleanup Testbed After Protractor Test Completes
     # revert app.po.ts
     OperatingSystem.Create File  ./h5c/vic/src/vic-webapp/e2e/app.po.ts  ${original_app_po_ts}
 
+    # delete all dangling VCHs
+    Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
+
 *** Test Cases ***
 Test On vSphere 6.5d
     # install VCH and VIC UI plugin
