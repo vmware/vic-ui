@@ -136,7 +136,6 @@ export class VicWebappPage {
 
   createVch() {
     this.clickByText('Button', 'Finish');
-    this.waitForElementToBePresent('.spinner', this.defaultTimeout);
     browser.switchTo().defaultContent();
     this.waitForElementToBeGone(this.iframeModal, this.extendedTimeout * 3);
     this.switchFrame(this.iframeTabs);
