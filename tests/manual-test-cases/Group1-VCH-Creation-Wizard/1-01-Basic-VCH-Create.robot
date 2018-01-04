@@ -37,7 +37,7 @@ Cleanup Testbed After Protractor Test Completes
     Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
 
 *** Test Cases ***
-Test On vSphere 6.5d
+Create And Delete VCH On A Single Cluster Environment
     # install VCH and VIC UI plugin
     Set Environment Variable  TEST_VCSA_BUILD  5318154
     Set Environment Variable  TEST_VSPHERE_VER  65
@@ -53,7 +53,39 @@ Test On vSphere 6.5d
     Log To Console  OVA IP is %{OVA_IP_6.5d}
     Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
 
+    # run protractor
     ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
     Log  ${out}
     Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
+Create And Delete VCH On An Environment With Some Empty Clusters
+    Set Environment Variable  GOVC_URL  ${BUILD_5318154_IP}
+    Set Environment Variable  GOVC_INSECURE  1
+    Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
+    Set Environment Variable  GOVC_PASSWORD  Admin!23
+
+    # add clusters
+    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster2
+    Should Be Empty  ${out}
+    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster3
+    Should Be Empty  ${out}
+
+    Log To Console  OVA IP is %{OVA_IP_6.5d}
+    Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
+    Log  ${out}
+    Log To Console  ${out}
+
+    # delete extra clusters
+    ${out}=  Run  govc object.destroy /Datacenter/host/Cluster2
+    Should Be Empty  ${out}
+    ${out}=  Run  govc object.destroy /Datacenter/host/Cluster3
+    Should Be Empty  ${out}
+
+    # report pass/fail
     Should Be Equal As Integers  ${rc}  0
