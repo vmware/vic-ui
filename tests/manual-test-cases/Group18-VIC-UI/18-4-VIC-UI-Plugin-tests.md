@@ -1,57 +1,95 @@
-Test 18-4 - VIC UI Plugin Tests
+Test 18-4 - VIC UI Plugin Tests - Portlets
 ======
 
 #Purpose:
-To test user interactions with VIC UI in vSphere Web Client
+To test functionality of Portlets of the VIC UI plugin in the vSphere Client
 
 #References:
 
 #Environment:
-* Testing VIC UI requires a working VCSA setup with VCH installed
+* vSphere 6.0u2 or higher for the Flex Client plugin
+* vSphere 6.5d or higher for the HTML5 Client plugin
+
+#Prerequisites:
+1. Deploy a VIC product OVA to the VCSA you want to test on
+2. Access the deployed appliance VM in vSphere Client console, retrieve its IP, and open the Getting Started page at https://$APPLIANCE_IP:9443 in the browser
+3. Finish product installation as instructed
+4. In the Getting Started page, click the "Download" button to download the VIC Engine tar ball
+5. Unextract the tar ball in an arbitrary location
+    ```
+    user $ tar -xvf vic_v1.3.0-rc6.tar.gz -C /tmp/
+    ```
+6. Run the UI plugins installer
+    ```
+    user $ cd /tmp/vic/ui/VCSA
+    user $ ./install.sh
+    ```
+7. As instructed by the installer script, make sure to restart the vSphere Web Client service
+    ```
+    user $ ssh root@$VCSA_IP
+    (type VCSA appliance root password)
+    root@VCSA # service-control --stop vsphere-client && service-control --start vsphere-client
+    ```
+    If your VC version is 6.5 also restart the vSphere Client service
+    ```
+    root@VCSA # service-control --stop vsphere-ui && service-control --start vsphere-ui
+    ```
 
 #Test Steps:
-1. Check if provider properties files exist
-2. Ensure UI plugin is already registered with VC before testing
-3. Run the NGC tests
+- Flex Client plugin
+  - **Note**: Test on the following platform - browser combinations
+    - macOS - Chrome, Firefox
+    - Windows - Chrome, Firefox, IE11
   - Test 1: Verify if the VIC UI plugin is installed correctly
-    - Open a browser
-    - Log in as admin user
+    - In an SSH session or macOS Terminal, deploy a VCH using the `vic-machine` binary
+      ```
+      user $ cd /tmp/vic
+      user $ ./vic-machine-linux create --target tina.eng.vmware.com --user administrator@vsphere.local --password Admin\!23 --name E2E-TEST-VCH --bridge-network bridge --image-store datastore1 --compute-resource Cluster --no-tlsverify --thumbprint 39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
+      (take a note of the value of DOCKER_HOST from the output, as it will be used to create a container below)
+      ```
+    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Log in as admin user (administrator@vsphere.local / Admin!23)
     - Navigate to Administration -> Client Plug-Ins
-    - Verify if item “VicUI” exists
+    - Verify if an entry named “vSphere Integrated Containers-FlexClient" exists
 
   - Test 2.1: Verify if VCH VM Portlet exists
-    - Open a browser
-    - Log in as admin user
-    - Navigate to the VCH VM Summary tab
-    - Verify if property id `dockerApiEndpoint` exists
+    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
+    - Verify the visibility of portlet "Virtual Container Host"
 
   - Test 2.2: Verify if VCH VM Portlet displays correct information while VM is OFF
-    - Ensure the vApp is off
-    - Open a browser
-    - Log in as admin user
-    - Navigate to the VCH VM Summary tab
-    - Verify if `dockerApiEndpoint` equals the placeholder value `-`
+    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
+    - Power off the VM
+    - Verify in the "Virtual Container Host" portlet if "Docker API endpoint" equals `-`
 
   - Test 2.3: Verify if VCH VM Portlet displays correct information while VM is ON
-    - Ensure the vApp is on
-    - Open a browser
-    - Log in as admin user
-    - Navigate to the VCH VM Summary tab
-    - Verify if `dockerApiEndpoint` does not equal the placeholder value `-`
+    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
+    - Power off the VM
+    - Verify in the "Virtual Container Host" portlet if "Docker API endpoint" displays the correct connection information
 
   - Test 3: Verify if Container VM Portlet exists
-    - Open a browser
-    - Log in as admin user
-    - Navigate to the Container VM Summary tab
-    - Verify if property id `containerName` exists
+    - In an SSH session or macOS Terminal, create a busybox container on the VCH created in a previous step
+      ```
+      user $ docker -H #.#.#.#:2376 --tls run -itd busybox /bin/top
+      ```
+    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Navigate to the "Hosts and Clusters" page and open the Summary tab of the container VM that just got created
+    - Verify the visibility of portlet "Container"
+
+  - Cleanup: Destroy VCH and Container VM
+    - In an SSH session or macOS Terminal, delete the VCH and its Container VMs using the `vic-machine` binary
+      ```
+      ./vic-machine-linux delete --target tina.eng.vmware.com --user administrator@vsphere.local --password Admin\!23 --name E2E-TEST-VCH --compute-resource Cluster --thumbprint 39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB --force
+      ```
+- HTML5 Client plugin
+  - Test cases for the H5 Client plugin are basically identical to those of the Flex Client plugin except there are some more cases to test the visibility of the shortcut icon to the vSphere Integrated Containers page in the H5 Client and basic navigation.
+
 
 #Expected Outcome:
-* Each step should return success
-
-#Possible Problems:
-1. NGC automated testing is not available on VC 5.5, so if the tests were to run against a box with VC 5.5 Step 3 above would be skipped. However, you can manually run the NGC tests by following the steps above.
-2. Some Selenium Web Drivers are known to have bugs that slow down or even crash the tests
-  - 64 bit version of the Internet Explorer Driver has an issue with text input speed where it takes about 4-5 seconds per keystroke. (using the 32 bit version solves the issue)
-  - When run with the Chrome Driver, tests fail at the login page of the vSphere Web Client; browser hangs and does not automatically enter username and password
-  - Firefox driver has been the most stable and thus was set as the default browser for testing
-  - The findings were made using the latest non-beta release of Selenium (v2.53.1) and the latest browser drivers on a Nimbus-based Windows 7 VM
+* All tests should be successful
