@@ -67,6 +67,30 @@ BUILD_NUMBER=$(echo $FULL_VER_STRING | awk -F- '{print $2}')
 VIC_ENGINE_VER_STRING=${MAJOR_MINOR_PATCH}.${BUILD_NUMBER}
 VIC_UI_VER_STRING=$(ls -l ${VIC_BIN_ROOT}ui/plugin-packages | grep '^d' | head -1 | awk '{print $9}' | awk -F- '{print $2}')
 
+# update plugin-package.xml for H5 Client plugin
+SCRATCH_FOLDER=/tmp/plugin-pkg-scratch
+mkdir -p ${SCRATCH_FOLDER}/h5c
+mkdir -p ${SCRATCH_FOLDER}/flex
+echo "Updating description for H5 Client plugin to \"vSphere Client Plugin for vSphere Integrated Containers Engine (v${VIC_ENGINE_VER_STRING})"\"
+cd ${VIC_BIN_ROOT}ui/plugin-packages/com.vmware.vic-${VIC_UI_VER_STRING}
+sed "s/H5 Client Plugin for vSphere Integrated Containers Engine/vSphere Client Plugin for vSphere Integrated Containers Engine \(v${VIC_ENGINE_VER_STRING}\)/" plugin-package.xml > ${SCRATCH_FOLDER}/h5c/plugin-package.xml
+cp -v ${SCRATCH_FOLDER}/h5c/plugin-package.xml ./
+zip -9 -r ${SCRATCH_FOLDER}/h5c/com.vmware.vic-${VIC_UI_VER_STRING}.zip ./*
+cp -v ${SCRATCH_FOLDER}/h5c/com.vmware.vic-${VIC_UI_VER_STRING}.zip ../
+cd ${CURRENT_WORKING_DIR}
+
+# update plugin-package.xml for Flex Client plugin
+echo "Updating description for Flex Client plugin to \"vSphere Client Plugin for vSphere Integrated Containers Engine (v${VIC_ENGINE_VER_STRING})\""
+cd ${VIC_BIN_ROOT}ui/vsphere-client-serenity/com.vmware.vic.ui-${VIC_UI_VER_STRING}
+sed "s/Flex Client Plugin for vSphere Integrated Containers Engine/vSphere Client Plugin for vSphere Integrated Containers Engine \(v${VIC_ENGINE_VER_STRING}\)/" plugin-package.xml > ${SCRATCH_FOLDER}/flex/plugin-package.xml
+cp -v ${SCRATCH_FOLDER}/flex/plugin-package.xml ./
+zip -9 -r ${SCRATCH_FOLDER}/flex/com.vmware.vic.ui-${VIC_UI_VER_STRING}.zip ./*
+cp -v ${SCRATCH_FOLDER}/flex/com.vmware.vic.ui-${VIC_UI_VER_STRING}.zip ../
+cd ${CURRENT_WORKING_DIR}
+
+# clean up scratch folders
+rm -rf ${SCRATCH_FOLDER}
+
 # update plugin-manifest
 sed "s/summary=.*/summary=\"vSphere Client Plugin for vSphere Integrated Containers Engine (v${VIC_ENGINE_VER_STRING})\"/" ${VIC_BIN_ROOT}ui/plugin-manifest > /tmp/plugin-manifest
 mv /tmp/plugin-manifest ${VIC_BIN_ROOT}ui/plugin-manifest
