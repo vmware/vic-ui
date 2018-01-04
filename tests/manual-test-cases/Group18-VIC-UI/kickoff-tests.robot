@@ -279,8 +279,9 @@ Run Plugin Test With Config
     ...  -e "s|\#BROWSER_NORMALIZED_NAME|${selenium_browser_normalized}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g" > .drone.local.tests.yml
 
+    ${plugin_type}=  Set Variable If  ${vc_version} == '65'  H5 Client  Flex Client
     Log To Console  ${\n}........................................
-    Log To Console     Plugin Test
+    Log To Console     vSphere Client Plugin test - Portlets
     Log To Console  ........................................
     Log To Console  vSphere version: ${vc_version}
     Log To Console  ESX build: ${esx_build}
@@ -288,7 +289,7 @@ Run Plugin Test With Config
     Log To Console  Operating System: ${os}
     Log To Console  Browser: ${selenium_browser}
     Run Keyword If  ${is_skipped}  Log To Console  Skipped...
-    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\t${plugin_type} test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Return From Keyword If  ${is_skipped}
     Get Testbed Information
     Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
@@ -300,7 +301,7 @@ Run Plugin Test With Config
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
-    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \] Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \] ${plugin_type} test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
     ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
@@ -312,7 +313,7 @@ Run Plugin Test With Config
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
     ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
-    ${pf_string}=  Set Variable  ${pf}\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    ${pf_string}=  Set Variable  ${pf}\t${plugin_type} test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ${pf_string}
 
     Log To Console  ${results.rc}
@@ -410,32 +411,12 @@ Send Email
     \    ${remarks}=  Get From Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${key}
     \    Append To File  email_body.txt  ${remarks}${\n}
 
-    ${installer_notes_str}=  Run  cat ${TEST_SCRIPTS_ROOT}/18-1-VIC-UI-Installer.robot | grep "# NOTE" | sed -e "s/^[[:space:]]*//g"
-    ${uninstaller_notes_str}=  Run  cat ${TEST_SCRIPTS_ROOT}/18-2-VIC-UI-Uninstaller.robot | grep "# NOTE" | sed -e "s/^[[:space:]]*//g"
-    ${upgrader_notes_str}=  Run  cat ${TEST_SCRIPTS_ROOT}/18-3-VIC-UI-Upgrader.robot | grep "# NOTE" | sed -e "s/^[[:space:]]*//g"
+    ${flex_note}=  Catenate
+    ...  Due to challenges in getting the right environment for the automated test framework to run and the fact that
+    ...  the amount of time and effort spent on automating the test for the obsolete Flex Client plugin is unreasonably big,
+    ...  we decided to run Flex Client plugin tests manually before each major milestone (e.g. release).
 
-    @{installer_notes}=  Split String  ${installer_notes_str}  ${\n}
-    @{uninstaller_notes}=  Split String  ${uninstaller_notes_str}  ${\n}
-    @{upgrader_notes}=  Split String  ${upgrader_notes_str}  ${\n}
-
-    ${installer_notes_len}=  Get Length  ${installer_notes}
-    ${uninstaller_notes_len}=  Get Length  ${uninstaller_notes}
-    ${upgrader_notes_len}=  Get Length  ${upgrader_notes}
-
-    Run Keyword If  ${installer_notes_len} > 0  Append To File  email_body.txt  \n**Installer Test Notes**${\n}
-    :FOR  ${line}  IN  @{installer_notes}
-    \    ${bulletpointified}=  Replace String Using Regexp  ${line}  \#\\sNOTE\:  -
-    \    Append To File  email_body.txt  ${bulletpointified}${\n}
-
-    Run Keyword If  ${uninstaller_notes_len} > 0  Append To File  email_body.txt  \n**Uninstaller Test Notes**${\n}
-    :FOR  ${line}  IN  @{uninstaller_notes}
-    \    ${bulletpointified}=  Replace String Using Regexp  ${line}  \#\\sNOTE\:  -
-    \    Append To File  email_body.txt  ${bulletpointified}${\n}
-
-    Run Keyword If  ${upgrader_notes_len} > 0  Append To File  email_body.txt  \n**Upgrader Test Notes**${\n}
-    :FOR  ${line}  IN  @{upgrader_notes}
-    \    ${bulletpointified}=  Replace String Using Regexp  ${line}  \#\\sNOTE\:  -
-    \    Append To File  email_body.txt  ${bulletpointified}${\n}
+    Append To File  email_body.txt  \n*Note: ${flex_note} ${\n}
 
     ${email_zip_section}=  Catenate  SEPARATOR=\n
     ...    ${\n}--${boundary}
