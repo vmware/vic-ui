@@ -26,8 +26,8 @@ Load Testbed Information And Force Install Vicui Plugin
     Force Install Vicui Plugin
 
 *** Variables ***
-${HSUIA_TESTS}                   hsuia-tests-for-4849304
-${HSUIA_TESTS_ZIP_URL}           https://storage.googleapis.com/vic-engine-builds/${HSUIA_TESTS}.zip
+${HSUIA_TESTS}                   hsuia-ie11-no-cleansession
+${HSUIA_TESTS_ZIP_URL}           https://storage.googleapis.com/vic-ui-builds/${HSUIA_TESTS}.zip
 ${HSUIA_TESTS_EXTRACT_LOCATION}  /tmp/${HSUIA_TESTS}
 ${SUITA_TESTS}                   suita-tests-for-3624791
 ${SUITA_TESTS_ZIP_URL}           https://storage.googleapis.com/vic-engine-builds/${SUITA_TESTS}.zip
