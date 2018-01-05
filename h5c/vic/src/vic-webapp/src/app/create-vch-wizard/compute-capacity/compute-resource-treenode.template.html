@@ -5,6 +5,7 @@
       <clr-tree-node *ngFor="let cluster of clusters"
                      [clrLoading]="loading">
         <button #btnEl class="clr-treenode-link cc-resource"
+                *ngIf="!cluster.isEmpty"
                 (click)="selectResource($event, cluster)">
           <clr-icon shape="cluster"></clr-icon>
           {{ cluster['text'] }}

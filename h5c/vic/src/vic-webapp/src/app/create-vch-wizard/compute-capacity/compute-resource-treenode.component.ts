@@ -34,6 +34,7 @@ export interface ComputeResource {
   nodeTypeId: string;
   objRef: string;
   aliases: string[];
+  isEmpty: boolean;
 }
 
 /**
@@ -103,7 +104,7 @@ export class ComputeResourceTreenodeComponent implements OnInit {
             // to display the cluster to the user, and trying to utilize the empty cluster
             // would surely cause an error, so it makes sense to remove the cluster node from view
             if (!clusterHostSystems.length) {
-              this.clusters = [...this.clusters.slice(0, idx), ...this.clusters.slice(idx + 1)];
+              this.clusters[idx].isEmpty = true;
               idx++;
               return;
             }
