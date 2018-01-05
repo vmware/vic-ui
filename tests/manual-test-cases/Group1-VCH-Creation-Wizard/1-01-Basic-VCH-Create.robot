@@ -15,36 +15,77 @@
 *** Settings ***
 Documentation  Test 1-01 - Basic VCH Create
 Resource  ../../resources/Util.robot
-Suite Teardown  Close All Browsers
+Resource  ../Group18-VIC-UI/vicui-common.robot
+Suite Setup  Prepare Testbed For Protractor Tests
+Test Teardown  Cleanup Testbed After Protractor Test Completes
+
+*** Variables ***
+${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
 
 *** Keywords ***
+Cleanup Testbed After Protractor Test Completes
+    # delete plugins from VC
+    Cleanup Plugins From VC  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
+
+    # revert protractor.conf.js
+    OperatingSystem.Create File  ./h5c/vic/src/vic-webapp/protractor.conf.js  ${original_protractor_conf}
+
+    # revert app.po.ts
+    OperatingSystem.Create File  ./h5c/vic/src/vic-webapp/e2e/app.po.ts  ${original_app_po_ts}
+
+    # delete all dangling VCHs
+    Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
 
 *** Test Cases ***
-Test
-    Open Browser  about:  browser=firefox  remote_url=http://0.0.0.0:4444/wd/hub
+Create And Delete VCH On A Single Cluster Environment
+    # install VCH and VIC UI plugin
+    Set Environment Variable  TEST_VCSA_BUILD  5318154
+    Set Environment Variable  TEST_VSPHERE_VER  65
+    Set Environment Variable  VC_FINGERPRINT  ${VC_FINGERPRINT_5318154}
+    Set Global Variable  ${TEST_VC_IP}  ${BUILD_5318154_IP}
+    Set Global Variable  ${TEST_VC_USERNAME}  administrator@vsphere.local
+    Set Global Variable  ${TEST_VC_PASSWORD}  Admin!23
 
-    Go To  http://google.com
-    Page should contain element  q
-    Pass Execution  Not ready yet
+    Set Absolute Script Paths  ./scripts
+    Force Install Vicui Plugin
+    Reboot vSphere Client  ${TEST_VC_IP}
 
-    Login To Vsphere UI
-    Navigate To VCH Creation Wizard
-    Navigate To VCH Tab
-    Click New Virtual Container Host Button
-    ${name}=  Evaluate  'VCH-1-01-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
-    Input VCH Name  ${name}
-    Click Next Button
-    Select Cluster
-    Click Next Button
-    Select Image Datastore  datastore1
-    Click Next Button
-    Select Bridge Network  bridge
-    Select Public Network  vm-network
-    Click Next Button
-    # Security
-    Click Next Button
-    # Finish
-    Click Next Button
-    
-    Sleep  10
-    # TODO: Still blocked by implementation of the full wizard
+    Log To Console  OVA IP is %{OVA_IP_6.5d}
+    Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
+    Log  ${out}
+    Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
+Create And Delete VCH On An Environment With Some Empty Clusters
+    Set Environment Variable  GOVC_URL  ${BUILD_5318154_IP}
+    Set Environment Variable  GOVC_INSECURE  1
+    Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
+    Set Environment Variable  GOVC_PASSWORD  Admin!23
+
+    # add clusters
+    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster2
+    Should Be Empty  ${out}
+    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster3
+    Should Be Empty  ${out}
+
+    Log To Console  OVA IP is %{OVA_IP_6.5d}
+    Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
+    Log  ${out}
+    Log To Console  ${out}
+
+    # delete extra clusters
+    ${out}=  Run  govc object.destroy /Datacenter/host/Cluster2
+    Should Be Empty  ${out}
+    ${out}=  Run  govc object.destroy /Datacenter/host/Cluster3
+    Should Be Empty  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
