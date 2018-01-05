@@ -17,7 +17,7 @@ Documentation  Test 1-01 - Basic VCH Create
 Resource  ../../resources/Util.robot
 Resource  ../Group18-VIC-UI/vicui-common.robot
 Suite Setup  Prepare Testbed For Protractor Tests
-Test Teardown  Cleanup Testbed After Protractor Test Completes
+Suite Teardown  Cleanup Testbed After Protractor Test Completes
 
 *** Variables ***
 ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
@@ -35,6 +35,10 @@ Cleanup Testbed After Protractor Test Completes
 
     # delete all dangling VCHs
     Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
+
+    # ensure extra clusters are not present in VC inventory
+    Run  govc object.destroy /Datacenter/host/Cluster2
+    Run  govc object.destroy /Datacenter/host/Cluster3
 
 *** Test Cases ***
 Create And Delete VCH On A Single Cluster Environment
@@ -80,12 +84,6 @@ Create And Delete VCH On An Environment With Some Empty Clusters
     ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
     Log  ${out}
     Log To Console  ${out}
-
-    # delete extra clusters
-    ${out}=  Run  govc object.destroy /Datacenter/host/Cluster2
-    Should Be Empty  ${out}
-    ${out}=  Run  govc object.destroy /Datacenter/host/Cluster3
-    Should Be Empty  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
