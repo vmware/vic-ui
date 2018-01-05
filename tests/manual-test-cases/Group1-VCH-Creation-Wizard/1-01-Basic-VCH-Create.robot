@@ -37,9 +37,9 @@ Cleanup Testbed After Protractor Test Completes
     Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
 
     # ensure extra objects are not present in VC inventory
-    Run  govc object.destroy /Datacenter/host/Cluster2
-    Run  govc object.destroy /Datacenter/host/Cluster3
-    Run  govc object.destroy /Datacenter2
+    Run  govc object.destroy -dc Datacenter /Datacenter/host/Cluster2
+    Run  govc object.destroy -dc Datacenter /Datacenter/host/Cluster3
+    Run  govc object.destroy -dc Datacenter2 /Datacenter2
 
 *** Test Cases ***
 Create And Delete VCH On A Single Cluster Environment
@@ -90,31 +90,6 @@ Create And Delete VCH On An Environment With Some Empty Clusters
 
     # report pass/fail
     #Should Be Equal As Integers  ${rc}  0
-
-Create And Delete VCH On A Multi-DC Environment
-    Set Environment Variable  GOVC_URL  ${BUILD_5318154_IP}
-    Set Environment Variable  GOVC_INSECURE  1
-    Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
-    Set Environment Variable  GOVC_PASSWORD  Admin!23
-
-    # add a new datacenter and an empty cluster to it
-    ${out}=  Run  govc datacenter.create Datacenter2
-    Should Be Empty  ${out}
-    ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
-    Should Be Empty  ${out}
-    ${out}=  Run  govc cluster.change -dc=Datacenter2 -drs-enabled=true /Datacenter2/host/Cluster
-    Should Be Empty  ${out}
-
-    Log To Console  OVA IP is %{OVA_IP_6.5d}
-    Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
-
-    # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
-    Log  ${out}
-    Log To Console  ${out}
-
-    # report pass/fail
-    Should Be Equal As Integers  ${rc}  0
 
 Create And Delete VCH On A Multi-DC Environment
     Set Environment Variable  GOVC_URL  ${BUILD_5318154_IP}

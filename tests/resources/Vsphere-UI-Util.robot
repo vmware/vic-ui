@@ -145,7 +145,7 @@ Destroy Dangling VCHs Created By Protractor
     ${vic-machine-binary}=  Set Variable If  ${is_darwin}  ./ui-nightly-run-bin/vic-machine-darwin  ./ui-nightly-run-bin/vic-machine-linux
 
     # get a list of dangling VMs created by protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  govc vm.info -json true "virtual-container-host-*" | jq -r '.VirtualMachines[].Name'
+    ${rc}  ${out}=  Run And Return Rc And Output  govc vm.info -dc Datacenter -json true "virtual-container-host-*" | jq -r '.VirtualMachines[].Name'
 
     # if there are any dangling VCHs, delete them. if not, exit the keyword
     Run Keyword Unless  ${rc} == 0  Log To Console  VC inventory is clean. No need to clean up dangling VCHs
@@ -153,5 +153,5 @@ Destroy Dangling VCHs Created By Protractor
     @{vms}=  Split String  ${out}  \n
     :FOR  ${vm}  IN  @{vms}
     \  Log To Console  Destroying VCH: ${vm}
-    \  ${rc}  ${out}=  Run And Return Rc And Output  ${vic-machine-binary} delete --name ${vm} --target ${VC_TARGET} --user ${VC_USERNAME} --password '${VC_PASSWORD}' --compute-resource Cluster --force --thumbprint ${VCSA_FINGERPRINT}
+    \  ${rc}  ${out}=  Run And Return Rc And Output  ${vic-machine-binary} delete --name ${vm} --target ${VC_TARGET}/Datacenter --user ${VC_USERNAME} --password '${VC_PASSWORD}' --compute-resource Cluster --force --thumbprint ${VCSA_FINGERPRINT}
     \  Log To Console  ${out}
