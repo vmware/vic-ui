@@ -412,9 +412,8 @@ Send Email
     \    Append To File  email_body.txt  ${remarks}${\n}
 
     ${flex_note}=  Catenate
-    ...  Due to challenges in getting the right environment for the automated test framework to run and the fact that
-    ...  the amount of time and effort spent on automating the test for the obsolete Flex Client plugin is unreasonably big,
-    ...  we decided to run Flex Client plugin tests manually before each major milestone (e.g. release).
+    ...  Due to challenges surrounding Flex testing automation, Flex Client plugin tests are manually run
+    ...  after any Flex code change and before each major milestone (e.g. release).
 
     Append To File  email_body.txt  \n*Note: ${flex_note} ${\n}
 

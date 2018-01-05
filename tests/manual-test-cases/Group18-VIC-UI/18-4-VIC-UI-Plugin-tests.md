@@ -26,7 +26,7 @@ To test functionality of Portlets of the VIC UI plugin in the vSphere Client
     ```
 7. As instructed by the installer script, make sure to restart the vSphere Web Client service
     ```
-    user $ ssh root@$VCSA_IP
+    user $ ssh root@tina.eng.vmware.com
     (type VCSA appliance root password)
     root@VCSA # service-control --stop vsphere-client && service-control --start vsphere-client
     ```
@@ -47,26 +47,26 @@ To test functionality of Portlets of the VIC UI plugin in the vSphere Client
       user $ ./vic-machine-linux create --target tina.eng.vmware.com --user administrator@vsphere.local --password Admin\!23 --name E2E-TEST-VCH --bridge-network bridge --image-store datastore1 --compute-resource Cluster --no-tlsverify --thumbprint 39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
       (take a note of the value of DOCKER_HOST from the output, as it will be used to create a container below)
       ```
-    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
     - Log in as admin user (administrator@vsphere.local / Admin!23)
     - Navigate to Administration -> Client Plug-Ins
     - Verify if an entry named “vSphere Integrated Containers-FlexClient" exists
 
   - Test 2.1: Verify if VCH VM Portlet exists
-    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
     - Log in as admin user (administrator@vsphere.local / Admin!23)
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
     - Verify the visibility of portlet "Virtual Container Host"
 
   - Test 2.2: Verify if VCH VM Portlet displays correct information while VM is OFF
-    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
     - Log in as admin user (administrator@vsphere.local / Admin!23)
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
     - Power off the VM
     - Verify in the "Virtual Container Host" portlet if "Docker API endpoint" equals `-`
 
   - Test 2.3: Verify if VCH VM Portlet displays correct information while VM is ON
-    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
     - Log in as admin user (administrator@vsphere.local / Admin!23)
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
     - Power off the VM
@@ -77,7 +77,7 @@ To test functionality of Portlets of the VIC UI plugin in the vSphere Client
       ```
       user $ docker -H #.#.#.#:2376 --tls run -itd busybox /bin/top
       ```
-    - Open the browser to navigate to https://$VCSA_IP/vsphere-client
+    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
     - Log in as admin user (administrator@vsphere.local / Admin!23)
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of the container VM that just got created
     - Verify the visibility of portlet "Container"
