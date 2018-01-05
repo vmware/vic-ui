@@ -66,15 +66,42 @@ Create And Delete VCH On A Single Cluster Environment
     Should Be Equal As Integers  ${rc}  0
 
 Create And Delete VCH On An Environment With Some Empty Clusters
+    Log To Console  Skipping because v1.3.0 GA doesn't have the fix and will always fail. See https://github.com/vmware/vic-ui/issues/274 for details
+
+    #Set Environment Variable  GOVC_URL  ${BUILD_5318154_IP}
+    #Set Environment Variable  GOVC_INSECURE  1
+    #Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
+    #Set Environment Variable  GOVC_PASSWORD  Admin!23
+
+    # add clusters
+    #${out}=  Run  govc cluster.create -dc=Datacenter Cluster2
+    #Should Be Empty  ${out}
+    #${out}=  Run  govc cluster.create -dc=Datacenter Cluster3
+    #Should Be Empty  ${out}
+
+    #Log To Console  OVA IP is %{OVA_IP_6.5d}
+    #Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
+
+    # run protractor
+    #${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    #Log  ${out}
+    #Log To Console  ${out}
+
+    # report pass/fail
+    #Should Be Equal As Integers  ${rc}  0
+
+Create And Delete VCH On A Multi-DC Environment
     Set Environment Variable  GOVC_URL  ${BUILD_5318154_IP}
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
     Set Environment Variable  GOVC_PASSWORD  Admin!23
 
-    # add clusters
-    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster2
+    # add a new datacenter and an empty cluster to it
+    ${out}=  Run  govc datacenter.create Datacenter2
     Should Be Empty  ${out}
-    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster3
+    ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
+    Should Be Empty  ${out}
+    ${out}=  Run  govc cluster.change -dc=Datacenter2 -drs-enabled=true /Datacenter2/host/Cluster
     Should Be Empty  ${out}
 
     Log To Console  OVA IP is %{OVA_IP_6.5d}
