@@ -67,7 +67,7 @@ Prepare Testbed For Protractor Tests
     Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
     Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
 
-    # Check govc
+    # Make sure the govc binary exists (it should not return RC 127)
     ${rc}=  Run And Return Rc  govc
     Should Be True  ${rc} != 127
 
