@@ -16,10 +16,10 @@
 
 import { browser, by, element } from 'protractor';
 
-import { JASMINE_TIMEOUT } from '../src/app/testing/jasmine.constants';
-import { VicWebappPage } from './app.po';
+import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
+import { VicWebappPage } from '../app.po';
 
-describe('vic-webapp', () => {
+describe('VCH Create Wizard - Basic', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 2;
   let page: VicWebappPage;
   let specRunId: number;

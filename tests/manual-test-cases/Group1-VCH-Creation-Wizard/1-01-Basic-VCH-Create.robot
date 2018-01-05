@@ -58,7 +58,7 @@ Create And Delete VCH On A Single Cluster Environment
     Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
@@ -81,7 +81,7 @@ Create And Delete VCH On An Environment With Some Empty Clusters
     Prepare Protractor  ${BUILD_5318154_IP}  ${WINDOWS_HOST_IP}
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
