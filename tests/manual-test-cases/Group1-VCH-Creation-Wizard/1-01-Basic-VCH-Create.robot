@@ -115,3 +115,4 @@ Create And Delete VCH On A Multi-DC Environment
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
+    
