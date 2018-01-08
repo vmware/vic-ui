@@ -105,11 +105,6 @@ Build Flex And H5 Plugins
 Setup Test Matrix
     # skip matrix
     @{skip_test_config_matrix}=  Create List
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Googlechrome,Chrome
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Firefox,Firefox
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Googlechrome,Chrome
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Firefox,Firefox
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,iexplore,IE11
     # There's currently a version clash between the Selenium standalone binary and HSUIA project
     Append To List  ${skip_test_config_matrix}  65,5310538,5318154,Windows,Firefox,Firefox
     # There's a H5C bug in IE11 that appears only when automatically tested
@@ -158,11 +153,6 @@ Setup Test Matrix
     # vSphere H5C and Flex Client are not supported  on Linux
     # https://docs.vmware.com/en/VMware-vSphere/6.0/com.vmware.vsphere.install.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
     # https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.upgrade.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Mac,Googlechrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Mac,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,Googlechrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,iexplore,IE11
     Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Mac,Chrome,Chrome
     Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Mac,Firefox,Firefox
     Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Windows,Chrome,Chrome
@@ -279,7 +269,6 @@ Run Plugin Test With Config
     ...  -e "s|\#BROWSER_NORMALIZED_NAME|${selenium_browser_normalized}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g" > .drone.local.tests.yml
 
-    ${plugin_type}=  Set Variable If  ${vc_version} == '65'  H5 Client  Flex Client
     Log To Console  ${\n}........................................
     Log To Console     vSphere Client Plugin test - Portlets
     Log To Console  ........................................
@@ -289,7 +278,7 @@ Run Plugin Test With Config
     Log To Console  Operating System: ${os}
     Log To Console  Browser: ${selenium_browser}
     Run Keyword If  ${is_skipped}  Log To Console  Skipped...
-    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\t${plugin_type} test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\tH5 Client plugin test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Return From Keyword If  ${is_skipped}
     Get Testbed Information
     Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
@@ -301,7 +290,7 @@ Run Plugin Test With Config
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
-    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \] ${plugin_type} test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \]\tH5 Client plugin test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
     ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
@@ -313,7 +302,7 @@ Run Plugin Test With Config
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
     ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
-    ${pf_string}=  Set Variable  ${pf}\t${plugin_type} test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    ${pf_string}=  Set Variable  ${pf}\tH5 Client plugin - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ${pf_string}
 
     Log To Console  ${results.rc}
