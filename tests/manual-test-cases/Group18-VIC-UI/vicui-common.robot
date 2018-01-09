@@ -16,6 +16,7 @@
 Documentation  Common keywords used by VIC UI installation & uninstallation test suites
 Resource  ../../resources/Util.robot
 Library  VicUiInstallPexpectLibrary.py
+Library  XML
 
 *** Variables ***
 ${MACOS_HOST_IP}                      10.25.201.232
@@ -346,3 +347,18 @@ Open SSH Connection
   Open Connection  ${host}  port=${port}  
   Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
 
+Get Robot Test Result Summary
+  [Arguments]  ${child}
+  ${name}=  Get Element Attribute  ${child}  name
+  ${status}=  Get Element  ${child}  status
+  ${pf}=  Get Element Attribute  ${status}  status
+  Log To Console  ${name}: ${pf}
+  [Return]  ${name}  ${pf}
+
+Get Robot Test Suite Result Summary
+  [Arguments]  ${robot}
+  ${suite}=  Get Element  ${robot}  suite
+  ${name}=  Get Element Attribute  ${suite}  name
+  ${suite_status}=  Get Element  ${suite}  status
+  ${suite_status_txt}=  Get Element Attribute  ${suite_status}  status
+  [Return]  ${name}  ${suite_status_txt}
