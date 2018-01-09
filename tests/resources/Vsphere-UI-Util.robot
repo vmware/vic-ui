@@ -73,9 +73,7 @@ Prepare Testbed For Protractor Tests
 
     # Ensure product OVA is deployed and ready
     Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  %{OVA_ESX_IP_VC60U2}  %{OVA_ESX_DATASTORE_VC60U2}
-    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  %{OVA_ESX_IP_VC65D}  %{OVA_ESX_DATASTORE_VC65D}
-    # TODO: use 6.5u1 instance
-    # Install VIC Product OVA  6.5u1  ${BUILD_5973321_IP}  ?  ?
+    Install VIC Product OVA  6.5u1d  ${BUILD_7312210_IP}  %{OVA_ESX_IP_VC65U1D}  %{OVA_ESX_DATASTORE_VC65U1D}
     Get Vic Engine Binaries
 
 Prepare Protractor
