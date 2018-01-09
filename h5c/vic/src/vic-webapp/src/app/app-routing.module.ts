@@ -27,7 +27,8 @@ const appRoutes: Routes = [
     { path: 'vch-view', loadChildren: './vch-view/vch-view.module#VicVchViewModule' },
     { path: 'container-view', loadChildren: './container-view/container-view.module#VicContainerViewModule' },
     { path: 'create-vch', loadChildren: './create-vch-wizard/create-vch-wizard.module#CreateVchWizardModule' },
-    { path: 'delete-vch', loadChildren: './delete-vch-modal/delete-vch-modal.module#DeleteVchModalModule' }
+    { path: 'delete-vch', loadChildren: './delete-vch-modal/delete-vch-modal.module#DeleteVchModalModule' },
+    { path: 'ui-actions', loadChildren: './ui-actions/ui-actions.module#UiActionsModule' }
 ];
 
 export const extensionToRoutes = {};

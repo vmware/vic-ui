@@ -187,4 +187,96 @@
             </componentClass>
         </object>
     </extension>
+    
+    <extension id="com.vmware.vic.actionSet">
+      <extendedPoint>vise.actions.sets</extendedPoint>
+      <object>
+         <actions>
+            <!-- Create VCH -->
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.vmware.vic.createVch</uid>
+               <label>New Virtual Container Host...</label>
+               <delegate>
+                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <object><root>
+                      <!-- execute the action on client-side (html view in a modal dialog) -->
+                      <actionUrl>/vsphere-client/vic/resources/build-dev/index.html?view=ui-actions</actionUrl>
+                      <dialogTitle>Wait...</dialogTitle>
+                  </root></object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+
+            <!-- Delete VCH -->
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.vmware.vic.deleteVch</uid>
+               <label>Delete Virtual Container Host</label>
+               <delegate>
+                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <object><root>
+                      <!-- execute the action on client-side (html view in a modal dialog) -->
+                      <actionUrl>/vsphere-client/vic/resources/build-dev/index.html?view=ui-actions</actionUrl>
+                      <dialogTitle>Wait...</dialogTitle>
+                  </root></object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+
+          </actions>
+      </object>
+      <metadata>
+         <objectType>VirtualMachine</objectType>
+            <propertyConditions>
+                <com.vmware.data.query.CompositeConstraint>
+                    <nestedConstraints>
+                        <com.vmware.data.query.PropertyConstraint>
+                            <propertyName>isVCH</propertyName>
+                            <comparator>EQUALS</comparator>
+                            <comparableValue>
+                                <Boolean>true</Boolean>
+                            </comparableValue>
+                        </com.vmware.data.query.PropertyConstraint>
+                    </nestedConstraints>
+                    <conjoiner>AND</conjoiner>
+                </com.vmware.data.query.CompositeConstraint>
+            </propertyConditions>
+      </metadata>
+   </extension>
+   
+   <extension id="com.vmware.vic.menu">
+      <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
+      <object>
+         <label>All VIC Actions</label>
+         <children>
+            <Array>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <!-- Create VCH -->
+                  <type>action</type>
+                  <uid>com.vmware.vic.createVch</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <!-- Delete VCH -->
+                  <type>action</type>
+                  <uid>com.vmware.vic.deleteVch</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+            </Array>
+         </children>
+      </object>
+      <metadata>
+         <objectType>VirtualMachine</objectType>
+            <propertyConditions>
+                <com.vmware.data.query.CompositeConstraint>
+                    <nestedConstraints>
+                        <com.vmware.data.query.PropertyConstraint>
+                            <propertyName>isVCH</propertyName>
+                            <comparator>EQUALS</comparator>
+                            <comparableValue>
+                                <Boolean>true</Boolean>
+                            </comparableValue>
+                        </com.vmware.data.query.PropertyConstraint>
+                    </nestedConstraints>
+                    <conjoiner>AND</conjoiner>
+                </com.vmware.data.query.CompositeConstraint>
+            </propertyConditions>
+      </metadata>
+   </extension>
 </plugin>
