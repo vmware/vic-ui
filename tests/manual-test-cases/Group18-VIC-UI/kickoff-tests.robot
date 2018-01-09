@@ -114,12 +114,12 @@ Setup Test Matrix
     # installer test matrix
     @{installer_test_config_matrix}=  Create List
     &{installer_test_results_dict}=  Create Dictionary
-    # Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Ubuntu
+    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Ubuntu
     Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Ubuntu
-    # Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Mac
-    # Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Mac
-    # Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Windows
-    # Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Windows
+    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Mac
+    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Mac
+    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Windows
+    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${INSTALLER_TEST_MATRIX}        ${installer_test_config_matrix}
     Set Global Variable  ${INSTALLER_TEST_RESULTS_DICT}  ${installer_test_results_dict}
 

@@ -346,19 +346,3 @@ Open SSH Connection
   [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
   Open Connection  ${host}  port=${port}  
   Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
-
-Get Robot Test Result Summary
-  [Arguments]  ${child}
-  ${name}=  Get Element Attribute  ${child}  name
-  ${status}=  Get Element  ${child}  status
-  ${pf}=  Get Element Attribute  ${status}  status
-  Log To Console  ${name}: ${pf}
-  [Return]  ${name}  ${pf}
-
-Get Robot Test Suite Result Summary
-  [Arguments]  ${robot}
-  ${suite}=  Get Element  ${robot}  suite
-  ${name}=  Get Element Attribute  ${suite}  name
-  ${suite_status}=  Get Element  ${suite}  status
-  ${suite_status_txt}=  Get Element Attribute  ${suite_status}  status
-  [Return]  ${name}  ${suite_status_txt}
