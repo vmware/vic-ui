@@ -64,7 +64,7 @@ Check Govc
 
 Cleanup Previous Test Logs
     Log  Removing UI test result directories if present...
-    Run  rm -rf ui-test-results 2>/dev/null
+    Run  rm -rf ui-test-results* 2>/dev/null
     Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
 
 Prepare Flex And H5 Plugins For Testing
@@ -114,12 +114,12 @@ Setup Test Matrix
     # installer test matrix
     @{installer_test_config_matrix}=  Create List
     &{installer_test_results_dict}=  Create Dictionary
-    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Ubuntu
+    # Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Ubuntu
     Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Ubuntu
-    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Mac
-    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Mac
-    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Windows
-    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Windows
+    # Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Mac
+    # Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Mac
+    # Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Windows
+    # Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${INSTALLER_TEST_MATRIX}        ${installer_test_config_matrix}
     Set Global Variable  ${INSTALLER_TEST_RESULTS_DICT}  ${installer_test_results_dict}
 
@@ -232,9 +232,8 @@ Run Script Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
-    ${pf_string}=  Set Variable  ${pf}\t${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
-    Set To Dictionary  ${results_dict}  ${dict_key}  ${pf_string}
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASS \]\t${title} / ESX build ${esx_build} / VC build ${vc_build} / ${os}  ELSE  Set Variable  \[ FAIL \]\t${title} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
+    Set To Dictionary  ${results_dict}  ${test_name}-${dict_key}  ${pf}
 
     Log To Console  ${results.rc}
     Log To Console  ${results.stdout}
@@ -325,7 +324,6 @@ Cleanup Testbed
 
     # Delete all transient and sensitive information
     Run  rm -rf .drone.local.tests.yml testbed-information tests/manual-test-cases/Group18-VIC-UI/testbed-information /tmp/sdk/ >/dev/null 2>&1
-    Run  rm -rf ui-test-results >/dev/null 2>&1
     Run  rm -rf Kickoff-Tests* VCH-0*
 
     # Revert some modified local files
@@ -419,6 +417,28 @@ Send Email
     ${rc}=  Run And Return Rc  /usr/sbin/sendmail -t < email_body.txt
     Should Be Equal As Integers  ${rc}  0
 
+Generate Report
+    ${results_dir_exists}=  Run Keyword And Return Status  OperatingSystem.Directory Should Exist  ui-test-results
+    Touch  ui-test-results.log
+
+    # go through each folder and extract results
+    @{cases}=  OperatingSystem.List Directories In Directory  ui-test-results
+    ${keys_installer}=  Get Dictionary Keys  ${INSTALLER_TEST_RESULTS_DICT}
+    ${keys_uninstaller}=  Get Dictionary Keys  ${UNINSTALLER_TEST_RESULTS_DICT}
+    ${keys_upgrader}=  Get Dictionary Keys  ${UPGRADER_TEST_RESULTS_DICT}
+
+    :FOR  ${case}  IN  @{keys_installer}
+    \    ${pf}=  Get From Dictionary  ${INSTALLER_TEST_RESULTS_DICT}  ${case}
+    \    Append To File  ui-test-results.log  ${pf}\n
+
+    :FOR  ${case}  IN  @{keys_uninstaller}
+    \    ${pf}=  Get From Dictionary  ${UNINSTALLER_TEST_RESULTS_DICT}  ${case}
+    \    Append To File  ui-test-results.log  ${pf}\n
+
+    :FOR  ${case}  IN  @{keys_upgrader}
+    \    ${pf}=  Get From Dictionary  ${UPGRADER_TEST_RESULTS_DICT}  ${case}
+    \    Append To File  ui-test-results.log  ${pf}\n
+
 *** Test Cases ***
 Launch Installer Tests
     :FOR  ${config}  IN  @{INSTALLER_TEST_MATRIX}
@@ -445,7 +465,8 @@ Launch Plugin Tests
     \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Report Results
-    Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Test Report
-    Send Email
+    #Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Test Report
+    #Send Email
+    Generate Report
     Run Keyword Unless  ${ALL_TESTS_PASSED}  Log To Console  At least one test failed!
     Should Be True  ${ALL_TESTS_PASSED}
