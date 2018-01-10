@@ -61,6 +61,7 @@ Cleanup Testbed After Protractor Test Completes
     Set Global Variable  ${TEST_VC_USERNAME}  administrator@vsphere.local
     Set Global Variable  ${TEST_VC_PASSWORD}  Admin!23
 
+    # install the plugin only the first time
     Set Absolute Script Paths  ./scripts
     Force Install Vicui Plugin
     Reboot vSphere Client  ${TEST_VC_IP}

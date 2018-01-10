@@ -184,7 +184,6 @@ describe('VCH Create Wizard - Basic', () => {
 
 
   it('should verify the created vch has been deleted', () => {
-    browser.ignoreSynchronization = true;
     let vchFound = false;
     browser.switchTo().defaultContent();
     page.switchFrame(iframeTabs);
@@ -199,6 +198,7 @@ describe('VCH Create Wizard - Basic', () => {
     });
     browser.sleep(defaultTimeout);
     expect(vchFound).toBeFalsy();
+    browser.sleep(defaultTimeout);
   });
 
 });
