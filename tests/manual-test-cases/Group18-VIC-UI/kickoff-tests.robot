@@ -166,7 +166,8 @@ Get Testbed Information
     Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
     ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/manual-test-cases/Group18-VIC-UI/setup-testbed.robot > tests/manual-test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
     Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
-    Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${results.stderr}
+    ${testbed-setup-log}=  OperatingSystem.Get File  tests/manual-test-cases/Group18-VIC-UI/setup-testbed.log
+    Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${testbed-setup-log}
     Load Nimbus Testbed Env
     Move File  testbed-information  tests/manual-test-cases/Group18-VIC-UI/testbed-information
 
