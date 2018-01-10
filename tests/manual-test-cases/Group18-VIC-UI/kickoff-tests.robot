@@ -312,7 +312,7 @@ Run Plugin Test With Config
     # move log files
     Move Files  tests/manual-test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
 
-Generate Test Report
+Generate Excel Report
     ${script_exists}  ${out}=  Run Keyword And Ignore Error  OperatingSystem.File Should Exist  ${VICTEST2XL}
     ${run_results}=  Run Keyword If  '${script_exists}' == 'PASS'  Run  bash -c "${script_exists} -searchdir ./ui-test-results/ -f output.xml 2>&1 && cp log.xlsx ui-test-results/"
     Run Keyword Unless  '${script_exists}' == 'PASS'  Log  ${VICTEST2XL} was not found. Skipping...  WARN
@@ -337,87 +337,6 @@ Cleanup Testbed
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
 
-Send Email
-    ${boundary}=  Set Variable  zz_/afg6432dfgkl.94531qdffe121
-    ${time_end}=  Get Current Date  result_format=epoch  exclude_millis=True
-    ${elapsed_time}=  Evaluate  ${time_end} - ${time_start}
-    # zip results
-    ${results_dir_exists}=  Run Keyword And Return Status  OperatingSystem.Directory Should Exist  ui-test-results
-    ${now}=  Run  date +%m%d%y
-    ${zip_filename}=  Set Variable  vicui-test-report-${now}.zip
-    ${rc1}=  Run And Return Rc  zip -9 -r ${zip_filename} ui-test-results/
-    ${rc2}  ${testresults_base64}=  Run And Return Rc And Output  base64 "${zip_filename}"
-    Run Keyword If  ${results_dir_exists}  Should Be Equal As Integers  ${rc1}  0
-    Run Keyword If  ${results_dir_exists}  Should Be Equal As Integers  ${rc2}  0
-
-    ${head_commit}=  Run  git log -1 --pretty=format:%h
-    ${email_title}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  vic ui nightly run ${buildNumber}  ELSE  Set Variable  vic integration test run ${head_commit}
-    ${whoami}=  Run  whoami
-    ${report_recipients}=  Catenate  SEPARATOR=\n
-    ...    To: kjosh@vmware.com
-    ...    To: joshuak@vmware.com
-    ...    To: cfalcone@vmware.com
-    ...    To: kmacdonell@vmware.com
-    ...    To: mwilliamson@vmware.com
-    ...    To: mikeh@vmware.com
-    ...    To: mhagen@vmware.com
-    ...    To: carellie@vmware.com
-    ${email_to}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  ${report_recipients}  ELSE  Set Variable  To: ${whoami}@vmware.com
-    ${email_body}=  Catenate  SEPARATOR=\n
-    ...    ${email_to}
-    ...    Subject: ${email_title}
-    ...    From: VIC Lifecycle - UI <kjosh@vmware.com>
-    ...    MIME-Version: 1.0
-    ...    Content-Type: multipart/mixed; boundary="${boundary}"${\n}
-    ...    --${boundary}
-    ...    Content-Type: text/plain; charset="utf-8"
-    ...    Content-Disposition: inline${\n}
-    ...    hello, this is an auto-generated vic ui test report. please see the attachment to find out more details.
-    ...    elapsed time: ${elapsed_time} seconds
-    ...    ${SPACE}${\n}
-    ...    --- tests run ---${\n}${\n}
-
-    Create File  email_body.txt  ${email_body}
-    @{installer_result_keys}=  Get Dictionary Keys    ${INSTALLER_TEST_RESULTS_DICT}
-    @{uninstaller_result_keys}=  Get Dictionary Keys  ${UNINSTALLER_TEST_RESULTS_DICT}
-    @{upgrader_result_keys}=  Get Dictionary Keys     ${UPGRADER_TEST_RESULTS_DICT}
-    @{plugin_result_keys}=  Get Dictionary Keys       ${PLUGIN_TEST_RESULTS_DICT}
-
-    :FOR  ${key}  IN  @{installer_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${INSTALLER_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
-
-    :FOR  ${key}  IN  @{uninstaller_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${UNINSTALLER_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
-
-    :FOR  ${key}  IN  @{upgrader_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${UPGRADER_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
-
-    :FOR  ${key}  IN  @{plugin_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
-
-    ${flex_note}=  Catenate
-    ...  Due to challenges surrounding Flex testing automation, Flex Client plugin tests are manually run
-    ...  after any Flex code change and before each major milestone (e.g. release).
-
-    Append To File  email_body.txt  \n*Note: ${flex_note} ${\n}
-
-    ${email_zip_section}=  Catenate  SEPARATOR=\n
-    ...    ${\n}--${boundary}
-    ...    Content-Type: application/zip
-    ...    Content-Transfer-Encoding: base64
-    ...    Content-Disposition: attachment; filename="${zip_filename}"
-    ...    ${\n}${testresults_base64}${\n}
-    ...    --${boundary}--
-
-    Run Keyword If  ${results_dir_exists}  Append To File  email_body.txt  ${email_zip_section}
-    Log To Console  Emailing run report...
-    ${rc}=  Run And Return Rc  /usr/sbin/sendmail -t < email_body.txt
-    Should Be Equal As Integers  ${rc}  0
-
 Generate Report
     ${results_dir_exists}=  Run Keyword And Return Status  OperatingSystem.Directory Should Exist  ui-test-results
     Touch  ui-test-results.log
@@ -428,14 +347,17 @@ Generate Report
     ${keys_uninstaller}=  Get Dictionary Keys  ${UNINSTALLER_TEST_RESULTS_DICT}
     ${keys_upgrader}=  Get Dictionary Keys  ${UPGRADER_TEST_RESULTS_DICT}
 
+    Append To File  ui-test-results.log  ** Installer script **\n
     :FOR  ${case}  IN  @{keys_installer}
     \    ${pf}=  Get From Dictionary  ${INSTALLER_TEST_RESULTS_DICT}  ${case}
     \    Append To File  ui-test-results.log  ${pf}\n
 
+    Append To File  ui-test-results.log  \n** Uninstaller script **\n
     :FOR  ${case}  IN  @{keys_uninstaller}
     \    ${pf}=  Get From Dictionary  ${UNINSTALLER_TEST_RESULTS_DICT}  ${case}
     \    Append To File  ui-test-results.log  ${pf}\n
 
+    Append To File  ui-test-results.log  \n** Upgrader script **\n
     :FOR  ${case}  IN  @{keys_upgrader}
     \    ${pf}=  Get From Dictionary  ${UPGRADER_TEST_RESULTS_DICT}  ${case}
     \    Append To File  ui-test-results.log  ${pf}\n
@@ -459,15 +381,16 @@ Launch Upgrader Tests
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Upgrader Test,${config}
     \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
-Launch Plugin Tests
-    :FOR  ${config}  IN  @{PLUGIN_TEST_MATRIX}
-    \    Run Plugin Test With Config  ${config}
-    \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  ${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
+# All H5 Client plugin tests are now migrated to Protractor
+# Launch Plugin Tests
+#     :FOR  ${config}  IN  @{PLUGIN_TEST_MATRIX}
+#     \    Run Plugin Test With Config  ${config}
+#     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  ${config}
+#     \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Report Results
-    #Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Test Report
-    #Send Email
+    # TODO: revisit later
+    # Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Excel Report
     Generate Report
     Run Keyword Unless  ${ALL_TESTS_PASSED}  Log To Console  At least one test failed!
     Should Be True  ${ALL_TESTS_PASSED}

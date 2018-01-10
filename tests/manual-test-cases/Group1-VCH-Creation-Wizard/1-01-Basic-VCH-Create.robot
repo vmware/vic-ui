@@ -24,6 +24,17 @@ ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resour
 
 *** Keywords ***
 Cleanup Testbed After Protractor Test Completes
+    # Delete all vic-machine generated artifacts
+    Run  rm -rf VCH-0*
+
+    # Revert some modified local files
+    Run  git reset --hard HEAD
+
+    # Delete binaries
+    Run  rm -rf vic*.tar.gz ui-nightly-run-bin
+    Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
+    Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
+
     # delete plugins from VC
     Cleanup Plugins From VC  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
 

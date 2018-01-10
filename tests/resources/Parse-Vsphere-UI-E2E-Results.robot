@@ -32,7 +32,7 @@ Process Robot Test Suite Result Summary
   ${name}=  Get Element Attribute  ${suite}  name
   ${suite_status}=  Get Element  ${suite}  status
   ${suite_status_txt}=  Get Element Attribute  ${suite_status}  status
-  Append to File  ui-test-results.log   ** ${name} **\n
+  Append to File  ui-test-results.log   \n** ${name} **\n
 
 *** Test Cases ***
 Parse Protractor Test Results
