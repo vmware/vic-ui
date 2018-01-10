@@ -28,7 +28,7 @@ Cleanup Testbed After Protractor Test Completes
     Run  rm -rf VCH-0*
 
     # Revert some modified local files
-    Run  git reset --hard HEAD
+    Run  git reset --hard HEAD 2>&1
 
     # Delete binaries
     Run  rm -rf vic*.tar.gz ui-nightly-run-bin
@@ -37,12 +37,6 @@ Cleanup Testbed After Protractor Test Completes
 
     # delete plugins from VC
     Cleanup Plugins From VC  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
-
-    # revert protractor.conf.js
-    OperatingSystem.Create File  ./h5c/vic/src/vic-webapp/protractor.conf.js  ${original_protractor_conf}
-
-    # revert app.po.ts
-    OperatingSystem.Create File  ./h5c/vic/src/vic-webapp/e2e/app.po.ts  ${original_app_po_ts}
 
     # delete all dangling VCHs
     Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
@@ -77,13 +71,20 @@ Cleanup Testbed After Protractor Test Completes
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
+[ Windows 10 - Firefox ] Create And Delete VCH On A Single Cluster Environment
+    Log To Console  OVA IP is %{OVA_IP_6.5u1d}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  firefox
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    Log  ${out}
+    Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
 [ Windows 10 - Chrome ] Create And Delete VCH On An Environment With Some Empty Clusters
     Log To Console  Skipping because v1.3.0 GA doesn't have the fix and will always fail. See https://github.com/vmware/vic-ui/issues/274 for details
-
-    #Set Environment Variable  GOVC_URL  ${BUILD_7312210_IP}
-    #Set Environment Variable  GOVC_INSECURE  1
-    #Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
-    #Set Environment Variable  GOVC_PASSWORD  Admin!23
 
     # add clusters
     #${out}=  Run  govc cluster.create -dc=Datacenter Cluster2
@@ -103,11 +104,6 @@ Cleanup Testbed After Protractor Test Completes
     #Should Be Equal As Integers  ${rc}  0
 
 [ Windows 10 - Chrome ] Create And Delete VCH On A Multi-DC Environment
-    Set Environment Variable  GOVC_URL  ${BUILD_7312210_IP}
-    Set Environment Variable  GOVC_INSECURE  1
-    Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
-    Set Environment Variable  GOVC_PASSWORD  Admin!23
-
     # add a new datacenter and an empty cluster to it
     ${out}=  Run  govc datacenter.create Datacenter2
     Should Be Empty  ${out}
@@ -118,6 +114,23 @@ Cleanup Testbed After Protractor Test Completes
 
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    Log  ${out}
+    Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
+[ Windows 10 - Firefox ] Create And Delete VCH On A Multi-DC Environment
+    # datacenter might already exist, but try creating it again and continue in case something went wrong from the previous case
+    ${out}=  Run  govc datacenter.create Datacenter2
+    ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
+    ${out}=  Run  govc cluster.change -dc=Datacenter2 -drs-enabled=true /Datacenter2/host/Cluster
+
+    Log To Console  OVA IP is %{OVA_IP_6.5u1d}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  firefox
 
     # run protractor
     ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
