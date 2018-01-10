@@ -77,13 +77,18 @@ Prepare Testbed For Protractor Tests
     Get Vic Engine Binaries
 
 Prepare Protractor
-    [Arguments]  ${VCSA_IP}  ${SELENIUM_GRID_IP}
+    [Arguments]  ${VCSA_IP}  ${SELENIUM_GRID_IP}  ${BROWSER}
     # cache the original content of the protractor configuration file
     ${protractor_conf}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
     Set Global Variable  ${original_protractor_conf}  ${protractor_conf}
 
     # point the protractor to use the provided selenium grid host
-    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*baseUrl.*|baseUrl: 'https:\/\/${VCSA_IP}\/ui',|" -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|" h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
+    ${sed_cmd}=  Catenate
+    ...  sed -e "s|.*baseUrl.*|baseUrl: 'https:\/\/${VCSA_IP}\/ui',|"
+    ...  -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|"
+    ...  -e "s/'browserName.*/'browserName': '${BROWSER}',/"
+    ...  h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
+    ${rc}  ${out}=  Run And Return Rc And Output  ${sed_cmd}
     Should Be Equal As Integers  ${rc}  0
     Run Keyword Unless  ${rc} == 0  Log  ${out}
     Run  cp /tmp/protractor.conf.js ./h5c/vic/src/vic-webapp/

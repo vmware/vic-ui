@@ -53,8 +53,7 @@ Cleanup Testbed After Protractor Test Completes
     Run  govc object.destroy -dc Datacenter2 /Datacenter2
 
 *** Test Cases ***
-Create And Delete VCH On A Single Cluster Environment
-    # install VCH and VIC UI plugin
+[ Windows 10 - Chrome ] Create And Delete VCH On A Single Cluster Environment
     Set Environment Variable  TEST_VCSA_BUILD  7312210
     Set Environment Variable  TEST_VSPHERE_VER  65
     Set Environment Variable  VC_FINGERPRINT  ${VC_FINGERPRINT_7312210}
@@ -67,7 +66,7 @@ Create And Delete VCH On A Single Cluster Environment
     Reboot vSphere Client  ${TEST_VC_IP}
 
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
-    Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
     ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
@@ -77,7 +76,7 @@ Create And Delete VCH On A Single Cluster Environment
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-Create And Delete VCH On An Environment With Some Empty Clusters
+[ Windows 10 - Chrome ] Create And Delete VCH On An Environment With Some Empty Clusters
     Log To Console  Skipping because v1.3.0 GA doesn't have the fix and will always fail. See https://github.com/vmware/vic-ui/issues/274 for details
 
     #Set Environment Variable  GOVC_URL  ${BUILD_7312210_IP}
@@ -92,7 +91,7 @@ Create And Delete VCH On An Environment With Some Empty Clusters
     #Should Be Empty  ${out}
 
     #Log To Console  OVA IP is %{OVA_IP_6.5u1d}
-    #Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}
+    #Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
     #${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
@@ -102,7 +101,7 @@ Create And Delete VCH On An Environment With Some Empty Clusters
     # report pass/fail
     #Should Be Equal As Integers  ${rc}  0
 
-Create And Delete VCH On A Multi-DC Environment
+[ Windows 10 - Chrome ] Create And Delete VCH On A Multi-DC Environment
     Set Environment Variable  GOVC_URL  ${BUILD_7312210_IP}
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
@@ -117,7 +116,7 @@ Create And Delete VCH On A Multi-DC Environment
     Should Be Empty  ${out}
 
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
-    Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
     ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
