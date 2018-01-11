@@ -56,7 +56,6 @@ describe('VCH Create Wizard - Basic', () => {
   });
 
   it('should navigate to vsphere home', () => {
-    browser.waitForAngularEnabled(true);
     page.navigateToHome();
     expect(browser.getCurrentUrl()).toContain('vsphere');
   });
@@ -68,7 +67,6 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should navigate to summary tab', () => {
     page.navigateToSummaryTab();
-    expect(browser.getCurrentUrl()).toContain('vic-root');
   });
 
   it('should navigate to vch tab', () => {
@@ -83,7 +81,8 @@ describe('VCH Create Wizard - Basic', () => {
   });
 
   it('should input vch name', () => {
-    page.sendKeys('#nameInput', '-' + specRunId);
+    page.clear('#nameInput');
+    page.sendKeys('#nameInput', namePrefix + specRunId);
   });
 
   it('should complete general step', () => {
