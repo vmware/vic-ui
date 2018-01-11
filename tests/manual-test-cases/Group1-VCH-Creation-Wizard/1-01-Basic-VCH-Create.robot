@@ -95,6 +95,30 @@ Cleanup Testbed After Protractor Test Completes
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
+[ MacOS - Chrome ] Create And Delete VCH On A Single Cluster Environment
+    Log To Console  OVA IP is %{OVA_IP_6.5u1d}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  chrome
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    Log  ${out}
+    Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
+[ MacOS - Firefox ] Create And Delete VCH On A Single Cluster Environment
+    Log To Console  OVA IP is %{OVA_IP_6.5u1d}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  firefox
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    Log  ${out}
+    Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
 [ SKIPPED - See https://github.com/vmware/vic-ui/issues/274 ] Create And Delete VCH On An Environment With Some Empty Clusters
     Log To Console  Skipping because v1.3.0 GA doesn't have the fix and will always fail. See https://github.com/vmware/vic-ui/issues/274 for details
 
@@ -160,6 +184,40 @@ Cleanup Testbed After Protractor Test Completes
 
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  internet explorer
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    Log  ${out}
+    Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
+[ MacOS - Chrome ] Create And Delete VCH On A Multi-DC Environment
+    # datacenter might already exist, but try creating it again and continue in case something went wrong from the previous case
+    ${out}=  Run  govc datacenter.create Datacenter2
+    ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
+    ${out}=  Run  govc cluster.change -dc=Datacenter2 -drs-enabled=true /Datacenter2/host/Cluster
+
+    Log To Console  OVA IP is %{OVA_IP_6.5u1d}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  chrome
+
+    # run protractor
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    Log  ${out}
+    Log To Console  ${out}
+
+    # report pass/fail
+    Should Be Equal As Integers  ${rc}  0
+
+[ MacOS - Firefox ] Create And Delete VCH On A Multi-DC Environment
+    # datacenter might already exist, but try creating it again and continue in case something went wrong from the previous case
+    ${out}=  Run  govc datacenter.create Datacenter2
+    ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
+    ${out}=  Run  govc cluster.change -dc=Datacenter2 -drs-enabled=true /Datacenter2/host/Cluster
+
+    Log To Console  OVA IP is %{OVA_IP_6.5u1d}
+    Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  firefox
 
     # run protractor
     ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
