@@ -85,6 +85,7 @@ Prepare Protractor
     # point the protractor to use the provided selenium grid host
     ${sed_cmd}=  Catenate
     ...  sed -e "s|.*baseUrl.*|baseUrl: 'https:\/\/${VCSA_IP}\/ui',|"
+    ...  -e "s|.*seleniumAddress.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|"
     ...  -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|"
     ...  -e "s/'browserName.*/'browserName': '${BROWSER}',/"
     ...  h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
