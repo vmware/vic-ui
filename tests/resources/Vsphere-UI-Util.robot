@@ -89,10 +89,15 @@ Prepare Protractor
     ...  -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|"
     ...  -e "s/'browserName.*/'browserName': '${BROWSER}',/"
     ...  h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
+    ${before_sed}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
     ${rc}  ${out}=  Run And Return Rc And Output  ${sed_cmd}
     Should Be Equal As Integers  ${rc}  0
     Run Keyword Unless  ${rc} == 0  Log  ${out}
     Run  cp /tmp/protractor.conf.js ./h5c/vic/src/vic-webapp/
+    ${after_sed}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
+    Log  sed cmd: ${sed_cmd}
+    Log  before sed: ${before_sed}
+    Log  after sed: ${after_sed}
 
     # update app.po.ts to set the correct baseUrl
     ${app_po_ts}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/e2e/app.po.ts
