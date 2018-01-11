@@ -91,6 +91,7 @@ export class VicWebappPage {
     // click vch tab
     this.waitForElementToBePresent(this.tabBtnVchs);
     this.clickByCSS(this.tabBtnVchs);
+    browser.sleep(this.defaultTimeout);
   }
 
   openVchWizard() {
