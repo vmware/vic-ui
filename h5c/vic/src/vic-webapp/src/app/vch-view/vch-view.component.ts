@@ -34,6 +34,7 @@ import {
   WS_VCH
 } from '../shared/constants';
 import {
+  AfterViewInit,
   Component,
   NgZone,
   OnDestroy,
@@ -59,7 +60,7 @@ import {VirtualContainerHost} from './vch.model';
   styleUrls: ['./vch-view.scss'],
   templateUrl: './vch-view.template.html'
 })
-export class VicVchViewComponent implements OnInit, OnDestroy {
+export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
   public readonly WS_VCH_CONSTANTS = WS_VCH;
   private refreshSubscription: Subscription;
   public isDgLoading = true;
@@ -106,7 +107,6 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
       this.vchs = [];
     });
 
-
     // listens to a message event from an angular app from another iframe
     // this is set up to handle refreshing the datagrid upon successful vch creation
     // and messages from delete vch modal
@@ -115,6 +115,15 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
 
     // verify the appliance endpoint
     this.checkVicMachineServer();
+  }
+
+  ngAfterViewInit() {
+    const frames = window.parent.frames;
+    for (let i = 0; i < frames.length; i++) {
+      frames[i].postMessage({
+        eventType: 'vch-view.component.ngAfterViewInit'
+      }, location.protocol + '//' + location.host);
+    }
   }
 
   checkVicMachineServer() {
@@ -210,9 +219,9 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
   /**
    * Opens VCH delete modal
    */
-  deleteVch(vch: VirtualContainerHost) {
+  launchDeleteVchModal(vchId) {
     const subscriber = this.vmViewService.containers$.subscribe(containers => {
-      if (containers.some(container => container.parentObjectName === vch.name && container.powerState === 'POWERED_ON')) {
+      if (containers.some(container => container.parentObj === vchId && container.powerState === 'POWERED_ON')) {
         this.warning = 'You must stop all running containers VMs before you can delete the VCH.';
       } else {
         const webPlatform = this.globalsService.getWebPlatform();
@@ -221,13 +230,11 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
           `${DELETE_VCH_MODAL_URL}`,
           DELETE_VCH_MODAL_WIDTH,
           DELETE_VCH_MODAL_HEIGHT,
-          vch.id
+          vchId
         );
       }
-
       subscriber.unsubscribe();
     });
-
     this.vmViewService.getContainersData({}); // TODO: filter containers for the vch
   }
 
@@ -305,6 +312,14 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     } else if (data.eventType === DATAGRID_REFRESH_EVENT) {
       this.zone.run(() => {
         this.reloadVchs();
+      });
+    } else if (data.eventType === 'vch-view.component.launchCreateVchWizard') {
+      this.zone.run(() => {
+        this.launchCreateVchWizard();
+      });
+    } else if (data.eventType === 'vch-view.component.launchDeleteVchModal') {
+      this.zone.run(() => {
+        this.launchDeleteVchModal(data.payload.id);
       });
     }
   }
