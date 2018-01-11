@@ -11,7 +11,7 @@
  limitations under the License.
 */
 
-import { browser, by, element } from 'protractor';
+import { browser, by, element, ElementFinder } from 'protractor';
 
 export class VicWebappPage {
 
@@ -23,6 +23,7 @@ export class VicWebappPage {
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
   private iconVicRoot = '.com_vmware_vic-vic-root-icon';
   private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
+  private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
   private iframeModal = 'div.modal-body iframe.sandbox-iframe';
   private inputOpsUser = 'input#ops-user';
@@ -83,8 +84,10 @@ export class VicWebappPage {
 
   navigateToSummaryTab() {
     // click vic link
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVicRoot);
     this.clickByCSS(this.iconVicRoot);
+    browser.sleep(this.defaultTimeout);
   }
 
   navigateToVchTab() {
@@ -158,7 +161,8 @@ export class VicWebappPage {
     this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
-    browser.sleep(this.defaultTimeout);
+    browser.switchTo().defaultContent();
+    this.waitForTaskDone(vch, 'Delete resource pool');
   }
 
   /* Utility functions */
@@ -231,4 +235,28 @@ export class VicWebappPage {
       });
     }, timeout);
   };
+
+  waitForTaskDone(targetName, taskName, timeout = this.opsTimeout) {
+    return browser.wait(() => {
+      return browser.isElementPresent(by.css(this.latestTask)).then((el) => {
+        const taskNameAnchorSelector = this.latestTask + ' td:nth-of-type(2) a';
+        const statusAnchorSelector = this.latestTask + ' td:nth-of-type(3) span';
+        const taskTargetTxt = element(by.css(taskNameAnchorSelector)).getText();
+        const statusTxt = element(by.css(statusAnchorSelector)).getText();
+        return taskTargetTxt.then(targetNameValue => {
+          return statusTxt.then(statusTxtValue => {
+            browser.sleep(50);
+            console.log(`${targetName}: ${statusTxtValue}`);
+            if (targetNameValue === targetName && statusTxtValue === 'Completed') {
+              browser.sleep(this.defaultTimeout);
+              return true;
+            }
+          });
+        });
+      }).catch(function(el) {
+        console.log(el + ' not found');
+        return false;
+      });
+    }, timeout);
+  }
 }
