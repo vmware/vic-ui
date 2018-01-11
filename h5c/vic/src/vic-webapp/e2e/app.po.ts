@@ -22,6 +22,7 @@ export class VicWebappPage {
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
   private iconVicRoot = '.com_vmware_vic-vic-root-icon';
+  private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
   private iframeModal = 'div.modal-body iframe.sandbox-iframe';
   private inputOpsUser = 'input#ops-user';
@@ -69,6 +70,7 @@ export class VicWebappPage {
 
   navigateToHome() {
     // click top left vmware logo
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVsphereHome);
     this.clickByCSS(this.iconVsphereHome);
   }
@@ -87,7 +89,8 @@ export class VicWebappPage {
 
   navigateToVchTab() {
     // click vch tab
-    this.clickByText('a', 'Virtual Container Hosts');
+    this.waitForElementToBePresent(this.tabBtnVchs);
+    this.clickByCSS(this.tabBtnVchs);
   }
 
   openVchWizard() {
