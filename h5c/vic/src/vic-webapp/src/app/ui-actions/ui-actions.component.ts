@@ -14,11 +14,11 @@
  limitations under the License.
 */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, NgZone, OnInit} from '@angular/core';
 import {
   GlobalsService
 } from '../shared';
-import {Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'vic-ui-actions',
@@ -28,13 +28,50 @@ export class UiActionsComponent implements OnInit {
 
   constructor(
     private globalService: GlobalsService,
-    private router: Router
+    private router: ActivatedRoute,
+    private zone: NgZone,
+    private params: any
   ) { }
 
   /**
    * Launch the modal
    */
   ngOnInit() {
-    this.globalService.getWebPlatform().sendNavigationRequest('com.vmware.vic.customtab-vch', 'urn:vic:vic:Root:vic%25252Fvic-root');
+    this.router.params.subscribe(params => {
+      console.log(params);
+      this.globalService.getWebPlatform().sendNavigationRequest('com.vmware.vic.customtab-vch', 'urn:vic:vic:Root:vic%25252Fvic-root');
+    });
+    window.addEventListener('message', this.onMessage.bind(this), false);
+  }
+
+  /**
+   * Window 'message' listener
+   * @param event
+   */
+  onMessage(event: MessageEvent) {
+    if (event.origin !== location.protocol + '//' + location.host) {
+      return;
+    }
+
+    const data: any = event.data;
+
+    if (data.eventType === 'vch-view.component.ngAfterViewInit') {
+      this.zone.run(() => {
+        const frames = window.parent.frames;
+        for (let i = 0; i < frames.length; i++) {
+          if (this.params && this.params.actionId === 'com.vmware.vic.createVch') {
+            frames[i].postMessage({
+              eventType: 'vch-view.component.launchCreateVchWizard'
+            }, location.protocol + '//' + location.host);
+          } else if (this.params && this.params.actionId === 'com.vmware.vic.deleteVch') {
+            frames[i].postMessage({
+              eventType: 'vch-view.component.launchDeleteVchModal',
+              payload: {id: this.params.objectId}
+            }, location.protocol + '//' + location.host);
+          }
+        }
+      });
+      this.globalService.getWebPlatform().closeDialog();
+    }
   }
 }
