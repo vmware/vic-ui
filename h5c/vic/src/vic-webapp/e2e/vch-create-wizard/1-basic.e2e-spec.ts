@@ -20,7 +20,7 @@ import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
 
 describe('VCH Create Wizard - Basic', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 2;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
   let page: VicWebappPage;
   let specRunId: number;
   const defaultTimeout = 5000;
