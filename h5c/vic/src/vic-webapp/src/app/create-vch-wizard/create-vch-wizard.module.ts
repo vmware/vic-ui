@@ -29,6 +29,7 @@ import { SecurityComponent } from './security/security.component';
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { SummaryComponent } from './summary/summary.component';
 import { VchCreationWizardGeneralComponent } from './general/general.component';
+import { RegistryAccessComponent } from './registry-access/registry-access.component';
 
 const routes: Routes = [
   { path: '', component: CreateVchWizardComponent },
@@ -51,6 +52,7 @@ const routes: Routes = [
     StorageCapacityComponent,
     NetworksComponent,
     SecurityComponent,
+    RegistryAccessComponent,
     OperationsUserComponent,
     SummaryComponent
   ],
@@ -64,6 +66,7 @@ const routes: Routes = [
     ComputeResourceTreenodeComponent,
     StorageCapacityComponent,
     SecurityComponent,
+    RegistryAccessComponent,
     OperationsUserComponent,
     SummaryComponent
   ]
