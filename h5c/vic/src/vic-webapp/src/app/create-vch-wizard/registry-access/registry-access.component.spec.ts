@@ -17,15 +17,12 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ClarityModule} from 'clarity-angular';
 import {HttpModule} from '@angular/http';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
-import {Observable} from 'rxjs/Observable';
-import {SecurityComponent} from './security.component';
+import {RegistryAccessComponent} from './registry-access.component';
 
-describe('SecurityComponent', () => {
+describe('RegistryAccessComponent', () => {
 
-  let component: SecurityComponent;
-  let fixture: ComponentFixture<SecurityComponent>;
-  let service: CreateVchWizardService;
+  let component: RegistryAccessComponent;
+  let fixture: ComponentFixture<RegistryAccessComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -34,50 +31,32 @@ describe('SecurityComponent', () => {
         HttpModule,
         ClarityModule
       ],
-      providers: [
-        {
-          provide: CreateVchWizardService,
-          useValue: {
-            getUserId() {
-              return Observable.of('userId');
-            },
-            getServerThumbprint() {
-              return Observable.of('serverThumbprint');
-            },
-            getVcHostname() {
-              return Observable.of('vcHostname');
-            }
-          }
-        }
-      ],
       declarations: [
-        SecurityComponent
+        RegistryAccessComponent
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SecurityComponent);
+    fixture = TestBed.createComponent(RegistryAccessComponent);
     component = fixture.componentInstance;
-    component.vchName = 'vch-example-name';
     component.onPageLoad();
-
-    service = fixture.debugElement.injector.get(CreateVchWizardService);
-    spyOn(service, 'getUserId').and.callThrough();
-    spyOn(service, 'getServerThumbprint').and.callThrough();
-    spyOn(service, 'getVcHostname').and.callThrough();
   });
 
   it('should be created', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should start with a invalid form',  () => {
-    expect(component.form.invalid).toBe(true);
+  it('should start with a valid form',  () => {
+    expect(component.form.valid).toBe(true);
   });
 
   it('should validate advanced fields changes', () => {
-    expect(component.form.get('certificateKeySize').enabled).toBeTruthy();
+    component.form.get('useWhitelistRegistry').setValue(false);
+    expect(component.form.get('whitelistRegistries').disabled).toBeTruthy();
+
+    component.form.get('useWhitelistRegistry').setValue(true);
+    expect(component.form.get('whitelistRegistries').enabled).toBeTruthy();
   });
 
   it('should add and remove registry certificate entries', () => {
