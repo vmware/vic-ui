@@ -149,6 +149,7 @@ export class VicWebappPage {
   }
 
   deleteVch(vch) {
+    this.switchFrame(this.iframeTabs);
     this.waitForElementToBePresent(this.actionBar + vch);
     const vchActionMenu = this.actionBar + vch;
     this.clickByCSS(vchActionMenu);
@@ -162,7 +163,6 @@ export class VicWebappPage {
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
     browser.switchTo().defaultContent();
-    this.waitForTaskDone(vch, 'Delete resource pool');
   }
 
   /* Utility functions */
@@ -236,21 +236,22 @@ export class VicWebappPage {
     }, timeout);
   };
 
-  waitForTaskDone(targetName, taskName, timeout = this.opsTimeout) {
+  waitForTaskDone(targetName, desiredTaskName, timeout = this.opsTimeout) {
     return browser.wait(() => {
       return browser.isElementPresent(by.css(this.latestTask)).then((el) => {
-        const taskNameAnchorSelector = this.latestTask + ' td:nth-of-type(2) a';
-        const statusAnchorSelector = this.latestTask + ' td:nth-of-type(3) span';
-        const taskTargetTxt = element(by.css(taskNameAnchorSelector)).getText();
-        const statusTxt = element(by.css(statusAnchorSelector)).getText();
-        return taskTargetTxt.then(targetNameValue => {
-          return statusTxt.then(statusTxtValue => {
-            browser.sleep(50);
-            console.log(`${targetName}: ${statusTxtValue}`);
-            if (targetNameValue === targetName && statusTxtValue === 'Completed') {
-              browser.sleep(this.defaultTimeout);
-              return true;
-            }
+        const taskNameTxt = element(by.css(this.latestTask + ' td:nth-of-type(1)')).getText();
+        const taskTargetTxt = element(by.css(this.latestTask + ' td:nth-of-type(2)')).getText();
+        const endTimeTxt = element(by.css(this.latestTask + ' td:nth-of-type(7)')).getText();
+
+        browser.sleep(100);
+        return taskNameTxt.then(taskNameValue => {
+          return taskTargetTxt.then(targetNameValue => {
+            return endTimeTxt.then(endTimeValue => {
+              console.log(`${taskNameValue}: ${targetNameValue}: ${endTimeValue}`);
+              if (taskNameValue === desiredTaskName && targetNameValue === targetName && endTimeValue) {
+                return true;
+              }
+            });
           });
         });
       }).catch(function(el) {

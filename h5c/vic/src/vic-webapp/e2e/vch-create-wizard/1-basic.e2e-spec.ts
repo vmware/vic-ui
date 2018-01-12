@@ -166,14 +166,21 @@ describe('VCH Create Wizard - Basic', () => {
     page.waitForElementToBePresent(dataGridCell);
     browser.sleep(defaultTimeout);
     const newVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.getText().then(function(text) {
+    element.all(by.css(dataGridCell)).each(function(el, index) {
+      el.getText().then(function(text) {
         if (newVch.test(text)) {
           vchFound = true;
         }
       });
     }).then(function() {
       expect(vchFound).toBeTruthy();
+    });
+  });
+
+  it('should verify the new vch has properly started', () => {
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Reconfigure virtual machine').then((status) => {
+      expect(status).toBeTruthy();
     });
   });
 
@@ -184,7 +191,6 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should verify the created vch has been deleted', () => {
     let vchFound = false;
-    browser.switchTo().defaultContent();
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
     const deletedVch = new RegExp(namePrefix + specRunId);
@@ -196,8 +202,9 @@ describe('VCH Create Wizard - Basic', () => {
       });
     });
     browser.sleep(defaultTimeout);
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
     expect(vchFound).toBeFalsy();
-    browser.sleep(defaultTimeout);
   });
 
 });
