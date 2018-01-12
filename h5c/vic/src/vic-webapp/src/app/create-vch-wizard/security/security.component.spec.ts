@@ -80,13 +80,13 @@ describe('SecurityComponent', () => {
     expect(component.form.get('certificateKeySize').enabled).toBeTruthy();
   });
 
-  it('should add and remove registry certificate entries', () => {
-    component.addNewFormArrayEntry('registryCas');
-    expect(component.form.get('registryCas')['controls'].length).toBe(2);
-    component.removeFormArrayEntry('registryCas', 1);
-    expect(component.form.get('registryCas')['controls'].length).toBe(1);
-    component.removeFormArrayEntry('registryCas', 0);
+  it('should add and remove client certificate entries', () => {
+    component.addNewFormArrayEntry('tlsCas');
+    expect(component.form.get('tlsCas')['controls'].length).toBe(2);
+    component.removeFormArrayEntry('tlsCas', 1);
+    expect(component.form.get('tlsCas')['controls'].length).toBe(1);
+    component.removeFormArrayEntry('tlsCas', 0);
     // It should not remove the last one (only its contents) so the user can add a new entry.
-    expect(component.form.get('registryCas')['controls'].length).toBe(1);
+    expect(component.form.get('tlsCas')['controls'].length).toBe(1);
   });
 });

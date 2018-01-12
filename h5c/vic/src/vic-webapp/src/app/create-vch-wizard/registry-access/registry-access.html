@@ -8,7 +8,7 @@
     <div class="mb-2" *ngIf="form.get('useWhitelistRegistry').value">
       <p class="mt-1 mb-2">This VCH can access only those registries in the following whitelist.</p>
       <div formArrayName="whitelistRegistries"
-           *ngFor="let whitelistRegistry of form.controls.whitelistRegistries.controls; let i=index">
+           *ngFor="let whitelistRegistry of form.get('whitelistRegistries')['controls']; let i=index">
         <div [formGroupName]="i" class="form-group row mb-0">
           <div class="col-xs-3">
             <label *ngIf="i === 0" class="required">Whitelist registries</label>
@@ -17,15 +17,15 @@
             <label aria-haspopup="true"
                    role="tooltip"
                    class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
-                   [class.invalid]="form.get('whitelistRegistries').controls[i].controls.whitelistRegistry.invalid && (form.get('whitelistRegistries').controls[i].controls.whitelistRegistry.dirty || form.get('whitelistRegistries').controls[i].controls.whitelistRegistry.touched)">
+                   [class.invalid]="form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry.invalid && (form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry.dirty || form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry.touched)">
               <input class="form-control"
                      type="text"
                      placeholder="IP/FQDN:Port, CIDR or wildcard domain"
                      formControlName="whitelistRegistry">
-              <span class="tooltip-content" *ngIf="form.get('whitelistRegistries').controls[i].controls.whitelistRegistry.hasError('required')">
+              <span class="tooltip-content" *ngIf="form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry.hasError('required')">
                 Whitelist registry cannot be empty
               </span>
-              <span class="tooltip-content" *ngIf="form.get('whitelistRegistries').controls[i].controls.whitelistRegistry.hasError('pattern')">
+              <span class="tooltip-content" *ngIf="form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry.hasError('pattern')">
                 IP address, FQDN, CIDR, or Wildcard domain is not valid
               </span>
             </label>
@@ -47,7 +47,7 @@
             <clr-icon class="is-solid"
                       shape="plus-circle"
                       (click)="addNewFormArrayEntry('whitelistRegistries')"
-                      *ngIf="i === form.controls.whitelistRegistries.controls.length - 1">
+                      *ngIf="i === form.get('whitelistRegistries')['controls'].length - 1">
             </clr-icon>
           </div>
         </div>
@@ -58,7 +58,7 @@
       <label>Insecure registry access</label>
       <p class="mt-0 mb-1">Add registries which this VCH should not verify and access via HTTP if HTTPS fails.</p>
       <div formArrayName="insecureRegistries"
-           *ngFor="let insecureRegistry of form.controls.insecureRegistries.controls; let j=index">
+           *ngFor="let insecureRegistry of form.get('insecureRegistries')['controls']; let j=index">
         <div [formGroupName]="j" class="form-group row mb-0">
           <div class="col-xs-4">
             <input class="form-control"
@@ -71,15 +71,15 @@
             <label aria-haspopup="true"
                    role="tooltip"
                    class="tooltip tooltip-validation tooltip-md tooltip-top-left"
-                   [class.invalid]="form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.invalid && (form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.dirty || form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.touched)">
+                   [class.invalid]="form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort.invalid && (form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort.dirty || form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort.touched)">
               <input class="form-control"
                      placeholder="Port"
                      type="text"
                      formControlName="insecureRegistryPort">
-              <span class="tooltip-content" *ngIf="form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.hasError('maxlength')">
+              <span class="tooltip-content" *ngIf="form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort.hasError('maxlength')">
                 Port cannot be more than 5 digits long
               </span>
-              <span class="tooltip-content" *ngIf="form.get('insecureRegistries').controls[j].controls.insecureRegistryPort.hasError('pattern')">
+              <span class="tooltip-content" *ngIf="form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort.hasError('pattern')">
                 Port should be numeric
               </span>
             </label>
@@ -93,7 +93,7 @@
             <clr-icon class="is-solid"
                       shape="plus-circle"
                       (click)="addNewFormArrayEntry('insecureRegistries')"
-                      *ngIf="j === form.controls.insecureRegistries.controls.length - 1">
+                      *ngIf="j === form.get('insecureRegistries')['controls'].length - 1">
             </clr-icon>
           </div>
         </div>
@@ -109,7 +109,7 @@
         <span class="alert-text">{{ registryCaError }}</span>
       </div>
     </div>
-    <div formArrayName="registryCas" *ngFor="let registryCa of form.controls.registryCas.controls; index as i; last as isLast">
+    <div formArrayName="registryCas" *ngFor="let registryCa of form.get('registryCas')['controls']; index as i; last as isLast">
       <div [formGroupName]="i" class="form-group row mb-0">
         <div class="col-xs-6 text-truncate">
           <span class="text-muted" *ngIf="!registryCaContents[i]">Select certificate pem file</span>
