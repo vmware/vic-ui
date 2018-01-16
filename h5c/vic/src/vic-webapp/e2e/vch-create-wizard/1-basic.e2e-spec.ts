@@ -167,11 +167,15 @@ describe('VCH Create Wizard - Basic', () => {
     browser.sleep(defaultTimeout);
     const newVch = new RegExp(namePrefix + specRunId);
     element.all(by.css(dataGridCell)).each(function(el, index) {
-      el.getText().then(function(text) {
-        if (newVch.test(text)) {
-          vchFound = true;
+      el.isPresent().then(present => {
+        if (present) {
+          el.getText().then(function(text) {
+            if (newVch.test(text)) {
+              vchFound = true;
+            }
+          });
         }
-      });
+      })
     }).then(function() {
       expect(vchFound).toBeTruthy();
     });
@@ -195,11 +199,15 @@ describe('VCH Create Wizard - Basic', () => {
     page.waitForElementToBePresent(dataGridCell);
     const deletedVch = new RegExp(namePrefix + specRunId);
     element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.getText().then(function(text) {
-        if (deletedVch.test(text)) {
-          vchFound = true;
+      element.isPresent().then(present => {
+        if (present) {
+          element.getText().then(function(text) {
+            if (deletedVch.test(text)) {
+              vchFound = true;
+            }
+          });
         }
-      });
+      })
     });
     browser.sleep(defaultTimeout);
     browser.switchTo().defaultContent();
