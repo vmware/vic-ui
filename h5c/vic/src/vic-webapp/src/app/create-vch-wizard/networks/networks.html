@@ -121,15 +121,15 @@
             <input id="public-network-ip"
                    class="form-control"
                    type="text"
-                   placeholder="IP address"
+                   placeholder="CIDR"
                    formControlName="publicNetworkIp">
 
             <span class="tooltip-content" *ngIf="form.get('publicNetworkIp').hasError('required')">
-              Public network IP cannot be empty
+              Public network CIDR cannot be empty
             </span>
 
             <span class="tooltip-content" *ngIf="form.get('publicNetworkIp').hasError('pattern')">
-              IP address is not valid
+              CIDR is not valid
             </span>
 
           </label>
@@ -281,15 +281,15 @@
             <input class="form-control"
                    id="client-network-ip"
                    type="text"
-                   placeholder="IP address"
+                   placeholder="CIDR"
                    formControlName="clientNetworkIp">
 
             <span class="tooltip-content" *ngIf="form.get('clientNetworkIp').hasError('required')">
-              Client network IP cannot be empty
+              Client network CIDR cannot be empty
             </span>
 
             <span class="tooltip-content" *ngIf="form.get('clientNetworkIp').hasError('pattern')">
-              IP address is not valid
+              CIDR is not valid
             </span>
 
           </label>
@@ -415,15 +415,15 @@
             <input class="form-control"
                    id="management-network-ip"
                    type="text"
-                   placeholder="IP address"
+                   placeholder="CIDR"
                    formControlName="managementNetworkIp">
 
             <span class="tooltip-content" *ngIf="form.get('managementNetworkIp').hasError('required')">
-              Management network IP cannot be empty
+              Management network CIDR cannot be empty
             </span>
 
             <span class="tooltip-content" *ngIf="form.get('managementNetworkIp').hasError('pattern')">
-              IP address is not valid
+              CIDR is not valid
             </span>
 
           </label>

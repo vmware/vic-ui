@@ -26,7 +26,7 @@ export const ipV4Pattern =
 export const ipV6Pattern = new RegExp(/^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$/);
 export const ipPattern = new RegExp(ipV4Pattern.source + '|' + ipV6Pattern.source);
 export const fqdnPattern = /^((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}$/;
-export const cidrPattern = /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/;
+export const cidrPattern = /^(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(?:\/(?:[0-9]|[1-2][0-9]|3[0-2]))$/; // tslint:disable-line:max-line-length
 export const wildcardDomainPattern = /^(\*\.)?([a-z\d][a-z\d-]*[a-z\d]\.)+[a-z]+$/;
 export const ipOrFqdnPattern = new RegExp(ipPattern.source + '|' + fqdnPattern.source);
 export const ipListPattern =
