@@ -26,6 +26,7 @@ describe('vic-webapp', () => {
   const defaultTimeout = 5000;
   const sectionSummary = 'section#summary';
   const sectionOpsUser = 'section#ops-user';
+  const sectionRegistry = 'section#registry';
   const sectionSecurity = 'section#security';
   const sectionNetworks = 'section#networks';
   const sectionStorage = 'section#storage-capacity';
@@ -131,6 +132,13 @@ describe('vic-webapp', () => {
 
   it('should complete security step', () => {
     page.disableSecureAccess();
+    page.clickByText('Button', 'Next');
+    // check if we made it to registry access section
+    page.waitForElementToBePresent(sectionRegistry);
+    expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
+  });
+
+  it('should complete registry access step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to ops user section
     page.waitForElementToBePresent(sectionOpsUser);

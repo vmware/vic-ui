@@ -78,12 +78,6 @@ describe('SecurityComponent', () => {
 
   it('should validate advanced fields changes', () => {
     expect(component.form.get('certificateKeySize').enabled).toBeTruthy();
-
-    component.form.get('useWhitelistRegistry').setValue(false);
-    expect(component.form.get('whitelistRegistries').disabled).toBeTruthy();
-
-    component.form.get('useWhitelistRegistry').setValue(true);
-    expect(component.form.get('whitelistRegistries').enabled).toBeTruthy();
   });
 
   it('should add and remove client certificate entries', () => {
@@ -94,15 +88,5 @@ describe('SecurityComponent', () => {
     component.removeFormArrayEntry('tlsCas', 0);
     // It should not remove the last one (only its contents) so the user can add a new entry.
     expect(component.form.get('tlsCas')['controls'].length).toBe(1);
-  });
-
-  it('should add and remove registry certificate entries', () => {
-    component.addNewFormArrayEntry('registryCas');
-    expect(component.form.get('registryCas')['controls'].length).toBe(2);
-    component.removeFormArrayEntry('registryCas', 1);
-    expect(component.form.get('registryCas')['controls'].length).toBe(1);
-    component.removeFormArrayEntry('registryCas', 0);
-    // It should not remove the last one (only its contents) so the user can add a new entry.
-    expect(component.form.get('registryCas')['controls'].length).toBe(1);
   });
 });
