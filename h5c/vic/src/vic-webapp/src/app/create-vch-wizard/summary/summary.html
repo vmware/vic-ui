@@ -417,7 +417,7 @@
             </clr-stack-block>
           </clr-stack-block>
           <!-- whitelist registries -->
-          <clr-stack-block *ngFor="let whitelistReg of payload?.security?.whitelistRegistry; let i = index">
+          <clr-stack-block *ngFor="let whitelistReg of payload?.registry?.whitelistRegistry; let i = index">
             <clr-stack-label>
               Whitelisted registry {{ i + 1 }}
             </clr-stack-label>
@@ -426,7 +426,7 @@
             </clr-stack-content>
           </clr-stack-block>
           <!-- insecure registries -->
-          <clr-stack-block *ngFor="let insecureReg of payload?.security?.insecureRegistry; let i = index">
+          <clr-stack-block *ngFor="let insecureReg of payload?.registry?.insecureRegistry; let i = index">
             <clr-stack-label>
               Insecure registry {{ i + 1 }}
             </clr-stack-label>
@@ -435,7 +435,7 @@
             </clr-stack-content>
           </clr-stack-block>
           <!-- regsitry CAs -->
-          <clr-stack-block *ngFor="let registryCa of payload?.security?.registryCa; let i = index">
+          <clr-stack-block *ngFor="let registryCa of payload?.registry?.registryCa; let i = index">
             <clr-stack-label>
               Registry certificate {{ i + 1 }}
             </clr-stack-label>

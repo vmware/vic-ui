@@ -484,16 +484,16 @@ export class CreateVchWizardComponent implements OnInit {
 
     const registry: any = {};
 
-    if (payload.security.whitelistRegistry && payload.security.whitelistRegistry.length) {
-      registry['whitelist'] = payload.security.whitelistRegistry;
+    if (payload.registry.whitelistRegistry && payload.registry.whitelistRegistry.length) {
+      registry['whitelist'] = payload.registry.whitelistRegistry;
     }
 
-    if (payload.security.insecureRegistry && payload.security.insecureRegistry.length) {
-      registry['insecure'] = payload.security.insecureRegistry;
+    if (payload.registry.insecureRegistry && payload.registry.insecureRegistry.length) {
+      registry['insecure'] = payload.registry.insecureRegistry;
     }
 
-    if (payload.security.registryCa && payload.security.registryCa.length) {
-      registry['certificate_authorities'] = payload.security.registryCa.map(cert => ({pem: cert.content}));
+    if (payload.registry.registryCa && payload.registry.registryCa.length) {
+      registry['certificate_authorities'] = payload.registry.registryCa.map(cert => ({pem: cert.content}));
     }
 
     if (payload.networks.httpProxy || payload.networks.httpsProxy) {
