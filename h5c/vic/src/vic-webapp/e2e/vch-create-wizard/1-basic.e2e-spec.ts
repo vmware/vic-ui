@@ -16,11 +16,11 @@
 
 import { browser, by, element } from 'protractor';
 
-import { JASMINE_TIMEOUT } from '../src/app/testing/jasmine.constants';
-import { VicWebappPage } from './app.po';
+import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
+import { VicWebappPage } from '../app.po';
 
-describe('vic-webapp', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 2;
+describe('VCH Create Wizard - Basic', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
   let page: VicWebappPage;
   let specRunId: number;
   const defaultTimeout = 5000;
@@ -56,7 +56,6 @@ describe('vic-webapp', () => {
   });
 
   it('should navigate to vsphere home', () => {
-    browser.waitForAngularEnabled(true);
     page.navigateToHome();
     expect(browser.getCurrentUrl()).toContain('vsphere');
   });
@@ -68,7 +67,6 @@ describe('vic-webapp', () => {
 
   it('should navigate to summary tab', () => {
     page.navigateToSummaryTab();
-    expect(browser.getCurrentUrl()).toContain('vic-root');
   });
 
   it('should navigate to vch tab', () => {
@@ -83,7 +81,8 @@ describe('vic-webapp', () => {
   });
 
   it('should input vch name', () => {
-    page.sendKeys('#nameInput', '-' + specRunId);
+    page.clear('#nameInput');
+    page.sendKeys('#nameInput', namePrefix + specRunId);
   });
 
   it('should complete general step', () => {
@@ -132,13 +131,14 @@ describe('vic-webapp', () => {
 
   it('should complete security step', () => {
     page.disableSecureAccess();
-    page.clickByText('Button', 'Next');
-    // check if we made it to registry access section
-    page.waitForElementToBePresent(sectionRegistry);
-    expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
-  });
+    // TODO: uncomment the following 7 lines once VIC product 1.3.1 OVA is released
+  //   page.clickByText('Button', 'Next');
+  //   // check if we made it to registry access section
+  //   page.waitForElementToBePresent(sectionRegistry);
+  //   expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
+  // });
 
-  it('should complete registry access step', () => {
+  // it('should complete registry access step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to ops user section
     page.waitForElementToBePresent(sectionOpsUser);
@@ -167,14 +167,25 @@ describe('vic-webapp', () => {
     page.waitForElementToBePresent(dataGridCell);
     browser.sleep(defaultTimeout);
     const newVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.getText().then(function(text) {
-        if (newVch.test(text)) {
-          vchFound = true;
+    element.all(by.css(dataGridCell)).each(function(el, index) {
+      el.isPresent().then(present => {
+        if (present) {
+          el.getText().then(function(text) {
+            if (newVch.test(text)) {
+              vchFound = true;
+            }
+          });
         }
-      });
+      })
     }).then(function() {
       expect(vchFound).toBeTruthy();
+    });
+  });
+
+  it('should verify the new vch has properly started', () => {
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Reconfigure virtual machine').then((status) => {
+      expect(status).toBeTruthy();
     });
   });
 
@@ -184,20 +195,24 @@ describe('vic-webapp', () => {
 
 
   it('should verify the created vch has been deleted', () => {
-    browser.ignoreSynchronization = true;
     let vchFound = false;
-    browser.switchTo().defaultContent();
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
     const deletedVch = new RegExp(namePrefix + specRunId);
     element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.getText().then(function(text) {
-        if (deletedVch.test(text)) {
-          vchFound = true;
+      element.isPresent().then(present => {
+        if (present) {
+          element.getText().then(function(text) {
+            if (deletedVch.test(text)) {
+              vchFound = true;
+            }
+          });
         }
-      });
+      })
     });
     browser.sleep(defaultTimeout);
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
     expect(vchFound).toBeFalsy();
   });
 

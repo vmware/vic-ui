@@ -16,6 +16,7 @@
 Documentation  Common keywords used by VIC UI installation & uninstallation test suites
 Resource  ../../resources/Util.robot
 Library  VicUiInstallPexpectLibrary.py
+Library  XML
 
 *** Variables ***
 ${MACOS_HOST_IP}                      10.25.201.232
@@ -25,8 +26,8 @@ ${BUILD_3620759_IP}                   10.25.200.237
 ${BUILD_3634791_IP}                   10.25.201.233
 ${VC_FINGERPRINT_3634791}             39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
 ${BUILD_5310538_IP}                   10.25.200.231
-${BUILD_5318154_IP}                   10.25.201.234
-${VC_FINGERPRINT_5318154}             87:1A:3A:15:BA:EB:6B:9E:AA:1F:45:98:8D:C5:6D:BB:45:FE:18:2F
+${BUILD_7312210_IP}                   10.25.201.234
+${VC_FINGERPRINT_7312210}             FE:31:A9:D1:48:D7:0E:1D:44:75:F8:D9:64:50:8B:B9:30:93:EF:63
 ${TEST_DATASTORE}                     datastore1
 ${TEST_DATACENTER}                    /Datacenter
 ${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
@@ -305,12 +306,12 @@ Get Vic Engine Binaries
     # prepare vic engine binaries as well as store configs for the OVA deployed on 6.0 instance
     Prepare VIC Engine Binaries  3634791
 
-    Log To Console  \nDownloading VIC engine for VCSA 6.5d...
+    Log To Console  \nDownloading VIC engine for VCSA 6.5u1d...
     ${target_dir}=  Set Variable  bin
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5d  /tmp/vic.tar.gz
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5u1d  /tmp/vic.tar.gz
     Should Be True  ${results}
     # prepare vic engine binaries as well as store configs for the OVA deployed on 6.5 instance
-    Prepare VIC Engine Binaries  5318154
+    Prepare VIC Engine Binaries  7312210
 
 Download VIC Engine Tarball From OVA
     [Arguments]  ${vcenter-build}  ${filename}
@@ -345,4 +346,3 @@ Open SSH Connection
   [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
   Open Connection  ${host}  port=${port}  
   Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
-
