@@ -27,7 +27,8 @@ exports.config = {
     './e2e/**/*.e2e-spec.ts'
   ],
   capabilities: {
-    'browserName': 'chrome'
+    'browserName': 'chrome',
+    'acceptInsecureCerts': true
   },
   directConnect: true,
   baseUrl: 'http://localhost:9443/',

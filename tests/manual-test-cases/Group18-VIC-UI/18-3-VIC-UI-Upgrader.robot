@@ -267,6 +267,8 @@ Run Testcases On Windows
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  testbed-information  ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI/
     Put File  ../../../scripts/plugin-manifest  ${remote_vic_root}/scripts/
+    Put File  ../../../scripts/vCenterForWindows/configs-3634791  ${remote_vic_root}/scripts/vCenterForWindows/
+    Put File  ../../../scripts/vCenterForWindows/configs-7312210  ${remote_vic_root}/scripts/vCenterForWindows/
     Put File  ../../../vic-ui-windows.exe  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}

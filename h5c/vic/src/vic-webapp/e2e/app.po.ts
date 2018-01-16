@@ -11,7 +11,7 @@
  limitations under the License.
 */
 
-import { browser, by, element } from 'protractor';
+import { browser, by, element, ElementFinder } from 'protractor';
 
 export class VicWebappPage {
 
@@ -22,11 +22,15 @@ export class VicWebappPage {
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
   private iconVicRoot = '.com_vmware_vic-vic-root-icon';
+  private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
+  private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
   private iframeModal = 'div.modal-body iframe.sandbox-iframe';
   private inputOpsUser = 'input#ops-user';
   private inputOpsPassword = 'input#ops-password';
-  private labelEnableSecure = 'label[for=use-client-auth]';
+  // TODO: replace the following line with the line below it once VIC product 1.3.1 OVA is released
+  private labelEnableSecure = 'label[for=enable-secure-access]';
+  // private labelEnableSecure = 'label[for=use-client-auth]';
   private labelDeleteVolumes = 'label[for=delete-volumes]';
   private selectorImageStore = 'select#image-store-selector';
   private selectorBridgeNetwork = 'select#bridge-network-selector';
@@ -69,6 +73,7 @@ export class VicWebappPage {
 
   navigateToHome() {
     // click top left vmware logo
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVsphereHome);
     this.clickByCSS(this.iconVsphereHome);
   }
@@ -81,13 +86,17 @@ export class VicWebappPage {
 
   navigateToSummaryTab() {
     // click vic link
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVicRoot);
     this.clickByCSS(this.iconVicRoot);
+    browser.sleep(this.defaultTimeout);
   }
 
   navigateToVchTab() {
     // click vch tab
-    this.clickByText('a', 'Virtual Container Hosts');
+    this.waitForElementToBePresent(this.tabBtnVchs);
+    this.clickByCSS(this.tabBtnVchs);
+    browser.sleep(this.defaultTimeout);
   }
 
   openVchWizard() {
@@ -142,6 +151,7 @@ export class VicWebappPage {
   }
 
   deleteVch(vch) {
+    this.switchFrame(this.iframeTabs);
     this.waitForElementToBePresent(this.actionBar + vch);
     const vchActionMenu = this.actionBar + vch;
     this.clickByCSS(vchActionMenu);
@@ -154,7 +164,7 @@ export class VicWebappPage {
     this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
-    browser.sleep(this.defaultTimeout);
+    browser.switchTo().defaultContent();
   }
 
   /* Utility functions */
@@ -227,4 +237,29 @@ export class VicWebappPage {
       });
     }, timeout);
   };
+
+  waitForTaskDone(targetName, desiredTaskName, timeout = this.opsTimeout) {
+    return browser.wait(() => {
+      return browser.isElementPresent(by.css(this.latestTask)).then((el) => {
+        const taskNameTxt = element(by.css(this.latestTask + ' td:nth-of-type(1)')).getText();
+        const taskTargetTxt = element(by.css(this.latestTask + ' td:nth-of-type(2)')).getText();
+        const endTimeTxt = element(by.css(this.latestTask + ' td:nth-of-type(7)')).getText();
+
+        browser.sleep(100);
+        return taskNameTxt.then(taskNameValue => {
+          return taskTargetTxt.then(targetNameValue => {
+            return endTimeTxt.then(endTimeValue => {
+              console.log(`${taskNameValue}: ${targetNameValue}: ${endTimeValue}`);
+              if (taskNameValue === desiredTaskName && targetNameValue === targetName && endTimeValue) {
+                return true;
+              }
+            });
+          });
+        });
+      }).catch(function(el) {
+        console.log(el + ' not found');
+        return false;
+      });
+    }, timeout);
+  }
 }

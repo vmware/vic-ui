@@ -72,23 +72,32 @@ Prepare Testbed For Protractor Tests
     Should Be True  ${rc} != 127
 
     # Ensure product OVA is deployed and ready
-    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  10.192.42.90  datastore1 (3)
-    Install VIC Product OVA  6.5d  ${BUILD_5318154_IP}  10.160.75.194  datastore1 (1)
-    # TODO: use 6.5u1 instance
-    # Install VIC Product OVA  6.5u1  ${BUILD_5973321_IP}  ?  ?
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  %{OVA_ESX_IP_VC60U2}  %{OVA_ESX_DATASTORE_VC60U2}
+    Install VIC Product OVA  6.5u1d  ${BUILD_7312210_IP}  %{OVA_ESX_IP_VC65U1D}  %{OVA_ESX_DATASTORE_VC65U1D}
     Get Vic Engine Binaries
 
 Prepare Protractor
-    [Arguments]  ${VCSA_IP}  ${SELENIUM_GRID_IP}
+    [Arguments]  ${VCSA_IP}  ${SELENIUM_GRID_IP}  ${BROWSER}
     # cache the original content of the protractor configuration file
     ${protractor_conf}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
     Set Global Variable  ${original_protractor_conf}  ${protractor_conf}
 
     # point the protractor to use the provided selenium grid host
-    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*baseUrl.*|baseUrl: 'https:\/\/${VCSA_IP}\/ui',|" -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|" h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
+    ${sed_cmd}=  Catenate
+    ...  sed -e "s|.*baseUrl.*|baseUrl: 'https:\/\/${VCSA_IP}\/ui',|"
+    ...  -e "s|.*seleniumAddress.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|"
+    ...  -e "s|.*directConnect.*|seleniumAddress: 'http:\/\/${SELENIUM_GRID_IP}:4444\/wd\/hub',|"
+    ...  -e "s/'browserName.*/'browserName': '${BROWSER}',/"
+    ...  h5c/vic/src/vic-webapp/protractor.conf.js > /tmp/protractor.conf.js
+    ${before_sed}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
+    ${rc}  ${out}=  Run And Return Rc And Output  ${sed_cmd}
     Should Be Equal As Integers  ${rc}  0
     Run Keyword Unless  ${rc} == 0  Log  ${out}
     Run  cp /tmp/protractor.conf.js ./h5c/vic/src/vic-webapp/
+    ${after_sed}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/protractor.conf.js
+    Log  sed cmd: ${sed_cmd}
+    Log  before sed: ${before_sed}
+    Log  after sed: ${after_sed}
 
     # update app.po.ts to set the correct baseUrl
     ${app_po_ts}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/e2e/app.po.ts
@@ -145,7 +154,7 @@ Destroy Dangling VCHs Created By Protractor
     ${vic-machine-binary}=  Set Variable If  ${is_darwin}  ./ui-nightly-run-bin/vic-machine-darwin  ./ui-nightly-run-bin/vic-machine-linux
 
     # get a list of dangling VMs created by protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  govc vm.info -json true "virtual-container-host-*" | jq -r '.VirtualMachines[].Name'
+    ${rc}  ${out}=  Run And Return Rc And Output  govc vm.info -dc Datacenter -json true "virtual-container-host-*" | jq -r '.VirtualMachines[].Name'
 
     # if there are any dangling VCHs, delete them. if not, exit the keyword
     Run Keyword Unless  ${rc} == 0  Log To Console  VC inventory is clean. No need to clean up dangling VCHs
@@ -153,5 +162,5 @@ Destroy Dangling VCHs Created By Protractor
     @{vms}=  Split String  ${out}  \n
     :FOR  ${vm}  IN  @{vms}
     \  Log To Console  Destroying VCH: ${vm}
-    \  ${rc}  ${out}=  Run And Return Rc And Output  ${vic-machine-binary} delete --name ${vm} --target ${VC_TARGET} --user ${VC_USERNAME} --password '${VC_PASSWORD}' --compute-resource Cluster --force --thumbprint ${VCSA_FINGERPRINT}
+    \  ${rc}  ${out}=  Run And Return Rc And Output  ${vic-machine-binary} delete --name ${vm} --target ${VC_TARGET}/Datacenter --user ${VC_USERNAME} --password '${VC_PASSWORD}' --compute-resource Cluster --force --thumbprint ${VCSA_FINGERPRINT}
     \  Log To Console  ${out}
