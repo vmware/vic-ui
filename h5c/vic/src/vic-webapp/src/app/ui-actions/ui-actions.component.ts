@@ -15,10 +15,8 @@
 */
 
 import {Component, NgZone, OnInit} from '@angular/core';
-import {
-  GlobalsService
-} from '../shared';
 import {ActivatedRoute} from '@angular/router';
+import {GlobalsService} from '../shared';
 
 @Component({
   selector: 'vic-ui-actions',
@@ -26,11 +24,12 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class UiActionsComponent implements OnInit {
 
+  private params: any;
+
   constructor(
     private globalService: GlobalsService,
-    private router: ActivatedRoute,
     private zone: NgZone,
-    private params: any
+    private router: ActivatedRoute
   ) { }
 
   /**
@@ -38,8 +37,8 @@ export class UiActionsComponent implements OnInit {
    */
   ngOnInit() {
     this.router.params.subscribe(params => {
-      console.log(params);
-      this.globalService.getWebPlatform().sendNavigationRequest('com.vmware.vic.customtab-vch', 'urn:vic:vic:Root:vic%25252Fvic-root');
+       this.params = params;
+       this.globalService.getWebPlatform().sendNavigationRequest('com.vmware.vic.customtab-vch', 'urn:vic:vic:Root:vic%25252Fvic-root');
     });
     window.addEventListener('message', this.onMessage.bind(this), false);
   }
