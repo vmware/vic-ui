@@ -1,0 +1,17 @@
+@import "../../../../node_modules/clarity-ui/src/color/utils/_colors.clarity.scss";
+
+.add-remove-actions {
+
+  clr-icon {
+    margin-top: 9px;
+    cursor: pointer;
+  }
+
+  .btn {
+    color: $clr-action-blue-dark-midtone;
+
+    &:hover {
+      color: $clr-action-blue-dark;
+    }
+  }
+}

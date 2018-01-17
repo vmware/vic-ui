@@ -34,6 +34,7 @@ import { SecurityComponent } from './security/security.component';
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { SummaryComponent } from './summary/summary.component';
 import { VchCreationWizardGeneralComponent } from './general/general.component';
+import { RegistryAccessComponent } from './registry-access/registry-access.component';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -88,6 +89,7 @@ describe('CreateVchWizardComponent', () => {
         StorageCapacityComponent,
         NetworksComponent,
         SecurityComponent,
+        RegistryAccessComponent,
         OperationsUserComponent,
         SummaryComponent
       ]
