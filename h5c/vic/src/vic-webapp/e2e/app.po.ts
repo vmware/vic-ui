@@ -28,9 +28,7 @@ export class VicWebappPage {
   private iframeModal = 'div.modal-body iframe.sandbox-iframe';
   private inputOpsUser = 'input#ops-user';
   private inputOpsPassword = 'input#ops-password';
-  // TODO: replace the following line with the line below it once VIC product 1.3.1 OVA is released
-  private labelEnableSecure = 'label[for=enable-secure-access]';
-  // private labelEnableSecure = 'label[for=use-client-auth]';
+  private labelEnableSecure = 'label[for=use-client-auth]';
   private labelDeleteVolumes = 'label[for=delete-volumes]';
   private selectorImageStore = 'select#image-store-selector';
   private selectorBridgeNetwork = 'select#bridge-network-selector';
