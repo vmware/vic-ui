@@ -189,14 +189,12 @@ describe('vic-webapp', () => {
     browser.switchTo().defaultContent();
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
-    const deletedVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.getText().then(function(text) {
-        if (deletedVch.test(text)) {
-          vchFound = true;
-        }
-      });
+    const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
+    element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
+      console.log(vchClrDgActionXpath, present);
+      vchFound = present;
     });
+
     browser.sleep(defaultTimeout);
     expect(vchFound).toBeFalsy();
   });
