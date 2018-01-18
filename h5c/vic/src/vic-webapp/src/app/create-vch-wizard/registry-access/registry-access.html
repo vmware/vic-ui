@@ -112,7 +112,7 @@
     <div formArrayName="registryCas" *ngFor="let registryCa of form.get('registryCas')['controls']; index as i; last as isLast">
       <div [formGroupName]="i" class="form-group row mb-0">
         <div class="col-xs-6 text-truncate">
-          <span class="text-muted" *ngIf="!registryCaContents[i]">Select certificate pem file</span>
+          <span class="text-muted" *ngIf="!registryCaContents[i]">Select X.509 certificate pem file</span>
           <span *ngIf="registryCaContents[i]">
             {{ registryCaContents[i].name }}, expires: {{ registryCaContents[i].expires | date : 'mediumDate'}}
           </span>
