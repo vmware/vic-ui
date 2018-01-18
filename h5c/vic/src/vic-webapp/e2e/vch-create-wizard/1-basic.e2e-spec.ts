@@ -18,23 +18,25 @@ import { browser, by, element } from 'protractor';
 
 import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
+import {
+  defaultTimeout,
+  sectionSummary,
+  sectionOpsUser,
+  sectionRegistry,
+  sectionSecurity,
+  sectionNetworks,
+  sectionStorage,
+  sectionCompute,
+  modalWizard,
+  dataGridCell,
+  iframeTabs,
+  namePrefix
+} from './common';
 
 describe('VCH Create Wizard - Basic', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
   let page: VicWebappPage;
   let specRunId: number;
-  const defaultTimeout = 5000;
-  const sectionSummary = 'section#summary';
-  const sectionOpsUser = 'section#ops-user';
-  const sectionRegistry = 'section#registry';
-  const sectionSecurity = 'section#security';
-  const sectionNetworks = 'section#networks';
-  const sectionStorage = 'section#storage-capacity';
-  const sectionCompute = 'section#compute-capacity';
-  const modalWizard = '.clr-wizard-stepnav';
-  const dataGridCell = '.datagrid-cell';
-  const iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
-  const namePrefix = 'virtual-container-host-';
 
   beforeAll(() => {
     specRunId = Math.floor(Math.random() * 1000) + 100;
