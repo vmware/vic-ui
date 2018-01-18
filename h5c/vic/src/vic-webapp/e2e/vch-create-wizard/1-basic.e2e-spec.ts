@@ -135,7 +135,7 @@ describe('VCH Create Wizard - Basic', () => {
     // check if we made it to registry access section
     page.waitForElementToBePresent(sectionRegistry);
     expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
-   });
+  });
 
   it('should complete registry access step', () => {
     page.clickByText('Button', 'Next');
@@ -197,18 +197,12 @@ describe('VCH Create Wizard - Basic', () => {
     let vchFound = false;
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
-    const deletedVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.isPresent().then(present => {
-        if (present) {
-          element.getText().then(function(text) {
-            if (deletedVch.test(text)) {
-              vchFound = true;
-            }
-          });
-        }
-      })
+    const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
+    element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
+      console.log(vchClrDgActionXpath, present);
+      vchFound = present;
     });
+
     browser.sleep(defaultTimeout);
     browser.switchTo().defaultContent();
     page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
