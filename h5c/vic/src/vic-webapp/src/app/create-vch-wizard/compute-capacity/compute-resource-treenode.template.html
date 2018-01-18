@@ -1,4 +1,4 @@
-<!-- Copyright 2017 VMware, Inc. All Rights Reserved. -->
+<!-- Copyright 2017-2018 VMware, Inc. All Rights Reserved. -->
 <ng-template [clrIfExpanded]="false">
     <ng-container>
       <!-- cluster and clusterhostsystems -->
@@ -14,8 +14,7 @@
         <ng-template [clrIfExpanded]="false">
           <ng-container>
             <clr-tree-node *ngFor="let clHost of clusterHostSystemsMap[cluster.objRef]">
-              <button #btnEl class="clr-treenode-link cc-resource"
-                      (click)="selectResource($event, clHost, cluster)">
+              <button #btnEl class="clr-treenode-link cc-resource">
                 <clr-icon shape="host"></clr-icon>
                 {{ clHost['text'] }}
               </button>
