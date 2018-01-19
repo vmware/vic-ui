@@ -26,8 +26,7 @@ Check If Nimbus VMs Exist
 
     ${nimbus_machines}=  Set Variable  %{NIMBUS_USER}-UITEST-*
     Log To Console  \nFinding Nimbus machines for UI tests
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
 
     Execute Command  rm -rf public_html/pxe/*
     ${out}=  Execute Command  nimbus-ctl list | grep -i "${nimbus_machines}"
@@ -67,8 +66,7 @@ Load Testbed
 
 Extract BrowserVm Info
     [Arguments]  @{vm_fields}
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     ${vm_name}=  Evaluate  '@{vm_fields}[1]'.strip()
     ${out}=  Execute Command  NIMBUS=@{vm_fields}[0] nimbus-ctl ip ${vm_name} | grep -i ".*: %{NIMBUS_USER}-.*"
     @{out}=  Split String  ${out}  :
@@ -78,8 +76,7 @@ Extract BrowserVm Info
 
 Extract Esx Info
     [Arguments]  @{vm_fields}
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     ${vm_name}=  Evaluate  '@{vm_fields}[1]'.strip()
     ${out}=  Execute Command  NIMBUS=@{vm_fields}[0] nimbus-ctl ip ${vm_name} | grep -i ".*: %{NIMBUS_USER}-.*"
     @{out}=  Split String  ${out}  :
@@ -91,8 +88,7 @@ Extract Esx Info
 
 Extract Vcsa Info
     [Arguments]  @{vm_fields}
-    Open Connection  %{NIMBUS_GW}
-    Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     ${vm_name}=  Evaluate  '@{vm_fields}[1]'.strip()
     ${out}=  Execute Command  NIMBUS=@{vm_fields}[0] nimbus-ctl ip ${vm_name} | grep -i ".*: %{NIMBUS_USER}-.*"
     @{out}=  Split String  ${out}  :
@@ -123,8 +119,7 @@ Deploy Esx
 
     Log To Console  \nDeploying Nimbus ESXi server: ${name}
 
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
     # run nimbus command and make sure deployment was successful
     ${output}=  Execute Command  nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${buildnum}
     Run Keyword If  ${logfile} is not None  Create File  ${logfile}  ${output}
@@ -148,12 +143,11 @@ Deploy Vcsa
     [Arguments]  ${build}=None  ${logfile}=None
     # deploy a vcsa
     ${name}=  Evaluate  'UITEST-VC%{TEST_VSPHERE_VER}-' + str(random.randint(1000,9999))  modules=random
-    ${buildnum}=  Run Keyword If  ${build} is not None  Set Variable  ${build}  ELSE  Run Keyword If  %{TEST_VSPHERE_VER} == 60  Set Variable  3634791  ELSE  Set Variable  5318154
+    ${buildnum}=  Run Keyword If  ${build} is not None  Set Variable  ${build}  ELSE  Run Keyword If  %{TEST_VSPHERE_VER} == 60  Set Variable  3634791  ELSE  Set Variable  7312210
 
     Log To Console  \nDeploying Nimbus VC server: ${name}
 
-    Open Connection  %{NIMBUS_GW}
-    Wait Until Keyword Succeeds  2 min  30 sec  Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
     # run nimbus command and make sure deployment was successful
     ${output}=  Execute Command  nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${buildnum} ${name}
     Run Keyword If  ${logfile} is not None  Create File  ${logfile}  ${output}
@@ -224,8 +218,7 @@ Deploy Windows BrowserVm
     ${os}=  Set Variable  WINDOWS
     ${name}=  Evaluate  'UITEST-BROWSERVM-${os}-' + str(random.randint(1000,9999))  modules=random
     Log To Console  \nDeploying Browser VM: ${name}
-    Open Connection  %{NIMBUS_GW}
-    Login  ${user}  ${password}
+    Open SSH Connection  %{NIMBUS_GW}  ${user}  ${password}
 
     ${out}=  Execute Command  nimbus-genericdeploy --type ${vm-template} ${name} --lease 1
     # Make sure the deploy actually worked
@@ -253,7 +246,7 @@ Predeploy Vc And Esx
     Environment Variable Should Be Set  TEST_RESOURCE
     Set Environment Variable  GOVC_INSECURE  1
     @{VSPHERE_BUILDS_LIST}=  Create List
-    Append To List  ${VSPHERE_BUILDS_LIST}  60-3620759-3634791  65-5310538-5318154
+    Append To List  ${VSPHERE_BUILDS_LIST}  60-3620759-3634791  65-5310538-7312210
 
     Log To Console  \n==============================================================================
     Log To Console  This script will destroy all vSphere 6.0 and 6.5 instances plus Windows Browser VM

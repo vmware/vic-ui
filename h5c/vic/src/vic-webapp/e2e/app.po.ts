@@ -11,7 +11,7 @@
  limitations under the License.
 */
 
-import { browser, by, element } from 'protractor';
+import { browser, by, element, ElementFinder } from 'protractor';
 
 export class VicWebappPage {
 
@@ -25,6 +25,8 @@ export class VicWebappPage {
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
   private iconVicRoot = '.com_vmware_vic-vic-root-icon';
+  private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
+  private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
   private iframeModal = 'div.modal-body iframe.sandbox-iframe';
   private inputOpsUser = 'input#ops-user';
@@ -78,6 +80,7 @@ export class VicWebappPage {
 
   navigateToHome() {
     // click top left vmware logo
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVsphereHome);
     this.clickByCSS(this.iconVsphereHome);
   }
@@ -90,13 +93,17 @@ export class VicWebappPage {
 
   navigateToSummaryTab() {
     // click vic link
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVicRoot);
     this.clickByCSS(this.iconVicRoot);
+    browser.sleep(this.defaultTimeout);
   }
 
   navigateToVchTab() {
     // click vch tab
-    this.clickByText('a', 'Virtual Container Hosts');
+    this.waitForElementToBePresent(this.tabBtnVchs);
+    this.clickByCSS(this.tabBtnVchs);
+    browser.sleep(this.defaultTimeout);
   }
 
   openVchWizard() {
@@ -155,17 +162,20 @@ export class VicWebappPage {
   }
 
   deleteVch(vch) {
+    this.switchFrame(this.iframeTabs);
+    this.waitForElementToBePresent(this.actionBar + vch);
     const vchActionMenu = this.actionBar + vch;
-    this.waitForElementToBePresent(vchActionMenu);
     this.clickByCSS(vchActionMenu);
     this.clickByCSS(vchActionMenu + ' button.action-item-delete');
     browser.switchTo().defaultContent();
     this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
+    // wait for modal to set position
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
-    browser.sleep(this.defaultTimeout);
+    browser.switchTo().defaultContent();
   }
 
   /* Utility functions */
@@ -175,6 +185,7 @@ export class VicWebappPage {
       if (result) {
         element(by.cssContainingText(el, text)).click();
       } else {
+        console.log(text + ' not found');
         return false;
       }
     });
@@ -185,6 +196,7 @@ export class VicWebappPage {
       if (result) {
         browser.driver.findElement(by.css(el)).click();
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
@@ -206,6 +218,7 @@ export class VicWebappPage {
       if (result) {
         browser.driver.findElement(by.css(el)).clear();
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
@@ -216,6 +229,7 @@ export class VicWebappPage {
       if (result) {
         browser.driver.findElement(by.css(el)).sendKeys(keys);
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
@@ -226,6 +240,7 @@ export class VicWebappPage {
       if (result) {
         browser.switchTo().frame(browser.driver.findElement(by.css(el)));
       } else {
+        console.log(el + ' not found');
         return false;
       }
     });
@@ -244,4 +259,29 @@ export class VicWebappPage {
       });
     }, timeout);
   };
+
+  waitForTaskDone(targetName, desiredTaskName, timeout = this.opsTimeout) {
+    return browser.wait(() => {
+      return browser.isElementPresent(by.css(this.latestTask)).then((el) => {
+        const taskNameTxt = element(by.css(this.latestTask + ' td:nth-of-type(1)')).getText();
+        const taskTargetTxt = element(by.css(this.latestTask + ' td:nth-of-type(2)')).getText();
+        const endTimeTxt = element(by.css(this.latestTask + ' td:nth-of-type(7)')).getText();
+
+        browser.sleep(100);
+        return taskNameTxt.then(taskNameValue => {
+          return taskTargetTxt.then(targetNameValue => {
+            return endTimeTxt.then(endTimeValue => {
+              console.log(`${taskNameValue}: ${targetNameValue}: ${endTimeValue}`);
+              if (taskNameValue === desiredTaskName && targetNameValue === targetName && endTimeValue) {
+                return true;
+              }
+            });
+          });
+        });
+      }).catch(function(el) {
+        console.log(el + ' not found');
+        return false;
+      });
+    }, timeout);
+  }
 }

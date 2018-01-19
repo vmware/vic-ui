@@ -167,7 +167,7 @@ TestCase-Install Plugin Successfully
     Set Fileserver And Thumbprint In Configs
     Run Keyword And Continue On Failure  Install Plugin Successfully  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  install.log  install-fail-ensure-vicui-is-installed-before-testing.log
     Should Be True  ${passed}
 
@@ -176,7 +176,7 @@ TestCase-Install Plugin Successfully
     Remove Environment Variable  VIC_MACHINE_THUMBPRINT  target_vcenter_ip  vcenter_username  vcenter_password
     Run Keyword And Continue On Failure  Interact With Script  install  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  install.log  install-fail-ensure-vicui-is-installed-before-testing.log
     Should Be True  ${passed}
 
@@ -188,8 +188,7 @@ Run Testcases On Mac
     OperatingSystem.Create Directory  ${results_folder}
 
     # log into macOS host and copy required files
-    Open Connection  ${MACOS_HOST_IP}
-    Login  ${MACOS_HOST_USER}  ${MACOS_HOST_PASSWORD}
+    Open SSH Connection  ${MACOS_HOST_IP}  ${MACOS_HOST_USER}  ${MACOS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  testbed-information  ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI/  mode=0700
     Put File  ../../../ui-nightly-run-bin/vic-ui-darwin  ${remote_vic_root}/
@@ -214,7 +213,7 @@ Run Testcases On Mac
     # remotely run robot test
     ${run_tests_command}=  Catenate
     ...  cd ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI 2>&1 &&
-    ...  /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${rc}=  Execute Command  ${run_tests_command}  return_rc=True
 
     # Store whether the run was successful
@@ -241,13 +240,16 @@ Run Testcases On Windows
     OperatingSystem.Create Directory  ${results_folder}
 
     # log into Windows host and copy required files
-    Open Connection  ${WINDOWS_HOST_IP}
-    Login  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
+    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  testbed-information  ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI/
     Put File  ../../../scripts/plugin-manifest  ${remote_vic_root}/scripts/
+    Put File  ../../../scripts/vCenterForWindows/configs-3634791  ${remote_vic_root}/scripts/vCenterForWindows/
+    Put File  ../../../scripts/vCenterForWindows/configs-7312210  ${remote_vic_root}/scripts/vCenterForWindows/
     Put File  ../../../vic-ui-windows.exe  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_scratch_folder} 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     Execute Command  rm -rf ${REMOTE_RESULTS_FOLDER}
@@ -260,7 +262,7 @@ Run Testcases On Windows
     ...  git checkout -f master &&
     ...  git rebase vmware/master &&
     ...  cd tests/manual-test-cases/Group18-VIC-UI &&
-    ...  robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
 
     # Store whether the run was successful, print out any error message

@@ -33,8 +33,8 @@ import {
   namePrefix
 } from './common';
 
-describe('vic-webapp', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 2;
+describe('VCH Create Wizard - Basic', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
   let page: VicWebappPage;
   let specRunId: number;
 
@@ -62,7 +62,6 @@ describe('vic-webapp', () => {
   });
 
   it('should navigate to vsphere home', () => {
-    browser.waitForAngularEnabled(true);
     page.navigateToHome();
     expect(browser.getCurrentUrl()).toContain('vsphere');
   });
@@ -74,7 +73,6 @@ describe('vic-webapp', () => {
 
   it('should navigate to summary tab', () => {
     page.navigateToSummaryTab();
-    expect(browser.getCurrentUrl()).toContain('vic-root');
   });
 
   it('should navigate to vch tab', () => {
@@ -89,7 +87,8 @@ describe('vic-webapp', () => {
   });
 
   it('should input vch name', () => {
-    page.sendKeys('#nameInput', '-' + specRunId);
+    page.clear('#nameInput');
+    page.sendKeys('#nameInput', namePrefix + specRunId);
   });
 
   it('should complete general step', () => {
@@ -173,14 +172,25 @@ describe('vic-webapp', () => {
     page.waitForElementToBePresent(dataGridCell);
     browser.sleep(defaultTimeout);
     const newVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.getText().then(function(text) {
-        if (newVch.test(text)) {
-          vchFound = true;
+    element.all(by.css(dataGridCell)).each(function(el, index) {
+      el.isPresent().then(present => {
+        if (present) {
+          el.getText().then(function(text) {
+            if (newVch.test(text)) {
+              vchFound = true;
+            }
+          });
         }
-      });
+      })
     }).then(function() {
       expect(vchFound).toBeTruthy();
+    });
+  });
+
+  it('should verify the new vch has properly started', () => {
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Reconfigure virtual machine').then((status) => {
+      expect(status).toBeTruthy();
     });
   });
 
@@ -190,9 +200,7 @@ describe('vic-webapp', () => {
 
 
   it('should verify the created vch has been deleted', () => {
-    browser.ignoreSynchronization = true;
     let vchFound = false;
-    browser.switchTo().defaultContent();
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
     const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
@@ -202,6 +210,8 @@ describe('vic-webapp', () => {
     });
 
     browser.sleep(defaultTimeout);
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
     expect(vchFound).toBeFalsy();
   });
 

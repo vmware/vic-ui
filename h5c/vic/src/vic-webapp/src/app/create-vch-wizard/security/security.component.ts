@@ -124,7 +124,6 @@ export class SecurityComponent {
     }
 
     this.form.get('tlsCname').setValue(this.vchName);
-    this.form.get('organization').setValue(this.vchName);
 
     this.form.get('serverCertSource').valueChanges
       .subscribe(v => {
