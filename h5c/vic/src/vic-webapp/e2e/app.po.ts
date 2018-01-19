@@ -18,6 +18,7 @@ export class VicWebappPage {
   private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
   private datacenterTreenodeCaret = 'button.clr-treenode-caret';
+  private firstDcTreenodeCaretXpath = `(//button[contains(@class,'clr-treenode-caret')])[1]/clr-icon[contains(@dir, 'right')]`;
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
@@ -28,9 +29,7 @@ export class VicWebappPage {
   private iframeModal = 'div.modal-body iframe.sandbox-iframe';
   private inputOpsUser = 'input#ops-user';
   private inputOpsPassword = 'input#ops-password';
-  // TODO: replace the following line with the line below it once VIC product 1.3.1 OVA is released
-  private labelEnableSecure = 'label[for=enable-secure-access]';
-  // private labelEnableSecure = 'label[for=use-client-auth]';
+  private labelEnableSecure = 'label[for=use-client-auth]';
   private labelDeleteVolumes = 'label[for=delete-volumes]';
   private selectorImageStore = 'select#image-store-selector';
   private selectorBridgeNetwork = 'select#bridge-network-selector';
@@ -107,26 +106,30 @@ export class VicWebappPage {
     this.switchFrame(this.iframeModal);
   }
 
-  selectComputeResource() {
+  selectComputeResource(name: string = 'Cluster') {
     this.waitForElementToBePresent(this.datacenterTreenodeCaret);
-    this.clickByCSS(this.datacenterTreenodeCaret);
-    this.clickByCSS(this.buttonComputeResource);
+    element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
+      if (collapsed) {
+        this.clickByCSS(this.datacenterTreenodeCaret);
+      }
+    });
+
+    this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
   }
 
-  selectDatastore() {
+  selectDatastore(name: string = 'datastore1') {
     this.waitForElementToBePresent(this.selectorImageStore);
-    this.clickByText(this.selectorImageStore + ' option', 'datastore1');
-    // this.clickByCSS(this.selectorImageStore + ' option:nth-child(3)');
+    this.clickByText(this.selectorImageStore + ' option', name);
   }
 
-  selectBridgeNetwork() {
+  selectBridgeNetwork(name: string = 'bridge') {
     this.waitForElementToBePresent(this.selectorBridgeNetwork);
-    this.clickByText(this.selectorBridgeNetwork + ' option', 'bridge');
+    this.clickByText(this.selectorBridgeNetwork + ' option', name);
   }
 
-  selectPublicNetwork() {
+  selectPublicNetwork(name: string = 'network') {
     this.waitForElementToBePresent(this.selectorPublicNetwork);
-    this.clickByText(this.selectorPublicNetwork + ' option', 'network');
+    this.clickByText(this.selectorPublicNetwork + ' option', name);
   }
 
   disableSecureAccess() {
@@ -187,6 +190,17 @@ export class VicWebappPage {
       } else {
         console.log(el + ' not found');
         return false;
+      }
+    });
+  }
+
+  clickByXpath(xpath) {
+    element(by.xpath(xpath)).isPresent().then(function(result) {
+      if (result) {
+        browser.driver.findElement(by.xpath(xpath)).click();
+      } else {
+        console.log(xpath + ' not found');
+        return false
       }
     });
   }
