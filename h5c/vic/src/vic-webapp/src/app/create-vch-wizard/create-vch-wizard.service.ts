@@ -34,6 +34,7 @@ import { GlobalsService } from '../shared';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
+import { flattenArray } from '../shared/utils/array-utils';
 
 @Injectable()
 export class CreateVchWizardService {
@@ -45,8 +46,6 @@ export class CreateVchWizardService {
     private _serverHostname: string = null;
     private _clusters: any[] = null;
     private _clusterToHostRpsMap = {};
-    private _networkingTree: any[] = null;
-    private _distributedPortGroups: any[] = null;
     private _userSession: any = null;
     private _latestVicApplianceIp: string = null;
 
@@ -287,43 +286,68 @@ export class CreateVchWizardService {
     }
 
     getNetworkingTree(): Observable<any[]> {
-        // cache
-        if (this._networkingTree !== null) {
-            return Observable.of(this._networkingTree);
-        }
-
         return this.getDatacenter()
             .switchMap(dcs => {
+              const dcsObs = dcs.map(dc => {
                 return this.http.get('/ui/tree/children?nodeTypeId=Datacenter' +
-                    `&objRef=${dcs[0]['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
+                  `&objRef=${dc['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
+                  .map(response => response.json())
+              });
 
-            }).catch(e => Observable.throw(e))
-            .map(response => response.json())
-            .catch(e => Observable.throw(e))
-            .do(tree => this._networkingTree = tree);
+              return Observable.zip.apply(null, dcsObs);
+            })
+            .map((response: any[]) => {
+              return flattenArray(response);
+            });
     }
 
-    getDistributedPortGroups(): Observable<any[]> {
-        // cache
-        if (this._distributedPortGroups !== null) {
-            return Observable.of(this._distributedPortGroups);
-        }
-
+    /**
+     * Get all available portgroups for the selected compute resource
+     * @param resourceObjName name of the selected compute resource
+     */
+    getDistributedPortGroups(resourceObjName?: string): Observable<any> {
         return this.getNetworkingTree()
             .switchMap(inventories => {
-                const obsArray: Array<Observable<any>> =
-                    inventories.filter(item => item['nodeTypeId'] === 'DcDvs')
-                        .map(dv => {
-                            return this.http.get('/ui/tree/children?nodeTypeId=DcDvs' +
-                                `&objRef=${dv['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
-                                .map(response => response.json());
-                        });
-                return Observable.from(obsArray);
-            })
-            .mergeAll()
-            .mergeMap(val => {
-                this._distributedPortGroups = val;
-                return Observable.of(this._distributedPortGroups);
+                // filter the payload to get only DcDvs nodes
+                const dcDvsList = inventories.filter(item => item['nodeTypeId'] === 'DcDvs');
+
+                // create an array of observables for DV portgroup entries
+                const dvsObs = dcDvsList.map(dv => {
+                      return this.http.get('/ui/tree/children?nodeTypeId=DcDvs' +
+                          `&objRef=${dv['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
+                          .map(response => response.json());
+                  });
+
+                // create an array of observables for DVS host entries
+                const dvsHostsObs = dcDvsList.map(dv => {
+                  return this.http.get(`/ui/data/properties/${dv['objRef']}?properties=dvs:dvsHostsData`)
+                    .map(response => response.json());
+                });
+
+                // zip all observables
+                const allDvs = Observable.zip.apply(null, dvsObs);
+                const allDvsHosts = Observable.zip.apply(null, dvsHostsObs).map(arr => {
+                  return arr.map(dvsHostsData => {
+                    return dvsHostsData['dvs:dvsHostsData']['dvsHosts'];
+                  });
+                });
+
+                // process the results from the zipped observables wherein only DV port group entries
+                // whose parent distributed virtual switch can be accessed by the specified compute resource should be taken
+                return Observable.combineLatest(allDvs, allDvsHosts).map(([dvs, dvsHosts]) => {
+                  let results = [];
+                  for (let index = 0; index < dvsHosts.length; index++) {
+                    // if any of the array item's clusterName or hostName property matches resourceObjName,
+                    // it means all portgroups under that switch can be accessed by this compute resource
+                    if (dvsHosts[index].some(computeResource => {
+                      return computeResource['clusterName'] === resourceObjName || computeResource['hostName'] === resourceObjName;
+                    })) {
+                      results = results.concat(dvs[index]);
+                    }
+                  }
+
+                  return flattenArray(results);
+                });
             });
     }
 
