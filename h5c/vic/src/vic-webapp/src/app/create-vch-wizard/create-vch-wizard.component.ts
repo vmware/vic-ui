@@ -449,7 +449,7 @@ export class CreateVchWizardComponent implements OnInit {
       auth.client = {'certificate_authorities': payload.security['tlsCa'].map(cert => ({pem: cert.content}))};
     }
 
-    if (payload.security.certificateKeySize) {
+    if (payload.security.tlsCname) {
       auth.server = {
         generate: {
           size: {
@@ -457,7 +457,11 @@ export class CreateVchWizardComponent implements OnInit {
             units: 'bit'
           },
           cname: payload.security.tlsCname
-        }
+        },
+      };
+
+      if (payload.security.organization) {
+        auth.server.generate['organization'] = [payload.security.organization]
       }
     } else if (payload.security.tlsServerCert) {
       auth.server = {
@@ -469,7 +473,7 @@ export class CreateVchWizardComponent implements OnInit {
         generate: {
           size: {
             value: 2048,
-            units: 'bits'
+            units: 'bit'
           },
           organization: [payload.general.name],
           cname: payload.general.name
