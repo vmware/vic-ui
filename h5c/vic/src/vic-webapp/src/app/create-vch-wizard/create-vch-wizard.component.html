@@ -114,7 +114,7 @@
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="securityStep.form.get('useClientAuth').value && securityStep.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="securityStep.form.invalid"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(securityStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
