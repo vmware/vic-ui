@@ -18,6 +18,7 @@
     "test": "npm run prebuildCheck",
     "lint": "ng lint",
     "rimraf": "rimraf",
+    "e2e": "ng e2e --progress false",
     "prebuildCheck": "npm run setAppBaseUrl:test && ng lint && ng test --code-coverage --sourcemaps false",
     "setAppBaseUrl:dev": "sed -e 's|<base href=.*|<base href=\"/ui/vic/resources/build-dev/\">|' src/index.html > /tmp/vicwebapp-index.html && mv /tmp/vicwebapp-index.html ./src/index.html",
     "setAppBaseUrl:prod": "sed -e 's|<base href=.*|<base href=\"/ui/vic/resources/dist/\">|' src/index.html > /tmp/vicwebapp-index.html && mv /tmp/vicwebapp-index.html ./src/index.html",

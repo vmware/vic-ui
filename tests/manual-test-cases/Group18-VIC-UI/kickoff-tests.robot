@@ -20,20 +20,27 @@ Resource         ../../resources/Util.robot
 Resource         ./vicui-common.robot
 
 *** Variables ***
-${TEST_SCRIPTS_ROOT}     tests/manual-test-cases/Group18-VIC-UI/
-${VICTEST2XL}            ${TEST_SCRIPTS_ROOT}/victest2xl.py
-${IS_NIGHTLY_TEST}       ${TRUE}
+${TEST_SCRIPTS_ROOT}           tests/manual-test-cases/Group18-VIC-UI/
+${VICTEST2XL}                  ${TEST_SCRIPTS_ROOT}/victest2xl.py
+${IS_NIGHTLY_TEST}             ${TRUE}
 ${BUILD_VER_ISSUE_WORKAROUND}  ${TRUE}
 ${ALL_TESTS_PASSED}            ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
+    # ova url is checked here. should be taken in runtime as a variable
+    # e.g. robot --variable ova_url:https://storage.googleapis.com/vic-product-ova-builds/build-to-test.ova
+    Variable Should Exist  ${ova_url}
+
     ${ts}=  Get Current Date  result_format=epoch  exclude_millis=True
     Set Suite Variable  ${time_start}  ${ts}
     Cleanup Previous Test Logs
     Check Working Dir
     Check Drone
-    Get Latest Vic Engine Binary
+    Check Govc
+    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  %{OVA_ESX_IP_VC60U2}  %{OVA_ESX_DATASTORE_VC60U2}
+    Install VIC Product OVA  6.5u1d  ${BUILD_7312210_IP}  %{OVA_ESX_IP_VC65U1D}  %{OVA_ESX_DATASTORE_VC65U1D}
+    Get Vic Engine Binaries
     Setup Test Matrix
 
 Check Working Dir
@@ -51,34 +58,18 @@ Check Drone
     Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
     Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
 
+Check Govc
+    ${rc}=  Run And Return Rc  govc
+    Should Be True  ${rc} != 127
+
 Cleanup Previous Test Logs
     Log  Removing UI test result directories if present...
-    Run  rm -rf ui-test-results 2>/dev/null
+    Run  rm -rf ui-test-results* 2>/dev/null
     Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
-
-Download VIC Engine Tarball
-    [Arguments]  ${url}  ${filename}
-    Log  Downloading ${url}...
-    ${rc}=  Run And Return Rc  wget ${url} -O ${filename}
-    Should Be Equal As Integers  ${rc}  0
-    OperatingSystem.File Should Exist  ${filename}
-    [Return]  ${rc} == 0
-
-Prepare VIC Engine Binaries
-    Log  Extracting binary files...
-    ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
-    ${rc2}=  Run And Return Rc  tar xvzf ${LATEST_VIC_ENGINE_TARBALL} -C ui-nightly-run-bin --strip 1
-    ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
-    Should Be Equal As Integers  ${rc1}  0
-    Should Be Equal As Integers  ${rc2}  0
-    Should Be Equal As Integers  ${rc3}  0
-    # copy vic-ui-linux and plugin binaries to where test scripts will access them
-    Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
-    Prepare Flex And H5 Plugins For Testing
 
 Prepare Flex And H5 Plugins For Testing
     Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build Flex And H5 Plugins
-    Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND}  Sync Vic Ui Version With Vic Repo
+    Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND} and not ${IS_NIGHTLY_TEST}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/plugin-packages/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
@@ -111,43 +102,24 @@ Build Flex And H5 Plugins
     Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build H5 Client plugin! ${out}
     Log To Console  Successfully built H5 Client plugin.\n
 
-Get Latest Vic Engine Binary
-    Log  Fetching the latest VIC Engine tar ball...
-    ${input}=  Run  gsutil ls -l gs://vic-engine-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    Set Suite Variable  ${buildNumber}  ${input}
-    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${input}
-    Log  Fetching the latest VIC UI tar ball...
-    ${input2}=  Run  gsutil ls -l gs://vic-ui-builds/vic_* | grep -v TOTAL | sort -k2 -r | head -n1 | xargs | cut -d ' ' -f 3 | cut -d '/' -f 4
-    Set Suite Variable  ${LATEST_VIC_UI_TARBALL}  ${input2}
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-engine-builds/${input}  ${LATEST_VIC_ENGINE_TARBALL}
-    Should Be True  ${results}
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball  https://storage.googleapis.com/vic-ui-builds/${input2}  ${LATEST_VIC_UI_TARBALL}
-    Should Be True  ${results}
-    Prepare VIC Engine Binaries
-
 Setup Test Matrix
     # skip matrix
     @{skip_test_config_matrix}=  Create List
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Googlechrome,Chrome
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Mac,Firefox,Firefox
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Googlechrome,Chrome
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,Firefox,Firefox
-    Append To List  ${skip_test_config_matrix}  60,3620759,3634791,Windows,iexplore,IE11
     # There's currently a version clash between the Selenium standalone binary and HSUIA project
-    Append To List  ${skip_test_config_matrix}  65,5310538,5318154,Windows,Firefox,Firefox
+    Append To List  ${skip_test_config_matrix}  65,5310538,7312210,Windows,Firefox,Firefox
     # There's a H5C bug in IE11 that appears only when automatically tested
-    Append To List  ${skip_test_config_matrix}  65,5310538,5318154,Windows,IExplorer,IE11
+    Append To List  ${skip_test_config_matrix}  65,5310538,7312210,Windows,IExplorer,IE11
     Set Global Variable  ${SKIP_TEST_MATRIX}  ${skip_test_config_matrix}
 
     # installer test matrix
     @{installer_test_config_matrix}=  Create List
     &{installer_test_results_dict}=  Create Dictionary
     Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Ubuntu
-    Append To List  ${installer_test_config_matrix}  65,5310538,5318154,Ubuntu
+    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Ubuntu
     Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Mac
-    Append To List  ${installer_test_config_matrix}  65,5310538,5318154,Mac
+    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Mac
     Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Windows
-    Append To List  ${installer_test_config_matrix}  65,5310538,5318154,Windows
+    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${INSTALLER_TEST_MATRIX}        ${installer_test_config_matrix}
     Set Global Variable  ${INSTALLER_TEST_RESULTS_DICT}  ${installer_test_results_dict}
 
@@ -155,11 +127,11 @@ Setup Test Matrix
     @{uninstaller_test_config_matrix}=  Create List
     &{uninstaller_test_results_dict}=  Create Dictionary
     Append To List  ${uninstaller_test_config_matrix}  60,3620759,3634791,Ubuntu
-    Append To List  ${uninstaller_test_config_matrix}  65,5310538,5318154,Ubuntu
+    Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Ubuntu
     Append To List  ${uninstaller_test_config_matrix}  60,3620759,3634791,Mac
-    Append To List  ${uninstaller_test_config_matrix}  65,5310538,5318154,Mac
+    Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Mac
     Append To List  ${uninstaller_test_config_matrix}  60,3620759,3634791,Windows
-    Append To List  ${uninstaller_test_config_matrix}  65,5310538,5318154,Windows
+    Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${UNINSTALLER_TEST_MATRIX}        ${uninstaller_test_config_matrix}
     Set Global Variable  ${UNINSTALLER_TEST_RESULTS_DICT}  ${uninstaller_test_results_dict}
 
@@ -167,11 +139,11 @@ Setup Test Matrix
     @{upgrader_test_config_matrix}=  Create List
     &{upgrader_test_results_dict}=  Create Dictionary
     Append To List  ${upgrader_test_config_matrix}  60,3620759,3634791,Ubuntu
-    Append To List  ${upgrader_test_config_matrix}  65,5310538,5318154,Ubuntu
+    Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Ubuntu
     Append To List  ${upgrader_test_config_matrix}  60,3620759,3634791,Mac
-    Append To List  ${upgrader_test_config_matrix}  65,5310538,5318154,Mac
+    Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Mac
     Append To List  ${upgrader_test_config_matrix}  60,3620759,3634791,Windows
-    Append To List  ${upgrader_test_config_matrix}  65,5310538,5318154,Windows
+    Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${UPGRADER_TEST_MATRIX}        ${upgrader_test_config_matrix}
     Set Global Variable  ${UPGRADER_TEST_RESULTS_DICT}  ${upgrader_test_results_dict}
 
@@ -181,16 +153,11 @@ Setup Test Matrix
     # vSphere H5C and Flex Client are not supported  on Linux
     # https://docs.vmware.com/en/VMware-vSphere/6.0/com.vmware.vsphere.install.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
     # https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.upgrade.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Mac,Googlechrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Mac,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,Googlechrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  60,3620759,3634791,Windows,iexplore,IE11
-    Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Mac,Chrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Mac,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Windows,Chrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Windows,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  65,5310538,5318154,Windows,IExplorer,IE11
+    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Mac,Chrome,Chrome
+    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Mac,Firefox,Firefox
+    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Windows,Chrome,Chrome
+    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Windows,Firefox,Firefox
+    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Windows,IExplorer,IE11
     Set Global Variable  ${PLUGIN_TEST_MATRIX}        ${plugin_test_config_matrix}
     Set Global Variable  ${PLUGIN_TEST_RESULTS_DICT}  ${plugin_test_results_dict}
 
@@ -199,7 +166,8 @@ Get Testbed Information
     Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
     ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/manual-test-cases/Group18-VIC-UI/setup-testbed.robot > tests/manual-test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
     Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
-    Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${results.stderr}
+    ${testbed-setup-log}=  OperatingSystem.Get File  tests/manual-test-cases/Group18-VIC-UI/setup-testbed.log
+    Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${testbed-setup-log}
     Load Nimbus Testbed Env
     Move File  testbed-information  tests/manual-test-cases/Group18-VIC-UI/testbed-information
 
@@ -230,6 +198,7 @@ Run Script Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/${test_name}-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g"
     ...  -e "s|\#ROBOT_SCRIPT|${test_name}\.robot|g" > .drone.local.tests.yml
@@ -264,9 +233,8 @@ Run Script Test With Config
 
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
-    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
-    ${pf_string}=  Set Variable  ${pf}\t${title} / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
-    Set To Dictionary  ${results_dict}  ${dict_key}  ${pf_string}
+    ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASS \]\t${title} / ESX build ${esx_build} / VC build ${vc_build} / ${os}  ELSE  Set Variable  \[ FAIL \]\t${title} / ESX build ${esx_build} / VC build ${vc_build} / ${os}
+    Set To Dictionary  ${results_dict}  ${test_name}-${dict_key}  ${pf}
 
     Log To Console  ${results.rc}
     Log To Console  ${results.stdout}
@@ -295,13 +263,14 @@ Run Plugin Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/18-4-VIC-UI-Plugin-tests-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#SELENIUM_BROWSER|${selenium_browser}|g"
     ...  -e "s|\#BROWSER_NORMALIZED_NAME|${selenium_browser_normalized}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g" > .drone.local.tests.yml
 
     Log To Console  ${\n}........................................
-    Log To Console     Plugin Test
+    Log To Console     vSphere Client Plugin test - Portlets
     Log To Console  ........................................
     Log To Console  vSphere version: ${vc_version}
     Log To Console  ESX build: ${esx_build}
@@ -309,7 +278,7 @@ Run Plugin Test With Config
     Log To Console  Operating System: ${os}
     Log To Console  Browser: ${selenium_browser}
     Run Keyword If  ${is_skipped}  Log To Console  Skipped...
-    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Run Keyword If  ${is_skipped}  Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ SKIPPED \]\tH5 Client plugin test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Return From Keyword If  ${is_skipped}
     Get Testbed Information
     Set Environment Variable  VCH-NAME  %{VCH_VM_NAME}
@@ -321,7 +290,7 @@ Run Plugin Test With Config
 
     ${rc}=  Run And Return Rc  mkdir -p ${test_results_folder}
     Should Be Equal As Integers  ${rc}  0
-    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \] Plugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \]\tH5 Client plugin test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
     ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
@@ -333,7 +302,7 @@ Run Plugin Test With Config
     # set pass/fail based on return code
     Run Keyword Unless  ${results.rc} == 0  Set Global Variable  ${ALL_TESTS_PASSED}  ${FALSE}
     ${pf}=  Run Keyword If  ${results.rc} == 0  Set Variable  \[ PASSED \]  ELSE  Set Variable  \[ FAILED \]
-    ${pf_string}=  Set Variable  ${pf}\tPlugin test / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
+    ${pf_string}=  Set Variable  ${pf}\tH5 Client plugin - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  ${pf_string}
 
     Log To Console  ${results.rc}
@@ -343,7 +312,7 @@ Run Plugin Test With Config
     # move log files
     Move Files  tests/manual-test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
 
-Generate Test Report
+Generate Excel Report
     ${script_exists}  ${out}=  Run Keyword And Ignore Error  OperatingSystem.File Should Exist  ${VICTEST2XL}
     ${run_results}=  Run Keyword If  '${script_exists}' == 'PASS'  Run  bash -c "${script_exists} -searchdir ./ui-test-results/ -f output.xml 2>&1 && cp log.xlsx ui-test-results/"
     Run Keyword Unless  '${script_exists}' == 'PASS'  Log  ${VICTEST2XL} was not found. Skipping...  WARN
@@ -356,7 +325,6 @@ Cleanup Testbed
 
     # Delete all transient and sensitive information
     Run  rm -rf .drone.local.tests.yml testbed-information tests/manual-test-cases/Group18-VIC-UI/testbed-information /tmp/sdk/ >/dev/null 2>&1
-    Run  rm -rf ui-test-results >/dev/null 2>&1
     Run  rm -rf Kickoff-Tests* VCH-0*
 
     # Revert some modified local files
@@ -369,107 +337,30 @@ Cleanup Testbed
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
 
-Send Email
-    ${boundary}=  Set Variable  zz_/afg6432dfgkl.94531qdffe121
-    ${time_end}=  Get Current Date  result_format=epoch  exclude_millis=True
-    ${elapsed_time}=  Evaluate  ${time_end} - ${time_start}
-    # zip results
+Generate Report
     ${results_dir_exists}=  Run Keyword And Return Status  OperatingSystem.Directory Should Exist  ui-test-results
-    ${now}=  Run  date +%m%d%y
-    ${zip_filename}=  Set Variable  vicui-test-report-${now}.zip
-    ${rc1}=  Run And Return Rc  zip -9 -r ${zip_filename} ui-test-results/
-    ${rc2}  ${testresults_base64}=  Run And Return Rc And Output  base64 "${zip_filename}"
-    Run Keyword If  ${results_dir_exists}  Should Be Equal As Integers  ${rc1}  0
-    Run Keyword If  ${results_dir_exists}  Should Be Equal As Integers  ${rc2}  0
+    Touch  ui-test-results.log
 
-    ${head_commit}=  Run  git log -1 --pretty=format:%h
-    ${email_title}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  vic ui nightly run ${buildNumber}  ELSE  Set Variable  vic integration test run ${head_commit}
-    ${whoami}=  Run  whoami
-    ${report_recipients}=  Catenate  SEPARATOR=\n
-    ...    To: kjosh@vmware.com
-    ...    To: joshuak@vmware.com
-    ...    To: cfalcone@vmware.com
-    ...    To: kmacdonell@vmware.com
-    ...    To: mwilliamson@vmware.com
-    ...    To: mikeh@vmware.com
-    ...    To: mhagen@vmware.com
-    ...    To: carellie@vmware.com
-    ${email_to}=  Run Keyword If  ${IS_NIGHTLY_TEST}  Set Variable  ${report_recipients}  ELSE  Set Variable  To: ${whoami}@vmware.com
-    ${email_body}=  Catenate  SEPARATOR=\n
-    ...    ${email_to}
-    ...    Subject: ${email_title}
-    ...    From: VIC Lifecycle - UI <kjosh@vmware.com>
-    ...    MIME-Version: 1.0
-    ...    Content-Type: multipart/mixed; boundary="${boundary}"${\n}
-    ...    --${boundary}
-    ...    Content-Type: text/plain; charset="utf-8"
-    ...    Content-Disposition: inline${\n}
-    ...    hello, this is an auto-generated vic ui test report. please see the attachment to find out more details.
-    ...    elapsed time: ${elapsed_time} seconds
-    ...    ${SPACE}${\n}
-    ...    --- tests run ---${\n}${\n}
+    # go through each folder and extract results
+    @{cases}=  OperatingSystem.List Directories In Directory  ui-test-results
+    ${keys_installer}=  Get Dictionary Keys  ${INSTALLER_TEST_RESULTS_DICT}
+    ${keys_uninstaller}=  Get Dictionary Keys  ${UNINSTALLER_TEST_RESULTS_DICT}
+    ${keys_upgrader}=  Get Dictionary Keys  ${UPGRADER_TEST_RESULTS_DICT}
 
-    Create File  email_body.txt  ${email_body}
-    @{installer_result_keys}=  Get Dictionary Keys    ${INSTALLER_TEST_RESULTS_DICT}
-    @{uninstaller_result_keys}=  Get Dictionary Keys  ${UNINSTALLER_TEST_RESULTS_DICT}
-    @{upgrader_result_keys}=  Get Dictionary Keys     ${UPGRADER_TEST_RESULTS_DICT}
-    @{plugin_result_keys}=  Get Dictionary Keys       ${PLUGIN_TEST_RESULTS_DICT}
+    Append To File  ui-test-results.log  ** Installer script **\n
+    :FOR  ${case}  IN  @{keys_installer}
+    \    ${pf}=  Get From Dictionary  ${INSTALLER_TEST_RESULTS_DICT}  ${case}
+    \    Append To File  ui-test-results.log  ${pf}\n
 
-    :FOR  ${key}  IN  @{installer_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${INSTALLER_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
+    Append To File  ui-test-results.log  \n** Uninstaller script **\n
+    :FOR  ${case}  IN  @{keys_uninstaller}
+    \    ${pf}=  Get From Dictionary  ${UNINSTALLER_TEST_RESULTS_DICT}  ${case}
+    \    Append To File  ui-test-results.log  ${pf}\n
 
-    :FOR  ${key}  IN  @{uninstaller_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${UNINSTALLER_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
-
-    :FOR  ${key}  IN  @{upgrader_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${UPGRADER_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
-
-    :FOR  ${key}  IN  @{plugin_result_keys}
-    \    ${remarks}=  Get From Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${key}
-    \    Append To File  email_body.txt  ${remarks}${\n}
-
-    ${installer_notes_str}=  Run  cat ${TEST_SCRIPTS_ROOT}/18-1-VIC-UI-Installer.robot | grep "# NOTE" | sed -e "s/^[[:space:]]*//g"
-    ${uninstaller_notes_str}=  Run  cat ${TEST_SCRIPTS_ROOT}/18-2-VIC-UI-Uninstaller.robot | grep "# NOTE" | sed -e "s/^[[:space:]]*//g"
-    ${upgrader_notes_str}=  Run  cat ${TEST_SCRIPTS_ROOT}/18-3-VIC-UI-Upgrader.robot | grep "# NOTE" | sed -e "s/^[[:space:]]*//g"
-
-    @{installer_notes}=  Split String  ${installer_notes_str}  ${\n}
-    @{uninstaller_notes}=  Split String  ${uninstaller_notes_str}  ${\n}
-    @{upgrader_notes}=  Split String  ${upgrader_notes_str}  ${\n}
-
-    ${installer_notes_len}=  Get Length  ${installer_notes}
-    ${uninstaller_notes_len}=  Get Length  ${uninstaller_notes}
-    ${upgrader_notes_len}=  Get Length  ${upgrader_notes}
-
-    Run Keyword If  ${installer_notes_len} > 0  Append To File  email_body.txt  \n**Installer Test Notes**${\n}
-    :FOR  ${line}  IN  @{installer_notes}
-    \    ${bulletpointified}=  Replace String Using Regexp  ${line}  \#\\sNOTE\:  -
-    \    Append To File  email_body.txt  ${bulletpointified}${\n}
-
-    Run Keyword If  ${uninstaller_notes_len} > 0  Append To File  email_body.txt  \n**Uninstaller Test Notes**${\n}
-    :FOR  ${line}  IN  @{uninstaller_notes}
-    \    ${bulletpointified}=  Replace String Using Regexp  ${line}  \#\\sNOTE\:  -
-    \    Append To File  email_body.txt  ${bulletpointified}${\n}
-
-    Run Keyword If  ${upgrader_notes_len} > 0  Append To File  email_body.txt  \n**Upgrader Test Notes**${\n}
-    :FOR  ${line}  IN  @{upgrader_notes}
-    \    ${bulletpointified}=  Replace String Using Regexp  ${line}  \#\\sNOTE\:  -
-    \    Append To File  email_body.txt  ${bulletpointified}${\n}
-
-    ${email_zip_section}=  Catenate  SEPARATOR=\n
-    ...    ${\n}--${boundary}
-    ...    Content-Type: application/zip
-    ...    Content-Transfer-Encoding: base64
-    ...    Content-Disposition: attachment; filename="${zip_filename}"
-    ...    ${\n}${testresults_base64}${\n}
-    ...    --${boundary}--
-
-    Run Keyword If  ${results_dir_exists}  Append To File  email_body.txt  ${email_zip_section}
-    Log To Console  Emailing run report...
-    ${rc}=  Run And Return Rc  /usr/sbin/sendmail -t < email_body.txt
-    Should Be Equal As Integers  ${rc}  0
+    Append To File  ui-test-results.log  \n** Upgrader script **\n
+    :FOR  ${case}  IN  @{keys_upgrader}
+    \    ${pf}=  Get From Dictionary  ${UPGRADER_TEST_RESULTS_DICT}  ${case}
+    \    Append To File  ui-test-results.log  ${pf}\n
 
 *** Test Cases ***
 Launch Installer Tests
@@ -490,14 +381,16 @@ Launch Upgrader Tests
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Upgrader Test,${config}
     \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
-Launch Plugin Tests
-    :FOR  ${config}  IN  @{PLUGIN_TEST_MATRIX}
-    \    Run Plugin Test With Config  ${config}
-    \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  ${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
+# All H5 Client plugin tests are now migrated to Protractor
+# Launch Plugin Tests
+#     :FOR  ${config}  IN  @{PLUGIN_TEST_MATRIX}
+#     \    Run Plugin Test With Config  ${config}
+#     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  ${config}
+#     \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Report Results
-    Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Test Report
-    Send Email
+    # TODO: revisit later
+    # Run Keyword If  ${IS_NIGHTLY_TEST}  Generate Excel Report
+    Generate Report
     Run Keyword Unless  ${ALL_TESTS_PASSED}  Log To Console  At least one test failed!
     Should Be True  ${ALL_TESTS_PASSED}

@@ -456,7 +456,6 @@ export class CreateVchWizardComponent implements OnInit {
             value: parseInt(payload.security.certificateKeySize, 10),
             units: 'bit'
           },
-          organization: [payload.security.organization],
           cname: payload.security.tlsCname
         }
       }

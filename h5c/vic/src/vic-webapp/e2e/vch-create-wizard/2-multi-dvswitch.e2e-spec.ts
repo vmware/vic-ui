@@ -1,5 +1,6 @@
+
 /*
- Copyright 2017 VMware, Inc. All Rights Reserved.
+ Copyright 2018 VMware, Inc. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,27 +15,30 @@
  limitations under the License.
 */
 
-import { browser, by, element } from 'protractor';
+import { by, browser, element } from 'protractor';
 
-import { JASMINE_TIMEOUT } from '../src/app/testing/jasmine.constants';
-import { VicWebappPage } from './app.po';
+import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
+import { VicWebappPage } from '../app.po';
+import {
+  defaultTimeout,
+  sectionSummary,
+  sectionOpsUser,
+  sectionRegistry,
+  sectionSecurity,
+  sectionNetworks,
+  sectionStorage,
+  sectionCompute,
+  modalWizard,
+  dataGridCell,
+  iframeTabs,
+  namePrefix
+} from './common';
 
-describe('vic-webapp', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 2;
+describe('VCH Create Wizard with multiple DV Switches', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
   let page: VicWebappPage;
   let specRunId: number;
-  const defaultTimeout = 5000;
-  const sectionSummary = 'section#summary';
-  const sectionOpsUser = 'section#ops-user';
-  const sectionRegistry = 'section#registry';
-  const sectionSecurity = 'section#security';
-  const sectionNetworks = 'section#networks';
-  const sectionStorage = 'section#storage-capacity';
-  const sectionCompute = 'section#compute-capacity';
-  const modalWizard = '.clr-wizard-stepnav';
-  const dataGridCell = '.datagrid-cell';
-  const iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
-  const namePrefix = 'virtual-container-host-';
+  const DVS_TEST_ESX_HOST_IP = process.env.TEST_ESX1_IP || '10.162.46.79';
 
   beforeAll(() => {
     specRunId = Math.floor(Math.random() * 1000) + 100;
@@ -42,6 +46,10 @@ describe('vic-webapp', () => {
 
   beforeEach(() => {
     page = new VicWebappPage();
+  });
+
+  afterAll(() => {
+    page.logOut();
   });
 
   it('should redirect to login', () => {
@@ -56,7 +64,6 @@ describe('vic-webapp', () => {
   });
 
   it('should navigate to vsphere home', () => {
-    browser.waitForAngularEnabled(true);
     page.navigateToHome();
     expect(browser.getCurrentUrl()).toContain('vsphere');
   });
@@ -68,7 +75,6 @@ describe('vic-webapp', () => {
 
   it('should navigate to summary tab', () => {
     page.navigateToSummaryTab();
-    expect(browser.getCurrentUrl()).toContain('vic-root');
   });
 
   it('should navigate to vch tab', () => {
@@ -83,7 +89,8 @@ describe('vic-webapp', () => {
   });
 
   it('should input vch name', () => {
-    page.sendKeys('#nameInput', '-' + specRunId);
+    page.clear('#nameInput');
+    page.sendKeys('#nameInput', namePrefix + specRunId);
   });
 
   it('should complete general step', () => {
@@ -93,7 +100,7 @@ describe('vic-webapp', () => {
     expect(element(by.css(sectionCompute)).isPresent()).toBe(true);
   });
 
-  it('should select a compute resource', () => {
+  it('should select "Cluster" as compute resource', () => {
     page.selectComputeResource();
   });
 
@@ -121,6 +128,32 @@ describe('vic-webapp', () => {
 
   it('should select a public network', () => {
     page.selectPublicNetwork();
+  });
+
+  it('should navigate back to compute capacity step', () => {
+    page.clickByText('Button', 'Back');
+    page.clickByText('Button', 'Back');
+    page.waitForElementToBePresent(sectionCompute);
+    expect(element(by.css(sectionCompute)).isPresent()).toBe(true);
+  });
+
+  it('should select "' + DVS_TEST_ESX_HOST_IP + '" as compute resource', () => {
+    page.selectComputeResource(DVS_TEST_ESX_HOST_IP);
+    page.clickByText('Button', 'Next');
+    page.waitForElementToBePresent(sectionStorage);
+    expect(element(by.css(sectionStorage)).isPresent()).toBe(true);
+    page.selectDatastore();
+    page.clickByText('Button', 'Next');
+    page.waitForElementToBePresent(sectionNetworks);
+    expect(element(by.css(sectionNetworks)).isPresent()).toBe(true);
+  });
+
+  it('should select "net1" as bridge network', () => {
+    page.selectBridgeNetwork('net1');
+  });
+
+  it('should select "net2" as public network', () => {
+    page.selectPublicNetwork('net2');
   });
 
   it('should complete networks step', () => {
@@ -167,14 +200,25 @@ describe('vic-webapp', () => {
     page.waitForElementToBePresent(dataGridCell);
     browser.sleep(defaultTimeout);
     const newVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.getText().then(function(text) {
-        if (newVch.test(text)) {
-          vchFound = true;
+    element.all(by.css(dataGridCell)).each(function(el, index) {
+      el.isPresent().then(present => {
+        if (present) {
+          el.getText().then(function(text) {
+            if (newVch.test(text)) {
+              vchFound = true;
+            }
+          });
         }
-      });
+      })
     }).then(function() {
       expect(vchFound).toBeTruthy();
+    });
+  });
+
+  it('should verify the new vch has properly started', () => {
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Reconfigure virtual machine').then((status) => {
+      expect(status).toBeTruthy();
     });
   });
 
@@ -184,19 +228,24 @@ describe('vic-webapp', () => {
 
 
   it('should verify the created vch has been deleted', () => {
-    browser.ignoreSynchronization = true;
     let vchFound = false;
-    browser.switchTo().defaultContent();
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
-    const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
-    element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
-      console.log(vchClrDgActionXpath, present);
-      vchFound = present;
+    const deletedVch = new RegExp(namePrefix + specRunId);
+    element.all(by.css(dataGridCell)).each(function(element, index) {
+      element.isPresent().then(present => {
+        if (present) {
+          element.getText().then(function(text) {
+            if (deletedVch.test(text)) {
+              vchFound = true;
+            }
+          });
+        }
+      })
     });
-
     browser.sleep(defaultTimeout);
+    browser.switchTo().defaultContent();
+    page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
     expect(vchFound).toBeFalsy();
   });
-
 });

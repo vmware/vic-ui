@@ -16,15 +16,18 @@
 Documentation  Common keywords used by VIC UI installation & uninstallation test suites
 Resource  ../../resources/Util.robot
 Library  VicUiInstallPexpectLibrary.py
+Library  XML
 
 *** Variables ***
-${MACOS_HOST_IP}                      10.20.121.66
+${MACOS_HOST_IP}                      10.25.201.232
 ${UBUNTU_HOST_IP}                     10.20.121.145
 ${WINDOWS_HOST_IP}                    10.25.200.225
 ${BUILD_3620759_IP}                   10.25.200.237
-${BUILD_3634791_IP}                   10.25.200.245
+${BUILD_3634791_IP}                   10.25.201.233
+${VC_FINGERPRINT_3634791}             39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
 ${BUILD_5310538_IP}                   10.25.200.231
-${BUILD_5318154_IP}                   10.25.200.243
+${BUILD_7312210_IP}                   10.25.201.234
+${VC_FINGERPRINT_7312210}             FE:31:A9:D1:48:D7:0E:1D:44:75:F8:D9:64:50:8B:B9:30:93:EF:63
 ${TEST_DATASTORE}                     datastore1
 ${TEST_DATACENTER}                    /Datacenter
 ${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
@@ -32,7 +35,7 @@ ${MACOS_HOST_USER}                    browseruser
 ${MACOS_HOST_PASSWORD}                ca*hc0w
 ${WINDOWS_HOST_USER}                  IEUser
 ${WINDOWS_HOST_PASSWORD}              Passw0rd!
-${vic_macmini_fileserver_url}         https://10.20.121.66:3443/vsphere-plugins/
+${vic_macmini_fileserver_url}         https://${MACOS_HOST_IP}:3443/vsphere-plugins/
 ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:8B:86:5F:AD:79:CE
 ${GCP_DOWNLOAD_PATH}                  https://storage.googleapis.com/vic-engine-builds/
 ${SDK_PACKAGE_ARCHIVE}                vic-ui-sdk.tar.gz
@@ -43,8 +46,11 @@ ${ENV_HTML_SDK_HOME}                  /tmp/sdk/html-client-sdk
 *** Keywords ***
 Set Fileserver And Thumbprint In Configs
     [Arguments]  ${fake}=${FALSE}
-    ${fileserver_url}=  Run Keyword If  ${fake} == ${TRUE}  Set Variable  https://256.256.256.256/  ELSE  Set Variable  ${vic_macmini_fileserver_url}
-    ${fileserver_thumbprint}=  Run Keyword If  ${fake} == ${TRUE}  Set Variable  ab:cd:ef  ELSE  Set Variable  ${vic_macmini_fileserver_thumbprint}
+    Run Keyword If  ${fake} == ${FALSE}  Create File  ${UI_INSTALLER_PATH}/configs  ${configs}
+    Return From Keyword If  ${fake} == ${FALSE}
+
+    ${fileserver_url}=  Set Variable  https://256.256.256.256/
+    ${fileserver_thumbprint}=  Set Variable  ab:cd:ef
     ${results}=  Replace String Using Regexp  ${configs}  VIC_UI_HOST_URL=.*  VIC_UI_HOST_URL=\"${fileserver_url}\"
     ${results}=  Replace String Using Regexp  ${results}  VIC_UI_HOST_THUMBPRINT=.*  VIC_UI_HOST_THUMBPRINT=\"${fileserver_thumbprint}\"
     Create File  ${UI_INSTALLER_PATH}/configs  ${results}
@@ -97,12 +103,12 @@ Cleanup Dangling VMs On VIC UI Test Server
     \   ${rc}  ${output}=  Delete VIC Machine  ${vm}  ${vic-machine-binary}
 
 Set Absolute Script Paths
+    [Arguments]  ${UI_INSTALLERS_ROOT}=../../../scripts
     ${rc}  ${out}=  Run And Return Rc And Output  ver
     ${is_windows}=  Run Keyword And Return Status  Should Contain  ${out}  Windows
-    ${UI_INSTALLERS_ROOT}=  Set Variable  ../../../scripts
     Run Keyword If  ${is_windows}  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/vCenterForWindows  ELSE  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/VCSA
     Should Exist  ${UI_INSTALLER_PATH}
-    ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs
+    ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs-%{TEST_VCSA_BUILD}
     Set Suite Variable  ${configs}  ${configs_content}
     Run Keyword If  %{TEST_VSPHERE_VER} == 65  Set Suite Variable  ${plugin_folder}  plugin-packages  ELSE  Set Suite Variable  ${plugin_folder}  vsphere-client-serenity
 
@@ -132,7 +138,7 @@ Force Install Vicui Plugin
     Run Keyword If  ${is_windows}  Interact With Script  install  -f -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True  ELSE  Install Plugin Successfully  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}  None  ${TRUE}
     Run Keyword Unless  ${is_windows}  Reset Configs
     ${output}=  OperatingSystem.GetFile  install.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  exited successfully
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
     Run Keyword Unless  ${passed}  Move File  install.log  fail-force-install-vicui-plugin.log
     Should Be True  ${passed}
 
@@ -216,3 +222,127 @@ Cleanup Windows Testbed
 
     ${output}=  Run  rm -rf ${files_to_remove} 2>&1
     Log  Cleaning up Windows testbed...\n${output}
+
+Run GOVC
+    [Arguments]  ${cmd_options}
+    ${rc}  ${output}=  Run And Return Rc And Output  govc ${cmd_options}
+    Log  ${output}
+    Should Be Equal As Integers  ${rc}  0
+    [Return]  ${rc}
+
+Install VIC Product OVA
+    [Arguments]  ${vcenter-build}  ${target-vc-ip}  ${ova-esx-host-ip}  ${ova-esx-datastore}
+    Variable Should Exist  ${ova_url}
+    ${ova-name}=  Fetch From Right  ${ova_url}  /
+    Log  OVA filename is: ${ova-name}
+    Log  Target vSphere is located at: ${target-vc-ip}
+
+    # set ova name global
+    Set Global Variable  ${ova_name}  ${ova-name}
+
+    # set the local path to ova global
+    Set Global Variable  ${ova_local_path}  /vic/${ova-name}
+
+    Set Environment Variable  GOVC_URL  ${target-vc-ip}
+    Set Environment Variable  GOVC_INSECURE  1
+    Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
+    Set Environment Variable  GOVC_PASSWORD  Admin!23
+    ${rc}  ${ova_ip}=  Run And Return Rc And Output  govc vm.ip ${ova-name}
+    ${ova_found}=  Run Keyword And Return Status  Should Be True  ${rc} == 0
+
+    # if ova is already found in the target VC, get IP and break out of the keyword
+    Run Keyword If  ${ova_found}  Set Environment Variable  OVA_IP_${vcenter-build}  ${ova_ip}
+    Return From Keyword If  ${ova_found}
+
+    # check if OVA file is locally available already and download if there's none
+    ${ova_exists}=  Run Keyword And Return Status  OperatingSystem.File Should Exist  ${ova_local_path}
+    Run Keyword If  ${ova_exists}  Log To Console  OVA file is already found at ${ova_local_path}
+    Run Keyword Unless  ${ova_exists}  Download VIC OVA  ${ova_url}  ${ova_local_path}    
+
+    Log To Console  \nInstalling VIC appliance...
+    Log To Console  \novftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'\n
+    ${output}=  Run  ovftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'
+    Should Contain  ${output}  Completed successfully
+    Should Contain  ${output}  Received IP address:
+
+    ${output}=  Split To Lines  ${output} 
+    :FOR  ${line}  IN  @{output}
+    \   ${status}=  Run Keyword And Return Status  Should Contain  ${line}  Received IP address:
+    \   ${ip}=  Run Keyword If  ${status}  Fetch From Right  ${line}  ${SPACE}
+    \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP_${vcenter-build}  ${ip}
+
+    Log To Console  \nWaiting for Getting Started Page to Come Up...
+    :FOR  ${i}  IN RANGE  24
+    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP_${vcenter-build}}:9443/register 2>/dev/null
+    \   Exit For Loop If  '200' in '''${out}'''
+    \   Sleep  5s
+    Log To Console  ${rc}
+    Log To Console  ${out}
+    Should Contain  ${out}  200
+
+    Log  %{OVA_IP_${vcenter-build}}
+
+Download VIC OVA
+    [Arguments]  ${url}  ${local_path}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk ${url} -o ${local_path}
+    Log  ${out}
+    Should Be True  ${rc} == 0
+    OperatingSystem.File Should Exist  ${local_path}
+    Log To Console  OVA successfully downloaded
+
+Cleanup VIC Product OVA
+    [Arguments]  ${target-vc-ip}  ${ova-esx-datastore}  ${ova_target_vm_name}
+    Log To Console  \nCleaning up VIC appliance...
+    ${rc}=  Wait Until Keyword Succeeds  10x  5s  Run GOVC  vm.destroy ${ova_target_vm_name}
+    Run Keyword And Ignore Error  Run GOVC  datastore.rm "/${ova-esx-datastore}/vm/${ova_target_vm_name}"
+    Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${target-vc-ip}
+
+Get Vic Engine Binaries
+    Log  Fetching the latest VIC Engine tar ball...
+    Log To Console  \nDownloading VIC engine for VCSA 6.0u2...
+    ${target_dir}=  Set Variable  bin    
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.0u2  /tmp/vic.tar.gz
+    Should Be True  ${results}
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.0 instance
+    Prepare VIC Engine Binaries  3634791
+
+    Log To Console  \nDownloading VIC engine for VCSA 6.5u1d...
+    ${target_dir}=  Set Variable  bin
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5u1d  /tmp/vic.tar.gz
+    Should Be True  ${results}
+    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.5 instance
+    Prepare VIC Engine Binaries  7312210
+
+Download VIC Engine Tarball From OVA
+    [Arguments]  ${vcenter-build}  ${filename}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_${vcenter-build}}:9443/files
+    Should Be Equal As Integers  ${rc}  0
+    ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz)
+    Should Not Be Empty  ${tarball_file}
+    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_${vcenter-build}}:9443/files/${tarball_file} -O ${filename}
+    Should Be Equal As Integers  ${rc}  0
+    OperatingSystem.File Should Exist  ${filename}
+    Set Suite Variable  ${buildNumber}  ${tarball_file}
+    Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${tarball_file}
+    [Return]  ${rc} == 0
+
+Prepare VIC Engine Binaries
+    [Arguments]  ${vc-build}
+    Log  Extracting binary files...
+    ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
+    ${rc2}=  Run And Return Rc  tar xvzf /tmp/vic.tar.gz -C ui-nightly-run-bin --strip 1
+    # ${rc3}=  Run And Return Rc  tar xvzf ${LATEST_VIC_UI_TARBALL} -C ui-nightly-run-bin --strip 1
+    Should Be Equal As Integers  ${rc1}  0
+    Should Be Equal As Integers  ${rc2}  0
+    # Should Be Equal As Integers  ${rc3}  0
+    # copy vic-ui-linux and plugin binaries to where test scripts will access them
+    Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
+    Run  cp -rf ui-nightly-run-bin/ui/* scripts/
+    Run  cp -rf scripts/ui/vCenterForWindows/utils* 2>/dev/null
+    Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
+    Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
+
+Open SSH Connection
+  [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
+  Open Connection  ${host}  port=${port}  
+  Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
