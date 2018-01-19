@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
@@ -35,6 +35,8 @@ export class NetworksComponent implements OnInit {
   public inAdvancedMode = false;
   public portgroupsLoading = true;
   public portgroups: any[] = [];
+
+  @Input() resourceObjName: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -134,9 +136,21 @@ export class NetworksComponent implements OnInit {
     });
   }
 
+  loadPortgroups(computeResourceObjName: string) {
+    this.portgroupsLoading = true;
+    this.createWzService.getDistributedPortGroups(computeResourceObjName)
+      .subscribe(v => {
+        this.portgroups = v;
+        this.form.get('bridgeNetwork').setValue('');
+        this.form.get('publicNetwork').setValue('');
+        this.form.get('clientNetwork').setValue('');
+        this.form.get('managementNetwork').setValue('');
+        this.portgroupsLoading = false;
+      }, err => console.error(err));
+  }
   onPageLoad() {
-
     if (this.portgroups.length) {
+      this.loadPortgroups(this.resourceObjName);
       return;
     }
 
@@ -261,16 +275,8 @@ export class NetworksComponent implements OnInit {
         });
       });
 
-    // load portgroups
-    this.createWzService.getDistributedPortGroups()
-      .subscribe(v => {
-        this.portgroups = v;
-        this.form.get('bridgeNetwork').setValue('');
-        this.form.get('publicNetwork').setValue('');
-        this.form.get('clientNetwork').setValue('');
-        this.form.get('managementNetwork').setValue('');
-        this.portgroupsLoading = false;
-      }, err => console.error(err));
+      // load portgroups
+      this.loadPortgroups(this.resourceObjName);
   }
 
   /**

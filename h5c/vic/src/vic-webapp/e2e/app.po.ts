@@ -15,9 +15,12 @@ import { browser, by, element, ElementFinder } from 'protractor';
 
 export class VicWebappPage {
 
+  private h5cActionMenuToggle = 'vc-action-menu-toggle';
+  private h5cActionMenuLogOut = 'vc-action-menu-item:nth-of-type(3)';
   private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
   private datacenterTreenodeCaret = 'button.clr-treenode-caret';
+  private firstDcTreenodeCaretXpath = `(//button[contains(@class,'clr-treenode-caret')])[1]/clr-icon[contains(@dir, 'right')]`;
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
@@ -59,6 +62,12 @@ export class VicWebappPage {
     this.sendKeys(this.inputPassword, this.password);
     // submit
     this.clickByCSS(this.submit);
+  }
+
+  logOut() {
+    this.clickByCSS(this.h5cActionMenuToggle);
+    this.waitForElementToBePresent(this.h5cActionMenuLogOut);
+    this.clickByCSS(this.h5cActionMenuLogOut);
   }
 
   waitUntilStable() {
@@ -105,26 +114,30 @@ export class VicWebappPage {
     this.switchFrame(this.iframeModal);
   }
 
-  selectComputeResource() {
+  selectComputeResource(name: string = 'Cluster') {
     this.waitForElementToBePresent(this.datacenterTreenodeCaret);
-    this.clickByCSS(this.datacenterTreenodeCaret);
-    this.clickByCSS(this.buttonComputeResource);
+    element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
+      if (collapsed) {
+        this.clickByCSS(this.datacenterTreenodeCaret);
+      }
+    });
+
+    this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
   }
 
-  selectDatastore() {
+  selectDatastore(name: string = 'datastore1') {
     this.waitForElementToBePresent(this.selectorImageStore);
-    this.clickByText(this.selectorImageStore + ' option', 'datastore1');
-    // this.clickByCSS(this.selectorImageStore + ' option:nth-child(3)');
+    this.clickByText(this.selectorImageStore + ' option', name);
   }
 
-  selectBridgeNetwork() {
+  selectBridgeNetwork(name: string = 'bridge') {
     this.waitForElementToBePresent(this.selectorBridgeNetwork);
-    this.clickByText(this.selectorBridgeNetwork + ' option', 'bridge');
+    this.clickByText(this.selectorBridgeNetwork + ' option', name);
   }
 
-  selectPublicNetwork() {
+  selectPublicNetwork(name: string = 'network') {
     this.waitForElementToBePresent(this.selectorPublicNetwork);
-    this.clickByText(this.selectorPublicNetwork + ' option', 'network');
+    this.clickByText(this.selectorPublicNetwork + ' option', name);
   }
 
   disableSecureAccess() {
@@ -185,6 +198,17 @@ export class VicWebappPage {
       } else {
         console.log(el + ' not found');
         return false;
+      }
+    });
+  }
+
+  clickByXpath(xpath) {
+    element(by.xpath(xpath)).isPresent().then(function(result) {
+      if (result) {
+        browser.driver.findElement(by.xpath(xpath)).click();
+      } else {
+        console.log(xpath + ' not found');
+        return false
       }
     });
   }
