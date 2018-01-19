@@ -15,6 +15,8 @@ import { browser, by, element, ElementFinder } from 'protractor';
 
 export class VicWebappPage {
 
+  private h5cActionMenuToggle = 'vc-action-menu-toggle';
+  private h5cActionMenuLogOut = 'vc-action-menu-item:nth-of-type(3)';
   private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
   private datacenterTreenodeCaret = 'button.clr-treenode-caret';
@@ -60,6 +62,12 @@ export class VicWebappPage {
     this.sendKeys(this.inputPassword, this.password);
     // submit
     this.clickByCSS(this.submit);
+  }
+
+  logOut() {
+    this.clickByCSS(this.h5cActionMenuToggle);
+    this.waitForElementToBePresent(this.h5cActionMenuLogOut);
+    this.clickByCSS(this.h5cActionMenuLogOut);
   }
 
   waitUntilStable() {

@@ -46,6 +46,10 @@ describe('VCH Create Wizard - Basic', () => {
     page = new VicWebappPage();
   });
 
+  afterAll(() => {
+    page.logOut();
+  });
+
   it('should redirect to login', () => {
     page.navigateTo();
     expect(browser.getCurrentUrl()).toContain('SSO');
