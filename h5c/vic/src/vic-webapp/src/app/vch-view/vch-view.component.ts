@@ -269,6 +269,11 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
           link.remove();
           this.isDgLoading = false;
         }, error => {
+          try {
+            error = error._body ? JSON.parse(error._body) : error;
+          } catch (e) {
+            console.error('error parsing:', e);
+          }
           this.error = error.message || 'Error downloading VCH certificate!';
           this.isDgLoading = false;
         });
