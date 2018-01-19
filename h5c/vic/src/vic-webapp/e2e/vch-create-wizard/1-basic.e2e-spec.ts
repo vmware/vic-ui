@@ -133,14 +133,13 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should complete security step', () => {
     page.disableSecureAccess();
-    // TODO: uncomment the following 7 lines once VIC product 1.3.1 OVA is released
-  //   page.clickByText('Button', 'Next');
-  //   // check if we made it to registry access section
-  //   page.waitForElementToBePresent(sectionRegistry);
-  //   expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
-  // });
+    page.clickByText('Button', 'Next');
+    // check if we made it to registry access section
+    page.waitForElementToBePresent(sectionRegistry);
+    expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
+  });
 
-  // it('should complete registry access step', () => {
+  it('should complete registry access step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to ops user section
     page.waitForElementToBePresent(sectionOpsUser);
