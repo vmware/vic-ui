@@ -21,7 +21,6 @@ Suite Teardown  Cleanup Testbed After Protractor Test Completes
 
 *** Variables ***
 ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
-${DVS_TEST_ESX_HOST_IP}  10.162.46.79
 
 *** Keywords ***
 Cleanup Testbed After Protractor Test Completes
@@ -43,6 +42,7 @@ Cleanup Testbed After Protractor Test Completes
     Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
 
     Run  govc object.destroy '/Datacenter/network/DSwitch 2'
+    Run  govc host.remove -dc=Datacenter -host.ip=%{TEST_ESX1_IP}
 
 
 *** Test Cases ***
@@ -54,6 +54,11 @@ Cleanup Testbed After Protractor Test Completes
     Set Global Variable  ${TEST_VC_USERNAME}  administrator@vsphere.local
     Set Global Variable  ${TEST_VC_PASSWORD}  Admin!23
 
+    # Add %{TEST_ESX1_IP} to VC
+    Run  govc host.remove -dc=Datacenter -host.ip=%{TEST_ESX1_IP}
+    ${rc}  ${out}=  Run And Return Rc And Output  govc host.add -dc=Datacenter -hostname %{TEST_ESX1_IP} -username root -password ca*hc0w -noverify
+    Should Be Equal As Integers  ${rc}  0
+
     # create a new distributed switch and add a new host
     Run  govc object.destroy '/Datacenter/network/DSwitch 2'
     ${rc}=  Run And Return Rc  govc dvs.create -dc=Datacenter 'DSwitch 2'
@@ -61,15 +66,17 @@ Cleanup Testbed After Protractor Test Completes
 
     # create port groups: net1, net2
     ${rc}  ${out}=  Run And Return Rc And Output  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs='DSwitch 2' net1
-    Should Be Equal As Integers  ${rc}  0
     Log To Console  ${out}
+    Should Be Equal As Integers  ${rc}  0
+
     ${rc}  ${out}=  Run And Return Rc And Output  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs='DSwitch 2' net2
-    Should Be Equal As Integers  ${rc}  0
     Log To Console  ${out}
-    # add ${DVS_TEST_ESX_HOST_IP} to DSwitch 2
-    ${rc}  ${out}=  Run And Return Rc And Output  govc dvs.add -dvs='DSwitch 2' -pnic=vmnic1 -host.ip=${DVS_TEST_ESX_HOST_IP} ${DVS_TEST_ESX_HOST_IP}
     Should Be Equal As Integers  ${rc}  0
+
+    # add %{TEST_ESX1_IP} to DSwitch 2
+    ${rc}  ${out}=  Run And Return Rc And Output  govc dvs.add -dvs='DSwitch 2' -pnic=vmnic1 -host.ip=%{TEST_ESX1_IP} %{TEST_ESX1_IP}
     Log To Console  ${out}
+    Should Be Equal As Integers  ${rc}  0
 
     # install the plugin only the first time
     Set Absolute Script Paths  ./scripts
@@ -80,7 +87,7 @@ Cleanup Testbed After Protractor Test Completes
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/2-multi-dvswitch.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && export TEST_ESX1_IP=%{TEST_ESX1_IP} && npm run e2e -- --specs=e2e/vch-create-wizard/2-multi-dvswitch.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 

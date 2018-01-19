@@ -38,8 +38,7 @@ describe('VCH Create Wizard with multiple DV Switches', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
   let page: VicWebappPage;
   let specRunId: number;
-  // TODO: set up an ESXi box and get its IP
-  const DVS_TEST_ESX_HOST_IP = '10.162.46.79';
+  const DVS_TEST_ESX_HOST_IP = process.env.TEST_ESX1_IP || '10.162.46.79';
 
   beforeAll(() => {
     specRunId = Math.floor(Math.random() * 1000) + 100;
