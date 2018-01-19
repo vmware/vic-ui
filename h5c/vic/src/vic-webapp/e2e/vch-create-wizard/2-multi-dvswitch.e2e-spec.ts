@@ -1,5 +1,6 @@
+
 /*
- Copyright 2017 VMware, Inc. All Rights Reserved.
+ Copyright 2018 VMware, Inc. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,7 +15,7 @@
  limitations under the License.
 */
 
-import { browser, by, element } from 'protractor';
+import { by, browser, element } from 'protractor';
 
 import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
@@ -33,10 +34,11 @@ import {
   namePrefix
 } from './common';
 
-describe('VCH Create Wizard - Basic', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
+describe('VCH Create Wizard with multiple DV Switches', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
   let page: VicWebappPage;
   let specRunId: number;
+  const DVS_TEST_ESX_HOST_IP = process.env.TEST_ESX1_IP || '10.162.46.79';
 
   beforeAll(() => {
     specRunId = Math.floor(Math.random() * 1000) + 100;
@@ -98,7 +100,7 @@ describe('VCH Create Wizard - Basic', () => {
     expect(element(by.css(sectionCompute)).isPresent()).toBe(true);
   });
 
-  it('should select a compute resource', () => {
+  it('should select "Cluster" as compute resource', () => {
     page.selectComputeResource();
   });
 
@@ -126,6 +128,32 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should select a public network', () => {
     page.selectPublicNetwork();
+  });
+
+  it('should navigate back to compute capacity step', () => {
+    page.clickByText('Button', 'Back');
+    page.clickByText('Button', 'Back');
+    page.waitForElementToBePresent(sectionCompute);
+    expect(element(by.css(sectionCompute)).isPresent()).toBe(true);
+  });
+
+  it('should select "' + DVS_TEST_ESX_HOST_IP + '" as compute resource', () => {
+    page.selectComputeResource(DVS_TEST_ESX_HOST_IP);
+    page.clickByText('Button', 'Next');
+    page.waitForElementToBePresent(sectionStorage);
+    expect(element(by.css(sectionStorage)).isPresent()).toBe(true);
+    page.selectDatastore();
+    page.clickByText('Button', 'Next');
+    page.waitForElementToBePresent(sectionNetworks);
+    expect(element(by.css(sectionNetworks)).isPresent()).toBe(true);
+  });
+
+  it('should select "net1" as bridge network', () => {
+    page.selectBridgeNetwork('net1');
+  });
+
+  it('should select "net2" as public network', () => {
+    page.selectPublicNetwork('net2');
   });
 
   it('should complete networks step', () => {
@@ -203,16 +231,21 @@ describe('VCH Create Wizard - Basic', () => {
     let vchFound = false;
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
-    const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
-    element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
-      console.log(vchClrDgActionXpath, present);
-      vchFound = present;
+    const deletedVch = new RegExp(namePrefix + specRunId);
+    element.all(by.css(dataGridCell)).each(function(element, index) {
+      element.isPresent().then(present => {
+        if (present) {
+          element.getText().then(function(text) {
+            if (deletedVch.test(text)) {
+              vchFound = true;
+            }
+          });
+        }
+      })
     });
-
     browser.sleep(defaultTimeout);
     browser.switchTo().defaultContent();
     page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
     expect(vchFound).toBeFalsy();
   });
-
 });

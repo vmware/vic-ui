@@ -110,7 +110,9 @@
     </ng-template>
     <ng-template clrPageNavTitle>Networks</ng-template>
 
-    <vic-vch-creation-networks #networksStep></vic-vch-creation-networks>
+    <vic-vch-creation-networks #networksStep
+                               [resourceObjName]="computeCapacityStep.selectedObjectName">
+    </vic-vch-creation-networks>
 
   </clr-wizard-page>
 
