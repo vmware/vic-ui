@@ -246,7 +246,7 @@ Predeploy Vc And Esx
     Environment Variable Should Be Set  TEST_RESOURCE
     Set Environment Variable  GOVC_INSECURE  1
     @{VSPHERE_BUILDS_LIST}=  Create List
-    Append To List  ${VSPHERE_BUILDS_LIST}  60-3620759-3634791  65-5310538-7312210
+    Append To List  ${VSPHERE_BUILDS_LIST}  65-5310538-7312210
 
     Log To Console  \n==============================================================================
     Log To Console  This script will destroy all vSphere 6.0 and 6.5 instances plus Windows Browser VM

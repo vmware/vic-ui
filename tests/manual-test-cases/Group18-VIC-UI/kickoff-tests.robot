@@ -38,7 +38,6 @@ Prepare Testbed
     Check Working Dir
     Check Drone
     Check Govc
-    Install VIC Product OVA  6.0u2  ${BUILD_3634791_IP}  %{OVA_ESX_IP_VC60U2}  %{OVA_ESX_DATASTORE_VC60U2}
     Install VIC Product OVA  6.5u1d  ${BUILD_7312210_IP}  %{OVA_ESX_IP_VC65U1D}  %{OVA_ESX_DATASTORE_VC65U1D}
     Get Vic Engine Binaries
     Setup Test Matrix
@@ -114,11 +113,8 @@ Setup Test Matrix
     # installer test matrix
     @{installer_test_config_matrix}=  Create List
     &{installer_test_results_dict}=  Create Dictionary
-    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Ubuntu
     Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Ubuntu
-    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Mac
     Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Mac
-    Append To List  ${installer_test_config_matrix}  60,3620759,3634791,Windows
     Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${INSTALLER_TEST_MATRIX}        ${installer_test_config_matrix}
     Set Global Variable  ${INSTALLER_TEST_RESULTS_DICT}  ${installer_test_results_dict}
@@ -126,11 +122,8 @@ Setup Test Matrix
     # uninstaller test matrix
     @{uninstaller_test_config_matrix}=  Create List
     &{uninstaller_test_results_dict}=  Create Dictionary
-    Append To List  ${uninstaller_test_config_matrix}  60,3620759,3634791,Ubuntu
     Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Ubuntu
-    Append To List  ${uninstaller_test_config_matrix}  60,3620759,3634791,Mac
     Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Mac
-    Append To List  ${uninstaller_test_config_matrix}  60,3620759,3634791,Windows
     Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${UNINSTALLER_TEST_MATRIX}        ${uninstaller_test_config_matrix}
     Set Global Variable  ${UNINSTALLER_TEST_RESULTS_DICT}  ${uninstaller_test_results_dict}
@@ -138,11 +131,8 @@ Setup Test Matrix
     # upgrader test matrix
     @{upgrader_test_config_matrix}=  Create List
     &{upgrader_test_results_dict}=  Create Dictionary
-    Append To List  ${upgrader_test_config_matrix}  60,3620759,3634791,Ubuntu
     Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Ubuntu
-    Append To List  ${upgrader_test_config_matrix}  60,3620759,3634791,Mac
     Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Mac
-    Append To List  ${upgrader_test_config_matrix}  60,3620759,3634791,Windows
     Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Windows
     Set Global Variable  ${UPGRADER_TEST_MATRIX}        ${upgrader_test_config_matrix}
     Set Global Variable  ${UPGRADER_TEST_RESULTS_DICT}  ${upgrader_test_results_dict}
@@ -151,7 +141,6 @@ Setup Test Matrix
     @{plugin_test_config_matrix}=  Create List
     &{plugin_test_results_dict}=  Create Dictionary
     # vSphere H5C and Flex Client are not supported  on Linux
-    # https://docs.vmware.com/en/VMware-vSphere/6.0/com.vmware.vsphere.install.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
     # https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.upgrade.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
     Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Mac,Chrome,Chrome
     Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Mac,Firefox,Firefox
