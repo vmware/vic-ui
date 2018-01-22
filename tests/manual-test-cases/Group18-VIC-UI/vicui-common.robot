@@ -22,9 +22,6 @@ Library  XML
 ${MACOS_HOST_IP}                      10.25.201.232
 ${UBUNTU_HOST_IP}                     10.20.121.145
 ${WINDOWS_HOST_IP}                    10.25.200.225
-${BUILD_3620759_IP}                   10.25.200.237
-${BUILD_3634791_IP}                   10.25.201.233
-${VC_FINGERPRINT_3634791}             39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
 ${BUILD_5310538_IP}                   10.25.200.231
 ${BUILD_7312210_IP}                   10.25.201.234
 ${VC_FINGERPRINT_7312210}             FE:31:A9:D1:48:D7:0E:1D:44:75:F8:D9:64:50:8B:B9:30:93:EF:63
@@ -298,14 +295,6 @@ Cleanup VIC Product OVA
     Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${target-vc-ip}
 
 Get Vic Engine Binaries
-    Log  Fetching the latest VIC Engine tar ball...
-    Log To Console  \nDownloading VIC engine for VCSA 6.0u2...
-    ${target_dir}=  Set Variable  bin    
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.0u2  /tmp/vic.tar.gz
-    Should Be True  ${results}
-    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.0 instance
-    Prepare VIC Engine Binaries  3634791
-
     Log To Console  \nDownloading VIC engine for VCSA 6.5u1d...
     ${target_dir}=  Set Variable  bin
     ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5u1d  /tmp/vic.tar.gz
@@ -317,7 +306,7 @@ Download VIC Engine Tarball From OVA
     [Arguments]  ${vcenter-build}  ${filename}
     ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_${vcenter-build}}:9443/files
     Should Be Equal As Integers  ${rc}  0
-    ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz)
+    ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz|vic_\\d\.\\d\.\\d\-dev\.tar\.gz)
     Should Not Be Empty  ${tarball_file}
     ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_${vcenter-build}}:9443/files/${tarball_file} -O ${filename}
     Should Be Equal As Integers  ${rc}  0
