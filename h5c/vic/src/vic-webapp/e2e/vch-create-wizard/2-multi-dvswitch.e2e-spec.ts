@@ -35,7 +35,7 @@ import {
 } from './common';
 
 describe('VCH Create Wizard with multiple DV Switches', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
   let page: VicWebappPage;
   let specRunId: number;
   const DVS_TEST_ESX_HOST_IP = process.env.TEST_ESX1_IP || '10.162.46.79';
