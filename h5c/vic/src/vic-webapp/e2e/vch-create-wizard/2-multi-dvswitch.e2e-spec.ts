@@ -17,7 +17,7 @@
 
 import { by, browser, element } from 'protractor';
 
-import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
+import { PROTRACTOR_JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
 import {
   defaultTimeout,
@@ -35,7 +35,7 @@ import {
 } from './common';
 
 describe('VCH Create Wizard with multiple DV Switches', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = PROTRACTOR_JASMINE_TIMEOUT;
   let page: VicWebappPage;
   let specRunId: number;
   const DVS_TEST_ESX_HOST_IP = process.env.TEST_ESX1_IP || '10.192.103.50';

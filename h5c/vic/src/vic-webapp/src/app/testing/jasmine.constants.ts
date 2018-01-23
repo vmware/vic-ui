@@ -15,3 +15,4 @@
 */
 
 export const JASMINE_TIMEOUT = 30000;
+export const PROTRACTOR_JASMINE_TIMEOUT = 120000;
