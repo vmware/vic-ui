@@ -16,7 +16,7 @@
 
 import { browser, by, element } from 'protractor';
 
-import { JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
+import { PROTRACTOR_JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
 import {
   defaultTimeout,
@@ -34,7 +34,7 @@ import {
 } from './common';
 
 describe('VCH Create Wizard - Basic', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT * 4;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = PROTRACTOR_JASMINE_TIMEOUT;
   let page: VicWebappPage;
   let specRunId: number;
 
