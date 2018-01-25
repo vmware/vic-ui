@@ -1,7 +1,8 @@
 <!--
-Issues in this repository are for VIC Engine only
+Issues in this repository are for VIC-UI only
 
 Issues related to other components should be submitted to their respective projects:
+VIC Engine: https://github.com/vmware/vic/issues
 VIC Appliance (OVA): https://github.com/vmware/vic-product/issues
 Container Management Portal (Admiral): https://github.com/vmware/admiral/issues
 Container Registry (Harbor): https://github.com/vmware/harbor/issues
@@ -11,9 +12,9 @@ If you are unsure which component your issue relates to, submit it to https://gi
 Thank you for contributing to VIC Engine! Please review this checklist before submitting your issue.
 
 [ ] Search for duplicates before logging new issues
-    https://github.com/vmware/vic/issues?q=is%3Aopen+is%3Aissue
+    https://github.com/vmware/vic-ui/issues?q=is%3Aopen+is%3Aissue
 [ ] Questions are best asked and answered on Slack
-    https://vmwarecode.slack.com/messages/vic-engine (see https://github.com/vmware/vic/blob/master/CONTRIBUTING.md#community for details)
+    https://vmwarecode.slack.com/messages/vic-ui (see https://github.com/vmware/vic-ui/blob/master/CONTRIBUTING.md#community for details)
 -->
 
 #For stories, please include the information below:
@@ -31,13 +32,28 @@ Specific deliverable and actionable items that the story needs to deliver in ord
 
 #For bug reports, please include the information below:
 
-**VIC version:**
 
-x.y.z / master / commit ID
+**VIC-UI version:**
 
-**Deployment details:**
+If applicable: 
 
-What was the vic-machine create command used to deploy the VCH?
+[In the VIC plugin] > Summary tab > Version
+
+**Platform details:**
+
+Which platform are you using? (Windows, Mac OS, Linux, etc)
+
+**Browser details:**
+
+Which browser are you using? (IE, Chrome, Firefox, etc)
+
+**Additional details:**
+
+If applicable please include the following:
+
+Error messages. (In the UI or from the browser's developer tools)
+
+Request/response, including headers (from the browser's developer tools).
 
 **Steps to reproduce:**
 
@@ -47,7 +63,11 @@ What was the vic-machine create command used to deploy the VCH?
 
 **Logs:**
 
-* If you can access the VCH Admin portal, please download and attach the log bundle(s). See https://vmware.github.io/vic/assets/files/html/vic_admin/log_bundles.html for details.
-* If the VCH Admin portal is inaccessible, you can enable SSH to the VCH endpoint VM to obtain logs manually. See https://vmware.github.io/vic/assets/files/html/vic_admin/vch_ssh_access.html for details. The VCH logs will be under /var/log/vic/ on the VM.
+If applicable attach vsphere_client_virgo.log
+
+See:
+
+https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.monitoring.doc/GUID-7E10C58F-16EA-44AB-8AA0-8D4A66399879.html
+
 
 **Additional details as necessary:**
