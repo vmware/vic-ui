@@ -68,4 +68,19 @@ describe('RegistryAccessComponent', () => {
     // It should not remove the last one (only its contents) so the user can add a new entry.
     expect(component.form.get('registryCas')['controls'].length).toBe(1);
   });
+
+  it('should return null for invalid controlName', () => {
+    expect(component.addNewFormArrayEntry(null)).toBeUndefined();
+    expect(component.removeFormArrayEntry(null, 0)).toBeUndefined();
+  });
+
+  it('should clear file reader errors', () => {
+    component.clearFileReaderError();
+    expect(component.registryCaError).toBeFalsy();
+  });
+
+  it('should end with an valid form on step commit', () => {
+    component.onCommit();
+    expect(component.form.valid).toBe(true);
+  });
 });
