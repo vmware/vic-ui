@@ -163,4 +163,139 @@ describe('SecurityComponent', () => {
     expect(component.tlsCaError).toBeNull();
     expect(component.tlsServerError).toBeNull();
   }));
+
+  it('should handle adding a correctly formatted TLS Server Cert', () => {
+    const evt = new Event('change');
+    const certContent = `-----BEGIN CERTIFICATE-----
+MIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG
+A1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE
+MRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl
+YiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw
+ODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE
+CAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs
+ZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl
+8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID
+AQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx
+8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy
+2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0
+Hn+GmxZA
+-----END CERTIFICATE-----`;
+    spyOnProperty(evt, 'target', 'get').and.returnValue({
+      files: [
+        new File([certContent], 'foo.txt', { type: 'text/plain' })
+      ]
+    });
+
+    component.addFileContent(evt, 'tlsServerCert', 0, true);
+    expect(component.tlsServerError).toBeNull();
+  });
+
+  it('should handle a malformatted TLS Server Cert correctly', () => {
+    const evt = new Event('change');
+    const certContent = `oops!`;
+    spyOnProperty(evt, 'target', 'get').and.returnValue({
+      files: [
+        new File([certContent], 'foo.txt', { type: 'text/plain' })
+      ]
+    });
+
+    component.addFileContent(evt, 'tlsServerCert', 0, true);
+  });
+
+  it('should handle adding a correctly formatted TLS Server Key', () => {
+    const evt = new Event('change');
+    const keyContent = `-----BEGIN PRIVATE KEY-----
+MIIBUwIBADANBgkqhkiG9w0BAQEFAASCAT0wggE5AgEAAkEAlcIDtrVom915ITL4
+tPi5b5w/jQi2zQwRLyyIRdsfdGdDQTcUxPdh2dMioHH4Ap5kkYiNvOO2RjdgyTTV
+iyy4fwIDAQABAkAZGN2Udgxk6pXNKYSil3hEKxQ/Z3FzJY2PsU/ZHSLFV/JNWaFH
+jVNu9dQvmLOo7p5puUDi5Whszr8jTE1caVHBAiEA59ksZnb8ZI/MfZZh8K4v/Z1+
+mBRwvA6KRAvzhK7h6l8CIQClW7CN+JwTlsaKzprHlsLvWR0JBiqwgpwfF6jWhQIl
+4QIgRKUcbEoWeH/K//Qik2w/cUvMS6LhrgxwC62uMD7HTOkCIGsx7lmKwfs88gaH
++vTKOiKZXWY9Ni1o7jaFyvEOFp9hAiAjvMqapHnolq4NDPx+h2fpYKMgCs6ujCsv
+zSyXyEl4rw==
+-----END PRIVATE KEY-----`;
+    spyOnProperty(evt, 'target', 'get').and.returnValue({
+      files: [
+        new File([keyContent], 'foo.txt', { type: 'text/plain' })
+      ]
+    });
+
+    component.addFileContent(evt, 'tlsServerKey', 0, true);
+    expect(component.tlsServerError).toBeNull();
+  });
+
+  it('should handle a malformatted TLS Server Key correctly', () => {
+    const evt = new Event('change');
+    const certContent = `oops!`;
+    spyOnProperty(evt, 'target', 'get').and.returnValue({
+      files: [
+        new File([certContent], 'foo.txt', { type: 'text/plain' })
+      ]
+    });
+
+    component.addFileContent(evt, 'tlsServerKey', 0, true);
+  });
+
+  it('should handle adding a correctly formatted TLS Client Cert', () => {
+    const evt = new Event('change');
+    const certContent = `-----BEGIN CERTIFICATE-----
+MIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG
+A1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE
+MRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl
+YiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw
+ODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE
+CAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs
+ZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl
+8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID
+AQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx
+8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy
+2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0
+Hn+GmxZA
+-----END CERTIFICATE-----`;
+    spyOnProperty(evt, 'target', 'get').and.returnValue({
+      files: [
+        new File([certContent], 'foo.txt', { type: 'text/plain' })
+      ]
+    });
+
+    component.addFileContent(evt, 'tlsCas', 0, true);
+    expect(component.tlsServerError).toBeNull();
+  });
+
+  it('should handle adding a malformatted TLS Client Cert correctly', () => {
+    const evt = new Event('change');
+    const certContent = `oops!`;
+    spyOnProperty(evt, 'target', 'get').and.returnValue({
+      files: [
+        new File([certContent], 'foo.txt', { type: 'text/plain' })
+      ]
+    });
+
+    component.addFileContent(evt, 'tlsCas', 0, true);
+  });
+
+  it('should handle an incorrect file event for addFileContent()', () => {
+    const evt = new Event('change');
+    spyOnProperty(evt, 'target', 'get').and.returnValue({
+      files: []
+    });
+
+    try {
+      component.addFileContent(evt, 'tlsCas', 0, true);
+    } catch (e) {
+      expect(component.tlsCaError).toBe('Failed to load client certificate PEM file!');
+    }
+
+    try {
+      component.addFileContent(evt, 'tlsServerCert', 0, true);
+    } catch (e) {
+      expect(component.tlsServerError).toBe('Failed to load server certificate PEM file!');
+    }
+
+    try {
+      component.addFileContent(evt, 'tlsServerKey', 0, true);
+    } catch (e) {
+      expect(component.tlsServerError).toBe('Failed to load server private key PEM file!');
+    }
+  });
 });
