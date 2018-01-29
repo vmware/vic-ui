@@ -1,5 +1,5 @@
 /*
- Copyright 2017 VMware, Inc. All Rights Reserved.
+ Copyright 2018 VMware, Inc. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 
 import {Component, NgZone, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Params} from '@angular/router';
 import {GlobalsService} from '../shared';
 
 @Component({
@@ -24,23 +24,23 @@ import {GlobalsService} from '../shared';
 })
 export class UiActionsComponent implements OnInit {
 
-  private params: any;
+  /* Route params as defined in UiActionsModule routes */
+  private params: Params = {};
 
-  constructor(
-    private globalService: GlobalsService,
-    private zone: NgZone,
-    private router: ActivatedRoute
-  ) { }
+  constructor(private globalService: GlobalsService,
+              private zone: NgZone,
+              private router: ActivatedRoute) {
+  }
 
   /**
    * Launch the modal
    */
   ngOnInit() {
-    this.router.params.subscribe(params => {
-       this.params = params;
-       this.globalService.getWebPlatform().sendNavigationRequest('com.vmware.vic.customtab-vch', 'urn:vic:vic:Root:vic%25252Fvic-root');
+    this.router.params.subscribe((params: Params) => {
+      this.params = params;
+      window.addEventListener('message', this.onMessage.bind(this), false);
+      this.globalService.getWebPlatform().sendNavigationRequest('com.vmware.vic.customtab-vch', 'urn:vic:vic:Root:vic%25252Fvic-root');
     });
-    window.addEventListener('message', this.onMessage.bind(this), false);
   }
 
   /**
@@ -57,17 +57,15 @@ export class UiActionsComponent implements OnInit {
     if (data.eventType === 'vch-view.component.ngAfterViewInit') {
       this.zone.run(() => {
         const frames = window.parent.frames;
-        for (let i = 0; i < frames.length; i++) {
-          if (this.params && this.params.actionId === 'com.vmware.vic.createVch') {
-            frames[i].postMessage({
-              eventType: 'vch-view.component.launchCreateVchWizard'
-            }, location.protocol + '//' + location.host);
-          } else if (this.params && this.params.actionId === 'com.vmware.vic.deleteVch') {
-            frames[i].postMessage({
-              eventType: 'vch-view.component.launchDeleteVchModal',
-              payload: {id: this.params.objectId}
-            }, location.protocol + '//' + location.host);
-          }
+        if (this.params.actionId === 'com.vmware.vic.createVch') {
+          frames[1].postMessage({
+            eventType: 'vch-view.component.launchCreateVchWizard'
+          }, location.protocol + '//' + location.host);
+        } else if (this.params.actionId === 'com.vmware.vic.deleteVch') {
+          frames[1].postMessage({
+            eventType: 'vch-view.component.launchDeleteVchModal',
+            payload: {id: this.params.objectId}
+          }, location.protocol + '//' + location.host);
         }
       });
       this.globalService.getWebPlatform().closeDialog();
