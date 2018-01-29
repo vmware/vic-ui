@@ -33,8 +33,6 @@ const routes: Routes = [
   declarations: [
     UiActionsComponent
   ],
-  providers: [
-  ],
   exports: [
     UiActionsComponent
   ]
