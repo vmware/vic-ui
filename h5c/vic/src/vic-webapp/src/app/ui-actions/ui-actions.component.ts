@@ -14,9 +14,10 @@
  limitations under the License.
 */
 
-import {Component, NgZone, OnInit} from '@angular/core';
-import {ActivatedRoute, Params} from '@angular/router';
-import {GlobalsService} from '../shared';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { GlobalsService } from '../shared';
+import * as bus from 'framebus';
 
 @Component({
   selector: 'vic-ui-actions',
@@ -24,51 +25,32 @@ import {GlobalsService} from '../shared';
 })
 export class UiActionsComponent implements OnInit {
 
-  /* Route params as defined in UiActionsModule routes */
-  private params: Params = {};
-
   constructor(private globalService: GlobalsService,
-              private zone: NgZone,
               private router: ActivatedRoute) {
   }
 
-  /**
-   * Launch the modal
-   */
   ngOnInit() {
     this.router.params.subscribe((params: Params) => {
-      this.params = params;
-      window.addEventListener('message', this.onMessage.bind(this), false);
-      this.globalService.getWebPlatform().sendNavigationRequest('com.vmware.vic.customtab-vch', 'urn:vic:vic:Root:vic%25252Fvic-root');
-    });
-  }
 
-  /**
-   * Window 'message' listener
-   * @param event
-   */
-  onMessage(event: MessageEvent) {
-    if (event.origin !== location.protocol + '//' + location.host) {
-      return;
-    }
-
-    const data: any = event.data;
-
-    if (data.eventType === 'vch-view.component.ngAfterViewInit') {
-      this.zone.run(() => {
-        const frames = window.parent.frames;
-        if (this.params.actionId === 'com.vmware.vic.createVch') {
-          frames[1].postMessage({
-            eventType: 'vch-view.component.launchCreateVchWizard'
-          }, location.protocol + '//' + location.host);
-        } else if (this.params.actionId === 'com.vmware.vic.deleteVch') {
-          frames[1].postMessage({
-            eventType: 'vch-view.component.launchDeleteVchModal',
-            payload: {id: this.params.objectId}
-          }, location.protocol + '//' + location.host);
+      /* Wait for VHC list to be ready */
+      bus.on('vch-view.component.ngAfterViewInit', () => {
+        if (params.actionId === 'com.vmware.vic.createVch') {
+          bus.emit('vch-view.component.launchCreateVchWizard');
+        } else if (params.actionId === 'com.vmware.vic.deleteVch') {
+          bus.emit('vch-view.component.launchDeleteVchModal', {
+            id: params.objectId
+          });
         }
+        this.globalService.getWebPlatform().closeDialog();
       });
-      this.globalService.getWebPlatform().closeDialog();
-    }
+
+      /* Navigate to VCH list */
+      this.globalService
+        .getWebPlatform()
+        .sendNavigationRequest(
+          'com.vmware.vic.customtab-vch',
+          'urn:vic:vic:Root:vic%25252Fvic-root'
+        );
+    });
   }
 }
