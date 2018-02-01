@@ -54,6 +54,7 @@ import {State} from 'clarity-angular';
 import {Subscription} from 'rxjs/Subscription';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from './vch.model';
+import * as bus from 'framebus';
 
 @Component({
   selector: 'vic-vch-view',
@@ -113,17 +114,24 @@ export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
     // TODO: move the following to a service
     window.addEventListener('message', this.onMessage.bind(this), false);
 
+    bus.on('vch-view.component.launchCreateVchWizard', () => {
+      this.zone.run(() => {
+        this.launchCreateVchWizard();
+      });
+    });
+
+    bus.on('vch-view.component.launchDeleteVchModal', data => {
+      this.zone.run(() => {
+        this.launchDeleteVchModal(data.id);
+      });
+    });
+
     // verify the appliance endpoint
     this.checkVicMachineServer();
   }
 
   ngAfterViewInit() {
-    const frames = window.parent.frames;
-    for (let i = 0; i < frames.length; i++) {
-      frames[i].postMessage({
-        eventType: 'vch-view.component.ngAfterViewInit'
-      }, location.protocol + '//' + location.host);
-    }
+    bus.emit('vch-view.component.ngAfterViewInit');
   }
 
   checkVicMachineServer() {
@@ -312,14 +320,6 @@ export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
     } else if (data.eventType === DATAGRID_REFRESH_EVENT) {
       this.zone.run(() => {
         this.reloadVchs();
-      });
-    } else if (data.eventType === 'vch-view.component.launchCreateVchWizard') {
-      this.zone.run(() => {
-        this.launchCreateVchWizard();
-      });
-    } else if (data.eventType === 'vch-view.component.launchDeleteVchModal') {
-      this.zone.run(() => {
-        this.launchDeleteVchModal(data.payload.id);
       });
     }
   }
