@@ -199,12 +199,12 @@ describe('VCH Create Wizard - Basic', () => {
     // wait for VM summary page to be ready
     browser.wait(function () {
       return browser.isElementPresent(by.cssContainingText('.summary-name-label', namePrefix + specRunId));
-    }, this.opsTimeout * 6);
-    this.clickByCSS('.summary-action-link');
+    }, defaultTimeout * 6);
+    page.clickByCSS('.summary-action-link');
     // wait for menu items to be calculated
-    browser.sleep(this.defaultTimeout);
+    browser.sleep(defaultTimeout);
     page.clickByText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions');
-    browser.sleep(this.defaultTimeout);
+    browser.sleep(defaultTimeout);
     // TODO: go back to vch list
   });
 
