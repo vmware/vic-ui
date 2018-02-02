@@ -142,6 +142,7 @@ export class VicVmViewService {
                     return;
                 }
 
+                this.totalContainersCount = data.totalResultCount;
                 this.containersSubj.next(containersArray);
             });
     }
