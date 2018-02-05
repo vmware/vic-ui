@@ -28,6 +28,16 @@
         <variable name="objectType" value="vic:Root"/>
         <excludedExtension>com.vmware.vic.objectView.related</excludedExtension>
     </templateInstance>
+    <!-- Add link to Object Navigator -->
+    <extension id="com.vmware.vic.node">
+        <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+        <object>
+            <title>vSphere Integrated Containers</title>
+            <icon>#{viinventory.vic.icon}</icon>
+            <navigationTargetUid>com.vmware.vic.objectView_collection.domainView</navigationTargetUid>
+            <parentUid>vsphere.core.navigator.solutionsCategory</parentUid>
+        </object>
+    </extension>
     <extension id="com.vmware.vic.objectView.lists.rootColumns">
         <extendedPoint>com.vmware.vic.objectView.list.columns</extendedPoint>
         <object>
