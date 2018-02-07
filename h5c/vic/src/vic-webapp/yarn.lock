@@ -2518,6 +2518,10 @@ forwarded@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
 
+framebus@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/framebus/-/framebus-2.0.8.tgz#01c7ee5f765beb3f9a2e0390ca0b7088b2bf76d3"
+
 fresh@0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"

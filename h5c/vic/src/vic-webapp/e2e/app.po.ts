@@ -178,6 +178,12 @@ export class VicWebappPage {
     browser.switchTo().defaultContent();
   }
 
+  navigateToVchVm(vch) {
+    this.switchFrame(this.iframeTabs);
+    this.waitForElementToBePresent(this.actionBar + vch);
+    this.clickByText('.datagrid-cell a', vch);
+  }
+
   /* Utility functions */
 
   clickByText(el, text) {
