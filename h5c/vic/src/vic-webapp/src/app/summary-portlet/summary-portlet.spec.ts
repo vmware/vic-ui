@@ -29,7 +29,6 @@ import {
   I18nService,
   RefreshService
 } from '../shared/index';
-import { ActionDevService } from '../services/action-dev.service';
 import { DataPropertyService } from '../services/data-property.service';
 import { AppErrorHandler } from '../shared/appErrorHandler';
 
