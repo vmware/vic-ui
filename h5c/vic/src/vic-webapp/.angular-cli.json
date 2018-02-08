@@ -52,6 +52,13 @@
   "test": {
     "karma": {
       "config": "./karma.conf.js"
+    },
+    "codeCoverage": {
+      "exclude": [
+        "src/app/shared/dev/webPlatformStub.ts",
+        "src/app/services/action-dev.service.ts",
+        "src/app/testing/*"
+      ]
     }
   },
   "defaults": {

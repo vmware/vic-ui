@@ -28,7 +28,7 @@ import { AppAlertService } from './app-alert.service';
       selector: 'vic-app-alert',
       templateUrl: './app-alert.component.html'
 })
-export class AppAlertComponent implements OnInit, OnDestroy {
+export class AppAlertComponent implements OnDestroy {
       @Input() alertClosed = true;
       message: string;
       alertType: string;
@@ -48,9 +48,6 @@ export class AppAlertComponent implements OnInit, OnDestroy {
             // Register to observe the closeAlert$ source and close the Alert component
             this.subForClose = appAlertService.closeAlert$.subscribe(
                   () => this.alertClosed = true);
-      }
-
-      ngOnInit(): void {
       }
 
       ngOnDestroy(): void {
