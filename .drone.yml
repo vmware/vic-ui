@@ -28,6 +28,21 @@ pipeline:
     commands:
       - make vic-appliance-ui
 
+  vic-appliance-ui-image:
+    environment:
+      DOCKER_HOST: tcp://127.0.0.1:2375
+    image: docker:latest
+    pull: true
+    commands:
+      - docker ps
+      - apk add --update bash git
+      - cd appliance-ui && docker build -t vic-appliance-ui .
+    when:
+      #branch: master
+      #repo: vmware/vic-product
+      #event: [ push, pull_request, tag, deployment ]
+      status: success
+
   vic-ui:
     image: gcr.io/eminent-nation-87317/vic-integration-test:1.36
     pull: true
@@ -95,3 +110,8 @@ pipeline:
 services:
   selenium:
     image: selenium/standalone-firefox
+
+  dind:
+    image: docker:dind
+    privileged: true
+    pull: true
