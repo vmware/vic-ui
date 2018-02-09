@@ -1,0 +1,22 @@
+/* Clarity UI overrides */
+
+.content-area {
+  padding: 0 !important;
+  background-color: #ececec;
+}
+
+.card.transparent {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* Custom elements and containers */
+
+#infra-deploy-tools-container {
+  background-color: #efefef;
+}
+
+#infra-deploy-tools-container .card-text {
+  min-height: 120px;
+}

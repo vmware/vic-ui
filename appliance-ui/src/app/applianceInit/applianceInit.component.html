@@ -1,0 +1,66 @@
+
+<div class="login-wrapper">
+    <form class="login" [formGroup]="form" novalidate>
+        <label class="title">
+            <h3 class="welcome">vSphere Integrated Containers</h3>
+            Appliance Configuration
+            <h5 class="hint">Use your vCenter Server credentials to log in to complete the appliance installation</h5>
+        </label>
+        <div class="login-group">
+          <label for="login_vcenter"
+                 aria-haspopup="true"
+                 role="tooltip"
+                 class="form-control tooltip tooltip-validation"
+                 [class.invalid]="form.get('vcenter').invalid && (form.get('vcenter').dirty || form.get('vcenter').touched)">
+            <input class="username form-control" type="text" id="login_vcenter" placeholder="vCenter FQDN or IP" formControlName="vcenter">
+
+            <span class="tooltip-content" *ngIf="form.get('vcenter').hasError('required')">
+              vCenter FQDN or IP cannot be empty
+            </span>
+          </label>
+          <label for="login_username"
+                 aria-haspopup="true"
+                 role="tooltip"
+                 class="form-control tooltip tooltip-validation"
+                 [class.invalid]="form.get('username').invalid && (form.get('username').dirty || form.get('username').touched)">
+            <input class="username form-control" type="text" id="login_username" placeholder="username@domain.local" formControlName="username">
+
+            <span class="tooltip-content" *ngIf="form.get('username').hasError('required')">
+                Username cannot be empty
+              </span>
+          </label>
+
+          <label for="login_password"
+                 aria-haspopup="true"
+                 role="tooltip"
+                 class="form-control tooltip tooltip-validation"
+                 [class.invalid]="form.get('password').invalid && (form.get('password').dirty || form.get('password').touched)">
+            <input class="password form-control" type="password" id="login_password" placeholder="Password" formControlName="password">
+
+            <span class="tooltip-content" *ngIf="form.get('password').hasError('required')">
+                Password cannot be empty
+              </span>
+          </label>
+
+          <!-- display to user that appliance is still initializing -->
+          <div class="applInitializing" *ngIf="!applianceStable">
+            <clr-alert [clrAlertClosable]="false" [clrAlertType]="'alert-info'">
+              <div clr-alert-item
+                  class="alert-item">
+                <div class="alert-text">
+                  Please wait while the appliance boots. This can take up to 10 minutes.
+                </div>
+              </div>
+            </clr-alert>
+            <span class="mt_1rem spinner spinner-md"></span>
+          </div>
+
+          <button [disabled]="!applianceStable || form.invalid"
+                  type="submit"
+                  class="btn btn-primary"
+                  (click)="authenticate()">
+            NEXT
+          </button>
+        </div>
+    </form>
+</div>

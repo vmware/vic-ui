@@ -1,0 +1,78 @@
+<app-init *ngIf="!applianceReady || (applianceReady && applianceInitialized !== true)">
+</app-init>
+
+<ng-container *ngIf="applianceReady">
+  <!-- clarity alert for failed operations -->
+  <clr-alert *ngIf="!!alert && alert.type === 'error'" [clrAlertType]="'alert-danger'" [clrAlertAppLevel]="true">
+    <clr-alert-item *ngIf="alert.category === 'err_1'">
+      <span class="alert-text">
+        Error type 1
+      </span>
+    </clr-alert-item>
+  </clr-alert>
+
+  <!-- clarity alert for information -->
+  <clr-alert *ngIf="!!alert && alert.type === 'info'" [clrAlertType]="'alert-info'" [clrAlertAppLevel]="true">
+    <clr-alert-item *ngIf="alert.category === 'info_1'">
+      <span class="alert-text">
+        Information type 1
+      </span>
+    </clr-alert-item>
+  </clr-alert>
+
+  <!-- clarity alert for success -->
+  <clr-alert *ngIf="!!alert && alert.type === 'success'" [clrAlertType]="'alert-success'" [clrAlertAppLevel]="true">
+    <clr-alert-item *ngIf="alert.category === 'success_1'">
+      <span class="alert-text">
+        Success type 1
+      </span>
+    </clr-alert-item>
+  </clr-alert>
+
+  <div class="main-container">
+    <header class="header-4">
+      <div class="branding">
+        <a href="/" class="nav-link">
+          <clr-icon shape="vm-bug"></clr-icon>
+          <span class="title">vSphere Integrated Containers</span>
+        </a>
+      </div>
+    </header>
+    <main class="content-container">
+        <div class="content-area">
+          <div class="row flex-items-xs-middle p1" style="background-color: white">
+            <div class="col-xs-8">
+                <h1 class="vic-header">
+                  vSphere Integrated Containers Appliance
+                </h1>
+              </div>
+              <div class="col-xs flex-xs-middle text-right">
+                <a href="https://vmware.github.io/vic-product/assets/files/html/1.3/" target="_blank" title="Documentation" class="btn btn-outline mx-0">Documentation</a>
+              </div>
+          </div>
+
+          <div class="row flex-items-xs-middle p1 pt0 pb0" style="background-color: white">
+            <div class="col-xs-12 m1rem">
+                <ul id="tabNav" class="nav" role="tablist">
+                    <li role="presentation" class="nav-item">
+                      <button id="gettingStartedBtn" class="btn btn-link nav-link" type="button"
+                              routerLink="getting-started"
+                              routerLinkActive="active">
+                        Getting Started
+                      </button>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                      <button id="configurationBtn" class="btn btn-link nav-link" type="button"
+                              routerLink="configure"
+                              routerLinkActive="active">
+                        Configuration
+                      </button>
+                    </li>
+                </ul>
+            </div>
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+    </main>
+  </div>
+</ng-container>
