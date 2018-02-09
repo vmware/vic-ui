@@ -51,7 +51,7 @@ vic-ui-plugins: yarn
 	rm -f $(VICUI_H5_UI_PATH)/src/vic-app/yarn.lock
 	rm -rf $(VICUI_H5_UI_PATH)/src/vic-app/node_modules
 
-vic-appliance-ui: yarn
+vic-appliance-ui:
 	cd appliance-ui && npm install
 	cd appliance-ui && npm run build:dev
 	ls -la appliance-ui/dev/
