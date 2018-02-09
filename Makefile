@@ -28,8 +28,10 @@ ENV_VSPHERE_SDK_HOME = "/tmp/sdk/vc_sdk_min"
 ENV_FLEX_SDK_HOME = "/tmp/sdk/flex_sdk_min"
 ENV_HTML_SDK_HOME = "/tmp/sdk/html-client-sdk"
 
-vic-ui-plugins:
+yarn:
 	@npm install -g yarn@0.24.6 > /dev/null
+
+vic-ui-plugins: yarn
 	sed -e "s/0.0.1/$(shell printf %s ${TAG_NUM}.${BUILD_NUMBER})/" -e "s/\-rc[[:digit:]]//g" ./$(VICUI_H5_UI_PATH)/plugin-package.xml > ./$(VICUI_H5_UI_PATH)/new_plugin-package.xml
 	sed -e "s/0.0.1/$(shell printf %s ${TAG_NUM}.${BUILD_NUMBER})/" -e "s/\-rc[[:digit:]]//g" ./$(VICUI_SOURCE_PATH)/plugin-package.xml > ./$(VICUI_SOURCE_PATH)/new_plugin-package.xml
 	sed "s/UI_VERSION_PLACEHOLDER/$(shell printf %s ${TAG}.${BUILD_NUMBER})/" ./$(VICUI_H5_SERVICE_PATH)/src/main/resources/configs.properties > ./$(VICUI_H5_SERVICE_PATH)/src/main/resources/new_configs.properties
@@ -48,6 +50,11 @@ vic-ui-plugins:
 	rm -rf $(VICUI_H5_UI_PATH)/src/vic-app/aot
 	rm -f $(VICUI_H5_UI_PATH)/src/vic-app/yarn.lock
 	rm -rf $(VICUI_H5_UI_PATH)/src/vic-app/node_modules
+
+vic-appliance-ui: yarn
+	cd appliance-ui && yarn
+	cd appliance-ui && npm run build:dev
+	ls -la appliance-ui/dev/
 
 clean:
 	@rm -rf $(VICUI_H5_UI_PATH)/src/vic-app/node_modules
