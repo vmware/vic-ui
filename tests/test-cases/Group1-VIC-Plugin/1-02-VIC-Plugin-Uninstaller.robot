@@ -13,7 +13,7 @@
 # limitations under the License
 
 *** Settings ***
-Documentation  Test 18-2 - VIC UI Uninstallation
+Documentation  Test 1-02 - VIC UI Uninstallation
 Resource       ../../resources/Util.robot
 Resource       ./vicui-common.robot
 Test Teardown  Cleanup Installer Environment

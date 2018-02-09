@@ -13,7 +13,7 @@
 # limitations under the License
 
 *** Settings ***
-Documentation  Test 2-01 - Basic VCH Create
+Documentation  Test 3-01 - Basic VCH Edit
 Resource  ../../resources/Util.robot
 Resource  ../Group18-VIC-UI/vicui-common.robot
 Suite Setup  Prepare Testbed For Protractor Tests
@@ -47,7 +47,7 @@ Cleanup Testbed After Protractor Test Completes
     Run  govc object.destroy -dc Datacenter2 /Datacenter2
 
 *** Test Cases ***
-[ Windows 10 - Chrome ] Create And Delete VCH On A Single Cluster Environment
+[ Windows 10 - Chrome ] Edit VCH On A Single Cluster Environment
     Set Environment Variable  TEST_VCSA_BUILD  7312210
     Set Environment Variable  TEST_VSPHERE_VER  65
     Set Environment Variable  VC_FINGERPRINT  ${VC_FINGERPRINT_7312210}
@@ -64,26 +64,26 @@ Cleanup Testbed After Protractor Test Completes
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ Windows 10 - Firefox ] Create And Delete VCH On A Single Cluster Environment
+[ Windows 10 - Firefox ] Edit VCH On A Single Cluster Environment
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  firefox
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ Windows 10 - IE11 ] Create And Delete VCH On A Single Cluster Environment
+[ Windows 10 - IE11 ] Edit VCH On A Single Cluster Environment
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  internet explorer
 
@@ -95,31 +95,31 @@ Cleanup Testbed After Protractor Test Completes
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ MacOS - Chrome ] Create And Delete VCH On A Single Cluster Environment
+[ MacOS - Chrome ] Edit VCH On A Single Cluster Environment
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
     Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ MacOS - Firefox ] Create And Delete VCH On A Single Cluster Environment
+[ MacOS - Firefox ] Edit VCH On A Single Cluster Environment
     Log To Console  OVA IP is %{OVA_IP_6.5u1d}
     Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  firefox
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ SKIPPED - See https://github.com/vmware/vic-ui/issues/274 ] Create And Delete VCH On An Environment With Some Empty Clusters
+[ SKIPPED - See https://github.com/vmware/vic-ui/issues/274 ] Edit VCH On An Environment With Some Empty Clusters
     Log To Console  Skipping because v1.3.0 GA doesn't have the fix and will always fail. See https://github.com/vmware/vic-ui/issues/274 for details
 
     # add clusters
@@ -132,14 +132,14 @@ Cleanup Testbed After Protractor Test Completes
     #Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
-    #${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    #${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     #Log  ${out}
     #Log To Console  ${out}
 
     # report pass/fail
     #Should Be Equal As Integers  ${rc}  0
 
-[ Windows 10 - Chrome ] Create And Delete VCH On A Multi-DC Environment
+[ Windows 10 - Chrome ] Edit VCH On A Multi-DC Environment
     # add a new datacenter and an empty cluster to it
     ${out}=  Run  govc datacenter.create Datacenter2
     Should Be Empty  ${out}
@@ -152,14 +152,14 @@ Cleanup Testbed After Protractor Test Completes
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ Windows 10 - Firefox ] Create And Delete VCH On A Multi-DC Environment
+[ Windows 10 - Firefox ] Edit VCH On A Multi-DC Environment
     # datacenter might already exist, but try creating it again and continue in case something went wrong from the previous case
     ${out}=  Run  govc datacenter.create Datacenter2
     ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
@@ -169,14 +169,14 @@ Cleanup Testbed After Protractor Test Completes
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  firefox
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ Windows 10 - IE11 ] Create And Delete VCH On A Multi-DC Environment
+[ Windows 10 - IE11 ] Edit VCH On A Multi-DC Environment
     # datacenter might already exist, but try creating it again and continue in case something went wrong from the previous case
     ${out}=  Run  govc datacenter.create Datacenter2
     ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
@@ -186,14 +186,14 @@ Cleanup Testbed After Protractor Test Completes
     Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  internet explorer
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ MacOS - Chrome ] Create And Delete VCH On A Multi-DC Environment
+[ MacOS - Chrome ] Edit VCH On A Multi-DC Environment
     # datacenter might already exist, but try creating it again and continue in case something went wrong from the previous case
     ${out}=  Run  govc datacenter.create Datacenter2
     ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
@@ -203,14 +203,14 @@ Cleanup Testbed After Protractor Test Completes
     Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 
     # report pass/fail
     Should Be Equal As Integers  ${rc}  0
 
-[ MacOS - Firefox ] Create And Delete VCH On A Multi-DC Environment
+[ MacOS - Firefox ] Edit VCH On A Multi-DC Environment
     # datacenter might already exist, but try creating it again and continue in case something went wrong from the previous case
     ${out}=  Run  govc datacenter.create Datacenter2
     ${out}=  Run  govc cluster.create -dc=Datacenter2 Cluster
@@ -220,7 +220,7 @@ Cleanup Testbed After Protractor Test Completes
     Prepare Protractor  ${BUILD_7312210_IP}  ${MACOS_HOST_IP}  firefox
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-edit-wizard/1-basic.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 

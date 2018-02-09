@@ -13,7 +13,7 @@
 # limitations under the License
 
 *** Settings ***
-Documentation  Test 18-4 - VIC UI Plugin tests
+Documentation  Test 1-04 - VIC UI Plugin tests
 Resource  ../../resources/Util.robot
 Resource  ./vicui-common.robot
 Test Teardown  Clean Up Testbed Config Files

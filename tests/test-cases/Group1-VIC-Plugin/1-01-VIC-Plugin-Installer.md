@@ -1,4 +1,4 @@
-Test 18-1 - VIC UI Installation
+Test 1-01 - VIC UI Installation
 ======
 
 #Purpose:

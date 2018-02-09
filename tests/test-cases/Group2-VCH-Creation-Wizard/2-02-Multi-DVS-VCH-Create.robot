@@ -13,7 +13,7 @@
 # limitations under the License
 
 *** Settings ***
-Documentation  Test 1-02 - Multi DVS VCH Create
+Documentation  Test 2-02 - Multi DVS VCH Create
 Resource  ../../resources/Util.robot
 Resource  ../Group18-VIC-UI/vicui-common.robot
 Suite Setup  Prepare Testbed For Protractor Tests

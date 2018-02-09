@@ -1,4 +1,4 @@
-Test 18-4 - VIC UI Plugin Tests - Portlets
+Test 1-04 - VIC UI Plugin Tests - Portlets
 ======
 
 #Purpose:

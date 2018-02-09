@@ -1,4 +1,4 @@
-Test 1-02 - Multi DVS VCH Create
+Test 2-02 - Multi DVS VCH Create
 =======
 
 # Purpose:

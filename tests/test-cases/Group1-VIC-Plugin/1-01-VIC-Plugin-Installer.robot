@@ -13,7 +13,7 @@
 # limitations under the License
 
 *** Settings ***
-Documentation   Test 18-1 - VIC UI Installation
+Documentation   Test 1-01 - VIC UI Installation
 Resource        ../../resources/Util.robot
 Resource        ./vicui-common.robot
 Test Teardown   Cleanup Installer Environment
