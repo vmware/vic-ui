@@ -29,7 +29,7 @@ ENV_FLEX_SDK_HOME = "/tmp/sdk/flex_sdk_min"
 ENV_HTML_SDK_HOME = "/tmp/sdk/html-client-sdk"
 
 yarn:
-	@npm install -g yarn@0.24.6 > /dev/null
+	@npm install -g yarn > /dev/null
 
 vic-ui-plugins: yarn
 	sed -e "s/0.0.1/$(shell printf %s ${TAG_NUM}.${BUILD_NUMBER})/" -e "s/\-rc[[:digit:]]//g" ./$(VICUI_H5_UI_PATH)/plugin-package.xml > ./$(VICUI_H5_UI_PATH)/new_plugin-package.xml
