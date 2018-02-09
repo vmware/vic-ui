@@ -52,7 +52,7 @@ vic-ui-plugins: yarn
 	rm -rf $(VICUI_H5_UI_PATH)/src/vic-app/node_modules
 
 vic-appliance-ui: yarn
-	cd appliance-ui && yarn
+	cd appliance-ui && npm install
 	cd appliance-ui && npm run build:dev
 	ls -la appliance-ui/dev/
 
