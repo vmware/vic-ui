@@ -7,4 +7,4 @@ WORKDIR /opt/vmware/vic-ui/vic-appliance-ui
 COPY . ./
 
 EXPOSE 4200
-RUN [ "ng", "serve", "--host", "0.0.0.0" ]
+CMD [ "npm", "run", "server:dev" ]
