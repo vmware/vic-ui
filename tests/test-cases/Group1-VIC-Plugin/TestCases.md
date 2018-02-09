@@ -1,11 +1,10 @@
-Group 18 - VIC UI
+Group 1 - VIC Plugin
 =======
 
-[Test 18-1 - VIC UI Installation](18-1-VIC-UI-Installer.md)
+[Test 1-01 - VIC Plugin Installation](1-01-VIC-Plugin-Installer.md)
 -
-[Test 18-2 - VIC UI Uninstallation](18-2-VIC-UI-Uninstaller.md)
+[Test 1-02 - VIC Plugin Uninstallation](1-02-VIC-Plugin-Uninstaller.md)
 -
-[Test 18-3 - VIC UI Upgrade](18-3-VIC-UI-Upgrader.md)
+[Test 1-03 - VIC Plugin Upgrade](1-03-VIC-Plugin-Upgrader.md)
 -
-[Test 18-4 - VIC UI Plugin tests](18-4-VIC-UI-Plugin-tests.md)
--
+[Test 1-04 - VIC Plugin Portlets](1-04-VIC-Plugin-Portlets.md)

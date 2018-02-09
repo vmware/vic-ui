@@ -1,7 +1,7 @@
-Group 1 - VCH Creation Wizard
+Group 2 - VCH Creation Wizard
 =======
 
-[Test 1-01 - Basic VCH Create](1-01-Basic-VCH-Createmd)
+[Test 2-01 - Basic VCH Create](2-01-Basic-VCH-Createmd)
 -
-[Test 1-02 - Multi-DVS VCH Create](1-02-Multi-DVS-VCH-Create.md)
+[Test 2-02 - Multi-DVS VCH Create](2-02-Multi-DVS-VCH-Create.md)
 
