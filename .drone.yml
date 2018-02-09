@@ -39,8 +39,8 @@ pipeline:
       - cd appliance-ui && docker build -t vic-appliance-ui .
     when:
       #branch: master
-      #repo: vmware/vic-product
-      #event: [ push, pull_request, tag, deployment ]
+      repo: vmware/vic-ui
+      event: [ push, pull_request, tag, deployment ]
       status: success
 
   vic-ui:
