@@ -10,6 +10,9 @@ import { LocalStorageService } from '../services/localstorage.service';
 import { APP_BASE_HREF } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { appConfigToken } from '../config/app.config';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { GettingStartedComponent } from '../main-view/getting-started/getting-started.component';
+import { ConfigureComponent } from '../main-view/configure/configure.component';
 
 describe('ApplianceInitComponent', () => {
   let component: ApplianceInitComponent;
@@ -17,7 +20,12 @@ describe('ApplianceInitComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ApplianceInitComponent ],
+      declarations: [
+        ApplianceInitComponent,
+        GettingStartedComponent,
+        ConfigureComponent
+      ],
+      schemas: [ NO_ERRORS_SCHEMA ],
       imports: [
         FormsModule,
         ReactiveFormsModule,

@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GettingStartedComponent } from './getting-started.component';
+import { ClarityModule } from '@clr/angular';
 
 describe('GettingStartedComponent', () => {
   let component: GettingStartedComponent;
@@ -8,7 +9,10 @@ describe('GettingStartedComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ GettingStartedComponent ]
+      declarations: [ GettingStartedComponent ],
+      imports: [
+        ClarityModule
+      ]
     })
     .compileComponents();
   }));
