@@ -6,5 +6,6 @@ ENV TLS_PRIVATE_KEY=/certs/server.key.pem
 WORKDIR /opt/vmware/vic-ui/vic-appliance-ui
 COPY . ./
 
+RUN [ "npm", "install" ]
 EXPOSE 4200
 CMD [ "npm", "run", "server:dev" ]
