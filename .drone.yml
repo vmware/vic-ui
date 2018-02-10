@@ -43,6 +43,26 @@ pipeline:
       event: [ push, pull_request, tag, deployment ]
       status: success
 
+  publish-vic-appliance-ui:
+    image: plugins/gcr
+    repo: eminent-nation-87317/vic-appliance-ui
+    dockerfile: appliance-ui/Dockerfile
+    tags:
+      - dev
+    json_key: >
+      {
+        "type": "service_account",
+        "project_id": "${GS_PROJECT_ID}",
+        "private_key_id": "${GS_PRIVATE_KEY_ID}",
+        "private_key": "${GS_PRIVATE_KEY}",
+        "client_email": "${GS_CLIENT_EMAIL}",
+        "client_id": "${GS_PROJECT_ID}",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": ""
+      }
+
   vic-ui:
     image: gcr.io/eminent-nation-87317/vic-integration-test:1.36
     pull: true
