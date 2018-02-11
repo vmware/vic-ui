@@ -37,6 +37,7 @@ pipeline:
       - docker ps
       - apk add --update bash git
       - cd appliance-ui && docker build -t vic-appliance-ui .
+      - docker tag vic-appliance-ui gcr.io/eminent-nation-87317/vic-appliance-ui:dev
     when:
       #branch: master
       repo: vmware/vic-ui
@@ -62,6 +63,11 @@ pipeline:
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
         "client_x509_cert_url": ""
       }
+
+    when:
+      repo: vmware/vic-ui
+      event: [ push, pull_request, tag, deployment ]
+      status: success
 
   vic-ui:
     image: gcr.io/eminent-nation-87317/vic-integration-test:1.36
