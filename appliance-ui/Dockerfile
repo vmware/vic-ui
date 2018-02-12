@@ -7,9 +7,6 @@ WORKDIR /opt/vmware/vic-ui/vic-appliance-ui
 
 COPY ./appliance-ui/ ./
 
-# Workaround to an issue where .dockerignore does not ignore node_modules
-RUN [ "rm", "-rf", "node_modules"]
-
 # install NPM dependencies
 RUN [ "npm", "install" ]
 
