@@ -14,21 +14,31 @@
  limitations under the License.
 */
 
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const rfs = require('rotating-file-stream');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
-var app = express();
+const app = express();
+const logDir = '/var/log/vic-appliance-ui';
+
+fs.existsSync(logDir) || fs.mkdirSync(logDir);
+
+const accessLogStream = rfs('access.log', {
+  size: '10M',
+  path: logDir
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.enable('trust proxy');
 
-app.use(logger('dev'));
+app.use(logger('combined', { stream: accessLogStream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

@@ -1,3 +1,8 @@
+# usage. docker run -d -p 443:7443 \
+#                 -v ${absolute_path_to_certs_folder}:/certs
+#                 -v ${absolute_path_to_webserver_logs_folder}:/var/log/vic-appliance-ui
+#                 gcr.io/eminent-nation-87317/vic-appliance-ui:dev
+
 FROM node:8
 
 ENV TLS_CERTIFICATE=/certs/server.cert.pem
