@@ -9,7 +9,7 @@
     "test": "ng test --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build:dev": "rimraf -- ./dev && npm run lint && npm run test && ng build -dev --output-path ./dev --sourcemaps",
+    "build:dev": "rimraf -- ./dev && npm run lint && npm run test && ng build -dev --output-path ./dist --sourcemaps",
     "build:prod": "rimraf -- ./dev && npm run lint && npm run test && ng build -aot -prod --output-path ./dist",
     "server:dev": "ng serve --host 0.0.0.0"
   },
