@@ -53,7 +53,7 @@ vic-ui-plugins: yarn
 
 vic-appliance-ui:
 	cd appliance-ui && npm install
-	cd appliance-ui && npm run build:dev
+	cd appliance-ui && npm run build:prod
 	ls -la appliance-ui/dist/
 
 clean:
