@@ -7,5 +7,6 @@ WORKDIR /opt/vmware/vic-ui/vic-appliance-ui
 COPY ./vic-appliance-ui/ ./
 
 RUN [ "npm", "install" ]
+# TODO: use express.js server and use TLS
 EXPOSE 4200
 CMD [ "npm", "run", "server:dev" ]
