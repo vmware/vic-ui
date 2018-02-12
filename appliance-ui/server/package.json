@@ -1,6 +1,13 @@
 {
-  "name": "server",
+  "name": "VIC Appliance UI Webapp Server",
   "version": "0.0.0",
+  "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Josh Kim",
+      "email": "kjosh@vmware.com"
+    }
+  ],
   "private": true,
   "scripts": {
     "start": "node ./bin/www"

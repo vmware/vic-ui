@@ -1,7 +1,13 @@
 {
-  "name": "vic-appliance",
+  "name": "VIC Appliance UI Webapp",
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Josh Kim",
+      "email": "kjosh@vmware.com"
+    }
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
