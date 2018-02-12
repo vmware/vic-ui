@@ -28,22 +28,6 @@ pipeline:
     commands:
       - make vic-appliance-ui
 
-  vic-appliance-ui-image:
-    environment:
-      DOCKER_HOST: tcp://127.0.0.1:2375
-    image: docker:latest
-    pull: true
-    commands:
-      - docker ps
-      - apk add --update bash git
-      - cd appliance-ui && docker build -t vic-appliance-ui .
-      - docker tag vic-appliance-ui gcr.io/eminent-nation-87317/vic-appliance-ui:dev
-    when:
-      #branch: master
-      repo: vmware/vic-ui
-      event: [ push, pull_request, tag, deployment ]
-      status: success
-
   publish-vic-appliance-ui:
     image: plugins/gcr
     repo: eminent-nation-87317/vic-appliance-ui
