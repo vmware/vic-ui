@@ -57,7 +57,8 @@ pipeline:
 
     when:
       repo: vmware/vic-ui
-      event: [ push, pull_request, tag, deployment ]
+      event: [ push, pull_request, tag, deployment ],
+      branch: [ master, appliance-ui* ],
       status: success
 
   vic-ui:
