@@ -14,8 +14,15 @@ pipeline:
   clone:
     image: plugins/git
     tags: true
-    # dont clone submodules
     recursive: false
+
+  clone-pr:
+    image: gcr.io/eminent-nation-87317/git-clone:1.1
+    pull: true
+    environment:
+      DRONE_PULL_REQUEST: ${DRONE_PULL_REQUEST}
+    when:
+      event: [ pull_request ]
 
   vic-appliance-ui:
     image: gcr.io/eminent-nation-87317/vic-integration-test:1.39
