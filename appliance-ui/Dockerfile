@@ -1,4 +1,4 @@
-FROM node:boron
+FROM node:8
 
 ENV TLS_CERTIFICATE=/certs/server.cert.pem
 ENV TLS_PRIVATE_KEY=/certs/server.key.pem
