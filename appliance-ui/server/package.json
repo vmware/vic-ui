@@ -1,0 +1,25 @@
+{
+  "name": "vic-appliance-ui-server",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Josh Kim",
+      "email": "kjosh@vmware.com"
+    }
+  ],
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "ejs": "~2.5.7",
+    "express": "~4.15.5",
+    "morgan": "~1.9.0",
+    "rotating-file-stream": "^1.3.4",
+    "serve-favicon": "~2.4.5"
+  }
+}

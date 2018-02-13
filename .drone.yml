@@ -14,8 +14,52 @@ pipeline:
   clone:
     image: plugins/git
     tags: true
-    # dont clone submodules
     recursive: false
+
+  clone-pr:
+    image: gcr.io/eminent-nation-87317/git-clone:1.1
+    pull: true
+    environment:
+      DRONE_PULL_REQUEST: ${DRONE_PULL_REQUEST}
+    when:
+      event: [ pull_request ]
+
+  vic-appliance-ui:
+    image: gcr.io/eminent-nation-87317/vic-integration-test:1.39
+    pull: true
+    environment:
+      BUILD_NUMBER: ${DRONE_BUILD_NUMBER}
+      GS_PROJECT_ID: ${GS_PROJECT_ID}
+      GS_CLIENT_EMAIL: ${GS_CLIENT_EMAIL}
+      GS_PRIVATE_KEY: ${GS_PRIVATE_KEY}
+    commands:
+      - make vic-appliance-ui
+
+  publish-vic-appliance-ui:
+    image: plugins/gcr
+    repo: eminent-nation-87317/vic-appliance-ui
+    dockerfile: appliance-ui/Dockerfile
+    tags:
+      - dev
+    json_key: >
+      {
+        "type": "service_account",
+        "project_id": "${GS_PROJECT_ID}",
+        "private_key_id": "${GS_PRIVATE_KEY_ID}",
+        "private_key": "${GS_PRIVATE_KEY}",
+        "client_email": "${GS_CLIENT_EMAIL}",
+        "client_id": "${GS_PROJECT_ID}",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": ""
+      }
+
+    when:
+      repo: vmware/vic-ui
+      event: [ push, pull_request, tag, deployment ]
+      branch: [ master, appliance-ui* ]
+      status: success
 
   vic-ui:
     image: gcr.io/eminent-nation-87317/vic-integration-test:1.36
@@ -84,3 +128,4 @@ pipeline:
 services:
   selenium:
     image: selenium/standalone-firefox
+
