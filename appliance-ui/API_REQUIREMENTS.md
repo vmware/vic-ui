@@ -19,20 +19,23 @@ The API would not be used directly by audience - VI admins. It would mostly be a
   
     - #### Request body
 
-      ```username=string``` (required)
-
-      ```password=string``` (required)
+      ```
+      {
+        username: string;
+        password: string;
+      }
+      ```
 
     - #### Notes
 
-      This endpoint is a gate keeper that will return a token that will be validated for any action in the Configuration secion of the Appliance Admin UI. In a success response it should return a JWT token that could be used by UI to keep a user session alive for a certain period of time. How long we want to keep the token valid is pending further discussions
+      This endpoint returns a token that will be validated for any action in the Configuration secion of the Appliance Admin UI. In a success response it should return a JWT token that could be used by UI to keep a user session alive for a certain period of time. How long we want to keep the token valid is pending further discussions
 
 ## Appliance
   - ### isApplianceReady
 
     - #### Purpose
 
-      Check if the web interface of the VIC Appliance is ready to be accessed before any critical tasks are completed during the appliance boot
+      Check if the web interface of the VIC Appliance is ready to be accessed.
 
     - #### Method
 
@@ -40,7 +43,7 @@ The API would not be used directly by audience - VI admins. It would mostly be a
 
     - #### Notes
 
-      This endpoint is polled at a certain interval. Its expected return format is a boolean value, which then would be used by the UI to determine which page to render
+      This endpoint is polled at a certain interval until the appliance has booted and become ready before any critical tasks can be performed. Its expected return format is a boolean value.
 
   - ### registerWithPSC
 
@@ -54,13 +57,14 @@ The API would not be used directly by audience - VI admins. It would mostly be a
 
     - #### Request body
 
-      ```username=string``` (required)
-
-      ```password=string``` (required)
-
-      ```external_psc``` (optional)
-
-      ```external_psc_domain``` (optional)
+      ```
+      {
+        username: string;
+        password: string;
+        external_psc?: string;
+        external_psc_domain?: string;
+      };
+      ```
 
     - #### Notes
 
