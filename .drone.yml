@@ -129,7 +129,3 @@ services:
   selenium:
     image: selenium/standalone-firefox
 
-  dind:
-    image: docker:dind
-    privileged: true
-    pull: true
