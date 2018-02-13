@@ -7,7 +7,7 @@ FROM node:8
 
 ENV TLS_CERTIFICATE=/certs/server.cert.pem
 ENV TLS_PRIVATE_KEY=/certs/server.key.pem
-ENV TLS_PORT=7443
+ENV TLS_PORT=443
 
 WORKDIR /opt/vmware/vic-ui/vic-appliance-ui
 
