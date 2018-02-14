@@ -81,6 +81,17 @@ pipeline:
       branch: [ refs/tags/* ]
       status: success
 
+  pass-rate:
+    image: harbor.ci.drone.local/library/vic-integration-test:1.42
+    pull: true
+    environment:
+      BIN: bin
+      SHELL: /bin/bash
+      GITHUB_AUTOMATION_API_KEY:  ${GITHUB_AUTOMATION_API_KEY}
+      SLACK_URL: ${SLACK_URL}
+    commands:
+      - tests/pass-rate.sh
+
 services:
   selenium:
     image: selenium/standalone-firefox
