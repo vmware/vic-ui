@@ -197,7 +197,7 @@
             </componentClass>
         </object>
     </extension>
-    
+
     <extension id="com.vmware.vic.actionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
@@ -211,7 +211,7 @@
                   <object><root>
                       <!-- execute the action on client-side (html view in a modal dialog) -->
                       <actionUrl>/vsphere-client/vic/resources/build-dev/index.html?view=ui-actions</actionUrl>
-                      <dialogTitle>Wait...</dialogTitle>
+                      <dialogTitle>Loading...</dialogTitle>
                   </root></object>
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
@@ -225,7 +225,7 @@
                   <object><root>
                       <!-- execute the action on client-side (html view in a modal dialog) -->
                       <actionUrl>/vsphere-client/vic/resources/build-dev/index.html?view=ui-actions</actionUrl>
-                      <dialogTitle>Wait...</dialogTitle>
+                      <dialogTitle>Loading...</dialogTitle>
                   </root></object>
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
@@ -250,7 +250,7 @@
             </propertyConditions>
       </metadata>
    </extension>
-   
+
    <extension id="com.vmware.vic.menu">
       <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
       <object>
