@@ -37,6 +37,8 @@ export class OperationsUserComponent implements OnInit {
 
   ngOnInit() { }
 
+  onPageLoad() { }
+
   onCommit(): Observable<any> {
     const result = {
       'operations': {
