@@ -202,9 +202,9 @@ Teardown Script Test Suite
 
 Cleanup MacOS Testbed
     ${files_to_remove}=  Catenate
-    ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
-    ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
-    ...  /Users/browseruser/Desktop/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
+    ...  /Users/browseruser/Desktop/vic/tests/test-cases/Group18-VIC-UI/testbed-information
+    ...  /Users/browseruser/Desktop/vic/tests/test-cases/Group18-VIC-UI/VCH-0*
+    ...  /Users/browseruser/Desktop/vic/tests/test-cases/Group18-VIC-UI/18-*.zip
     ...  /tmp/vic-ui-e2e-scratch
 
     ${output}=  Run  rm -rvf ${files_to_remove} 2>&1
@@ -212,9 +212,9 @@ Cleanup MacOS Testbed
 
 Cleanup Windows Testbed
     ${files_to_remove}=  Catenate
-    ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/testbed-information
-    ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/VCH-0*
-    ...  ~/vic/tests/manual-test-cases/Group18-VIC-UI/18-*.zip
+    ...  ~/vic/tests/test-cases/Group18-VIC-UI/testbed-information
+    ...  ~/vic/tests/test-cases/Group18-VIC-UI/VCH-0*
+    ...  ~/vic/tests/test-cases/Group18-VIC-UI/18-*.zip
     ...  /tmp/vic-ui-e2e-scratch
 
     ${output}=  Run  rm -rf ${files_to_remove} 2>&1
@@ -254,7 +254,7 @@ Install VIC Product OVA
     # check if OVA file is locally available already and download if there's none
     ${ova_exists}=  Run Keyword And Return Status  OperatingSystem.File Should Exist  ${ova_local_path}
     Run Keyword If  ${ova_exists}  Log To Console  OVA file is already found at ${ova_local_path}
-    Run Keyword Unless  ${ova_exists}  Download VIC OVA  ${ova_url}  ${ova_local_path}    
+    Run Keyword Unless  ${ova_exists}  Download VIC OVA  ${ova_url}  ${ova_local_path}
 
     Log To Console  \nInstalling VIC appliance...
     Log To Console  \novftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'\n
@@ -262,7 +262,7 @@ Install VIC Product OVA
     Should Contain  ${output}  Completed successfully
     Should Contain  ${output}  Received IP address:
 
-    ${output}=  Split To Lines  ${output} 
+    ${output}=  Split To Lines  ${output}
     :FOR  ${line}  IN  @{output}
     \   ${status}=  Run Keyword And Return Status  Should Contain  ${line}  Received IP address:
     \   ${ip}=  Run Keyword If  ${status}  Fetch From Right  ${line}  ${SPACE}
@@ -333,5 +333,5 @@ Prepare VIC Engine Binaries
 
 Open SSH Connection
   [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
-  Open Connection  ${host}  port=${port}  
+  Open Connection  ${host}  port=${port}
   Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
