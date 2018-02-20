@@ -41,8 +41,11 @@
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/com.springsource.javax.servlet-2.5.0.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/javax.servlet-api-3.0.1.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-web-3.1.4.RELEASE.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-web-4.3.9.RELEASE.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-beans-3.1.4.RELEASE.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-beans-4.3.9.RELEASE.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-context-3.1.4.RELEASE.jar"/>
+            <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/spring-context-4.3.9.RELEASE.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/gson-2.3.1.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/libs/vim25.jar"/>
             <pathelement path="${VSPHERE_H5C_SDK_HOME}/vsphere-ui/server/repository/usr/vlsiCore.jar"/>

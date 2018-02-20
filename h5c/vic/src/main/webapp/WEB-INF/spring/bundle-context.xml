@@ -19,22 +19,6 @@
    <mvc:annotation-driven />
    <context:annotation-config/>
 
-   <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-      <property name="mediaTypes">
-         <map>
-            <entry key="json" value="application/json"/>
-         </map>
-      </property>
-      <property name="defaultViews">
-         <list>
-            <!-- This is required to render the controller responses as Json -->
-            <bean
-               class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
-         </list>
-      </property>
-   </bean>
-
-
    <!-- Standard controller beans: you can modify them if necessary -->
 
    <bean name="servicesController" class="com.vmware.vic.mvc.ServicesController" />
