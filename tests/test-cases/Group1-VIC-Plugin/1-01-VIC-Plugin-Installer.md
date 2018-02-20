@@ -1,8 +1,8 @@
-Test 18-2 - VIC UI Uninstallation
+Test 1-01 - VIC UI Installation
 ======
 
 #Purpose:
-To test all possible uninstallation failures and success scenarios on VCSA
+To test all possible installation failures and success scenarios on VCSA
 
 #References:
 
@@ -20,8 +20,8 @@ To test all possible uninstallation failures and success scenarios on VCSA
 8. Script should fail when the user attempts to install the plugin against a non vCenter host
 9. Script should fail when the user attempts to pass wrong vCenter admin credentials
 10. [Unix-like OS only] Script should fail when the user provides a wrong VC thumbprint
-11. [Unix-like OS only] Script should successfully uninstall the plugins
-12. Script should fail when trying to uninstall the plugins already gone
+11. [Unix-like OS only] Script should fail when the URL to the plugin bundles on VIC appliance is incorrect
+12. Script should successfully install the plugins
 
 #Expected Outcome:
 * Each step should return success

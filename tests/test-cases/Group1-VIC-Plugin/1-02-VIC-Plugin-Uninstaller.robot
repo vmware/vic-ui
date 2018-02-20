@@ -1,4 +1,4 @@
-# Copyright 2017 VMware, Inc. All Rights Reserved.
+# Copyright 2016-2017 VMware, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,195 +13,184 @@
 # limitations under the License
 
 *** Settings ***
-Documentation   Test 18-3 - VIC UI Upgrade
-Resource        ../../resources/Util.robot
-Resource        ./vicui-common.robot
-Test Teardown   Cleanup Installer Environment
-Suite Setup     Load Testbed Information And Force Remove Vicui Plugin
+Documentation  Test 1-02 - VIC UI Uninstallation
+Resource       ../../resources/Util.robot
+Resource       ./vicui-common.robot
+Test Teardown  Cleanup Installer Environment
+Suite Setup    Load Testbed Information And Force Install Vicui Plugin
 Suite Teardown  Teardown Script Test Suite
 
 *** Variables ***
-${REMOTE_RESULTS_FOLDER}  /tmp/vic-ui-e2e-upgrader
+${REMOTE_RESULTS_FOLDER}  /tmp/vic-ui-e2e-uninstaller
 
 *** Keywords ***
-Load Testbed Information And Force Remove Vicui Plugin
+Load Testbed Information And Force Install Vicui Plugin
     # load nimbus & vch testbed information from testbed-information
     Load Nimbus Testbed Env
-    Force Remove Vicui Plugin
     Set Absolute Script Paths
+    Force Install Vicui Plugin
 
 *** Test Cases ***
-TestCase-Attempt To Upgrade With Configs File Missing
+TestCase-Attempt To Uninstall With Configs File Missing
     [Tags]  anyos
-    # Rename the configs file and run the upgrader script to see if it fails in an expected way
+    # Rename the configs file and run the uninstaller script to see if it fails in an expected way
     Move File  ${UI_INSTALLER_PATH}/configs  ${UI_INSTALLER_PATH}/configs_renamed
-    Run Keyword And Continue On Failure  Script Fails For Missing Config Or Manifest  upgrade
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Script Fails For Missing Config Or Manifest  uninstall
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Configs file is missing
     Move File  ${UI_INSTALLER_PATH}/configs_renamed  ${UI_INSTALLER_PATH}/configs
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-with-configs-file-missing.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-with-configs-file-missing.log
     Should Be True  ${passed}
 
-TestCase-Attempt To Upgrade With Plugin Manifest Missing
+TestCase-Attempt To Uninstall With Plugin Manifest Missing
     [Tags]  anyos
     Move File  ${UI_INSTALLER_PATH}/../plugin-manifest  ${UI_INSTALLER_PATH}/../plugin-manifest-a
-    Run Keyword And Continue On Failure  Script Fails For Missing Config Or Manifest  upgrade
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Script Fails For Missing Config Or Manifest  uninstall
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Plugin manifest was not found
     Move File  ${UI_INSTALLER_PATH}/../plugin-manifest-a  ${UI_INSTALLER_PATH}/../plugin-manifest
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-with-manifest-missing.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-with-manifest-missing.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Enter VC IP
     [Tags]    unixlike
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  None  Enter FQDN or IP to target vCenter Server
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  None  Enter FQDN or IP to target vCenter Server
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter FQDN or IP to target vCenter Server
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-be-prompted-to-fail-enter-vc-ip.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-be-prompted-to-fail-enter-vc-ip.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Enter VC IP
     [Tags]    windows
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -p pw  Enter FQDN or IP to target vCenter Server
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -p pw  Enter FQDN or IP to target vCenter Server
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter FQDN or IP to target vCenter Server
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-be-prompted-to-fail-enter-vc-ip.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-be-prompted-to-fail-enter-vc-ip.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Enter VC Username
     [Tags]    unixlike
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP}  Enter your vCenter Administrator Username
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP}  Enter your vCenter Administrator Username
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter your vCenter Administrator Username
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-be-prompted-to-enter-vc-username.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-be-prompted-to-enter-vc-username.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Enter VC Username
     [Tags]    windows
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -p pw  Enter your vCenter Administrator Username
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -p pw  Enter your vCenter Administrator Username
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter your vCenter Administrator Username
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-be-prompted-to-enter-vc-username.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-be-prompted-to-enter-vc-username.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Enter VC Password
     [Tags]    unixlike
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME}  Enter your vCenter Administrator Password
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME}  Enter your vCenter Administrator Password
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Enter your vCenter Administrator Password
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-be-prompted-to-enter-vc-password.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-be-prompted-to-enter-vc-password.log
     Should Be True  ${passed}
 
 TestCase-Be Prompted to Verify VC Thumbprint
     [Tags]    anyos
     Remove Environment Variable  VIC_MACHINE_THUMBPRINT
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Are you sure you trust the authenticity of this host
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Are you sure you trust the authenticity of this host
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  ${VC_FINGERPRINT}
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-be-prompted-to-verify-vc-thumbprint.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-be-prompted-to-verify-vc-thumbprint.log
     Should Be True  ${passed}
 
-TestCase-Attempt To Upgrade With VIC_MACHINE_THUMBPRINT Env Var Set
+TestCase-Attempt To Uninstall With VIC_MACHINE_THUMBPRINT Env Var Set
     [Tags]    anyos
     Set Environment Variable  VIC_MACHINE_THUMBPRINT  ${VC_FINGERPRINT}
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Are you sure you trust the authenticity of this host
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Are you sure you trust the authenticity of this host
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  ${VC_FINGERPRINT}
     Remove Environment Variable  VIC_MACHINE_THUMBPRINT
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-with-vic_machine_thumbprint-env-var-set.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-with-vic_machine_thumbprint-env-var-set.log
     Should Be True  ${passed}
 
-TestCase-Attempt To Upgrade Against A Non vCenter Server
+TestCase-Attempt To Uninstall From A Non vCenter Server
     [Tags]    unixlike
-    Run Keyword And Continue On Failure  Interact With Upgrade Sh  not-a-vcenter-server  admin  password
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Uninstall Fails  not-a-vcenter-server  admin  password
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  vCenter Server was not found
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-against-a-non-vcenter-server.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-from-a-non-vcenter-server.log
     Should Be True  ${passed}
 
-TestCase-Attempt To Upgrade Against A Non vCenter Server
+TestCase-Attempt To Uninstall From A Non vCenter Server
     [Tags]    windows
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i not-a-vcenter-server -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Error
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i not-a-vcenter-server -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  Error
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Error
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-against-a-non-vcenter-server.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-attempt-to-a-non-vcenter-server.log
     Should Be True  ${passed}
 
-TestCase-Attempt To Upgrade With Wrong Vcenter Credentials
+TestCase-Attempt To Uninstall With Wrong Vcenter Credentials
     [Tags]    unixlike
     Set Fileserver And Thumbprint In Configs
-    Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}_nope  ${TEST_VC_PASSWORD}_nope
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Uninstall Fails  ${TEST_VC_IP}  ${TEST_VC_USERNAME}_nope  ${TEST_VC_PASSWORD}_nope
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Cannot complete login due to an incorrect user name or password
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-with-wrong-vcenter-credentials.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-with-wrong-vcenter-credentials.log
     Should Be True  ${passed}
 
-TestCase-Attempt To Upgrade With Wrong Vcenter Credentials
+TestCase-Attempt To Uninstall With Wrong Vcenter Credentials
     [Tags]    windows
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME}_nope -p ${TEST_VC_PASSWORD}_nope  ${EMPTY}  ${TRUE}
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME}_nope -p ${TEST_VC_PASSWORD}_nope  ${EMPTY}  ${TRUE}
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     # TODO: replace the following error message with "Cannot complete login due to an incorrect user name or password"
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Error
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-with-wrong-vcenter-credentials.log
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-with-wrong-vcenter-credentials.log
     Should Be True  ${passed}
 
-TestCase-Attempt to Upgrade With Unmatching VC Fingerprint
+TestCase-Attempt to Uninstall With Unmatching Fingerprint
     [Tags]    unixlike
     Append To File  ${UI_INSTALLER_PATH}/configs  BYPASS_PLUGIN_VERIFICATION=1\n
-    Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${FALSE}  ff:ff:ff
-    ${output}=  OperatingSystem.GetFile  upgrade.log
+    Run Keyword And Continue On Failure  Uninstall Fails  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${FALSE}  ff:ff:ff
+    ${output}=  OperatingSystem.GetFile  uninstall.log
     ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  does not match
-    Run Keyword Unless  ${passed}  Move File  upgrade.log  upgrade-fail-attempt-to-upgrade-with-unmatching-fingerprint.log
+    Run Keyword Unless  ${passed}  Move File  install.log  uninstall-fail-attempt-to-uninstall-with-unmatching-fingerprint.log
     Should Be True  ${passed}
 
-TestCase-Attempt To Upgrade With Wrong OVA Fileserver URL
+TestCase-Uninstall Successfully
     [Tags]    unixlike
-    Set Fileserver And Thumbprint In Configs  ${TRUE}
-    Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}
-    ${output}=  OperatingSystem.GetFile  upgrade.log
-    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Error
-    Run Keyword Unless  ${passed}  Move File  install.log  upgrade-fail-attempt-to-upgrade-with-wrong-ova-fileserver-url.log
+    Set Fileserver And Thumbprint In Configs
+    Run Keyword And Continue On Failure  Uninstall Vicui  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
+    ${output}=  OperatingSystem.GetFile  uninstall.log
+    ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-uninstall-successfully.log
     Should Be True  ${passed}
 
-TestCase-Upgrade When No Plugin Is Installed
-    [Tags]    unixlike
-    Set Fileserver And Thumbprint In Configs
-    Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}
-    ${output}=  OperatingSystem.GetFile  upgrade.log
-    ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Do you want to install
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
-    Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-no-plugin-is-installed.log
-    Should Be True  ${passed} and ${passed2}
-
-TestCase-Upgrade When No Plugin Is Installed
+TestCase-Uninstall Plugin Successfully
     [Tags]    windows
     Remove Environment Variable  VIC_MACHINE_THUMBPRINT  target_vcenter_ip  vcenter_username  vcenter_password
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  ${TRUE}  ${TRUE}
-    ${output}=  OperatingSystem.GetFile  upgrade.log
-    ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Do you want to install
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
-    Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-no-plugin-is-installed.log
-    Should Be True  ${passed} and ${passed2}
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True
+    ${output}=  OperatingSystem.GetFile  uninstall.log
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  Exited successfully
+    Run Keyword Unless  ${passed}  Move File  uninstall.log  uninstall-fail-ensure-vicui-is-installed-before-testing.log
+    Should Be True  ${passed}
 
-TestCase-Upgrade When Plugins Are Already Installed
+TestCase-Attempt To Uninstall Plugin That Is Already Gone
     [Tags]    unixlike
     Set Fileserver And Thumbprint In Configs
-    Run Keyword And Continue On Failure  Interact With Upgrade Sh  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}
-    ${output}=  OperatingSystem.GetFile  upgrade.log
-    ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Are you sure you want to continue
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
-    Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-plugins-are-already-installed.log
-    Should Be True  ${passed} and ${passed2}
+    Run Keyword And Continue On Failure  Uninstall Vicui  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
+    ${output}=  OperatingSystem.GetFile  uninstall.log
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  'com.vmware.vic.ui' is not registered
+    ${passed2}=  Run Keyword And Return Status  Should Contain  ${output}  'com.vmware.vic' is not registered
+    Run Keyword Unless  (${passed} and ${passed2})  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-plugin-that-is-already-gone.log
+    Should Be True  ${passed}
 
-TestCase-Upgrade When Plugins Are Already Installed
+TestCase-Attempt To Uninstall Plugin That Is Already Gone
     [Tags]    windows
     Remove Environment Variable  VIC_MACHINE_THUMBPRINT  target_vcenter_ip  vcenter_username  vcenter_password
-    Run Keyword And Continue On Failure  Interact With Script  upgrade  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  ${TRUE}  ${TRUE}
-    ${output}=  OperatingSystem.GetFile  upgrade.log
-    ${passed}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Are you sure you want to continue
-    ${passed2}=  Run Keyword And Return Status  Should Match Regexp  ${output}  Exited successfully
-    Run Keyword Unless  ${passed} and ${passed2}  Move File  upgrade.log  upgrade-fail-upgrade-when-plugins-are-already-installed.log
-    Should Be True  ${passed} and ${passed2}
+    Run Keyword And Continue On Failure  Interact With Script  uninstall  -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True
+    ${output}=  OperatingSystem.GetFile  uninstall.log
+    ${passed}=  Run Keyword And Return Status  Should Contain  ${output}  failed to find target plugin (com.vmware.vic.ui)
+    ${passed2}=  Run Keyword And Return Status  Should Contain  ${output}  failed to find target plugin (com.vmware.vic)
+    Run Keyword Unless  (${passed} and ${passed2})  Move File  uninstall.log  uninstall-fail-attempt-to-uninstall-plugin-that-is-already-gone.log
+    Should Be True  ${passed}
 
 # Run the test cases above in macOS
 Run Testcases On Mac
@@ -236,7 +225,7 @@ Run Testcases On Mac
     # remotely run robot test
     ${run_tests_command}=  Catenate
     ...  cd ${remote_vic_root}/tests/manual-test-cases/Group18-VIC-UI 2>&1 &&
-    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-3-VIC-UI-Upgrader.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-2-VIC-UI-Uninstaller.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${rc}=  Execute Command  ${run_tests_command}  return_rc=True
 
     # Store whether the run was successful
@@ -282,7 +271,7 @@ Run Testcases On Windows
     ...  git checkout -f master &&
     ...  git rebase vmware/master &&
     ...  cd tests/manual-test-cases/Group18-VIC-UI &&
-    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-3-VIC-UI-Upgrader.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-2-VIC-UI-Uninstaller.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
 
     # Store whether the run was successful, print out any error message
