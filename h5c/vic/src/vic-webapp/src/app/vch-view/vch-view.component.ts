@@ -238,7 +238,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     this.isDgLoading = true;
     Observable.combineLatest(
       this.createWzService.getVicApplianceIp(),
-      this.createWzService.acquireCloneTicket()
+      this.createWzService.acquireCloneTicket(vch.id.split(':')[4])
     ).catch(err => {
       return Observable.throw(err);
     }).subscribe(([serviceHost, cloneTicket]) => {

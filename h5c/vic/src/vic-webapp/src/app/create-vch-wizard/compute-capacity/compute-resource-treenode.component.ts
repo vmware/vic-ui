@@ -28,14 +28,9 @@ import { DC_CLUSTER, DC_STANDALONE_HOST } from '../../shared/constants';
 
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { Observable } from 'rxjs/Observable';
-
-export interface ComputeResource {
-  text: string;
-  nodeTypeId: string;
-  objRef: string;
-  aliases: string[];
-  isEmpty: boolean;
-}
+import { GlobalsService } from '../../shared';
+import { ComputeResource } from '../../interfaces/compute.resource';
+import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
 
 /**
  * Component that renders a tree view of the inventory items on the selected Datacenter
@@ -48,12 +43,13 @@ export interface ComputeResource {
   templateUrl: './compute-resource-treenode.template.html'
 })
 export class ComputeResourceTreenodeComponent implements OnInit {
-  @Input() datacenter: ComputeResource;
   public loading = true;
   public clusters: ComputeResource[];
   public clusterHostSystemsMap: {[clusterRef: string]: ComputeResource[]} = {};
   public standaloneHosts: ComputeResource[];
   public selectedResourceObj: ComputeResource;
+  @Input() serverInfo: ServerInfo;
+  @Input() datacenter: ComputeResource;
   @Output() resourceSelected: EventEmitter<{
     obj: ComputeResource,
     parentClusterObj?: ComputeResource,
@@ -64,7 +60,8 @@ export class ComputeResourceTreenodeComponent implements OnInit {
 
   constructor(
     private createWzService: CreateVchWizardService,
-    private renderer: Renderer
+    private renderer: Renderer,
+    private globalsService: GlobalsService
   ) {
     this.resourceSelected = new EventEmitter<{
       obj: ComputeResource,
@@ -74,17 +71,17 @@ export class ComputeResourceTreenodeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadClusters(this.datacenter);
+    this.loadClusters(this.serverInfo);
   }
 
-  loadClusters(dc: ComputeResource) {
+  loadClusters(serverInfo: ServerInfo) {
     this.loading = true;
     this.createWzService
-      .getClustersList()
+      .getClustersList(serverInfo.serviceGuid)
       .subscribe(val => {
-        const filteredByDc = val.filter(v => v['datacenterObjRef'] === dc.objRef);
-        this.clusters = filteredByDc.filter(v => v.nodeTypeId === DC_CLUSTER);
-        this.standaloneHosts = filteredByDc.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
+        // const filteredByDc = val.filter(v => v['datacenterObjRef'] === dc.objRef);
+        this.clusters = val.filter(v => v.nodeTypeId === DC_CLUSTER);
+        this.standaloneHosts = val.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
 
         if (!this.clusters.length) {
           this.loading = false;
