@@ -84,7 +84,9 @@ export class CreateVchWizardService {
      * @returns {Observable<string>} Observable containing the clone ticket
      */
     acquireCloneTicket(serviceGuid: string): Observable<string> {
-      return this.http.post(GET_CLONE_TICKET_URL, { serviceGuid: serviceGuid })
+      const params = new URLSearchParams();
+      params.set('serviceGuid', serviceGuid);
+      return this.http.post(GET_CLONE_TICKET_URL, params)
           .catch(e => Observable.throw(e))
           .map(response => response.text())
           .catch(e => Observable.throw(e));

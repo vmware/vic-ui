@@ -726,19 +726,17 @@ public class PropFetcher implements ClientSessionEndListener {
 
         try {
             for (ServerInfo sInfo : sInfos) {
-                if (sInfo.serviceGuid == null || sInfo.serviceGuid != serviceGuid) {
-                    continue;
+                if (serviceGuid.equals(sInfo.serviceGuid)) {
+                    ServiceContent service = getServiceContent(serviceGuid);
+
+                    if (service == null) {
+                        _logger.error("Failed to retrieve ServiceContent!");
+                        return null;
+                    }
+
+                    ManagedObjectReference sessionMgrRef = service.getSessionManager();
+                    return _vimPort.acquireCloneTicket(sessionMgrRef);
                 }
-
-                ServiceContent service = getServiceContent(serviceGuid);
-
-                if (service == null) {
-                    _logger.error("Failed to retrieve ServiceContent!");
-                    return null;
-                }
-
-                ManagedObjectReference sessionMgrRef = service.getSessionManager();
-                return _vimPort.acquireCloneTicket(sessionMgrRef);
             };
         } catch (SecurityException e) {
             e.printStackTrace();

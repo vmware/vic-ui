@@ -53,6 +53,7 @@ import {State} from 'clarity-angular';
 import {Subscription} from 'rxjs/Subscription';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from './vch.model';
+import { getServerInfoByVchObjRef } from '../shared/utils/object-reference';
 
 @Component({
   selector: 'vic-vch-view',
@@ -244,9 +245,13 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
     }).subscribe(([serviceHost, cloneTicket]) => {
       const vchId = vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
-      const targetHost = this.extSessionService.getVcenterServersInfo()[0];
-      const targetHostname = targetHost.name;
-      const targetThumbprint = targetHost.thumbprint;
+      const vc = getServerInfoByVchObjRef(
+        this.globalsService.getWebPlatform().getUserSession().serversInfo,
+        vch
+      );
+
+      const targetHostname = vc ? vc.name : null;
+      const targetThumbprint = vc ? vc.thumbprint : null;
       const url =
         `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/vch/${vchId}/certificate?thumbprint=${targetThumbprint}`;
 
