@@ -92,7 +92,7 @@
             <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
                 <object>
                     <root>
-                        <url>/vsphere-client/vic/resources/build-dev/index.html?view=summary-view</url>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=summary-view</url>
                     </root>
                 </object>
             </componentClass>
@@ -114,7 +114,7 @@
             <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
                 <object>
                     <root>
-                        <url>/vsphere-client/vic/resources/build-dev/index.html?view=portlet</url>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=portlet</url>
                     </root>
                 </object>
             </componentClass>
@@ -144,7 +144,7 @@
             <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
                 <object>
                     <root>
-                        <url>/vsphere-client/vic/resources/build-dev/index.html?view=portlet</url>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=portlet</url>
                     </root>
                 </object>
             </componentClass>
@@ -176,7 +176,7 @@
             <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
                 <object>
                     <root>
-                        <url>/vsphere-client/vic/resources/build-dev/index.html?view=vch-view</url>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=vch-view</url>
                     </root>
                 </object>
             </componentClass>
@@ -191,7 +191,7 @@
             <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
                 <object>
                     <root>
-                        <url>/vsphere-client/vic/resources/build-dev/index.html?view=container-view</url>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=container-view</url>
                     </root>
                 </object>
             </componentClass>

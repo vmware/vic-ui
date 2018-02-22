@@ -1,35 +1,32 @@
-<!-- Copyright 2017-2018 VMware, Inc. All Rights Reserved. -->
-<ng-template [clrIfExpanded]="false">
-    <ng-container>
-      <!-- cluster and clusterhostsystems -->
-      <clr-tree-node *ngFor="let cluster of clusters"
-                     [clrLoading]="loading">
-        <button #btnEl class="clr-treenode-link cc-resource"
-                *ngIf="!cluster.isEmpty"
-                (click)="selectResource($event, cluster)">
-          <clr-icon shape="cluster"></clr-icon>
+<!-- Copyright 2017-2018 VMware, Inc. All Rights Reserved.-->
+
+<!-- cluster and cluster hostsystems -->
+<clr-tree-node *ngFor="let cluster of clusters"
+               [clrLoading]="loading">
+  <button #btnEl class="clr-treenode-link cc-resource"
+          *ngIf="!cluster.isEmpty"
+          (click)="selectResource($event, cluster)">
+    <clr-icon shape="cluster"></clr-icon>
           {{ cluster['text'] }}
-        </button>
+  </button>
 
-        <ng-template [clrIfExpanded]="false">
-          <ng-container>
-            <clr-tree-node *ngFor="let clHost of clusterHostSystemsMap[cluster.objRef]">
-              <button #btnEl class="clr-treenode-link cc-resource">
-                <clr-icon shape="host"></clr-icon>
-                {{ clHost['text'] }}
-              </button>
-            </clr-tree-node>
-          </ng-container>
-        </ng-template>
-      </clr-tree-node>
-
-      <!-- standalone hosts -->
-      <clr-tree-node *ngFor="let host of standaloneHosts">
-        <button #btnEl class="clr-treenode-link cc-resource"
-                (click)="selectResource($event, host)">
+  <ng-template [clrIfExpanded]="false">
+    <ng-container>
+      <clr-tree-node *ngFor="let clHost of clusterHostSystemsMap[cluster.objRef]">
+        <button #btnEl class="clr-treenode-link cc-resource">
           <clr-icon shape="host"></clr-icon>
-          {{ host['text'] }}
+            {{ clHost['text'] }}
         </button>
       </clr-tree-node>
     </ng-container>
   </ng-template>
+</clr-tree-node>
+
+<!-- standalone hosts -->
+<clr-tree-node *ngFor="let host of standaloneHosts">
+  <button #btnEl class="clr-treenode-link cc-resource"
+          (click)="selectResource($event, host)">
+    <clr-icon shape="host"></clr-icon>
+      {{ host['text'] }}
+    </button>
+</clr-tree-node>
