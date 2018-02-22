@@ -32,7 +32,7 @@
     </div>
   </clr-alert>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.component.form?.invalid || false"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
@@ -133,7 +133,7 @@
     </ng-template>
     <ng-template clrPageNavTitle>Security</ng-template>
 
-    <vic-vch-creation-security [vchName]="generalStep.form.get('name').value"
+    <vic-vch-creation-security [vchName]="generalStep.component.model?.name"
                                [datacenter]="computeCapacityStep.dcObj"
                                #securityStep>
     </vic-vch-creation-security>

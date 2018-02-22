@@ -30,6 +30,7 @@ import { StorageCapacityComponent } from './storage-capacity/storage-capacity.co
 import { SummaryComponent } from './summary/summary.component';
 import { VchCreationWizardGeneralComponent } from './general/general.component';
 import { RegistryAccessComponent } from './registry-access/registry-access.component';
+import { SharedModule } from '../shared/shared.module';
 
 const routes: Routes = [
   { path: '', component: CreateVchWizardComponent },
@@ -42,7 +43,8 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     ClarityModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    SharedModule
   ],
   declarations: [
     CreateVchWizardComponent,
