@@ -27,6 +27,8 @@ const appRoutes: Routes = [
     { path: 'vch-view', loadChildren: './vch-view/vch-view.module#VicVchViewModule' },
     { path: 'container-view', loadChildren: './container-view/container-view.module#VicContainerViewModule' },
     { path: 'create-vch', loadChildren: './create-vch-wizard/create-vch-wizard.module#CreateVchWizardModule' },
+    { path: 'configure-vch-view', loadChildren: './configure-vch-view/configure-vch-view.module#ConfigureVchViewModule' },
+    { path: 'configure-vch-modal', loadChildren: './configure-vch-modal/configure-vch-modal.module#ConfigureVchModalModule' },
     { path: 'delete-vch', loadChildren: './delete-vch-modal/delete-vch-modal.module#DeleteVchModalModule' },
     { path: 'ui-actions', loadChildren: './ui-actions/ui-actions.module#UiActionsModule' }
 ];
