@@ -1,0 +1,99 @@
+<div class="stack-header">
+  <div class="stack-title"></div>
+  <button class="stack-action btn btn-sm"
+          type="button"
+          (click)="launchVchConfigureModal()"
+  >
+    Edit...
+  </button>
+</div>
+<clr-tabs>
+  <clr-tab>
+    <button clrTabLink>General</button>
+    <clr-tab-content *clrIfActive>
+
+      <clr-stack-view class="mt-2">
+        <clr-stack-block>
+          <clr-stack-label>VCH Name</clr-stack-label>
+          <clr-stack-content>virtual-container-host</clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block>
+          <clr-stack-label>Container VM name template</clr-stack-label>
+          <clr-stack-content>ssdc-east-(container ID)</clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block>
+          <clr-stack-label>Debug</clr-stack-label>
+          <clr-stack-content>0 - Verbose logging is disabled</clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block>
+          <clr-stack-label>Syslog</clr-stack-label>
+          <clr-stack-content>tcp://192.168.0.1:514</clr-stack-content>
+        </clr-stack-block>
+      </clr-stack-view>
+
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button clrTabLink>Compute</button>
+    <clr-tab-content>
+
+      <clr-stack-view class="mt-2">
+        <clr-stack-block>
+          <clr-stack-label>Cluster/Resource pool</clr-stack-label>
+          <clr-stack-content>Datacenter_1/Cluster_5/Resource_Pool_1</clr-stack-content>
+        </clr-stack-block>
+      </clr-stack-view>
+
+      <clr-stack-view>
+        <clr-stack-header>Virtual Container Host limits</clr-stack-header>
+        <clr-stack-block>
+          <clr-stack-label>CPU</clr-stack-label>
+          <clr-stack-content>Unlimited</clr-stack-content>
+        </clr-stack-block>
+        <clr-stack-block>
+          <clr-stack-label>Memory</clr-stack-label>
+          <clr-stack-content>0 - Verbose logging is disabled</clr-stack-content>
+        </clr-stack-block>
+      </clr-stack-view>
+
+      <clr-stack-view>
+        <clr-stack-header>Virtual Container Host settings</clr-stack-header>
+      </clr-stack-view>
+
+      <clr-stack-view>
+        <clr-stack-header>VM endpoint settings</clr-stack-header>
+      </clr-stack-view>
+
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button clrTabLink>Storage</button>
+    <clr-tab-content >
+      storage stack view
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button clrTabLink>Network</button>
+    <clr-tab-content >
+      network stack view
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button clrTabLink>Security</button>
+    <clr-tab-content>
+      security stack view
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button clrTabLink>Registry Access</button>
+    <clr-tab-content>
+      registry access stack view
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button clrTabLink>Operations User</button>
+    <clr-tab-content>
+      operations user stack view
+    </clr-tab-content>
+  </clr-tab>
+</clr-tabs>

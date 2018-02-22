@@ -1,0 +1,66 @@
+<div class="clr-wizard clr-wizard--inline">
+  <div class="spinner"></div>
+  <clr-modal #modal>
+    <h3 class="modal-title">
+      <div>Edit Virtual Container Host</div>
+      <div class="separator"></div>
+      <div class="subtitle">virtual-container-host</div>
+    </h3>
+    <div class="modal-body">
+      <div class="clr-wizard-content">
+        <div class="clr-wizard-page pt-0">
+          <clr-tabs #tabs>
+            <clr-tab>
+              <button clrTabLink>General</button>
+              <clr-tab-content id="general" *clrIfActive>
+                <vic-vch-general [model]="model.general" #general></vic-vch-general>
+              </clr-tab-content>
+            </clr-tab>
+            <clr-tab>
+              <button clrTabLink>Compute</button>
+              <clr-tab-content>
+                compute component
+              </clr-tab-content>
+            </clr-tab>
+            <clr-tab>
+              <button clrTabLink>Storage</button>
+              <clr-tab-content>
+                storage component
+              </clr-tab-content>
+            </clr-tab>
+            <clr-tab>
+              <button clrTabLink>Network</button>
+              <clr-tab-content>
+                network component
+              </clr-tab-content>
+            </clr-tab>
+            <clr-tab>
+              <button clrTabLink>Security</button>
+              <clr-tab-content>
+                security component
+              </clr-tab-content>
+            </clr-tab>
+            <clr-tab>
+              <button clrTabLink>Registry Access</button>
+              <clr-tab-content>
+                registry access component
+              </clr-tab-content>
+            </clr-tab>
+            <clr-tab>
+              <button clrTabLink>Operations User</button>
+              <clr-tab-content>
+                operations user component
+              </clr-tab-content>
+            </clr-tab>
+          </clr-tabs>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="clr-wizard-footer-buttons">
+        <button class="btn btn-outline" type="button" (click)="onCancel()">Cancel</button>
+        <button class="btn btn-default" type="button" (click)="onSave()">Save</button>
+      </div>
+    </div>
+  </clr-modal>
+</div>
