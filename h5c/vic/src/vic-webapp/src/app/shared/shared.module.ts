@@ -14,25 +14,29 @@
  limitations under the License.
 */
 
-import { ClarityModule } from '@clr/angular';
+import { ClarityModule } from 'clarity-angular';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModel } from '@angular/forms/src/directives/ng_model';
 import { NgModule } from '@angular/core';
 import { VicOvaVerificationComponent } from './vic-ova-verification.component';
+import { VchGeneralComponent } from './components/vch-general.component';
 
 @NgModule({
   imports: [
     CommonModule,
     ClarityModule.forChild(),
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [
-    VicOvaVerificationComponent
+    VicOvaVerificationComponent,
+    VchGeneralComponent
   ],
   providers: [],
   exports: [
-    VicOvaVerificationComponent
+    VicOvaVerificationComponent,
+    VchGeneralComponent
   ]
 })
 export class SharedModule {}
