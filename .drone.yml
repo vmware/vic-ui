@@ -1,100 +1,110 @@
-# After any change to this file you MUST re-sign and checkin the .drone.yml.sig
-# When you are ready to submit a pull request, you must regenerate .drone.yml.sig for the vmware/vic repo:
-# $ export DRONE_SERVER=https://ci.vcna.io
-# $ export DRONE_TOKEN=<token>
-# $ drone sign vmware/vic-ui
-# The secrets file is in our local git repo.  Ask mhagen for access.
-
----
 workspace:
+
   base: /go
   path: src/github.com/vmware/vic-ui
-
 pipeline:
+
   clone:
     image: plugins/git
     tags: true
-    # dont clone submodules
     recursive: false
 
-  vic-ui:
-    image: gcr.io/eminent-nation-87317/vic-integration-test:1.36
+  check-org-membership:
+    image: 'wdc-harbor-ci.eng.vmware.com/default-project/vic-integration-test:1.44'
     pull: true
     environment:
-      BUILD_NUMBER: ${DRONE_BUILD_NUMBER}
       BIN: bin
-      GS_PROJECT_ID: ${GS_PROJECT_ID}
-      GS_CLIENT_EMAIL: ${GS_CLIENT_EMAIL}
-      GS_PRIVATE_KEY: ${GS_PRIVATE_KEY}
+      GOPATH: /go
+      SHELL: /bin/bash
+    secrets:
+      - github_automation_api_key
     commands:
-      - make vic-ui-plugins
+      - echo ${DRONE_COMMIT_AUTHOR}
+      - /bin/bash -c '[[ ! $(curl --silent "https://api.github.com/orgs/vmware/members/${DRONE_COMMIT_AUTHOR}?access_token=$GITHUB_AUTOMATION_API_KEY") ]]'
+    when:
+      status: success
+
+  vic-ui:
+    image: 'gcr.io/eminent-nation-87317/vic-integration-test:1.36'
+    pull: true
+    environment:
+      BIN: bin
+    secrets:
+      - gs_client_email
+      - gs_private_key
+      - gs_project_id
+    commands:
+      - 'export BUILD_NUMBER=${DRONE_BUILD_NUMBER}'
+      - 'make vic-ui-plugins'
     when:
       repo: vmware/vic-ui
-      branch: [ master, releases/*, refs/tags/* ]
+      branch: [master, 'releases/*', 'refs/tags/*']
 
   bundle:
-    image: gcr.io/eminent-nation-87317/vic-integration-test:1.36
+    image: 'gcr.io/eminent-nation-87317/vic-integration-test:1.36'
     pull: true
     environment:
       BIN: bin
       GOPATH: /go
       SHELL: /bin/bash
     commands:
-      - mkdir -p $BIN/ui
-      - tar -czvf $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN/ui
-      - mkdir bundle
-      - mkdir bundle-release
-      - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle
-      - cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle-release/vic_ui_`git describe --tags $(git rev-list --tags --max-count=1)`.tar.gz
-      - rm -rf $BIN
-      - ls -la bundle
+      - 'mkdir -p $BIN/ui'
+      - 'tar -czvf $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz $BIN/ui'
+      - 'mkdir bundle'
+      - 'mkdir bundle-release'
+      - 'cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle'
+      - 'cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle-release/vic_ui_`git describe --tags $(git rev-list --tags --max-count=1)`.tar.gz'
+      - 'rm -rf $BIN'
+      - 'ls -la bundle'
     when:
       repo: vmware/vic-ui
-      event: [ push, tag ]
-      branch: [ master, releases/*, refs/tags/* ]
+      event: [push, tag]
+      branch: [master, 'releases/*', 'refs/tags/*']
 
   publish-gcs-builds-on-pass:
-    image: maplain/drone-gcs:latest
+    image: 'maplain/drone-gcs:latest'
     pull: true
     source: bundle
     target: vic-ui-builds
     acl:
-      - allUsers:READER
-    cache_control: public,max-age=3600
+      - 'allUsers:READER'
+    cache_control: 'public,max-age=3600'
     when:
       repo: vmware/vic-ui
-      event: [ push ]
-      branch: [ master, releases/* ]
+      event: [push]
+      branch: [master, 'releases/*']
       status: success
 
   publish-gcs-releases:
-    image: maplain/drone-gcs:latest
+    image: 'maplain/drone-gcs:latest'
     pull: true
     source: bundle-release
     target: vic-ui-releases
     acl:
-      - allUsers:READER
-    cache_control: public,max-age=3600
+      - 'allUsers:READER'
+    cache_control: 'public,max-age=3600'
     when:
       repo: vmware/vic-ui
-      event: [ push, tag ]
-      branch: [ refs/tags/* ]
+      event: [push, tag]
+      branch: ['refs/tags/*']
       status: success
 
   report-coverage:
-     image: robertstettner/drone-codecov
-     token: ${CODECOV_TOKEN}
-     files:
-       - h5c/vic/src/vic-webapp/coverage/lcov.info
+    image: 'robertstettner/drone-codecov'
+    secrets:
+      - codecov_token
+    files:
+      - 'h5c/vic/src/vic-webapp/coverage/lcov.info'
 
   pass-rate:
-    image: harbor.ci.drone.local/library/vic-integration-test:1.42
+    image: 'gcr.io/eminent-nation-87317/vic-integration-test:1.42'
     pull: true
     environment:
       BIN: bin
       SHELL: /bin/bash
-      GITHUB_AUTOMATION_API_KEY:  ${GITHUB_AUTOMATION_API_KEY}
-      SLACK_URL: ${SLACK_URL}
+    secrets:
+      - github_automation_api_key
+      - slack_url
     commands:
       - tests/pass-rate.sh
 
