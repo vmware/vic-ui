@@ -27,6 +27,7 @@ import {Modal} from 'clarity-angular';
 import {Observable} from 'rxjs/Observable';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from '../vch-view/vch.model';
+import { getServerInfoByVchObjRef } from '../shared/utils/object-reference';
 
 @Component({
   selector: 'vic-delete-vch-modal',
@@ -168,14 +169,18 @@ export class DeleteVchModalComponent implements OnInit {
     this.loading = true;
     Observable.combineLatest(
       this.createWzService.getVicApplianceIp(),
-      this.createWzService.acquireCloneTicket(),
+      this.createWzService.acquireCloneTicket(this.vch.id.split(':')[4]),
       this.createWzService.getDatacenterForResource(this.vch.id)
     ).subscribe(([serviceHost, cloneTicket, datacenter]) => {
       const vchId = this.vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
-      const targetHost = this.extSessionService.getVcenterServersInfo()[0];
-      const targetHostname = targetHost.name;
-      const targetThumbprint = targetHost.thumbprint;
+      const vc = getServerInfoByVchObjRef(
+        this.globalsService.getWebPlatform().getUserSession().serversInfo,
+        this.vch
+      );
+
+      const targetHostname = vc.name;
+      const targetThumbprint = vc.thumbprint;
       const targetDatacenter = datacenter.id.split(':')[3];
       const url =
         `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/datacenter/${targetDatacenter}` +

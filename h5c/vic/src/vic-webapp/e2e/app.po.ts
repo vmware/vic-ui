@@ -15,7 +15,7 @@ import { browser, by, element, ElementFinder } from 'protractor';
 
 export class VicWebappPage {
 
-  private h5cActionMenuToggle = 'vc-action-menu-toggle';
+  private h5cActionMenuToggle = 'vc-action-menu.tid-control-bar-user-menu';
   private h5cActionMenuLogOut = 'vc-action-menu-item:nth-of-type(3)';
   private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
@@ -24,7 +24,7 @@ export class VicWebappPage {
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
-  private iconVicRoot = '.com_vmware_vic-vic-root-icon';
+  private iconVicRoot = '.object-link a';
   private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
@@ -53,6 +53,7 @@ export class VicWebappPage {
   login() {
     browser.waitForAngularEnabled(false);
     // username
+    this.waitForElementToBePresent(this.inputUsername);
     this.clickByCSS(this.inputUsername);
     this.clear(this.inputUsername);
     this.sendKeys(this.inputUsername, this.username);
@@ -80,7 +81,6 @@ export class VicWebappPage {
 
   navigateToHome() {
     // click top left vmware logo
-    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVsphereHome);
     this.clickByCSS(this.iconVsphereHome);
   }
@@ -96,14 +96,19 @@ export class VicWebappPage {
     browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVicRoot);
     this.clickByCSS(this.iconVicRoot);
-    browser.sleep(this.defaultTimeout);
   }
 
   navigateToVchTab() {
     // click vch tab
+    this.waitForElementToBePresent('.tabbed-object-view');
     this.waitForElementToBePresent(this.tabBtnVchs);
     this.clickByCSS(this.tabBtnVchs);
-    browser.sleep(this.defaultTimeout);
+    browser.wait(() => {
+      return browser.getCurrentUrl().then(v => {
+        browser.sleep(100);
+        return v.indexOf('customtab-vch') > -1;
+      });
+    }, this.opsTimeout);
   }
 
   openVchWizard() {
@@ -118,7 +123,7 @@ export class VicWebappPage {
     this.waitForElementToBePresent(this.datacenterTreenodeCaret);
     element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
       if (collapsed) {
-        this.clickByCSS(this.datacenterTreenodeCaret);
+        this.clickByXpath(this.firstDcTreenodeCaretXpath);
       }
     });
 
@@ -171,7 +176,6 @@ export class VicWebappPage {
     this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
     // wait for modal to set position
-    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
@@ -252,9 +256,16 @@ export class VicWebappPage {
     });
   }
 
-  waitForElementToBePresent(el, timeout = this.opsTimeout) {
+  waitForElementToBePresent(el, timeout = this.opsTimeout, selectBy = 'css') {
     browser.wait(function () {
-      return browser.isElementPresent(by.css(el));
+      return browser.isElementPresent(by[selectBy](el)).then((v) => {
+        if (!v) {
+          console.log(el, 'not found yet');
+          browser.sleep(100);
+          return v;
+        }
+        return element(by[selectBy](el)).isDisplayed();
+      });
     }, timeout);
   };
 
@@ -273,7 +284,7 @@ export class VicWebappPage {
         const taskTargetTxt = element(by.css(this.latestTask + ' td:nth-of-type(2)')).getText();
         const endTimeTxt = element(by.css(this.latestTask + ' td:nth-of-type(7)')).getText();
 
-        browser.sleep(100);
+        browser.sleep(1000);
         return taskNameTxt.then(taskNameValue => {
           return taskTargetTxt.then(targetNameValue => {
             return endTimeTxt.then(endTimeValue => {

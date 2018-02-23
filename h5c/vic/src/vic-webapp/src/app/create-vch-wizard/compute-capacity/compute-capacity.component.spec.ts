@@ -23,6 +23,7 @@ import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TestScheduler} from 'rxjs/Rx';
+import { GlobalsService } from '../../shared';
 
 describe('ComputeCapacityComponent', () => {
 
@@ -53,7 +54,7 @@ describe('ComputeCapacityComponent', () => {
                 text: 'datacenter'
               }]);
             },
-            getClustersList() {
+            getClustersList(serviceGuid: string) {
               return Observable.of([{
                 text: 'cluster'
               }]);
@@ -76,6 +77,24 @@ describe('ComputeCapacityComponent', () => {
                 nodeTypeId: 'DcCluster',
                 aliases: ['cluster']
               }]);
+            }
+          }
+        },
+        {
+          provide: GlobalsService,
+          useValue: {
+            getWebPlatform () {
+              return {
+                getUserSession () {
+                  return {
+                    serversInfo: [{
+                      name: 'server.vpshere.local',
+                      serviceGuid: 'aaaa-bbb-ccc',
+                      thumbprint: 'AA:BB:CC'
+                    }]
+                  }
+                }
+              }
             }
           }
         }

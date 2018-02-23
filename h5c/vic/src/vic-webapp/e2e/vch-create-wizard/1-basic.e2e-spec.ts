@@ -228,7 +228,6 @@ describe('VCH Create Wizard - Basic', () => {
     page.waitForElementToBePresent(dataGridCell);
     const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
     element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
-      console.log(vchClrDgActionXpath, present);
       vchFound = present;
     });
 
