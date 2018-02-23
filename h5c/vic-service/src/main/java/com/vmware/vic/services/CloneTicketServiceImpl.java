@@ -20,23 +20,24 @@ public class CloneTicketServiceImpl implements CloneTicketService {
 
     public CloneTicketServiceImpl (PropFetcher propFetcher) {
 
-      if (propFetcher == null) {
-          throw new IllegalArgumentException("constructor argument cannot be null");
-      }
+        if (propFetcher == null) {
+            throw new IllegalArgumentException("constructor argument cannot be null");
+        }
 
-      _propFetcher = propFetcher;
+        _propFetcher = propFetcher;
     }
 
     /**
      * Obtain a clone ticket from vSphere
      * @throws Exception
      */
-    public String acquireCloneTicket() throws Exception {
+    @Override
+    public String acquireCloneTicket(String serviceGuid) throws Exception {
 
         String acquireCloneTicket = "";
 
         try {
-            acquireCloneTicket = _propFetcher.acquireCloneTicket();
+            acquireCloneTicket = _propFetcher.acquireCloneTicket(serviceGuid);
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (RuntimeFaultFaultMsg e) {

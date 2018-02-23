@@ -56,7 +56,12 @@ describe('CreateVchWizardComponent', () => {
           provide: GlobalsService, useValue: {
             getWebPlatform: () => {
               return {
-                closeDialog: () => { }
+                closeDialog: () => { },
+                getUserSession: () => {
+                  return {
+                    serversInfo: []
+                  };
+                }
               };
             }
           }

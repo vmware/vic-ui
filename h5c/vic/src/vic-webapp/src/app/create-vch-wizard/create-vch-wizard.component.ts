@@ -24,6 +24,7 @@ import { RefreshService } from 'app/shared';
 import { VIC_APPLIANCE_PORT } from '../shared/constants';
 import { Wizard } from 'clarity-angular';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
+import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -145,7 +146,7 @@ export class CreateVchWizardComponent implements OnInit {
     if (!this.loading && payloadObs) {
 
         // Acquire a clone ticket from vsphere for auth
-        this.createWzService.acquireCloneTicket()
+        this.createWzService.acquireCloneTicket(getServerServiceGuidFromObj(this.computeCapacity.dcObj))
         .combineLatest(
           // Subscribe to payload observable
           payloadObs,
@@ -157,12 +158,12 @@ export class CreateVchWizardComponent implements OnInit {
           this.errorFlag = false;
           this.loading = true;
 
-          const vcIp = this.globalsService.getWebPlatform().getUserSession().serversInfo[0].name;
-
-          if ((vcIp && applianceIp) && cloneTicket) {
-
+          if (applianceIp && cloneTicket) {
+              const lastIndexOfSlash = payload.security.target.lastIndexOf('/');
+              const vc = payload.security.target.substr(0, lastIndexOfSlash);
               const url = 'https://' + applianceIp + ':' + VIC_APPLIANCE_PORT +
-              '/container/target/' + vcIp + (this.computeCapacity.dcId ? '/datacenter/' + this.computeCapacity.dcId : '') +
+              '/container/target/' + vc +
+              (this.computeCapacity.dcId ? '/datacenter/' + this.computeCapacity.dcId : '') +
               '/vch?' + 'thumbprint=' + payload.security.thumbprint;
 
               const body = this.processPayload(payload);
