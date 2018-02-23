@@ -17,7 +17,7 @@ import { environment } from '../../../environments/environment';
 
 export const VIC_ROOT_OBJECT_ID_WITH_NAME = 'urn:vic:vic:Root:vic%25252Fvic-root?properties=name';
 export const CREATE_VCH_WIZARD_URL =
-    `/ui/vic/resources/${environment.production ? 'dist' : 'build-dev'}/index.html?view=create-vch`;
+    `/ui/vic/resources/dist/index.html?view=create-vch`;
 export const WIZARD_MODAL_WIDTH = 1050;
 export const WIZARD_MODAL_HEIGHT = 700;
 export const CHECK_RP_UNIQUENESS_URL = '/ui/vic/rest/services/check-rp-uniqueness';

@@ -13,10 +13,28 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { environment } from '../../../environments/environment';
 
-export const DELETE_VCH_MODAL_URL =
-  `/ui/vic/resources/dist/index.html?view=delete-vch`;
-export const DELETE_VCH_MODAL_WIDTH = 600;
-export const DELETE_VCH_MODAL_HEIGHT = 360;
-export const DELETE_VCH_MODAL_ERROR_EVENT = 'delete-vch-modal.error';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {ClarityModule} from 'clarity-angular';
+import {UiActionsComponent} from './ui-actions.component';
+
+const routes: Routes = [
+  {path: ':objectId/:actionId', component: UiActionsComponent}
+];
+
+@NgModule({
+  imports: [
+    CommonModule,
+    ClarityModule,
+    RouterModule.forChild(routes)
+  ],
+  declarations: [
+    UiActionsComponent
+  ],
+  exports: [
+    UiActionsComponent
+  ]
+})
+export class UiActionsModule { }

@@ -194,6 +194,29 @@ describe('VCH Create Wizard - Basic', () => {
     });
   });
 
+  it('should redirect to VCH VM and display Create Wizard menu items', () => {
+    page.navigateToVchVm(namePrefix + specRunId);
+    // wait for VM summary page to be ready
+    browser.wait(function () {
+      return browser.isElementPresent(by.cssContainingText('.summary-name-label', namePrefix + specRunId));
+    }, defaultTimeout * 6);
+    page.clickByCSS('.summary-action-link');
+    // wait for menu items to be calculated
+    browser.sleep(defaultTimeout);
+    page.clickByText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions');
+    browser.sleep(defaultTimeout);
+    expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'New Virtual Container Host...'))).toBeTruthy();
+    expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'Delete Virtual Container Host'))).toBeTruthy();
+  });
+
+  it('should navigate to vch list', () => {
+    page.navigateToHome();
+    page.navigateToVicPlugin();
+    page.navigateToSummaryTab();
+    page.navigateToVchTab();
+    expect(browser.getCurrentUrl()).toContain('customtab-vch');
+  });
+
   it('should delete created vch', () => {
     page.deleteVch(namePrefix + specRunId);
   });

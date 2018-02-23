@@ -44,7 +44,7 @@ yarn install
 
 if [[ "$BUILD_MODE" = "prod" ]] ; then
     echo "Building in production mode"
-    rm -rf ../main/webapp/resources/build-dev 2>/dev/null
+    rm -rf ../main/webapp/resources/dist 2>/dev/null
     npm run build:prod
 else
     echo "Building in development mode"
