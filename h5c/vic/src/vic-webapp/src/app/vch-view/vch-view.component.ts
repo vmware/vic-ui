@@ -55,6 +55,7 @@ import {Subscription} from 'rxjs/Subscription';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from './vch.model';
 import * as bus from 'framebus';
+import { getServerInfoByVchObjRef } from '../shared/utils/object-reference';
 
 @Component({
   selector: 'vic-vch-view',
