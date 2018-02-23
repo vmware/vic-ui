@@ -20,6 +20,7 @@ import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {Observable} from 'rxjs/Observable';
 import {SecurityComponent} from './security.component';
+import { GlobalsService } from '../../shared';
 
 describe('SecurityComponent', () => {
 
@@ -48,6 +49,24 @@ describe('SecurityComponent', () => {
               return Observable.of('vcHostname');
             }
           }
+        },
+        {
+          provide: GlobalsService,
+          useValue: {
+            getWebPlatform () {
+              return {
+                getUserSession () {
+                  return {
+                    serversInfo: [{
+                      name: 'server.vpshere.local',
+                      serviceGuid: 'aaaa-bbb-ccc',
+                      thumbprint: 'AA:BB:CC'
+                    }]
+                  }
+                }
+              }
+            }
+          }
         }
       ],
       declarations: [
@@ -61,11 +80,16 @@ describe('SecurityComponent', () => {
     component = fixture.componentInstance;
     component.vchName = 'vch-example-name';
     component.onPageLoad();
+    component.datacenter = {
+      objRef: 'urn:vmomi:Datacenter:dc-test:aaaa-bbb-ccc',
+      text: 'Test DC',
+      nodeTypeId: 'test',
+      aliases: [],
+      isEmpty: false
+    };
 
     service = fixture.debugElement.injector.get(CreateVchWizardService);
     spyOn(service, 'getUserId').and.callThrough();
-    spyOn(service, 'getServerThumbprint').and.callThrough();
-    spyOn(service, 'getVcHostname').and.callThrough();
   });
 
   it('should be created', () => {

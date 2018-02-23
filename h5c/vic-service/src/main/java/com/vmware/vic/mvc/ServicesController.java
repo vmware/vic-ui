@@ -38,11 +38,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.vmware.vic.services.CloneTicketService;
 import com.vmware.vic.services.EchoService;
 import com.vmware.vic.services.ResourcePoolService;
-import com.vmware.vic.services.VicUserSessionService;
 import com.vmware.vic.services.VicApplianceService;
-import com.vmware.vic.services.CloneTicketService;
+import com.vmware.vic.services.VicUserSessionService;
 
 /**
  * A controller to serve HTTP JSON GET/POST requests to the endpoint "/services".
@@ -107,10 +107,10 @@ public class ServicesController {
      * Acquire a cloned session ticket from vSphere for auth
      * @throws Exception
      */
-    @RequestMapping(value = "/acquire-clone-ticket", method = RequestMethod.GET)
+    @RequestMapping(value = "/acquire-clone-ticket", method = RequestMethod.POST)
     @ResponseBody
-    public String acquireCloneTicket() throws Exception {
-        return _cloneTicketService.acquireCloneTicket();
+    public String acquireCloneTicket(@RequestParam(value = "serviceGuid", required = true) String serviceGuid) throws Exception {
+        return _cloneTicketService.acquireCloneTicket(serviceGuid);
     }
 
     /**

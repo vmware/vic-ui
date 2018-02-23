@@ -412,12 +412,12 @@ public class PropFetcher implements ClientSessionEndListener {
 
                 List<ManagedObjectReference> applianceVms =
                         _vimPort.queryManagedBy(service.getExtensionManager(), VICUI_H5C_EXTENSION_KEY);
-                List<PropertyFilterSpec> propertyFilterSpecs = new ArrayList<PropertyFilterSpec>();
 
                 if (applianceVms.size() == 0) {
-                    _logger.warn("No VIC appliance was found");
-                    return vicAppliancesList;
+                    continue;
                 }
+
+                List<PropertyFilterSpec> propertyFilterSpecs = new ArrayList<PropertyFilterSpec>();
 
                 for (ManagedObjectReference mor : applianceVms) {
                     ObjectSpec objectSpec = new ObjectSpec();
@@ -720,33 +720,30 @@ public class PropFetcher implements ClientSessionEndListener {
      * Obtain a clone ticket from vSphere
      * @throws Exception
      */
-    public String acquireCloneTicket() throws Exception {
+    public String acquireCloneTicket(String serviceGuid) throws Exception {
 
-        String acquireCloneTicket = "";
         ServerInfo[] sInfos = _userSessionService.getUserSession().serversInfo;
 
-        for (ServerInfo sInfo : sInfos) {
-            if (sInfo.serviceGuid != null) {
+        try {
+            for (ServerInfo sInfo : sInfos) {
+                if (serviceGuid.equals(sInfo.serviceGuid)) {
+                    ServiceContent service = getServiceContent(serviceGuid);
 
-                String serviceGuid = sInfo.serviceGuid;
-                ServiceContent service = getServiceContent(serviceGuid);
+                    if (service == null) {
+                        _logger.error("Failed to retrieve ServiceContent!");
+                        return null;
+                    }
 
-                if (service == null) {
-                    _logger.error("Failed to retrieve ServiceContent!");
-                    return null;
-                }
-
-                try {
                     ManagedObjectReference sessionMgrRef = service.getSessionManager();
-                    acquireCloneTicket = _vimPort.acquireCloneTicket(sessionMgrRef);
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                } catch (RuntimeFaultFaultMsg e) {
-                    e.printStackTrace();
+                    return _vimPort.acquireCloneTicket(sessionMgrRef);
                 }
-            }
-        };
+            };
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (RuntimeFaultFaultMsg e) {
+            e.printStackTrace();
+        }
 
-        return acquireCloneTicket;
+        throw new RuntimeException("Could not acquire clone ticket for serviceGuid: " + serviceGuid);
     }
 }

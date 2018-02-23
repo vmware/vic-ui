@@ -13,5 +13,5 @@ limitations under the License.
 package com.vmware.vic.services;
 
 public interface CloneTicketService {
-    public String acquireCloneTicket() throws Exception;
+    public String acquireCloneTicket(String serviceGuid) throws Exception;
 }

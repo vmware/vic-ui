@@ -20,7 +20,7 @@
         <variable name="icon" value="#{viinventory.vic.icon}"/>
         <variable name="objectType" value="vic:Root"/>
         <variable name="listViewId" value="com.vmware.vic.objectView.list"/>
-        <variable name="parentUid" value="vsphere.core.navigator.viInventoryLists"/>
+        <variable name="parentUid" value="vsphere.core.navigator.virtualInfrastructure"/>
     </templateInstance>
     <templateInstance id="com.vmware.vic.viewTemplateInstance">
         <templateId>vsphere.core.inventory.objectViewTemplate</templateId>

@@ -6,6 +6,9 @@
     margin-top: 0;
     margin-bottom: 0;
   }
+  &.rootNode > .clr-treenode-content {
+    padding-left: 0px !important;
+  }
 }
 
 #compute-resource-selector {

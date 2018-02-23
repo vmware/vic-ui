@@ -47,4 +47,5 @@ export class ServerInfo {
     serviceUrl: string;
     sessionId: string;
     name: string;
+    thumbprint: string;
 }

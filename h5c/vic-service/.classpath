@@ -36,10 +36,7 @@
 	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/vsphere-ui/server/repository/usr/vlsiCore.jar"/>
 	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/mockito-all-1.10.19.jar"/>
 	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/spring-beans-3.1.4.RELEASE.jar"/>
-	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/spring-beans-4.3.9.RELEASE.jar"/>
 	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/spring-context-3.1.4.RELEASE.jar"/>
-	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/spring-context-4.3.9.RELEASE.jar"/>
 	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/spring-web-3.1.4.RELEASE.jar"/>
-	<classpathentry kind="var" path="VSPHERE_CLIENT_SDK/libs/spring-web-4.3.9.RELEASE.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

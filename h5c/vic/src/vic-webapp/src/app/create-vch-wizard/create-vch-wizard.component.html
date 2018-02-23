@@ -111,6 +111,7 @@
     <ng-template clrPageNavTitle>Networks</ng-template>
 
     <vic-vch-creation-networks #networksStep
+                               [datacenter]="computeCapacityStep.dcObj"
                                [resourceObjName]="computeCapacityStep.selectedObjectName">
     </vic-vch-creation-networks>
 
@@ -133,7 +134,7 @@
     <ng-template clrPageNavTitle>Security</ng-template>
 
     <vic-vch-creation-security [vchName]="generalStep.form.get('name').value"
-                               [datacenter]="computeCapacityStep.dcName"
+                               [datacenter]="computeCapacityStep.dcObj"
                                #securityStep>
     </vic-vch-creation-security>
 

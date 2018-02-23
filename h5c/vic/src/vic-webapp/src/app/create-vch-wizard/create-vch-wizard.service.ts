@@ -29,19 +29,20 @@ import {
 } from '../shared/constants';
 import { Http, URLSearchParams } from '@angular/http';
 
-import { ComputeResource } from './compute-capacity/compute-resource-treenode.component';
+import { ComputeResource } from '../interfaces/compute.resource';
 import { GlobalsService } from '../shared';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
 import { flattenArray } from '../shared/utils/array-utils';
+import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
 
 @Injectable()
 export class CreateVchWizardService {
     // TODO: make a proper interface
     private _datacenter: any[] = null;
     private _userId: string = null;
-    private _serverGuid: string = null;
+    private _serverGuid: string[] = [];
     private _serverThumbprint: string = null;
     private _serverHostname: string = null;
     private _clusters: any[] = null;
@@ -82,8 +83,10 @@ export class CreateVchWizardService {
      * Gets a clone ticket from vSphere api to be passed to vic-machine-server
      * @returns {Observable<string>} Observable containing the clone ticket
      */
-    acquireCloneTicket(): Observable<string> {
-      return this.http.get(GET_CLONE_TICKET_URL)
+    acquireCloneTicket(serviceGuid: string): Observable<string> {
+      const params = new URLSearchParams();
+      params.set('serviceGuid', serviceGuid);
+      return this.http.post(GET_CLONE_TICKET_URL, params)
           .catch(e => Observable.throw(e))
           .map(response => response.text())
           .catch(e => Observable.throw(e));
@@ -100,67 +103,36 @@ export class CreateVchWizardService {
     }
 
     /**
-     * Get serverGuid for the current VC
+     * Get serverGuid
      */
-    getServerGuid(): string {
+    getServerGuidFromDcObjRef(): string[] {
         if (!this._serverGuid) {
-            // TODO: come up with a better solution to handle a case where
-            // linked datacenters are involved in a VC
-            this._serverGuid = this._userSession['serversInfo'][0]['serviceGuid'];
+            this._serverGuid = this._userSession['serversInfo'].map(server => server['serviceGuid']);
         }
         return this._serverGuid;
-    }
-
-    /**
-     * Get VC's thumbprint
-     * TODO: unit test, refactor
-     */
-    getServerThumbprint(): string {
-        if (!this._serverThumbprint) {
-            // TODO: see line 76
-            this._serverThumbprint = this._userSession['serversInfo'][0]['thumbprint'];
-        }
-        return this._serverThumbprint;
-    }
-
-    /**
-     * Get VC's hostname
-     * TODO: unit test, refactor
-     */
-    getVcHostname(): string {
-        if (!this._serverHostname) {
-            // TODO: see line 76
-            this._serverHostname = this._userSession['serversInfo'][0]['name'];
-        }
-        return this._serverHostname;
     }
 
     /**
      * Get datacenter for the current VC
      * TODO: unit test
      */
-    getDatacenter(): Observable<any[]> {
-        if (this._datacenter) {
-            return Observable.of(this._datacenter);
-        } else {
-            const serverGuid = this.getServerGuid();
-            return this.http.get('/ui/tree/children?nodeTypeId=VcRoot' +
-                `&objRef=urn:vmomi:Folder:group-d1:${serverGuid}&treeId=vsphere.core.physicalInventorySpec`)
-                .catch(e => Observable.throw(e))
-                .map(response => response.json())
-                .catch(e => Observable.throw(e))
-                .map(response => {
-                    this._datacenter = response;
-                    return this._datacenter;
-                });
-        }
+    getDatacenter(serverGuid: string): Observable<any[]> {
+      return this.http.get('/ui/tree/children?nodeTypeId=VcRoot' +
+        `&objRef=urn:vmomi:Folder:group-d1:${serverGuid}&treeId=vsphere.core.physicalInventorySpec`)
+        .catch(e => Observable.throw(e))
+        .map(response => response.json())
+        .catch(e => Observable.throw(e))
+        .map(response => {
+            this._datacenter = response;
+            return this._datacenter;
+        });
     }
 
     /**
      * Queries the H5 Client for clusters
      */
-    getClustersList(): Observable<any> {
-        return this.getDatacenter()
+    getClustersList(serverGuid: string): Observable<any> {
+        return this.getDatacenter(serverGuid)
                    .switchMap(dc => {
                      const obsArr = dc.map(v => {
                          return this.http.get('/ui/tree/children?nodeTypeId=RefAsRoot' +
@@ -285,8 +257,9 @@ export class CreateVchWizardService {
             });
     }
 
-    getNetworkingTree(): Observable<any[]> {
-        return this.getDatacenter()
+    getNetworkingTree(dcObj: ComputeResource): Observable<any[]> {
+      const serviceGuid = getServerServiceGuidFromObj(dcObj);
+        return this.getDatacenter(serviceGuid)
             .switchMap(dcs => {
               const dcsObs = dcs.map(dc => {
                 return this.http.get('/ui/tree/children?nodeTypeId=Datacenter' +
@@ -303,10 +276,11 @@ export class CreateVchWizardService {
 
     /**
      * Get all available portgroups for the selected compute resource
+     * @param dcObj selected datacenter object
      * @param resourceObjName name of the selected compute resource
      */
-    getDistributedPortGroups(resourceObjName?: string): Observable<any> {
-        return this.getNetworkingTree()
+    getDistributedPortGroups(dcObj: ComputeResource, resourceObjName?: string): Observable<any> {
+        return this.getNetworkingTree(dcObj)
             .switchMap(inventories => {
                 // filter the payload to get only DcDvs nodes
                 const dcDvsList = inventories.filter(item => item['nodeTypeId'] === 'DcDvs');

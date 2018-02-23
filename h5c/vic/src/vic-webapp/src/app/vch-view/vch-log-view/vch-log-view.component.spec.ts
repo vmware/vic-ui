@@ -81,20 +81,6 @@ describe('VicVchLogViewComponent', () => {
               })
             }
           }
-        },
-        {
-          provide: ExtendedUserSessionService,
-          useValue: {
-            getVcenterServersInfo(): IExtendedServerInfo[] {
-              return [{
-                name: '10.20.30.10',
-                serverGuid: 'aa-dd-cc-00-ff',
-                sessionCookie: 'nomnom',
-                thumbprint: '01:AB:CD:EF',
-                version: '1'
-              }];
-            }
-          }
         }
       ],
       declarations: [

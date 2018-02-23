@@ -19,10 +19,11 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Headers, Http, RequestOptions } from '@angular/http';
 
 import { CreateVchWizardService } from '../../create-vch-wizard/create-vch-wizard.service';
-import { ExtendedUserSessionService } from '../../services/extended-usersession.service';
 import { Observable } from 'rxjs/Observable';
 import { VIC_APPLIANCE_PORT } from '../../shared/constants/create-vch-wizard';
 import { VirtualContainerHost } from '../vch.model';
+import { getServerInfoByVchObjRef } from '../../shared/utils/object-reference';
+import { GlobalsService } from '../../shared';
 
 @Component({
   selector: 'vic-vch-log-view',
@@ -39,7 +40,7 @@ export class VicVchLogViewComponent implements OnInit {
     private formBuilder: FormBuilder,
     private http: Http,
     private createWzService: CreateVchWizardService,
-    private extSessionService: ExtendedUserSessionService
+    private globalsService: GlobalsService
   ) {
     this.form = formBuilder.group({
       enableSSH: false
@@ -50,16 +51,20 @@ export class VicVchLogViewComponent implements OnInit {
     this.loading = true;
     Observable.combineLatest(
       this.createWzService.getVicApplianceIp(),
-      this.createWzService.acquireCloneTicket(),
+      this.createWzService.acquireCloneTicket(this.vch.id.split(':')[4]),
       this.createWzService.getDatacenterForResource(this.vch.id)
   ).catch(err => {
       return Observable.throw(err);
     }).subscribe(([serviceHost, cloneTicket, datacenter]) => {
       const vchId = this.vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
-      const targetHost = this.extSessionService.getVcenterServersInfo()[0];
-      const targetHostname = targetHost.name;
-      const targetThumbprint = targetHost.thumbprint;
+      const vc = getServerInfoByVchObjRef(
+        this.globalsService.getWebPlatform().getUserSession().serversInfo,
+        this.vch
+      );
+
+      const targetHostname = vc ? vc.name : null;
+      const targetThumbprint = vc ? vc.thumbprint : null;
       const targetDatacenter = datacenter.id.split(':')[3];
       const url =
         `https://${serviceHost}:${servicePort}/container/target/${targetHostname}/datacenter/${targetDatacenter}` +

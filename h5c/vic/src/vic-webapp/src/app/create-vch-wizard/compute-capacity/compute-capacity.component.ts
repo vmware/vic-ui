@@ -20,11 +20,16 @@ import {
   unlimitedPattern
 } from '../../shared/utils/validators';
 
-import { ComputeResource, ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
+import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { DC_CLUSTER } from '../../shared/constants';
 import { Observable } from 'rxjs/Observable';
+import { GlobalsService } from './../../shared/globals.service';
+import { ComputeResource } from '../../interfaces/compute.resource';
+import { getMorIdFromObjRef } from '../../shared/utils/object-reference';
 import 'rxjs/add/observable/timer';
+import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
+import { flattenArray } from '../../shared/utils/array-utils';
 
 const endpointMemoryDefaultValue = 2048;
 
@@ -36,8 +41,8 @@ const endpointMemoryDefaultValue = 2048;
 export class ComputeCapacityComponent implements OnInit {
   public form: FormGroup;
   public datacenter: any[] = [];
-  public dcId: string;
-  public dcName: string;
+  public dcObj: ComputeResource;
+  public serviceGuid: string;
   public clusters: any[] = [];
   public resources: any[] = [];
   public isTreeLoading = false;
@@ -49,13 +54,15 @@ export class ComputeCapacityComponent implements OnInit {
   public selectedObjectName: string;
   public selectedResourceObjRef: string;
   private _selectedComputeResource: string;
+  public serversInfo: ServerInfo[];
 
   @ViewChildren(ComputeResourceTreenodeComponent)
   treenodeComponents: QueryList<ComputeResourceTreenodeComponent>;
 
   constructor(
     private formBuilder: FormBuilder,
-    private createWzService: CreateVchWizardService
+    private createWzService: CreateVchWizardService,
+    private globalsService: GlobalsService
   ) {
     // create a FormGroup instance
     this.form = formBuilder.group({
@@ -92,18 +99,11 @@ export class ComputeCapacityComponent implements OnInit {
   // TODO: add units selectors to compute fields
 
   ngOnInit() {
-
-  }
-
-  /**
-   * Get the latest list of clusters
-   */
-  loadClusters() {
-    this.isTreeLoading = true;
-    this.createWzService
-      .getClustersList()
-      .subscribe(val => {
-        this.clusters = val;
+    this.serversInfo = this.globalsService.getWebPlatform().getUserSession().serversInfo;
+    const obsArr = this.serversInfo.map(serverInfo => this.createWzService.getDatacenter(serverInfo.serviceGuid));
+    Observable.zip(...obsArr)
+      .subscribe(results => {
+        this.datacenter = flattenArray(results);
       });
   }
 
@@ -132,6 +132,11 @@ export class ComputeCapacityComponent implements OnInit {
         return dcIds[3];
       }
   }
+
+  get dcId () {
+    return getMorIdFromObjRef(this.dcObj.objRef);
+  }
+
   /**
    * Set the compute resource selected by the user.
    * @param {obj: ComputeResource; parentClusterObj?: ComputeResource; datacenterObj: ComputeResource}
@@ -145,13 +150,9 @@ export class ComputeCapacityComponent implements OnInit {
     const isCluster = nodeTypeId === DC_CLUSTER;
     const resourceObj = payload.obj.objRef;
     const dcObj = payload.datacenterObj.objRef;
-    this.dcName = payload.datacenterObj.text;
+    this.dcObj = payload.datacenterObj;
 
-    if (dcObj) {
-      this.dcId = this.getDataCenterId(dcObj);
-    }
-
-    let computeResource = `/${this.dcName}/host`;
+    let computeResource = `/${this.dcObj.text}/host`;
     let resourceObjForResourceAllocations = resourceObj;
 
     if (isCluster) {
@@ -242,10 +243,6 @@ export class ComputeCapacityComponent implements OnInit {
     if (this.selectedComputeResource) {
       return;
     }
-
-    this.createWzService.getDatacenter().subscribe(dcs => {
-      this.datacenter = dcs;
-    });
   }
 
   onCommit(): Observable<any> {
@@ -283,5 +280,9 @@ export class ComputeCapacityComponent implements OnInit {
 
   toggleAdvancedMode() {
     this.inAdvancedMode = !this.inAdvancedMode;
+  }
+
+  getDcs (serverInfo: ServerInfo): ComputeResource[] {
+    return this.datacenter.filter((item: ComputeResource) => item.objRef.indexOf(serverInfo.serviceGuid) > -1);
   }
 }
