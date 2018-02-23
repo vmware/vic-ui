@@ -34,6 +34,7 @@ import {
   WS_VCH
 } from '../shared/constants';
 import {
+  AfterViewInit,
   Component,
   NgZone,
   OnDestroy,
@@ -53,6 +54,7 @@ import {State} from 'clarity-angular';
 import {Subscription} from 'rxjs/Subscription';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from './vch.model';
+import * as bus from 'framebus';
 import { getServerInfoByVchObjRef } from '../shared/utils/object-reference';
 
 @Component({
@@ -60,7 +62,7 @@ import { getServerInfoByVchObjRef } from '../shared/utils/object-reference';
   styleUrls: ['./vch-view.scss'],
   templateUrl: './vch-view.template.html'
 })
-export class VicVchViewComponent implements OnInit, OnDestroy {
+export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
   public readonly WS_VCH_CONSTANTS = WS_VCH;
   private refreshSubscription: Subscription;
   public isDgLoading = true;
@@ -107,15 +109,30 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
       this.vchs = [];
     });
 
-
     // listens to a message event from an angular app from another iframe
     // this is set up to handle refreshing the datagrid upon successful vch creation
     // and messages from delete vch modal
     // TODO: move the following to a service
     window.addEventListener('message', this.onMessage.bind(this), false);
 
+    bus.on('vch-view.component.launchCreateVchWizard', () => {
+      this.zone.run(() => {
+        this.launchCreateVchWizard();
+      });
+    });
+
+    bus.on('vch-view.component.launchDeleteVchModal', data => {
+      this.zone.run(() => {
+        this.launchDeleteVchModal(data.id);
+      });
+    });
+
     // verify the appliance endpoint
     this.checkVicMachineServer();
+  }
+
+  ngAfterViewInit() {
+    bus.emit('vch-view.component.ngAfterViewInit');
   }
 
   checkVicMachineServer() {
@@ -211,9 +228,9 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
   /**
    * Opens VCH delete modal
    */
-  deleteVch(vch: VirtualContainerHost) {
+  launchDeleteVchModal(vchId) {
     const subscriber = this.vmViewService.containers$.subscribe(containers => {
-      if (containers.some(container => container.parentObjectName === vch.name && container.powerState === 'POWERED_ON')) {
+      if (containers.some(container => container.parentObj === vchId && container.powerState === 'POWERED_ON')) {
         this.warning = 'You must stop all running containers VMs before you can delete the VCH.';
       } else {
         const webPlatform = this.globalsService.getWebPlatform();
@@ -222,13 +239,11 @@ export class VicVchViewComponent implements OnInit, OnDestroy {
           `${DELETE_VCH_MODAL_URL}`,
           DELETE_VCH_MODAL_WIDTH,
           DELETE_VCH_MODAL_HEIGHT,
-          vch.id
+          vchId
         );
       }
-
       subscriber.unsubscribe();
     });
-
     this.vmViewService.getContainersData({}); // TODO: filter containers for the vch
   }
 

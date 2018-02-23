@@ -49,7 +49,7 @@
 
   <clr-dg-row *ngFor="let item of vchs">
     <clr-dg-action-overflow class="{{item.name}}">
-      <button class="action-item action-item-delete" (click)="deleteVch(item)">Delete</button>
+      <button class="action-item action-item-delete" (click)="launchDeleteVchModal(item.id)">Delete</button>
       <button class="action-item action-item-cert" (click)="downloadVchCert(item)">Download VCH certificate</button>
     </clr-dg-action-overflow>
     <clr-dg-row-detail>
