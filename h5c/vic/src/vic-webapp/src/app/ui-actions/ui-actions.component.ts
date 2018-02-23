@@ -32,7 +32,7 @@ export class UiActionsComponent implements OnInit {
   ngOnInit() {
     this.router.params.subscribe((params: Params) => {
 
-      /* Wait for VHC list to be ready */
+      /* Wait for VCH list to be ready */
       bus.on('vch-view.component.ngAfterViewInit', () => {
         if (params.actionId === 'com.vmware.vic.createVch') {
           bus.emit('vch-view.component.launchCreateVchWizard');
