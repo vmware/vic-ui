@@ -23,7 +23,7 @@ pipeline:
       TEST_OS: #TEST_OS
       SELENIUM_BROWSER: #SELENIUM_BROWSER
       BROWSER_NORMALIZED_NAME: #BROWSER_NORMALIZED_NAME
-      UI_TEST_CASES_FOLDER: tests/manual-test-cases/Group18-VIC-UI
+      UI_TEST_CASES_FOLDER: tests/test-cases/Group18-VIC-UI
       TEST_RESULTS_FOLDER: #TEST_RESULTS_FOLDER
     commands:
       - apt-get update && apt-get install -yq maven netcat

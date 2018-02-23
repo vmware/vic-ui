@@ -20,7 +20,7 @@ Resource         ../../resources/Util.robot
 Resource         ./vicui-common.robot
 
 *** Variables ***
-${TEST_SCRIPTS_ROOT}           tests/manual-test-cases/Group18-VIC-UI/
+${TEST_SCRIPTS_ROOT}           tests/test-cases/Group18-VIC-UI/
 ${VICTEST2XL}                  ${TEST_SCRIPTS_ROOT}/victest2xl.py
 ${IS_NIGHTLY_TEST}             ${TRUE}
 ${BUILD_VER_ISSUE_WORKAROUND}  ${TRUE}
@@ -153,12 +153,12 @@ Setup Test Matrix
 Get Testbed Information
     Set Environment Variable  GOVC_INSECURE  1
     Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
-    ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/manual-test-cases/Group18-VIC-UI/setup-testbed.robot > tests/manual-test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
+    ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/test-cases/Group18-VIC-UI/setup-testbed.robot > tests/test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
     Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
-    ${testbed-setup-log}=  OperatingSystem.Get File  tests/manual-test-cases/Group18-VIC-UI/setup-testbed.log
+    ${testbed-setup-log}=  OperatingSystem.Get File  tests/test-cases/Group18-VIC-UI/setup-testbed.log
     Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${testbed-setup-log}
     Load Nimbus Testbed Env
-    Move File  testbed-information  tests/manual-test-cases/Group18-VIC-UI/testbed-information
+    Move File  testbed-information  tests/test-cases/Group18-VIC-UI/testbed-information
 
 Get Integration Container Id
     ${rc}  ${out}=  Run And Return Rc And Output  docker ps --filter status=running --filter ancestor=gcr.io/eminent-nation-87317/vic-integration-test:1.33 -l --format={{.ID}}
@@ -230,7 +230,7 @@ Run Script Test With Config
     Log To Console  ${results.stderr}
 
     # move log files
-    Move Files  tests/manual-test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
+    Move Files  tests/test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
 
 Run Plugin Test With Config
     [Arguments]  ${run_config}
@@ -299,7 +299,7 @@ Run Plugin Test With Config
     Log To Console  ${results.stderr}
 
     # move log files
-    Move Files  tests/manual-test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
+    Move Files  tests/test-cases/Group18-VIC-UI/*.log  ${test_results_folder}/
 
 Generate Excel Report
     ${script_exists}  ${out}=  Run Keyword And Ignore Error  OperatingSystem.File Should Exist  ${VICTEST2XL}
@@ -313,7 +313,7 @@ Cleanup Testbed
     Terminate All Processes  kill=True
 
     # Delete all transient and sensitive information
-    Run  rm -rf .drone.local.tests.yml testbed-information tests/manual-test-cases/Group18-VIC-UI/testbed-information /tmp/sdk/ >/dev/null 2>&1
+    Run  rm -rf .drone.local.tests.yml testbed-information tests/test-cases/Group18-VIC-UI/testbed-information /tmp/sdk/ >/dev/null 2>&1
     Run  rm -rf Kickoff-Tests* VCH-0*
 
     # Revert some modified local files
@@ -322,7 +322,7 @@ Cleanup Testbed
     # Delete binaries
     Run  rm -rf vicui-test-report-*.zip
     Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL}
-    Run  rm -rf tests/manual-test-cases/Group18-VIC-UI/*VCH-0*
+    Run  rm -rf tests/test-cases/Group18-VIC-UI/*VCH-0*
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
 

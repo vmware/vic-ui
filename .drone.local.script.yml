@@ -21,7 +21,7 @@ pipeline:
       TEST_VSPHERE_VER: #TEST_VSPHERE_VER
       TEST_VCSA_BUILD: #TEST_VCSA_BUILD
       TEST_OS: #TEST_OS
-      UI_TEST_CASES_FOLDER: tests/manual-test-cases/Group18-VIC-UI
+      UI_TEST_CASES_FOLDER: tests/test-cases/Group18-VIC-UI
       TEST_RESULTS_FOLDER: #TEST_RESULTS_FOLDER
       ROBOT_SCRIPT: #ROBOT_SCRIPT
     commands:
