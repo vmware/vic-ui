@@ -24,7 +24,7 @@ export class VicWebappPage {
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
-  private iconVicRoot = '.object-link a';
+  private iconVicRoot = 'span[title="vSphere Integrated Containers"]:last-of-type';
   private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
@@ -81,6 +81,7 @@ export class VicWebappPage {
 
   navigateToHome() {
     // click top left vmware logo
+    browser.sleep(this.defaultTimeout);
     this.waitForElementToBePresent(this.iconVsphereHome);
     this.clickByCSS(this.iconVsphereHome);
   }
