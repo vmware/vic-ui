@@ -18,7 +18,7 @@ import { ComponentFixture, TestBed, async, fakeAsync, tick } from '@angular/core
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { ComputeResourceTreenodeComponent } from './compute-capacity/compute-resource-treenode.component';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';

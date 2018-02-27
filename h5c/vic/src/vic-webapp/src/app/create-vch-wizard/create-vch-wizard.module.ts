@@ -16,7 +16,7 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { CommonModule } from '@angular/common';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { ComputeResourceTreenodeComponent } from './compute-capacity/compute-resource-treenode.component';

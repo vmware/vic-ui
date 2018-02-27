@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModel } from '@angular/forms/src/directives/ng_model';

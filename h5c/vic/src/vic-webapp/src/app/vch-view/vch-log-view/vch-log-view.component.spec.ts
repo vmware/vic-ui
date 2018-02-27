@@ -27,7 +27,7 @@ import { Globals, GlobalsService } from '../../shared';
 import { MockBackend, MockConnection } from '@angular/http/testing';
 
 import { By } from '@angular/platform-browser';
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { CreateVchWizardService } from '../../create-vch-wizard/create-vch-wizard.service';
 import { ExtendedUserSessionService } from '../../services/extended-usersession.service';
 import { IExtendedServerInfo } from '../../services/extended-serverinfo.interface';

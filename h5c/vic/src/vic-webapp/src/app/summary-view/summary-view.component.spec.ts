@@ -28,7 +28,7 @@ import { Observable, Subject } from 'rxjs/Rx';
 
 import { AppErrorHandler } from '../shared/appErrorHandler';
 import { By } from '@angular/platform-browser';
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { DataPropertyService } from '../services/data-property.service';
 import { HttpModule } from '@angular/http';

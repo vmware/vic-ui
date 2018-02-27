@@ -15,7 +15,7 @@
 */
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ClarityModule} from 'clarity-angular';
+import {ClarityModule} from '@clr/angular';
 import {ComputeCapacityComponent} from './compute-capacity.component';
 import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
 import {CreateVchWizardService} from '../create-vch-wizard.service';

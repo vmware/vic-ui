@@ -42,7 +42,7 @@ import {
 } from '../services/mocks/vch.response';
 
 import { By } from '@angular/platform-browser';
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { ExtendedUserSessionService } from '../services/extended-usersession.service';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';

@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { Comparator, State } from 'clarity-angular';
+import { Comparator, State } from '@clr/angular';
 import {
     Component,
     NgZone,

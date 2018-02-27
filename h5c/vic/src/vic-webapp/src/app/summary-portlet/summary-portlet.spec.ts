@@ -32,7 +32,7 @@ import {
 import { DataPropertyService } from '../services/data-property.service';
 import { AppErrorHandler } from '../shared/appErrorHandler';
 
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 
 import { VicSummaryPortletComponent } from './summary-portlet.component';
 import { VchPortletComponent } from './vch-portlet/vch-portlet.component';

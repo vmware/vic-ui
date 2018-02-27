@@ -29,7 +29,7 @@ import {
 } from '../services/mocks/container.response';
 
 import { By } from '@angular/platform-browser';
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { ContainerVm } from './container.model';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { HttpModule } from '@angular/http';

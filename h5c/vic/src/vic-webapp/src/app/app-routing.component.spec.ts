@@ -22,7 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AppRoutingComponent } from './app-routing.component';
 import { Globals, GlobalsService } from './shared';
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { JASMINE_TIMEOUT } from './testing/jasmine.constants';
 import { AppRoutingModule, routedComponents } from 'app/app-routing.module';
 

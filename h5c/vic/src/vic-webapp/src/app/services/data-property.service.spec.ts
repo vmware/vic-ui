@@ -41,7 +41,7 @@ describe('VicDataPropertyService', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
 
   beforeEach(async(() => {
-    TestBed.configureCompiler({
+    TestBed.configureTestingModule({
       providers: [
         Http,
         { provide: ConnectionBackend, useClass: MockBackend },

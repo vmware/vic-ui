@@ -232,10 +232,10 @@ describe('VCH Create Wizard with multiple DV Switches', () => {
     page.switchFrame(iframeTabs);
     page.waitForElementToBePresent(dataGridCell);
     const deletedVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(element, index) {
-      element.isPresent().then(present => {
+    element.all(by.css(dataGridCell)).each(function(el, index) {
+      el.isPresent().then(present => {
         if (present) {
-          element.getText().then(function(text) {
+          el.getText().then(function(text) {
             if (deletedVch.test(text)) {
               vchFound = true;
             }

@@ -23,7 +23,7 @@ import {ActivatedRoute} from '@angular/router';
 import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
 import {GlobalsService} from 'app/shared';
-import {Modal} from 'clarity-angular';
+import {Modal} from '@clr/angular';
 import {Observable} from 'rxjs/Observable';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from '../vch-view/vch.model';

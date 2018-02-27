@@ -18,7 +18,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ClarityModule} from 'clarity-angular';
+import {ClarityModule} from '@clr/angular';
 import {DeleteVchModalComponent} from './delete-vch-modal.component';
 import {VicVmViewService} from '../services/vm-view.service';
 import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';

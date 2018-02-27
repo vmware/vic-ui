@@ -29,7 +29,7 @@ import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { ActionDevService } from './services/action-dev.service';
 import { AppComponent } from './app.component';
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { ContainerPortletComponent } from './summary-portlet/container-portlet/container-portlet.component';
 import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from './testing/jasmine.constants';
