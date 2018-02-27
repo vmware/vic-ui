@@ -16,7 +16,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ClarityModule } from 'clarity-angular';
+import { ClarityModule } from '@clr/angular';
 import { CommonModule } from '@angular/common';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { SharedModule } from '../shared/shared.module';

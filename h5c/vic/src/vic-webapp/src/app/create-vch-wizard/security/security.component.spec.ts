@@ -15,7 +15,7 @@
 */
 import {ComponentFixture, TestBed, async} from '@angular/core/testing';
 import {ReactiveFormsModule, FormArray} from '@angular/forms';
-import {ClarityModule} from 'clarity-angular';
+import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {Observable} from 'rxjs/Observable';

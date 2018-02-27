@@ -15,7 +15,7 @@
 */
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
-import {ClarityModule} from 'clarity-angular';
+import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
 import {RegistryAccessComponent} from './registry-access.component';
 

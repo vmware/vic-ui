@@ -18,8 +18,7 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpModule, XSRFStrategy } from '@angular/http';
-import { ClarityModule } from 'clarity-angular';
-import { AlertIconAndTypesService } from 'clarity-angular/emphasis/alert/providers/icon-and-types-service';
+import { ClarityModule } from '@clr/angular';
 
 import {
   Globals,
@@ -60,7 +59,6 @@ import { DisableCookieXSRFStrategy } from './shared/utils/disable-cookie-xsrf-st
     I18nService,
     Vic18nService,
     RefreshService,
-    AlertIconAndTypesService,
     { provide: ErrorHandler, useClass: AppErrorHandler }
   ],
   bootstrap: [AppComponent]
