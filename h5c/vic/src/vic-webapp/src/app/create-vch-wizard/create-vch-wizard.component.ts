@@ -22,7 +22,7 @@ import { GlobalsService } from 'app/shared';
 import { Observable } from 'rxjs/Observable';
 import { RefreshService } from 'app/shared';
 import { VIC_APPLIANCE_PORT } from '../shared/constants';
-import { Wizard } from 'clarity-angular';
+import { Wizard } from '@clr/angular';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
 

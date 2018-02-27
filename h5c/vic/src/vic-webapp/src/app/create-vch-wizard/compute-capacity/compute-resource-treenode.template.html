@@ -1,6 +1,4 @@
 <!-- Copyright 2017-2018 VMware, Inc. All Rights Reserved. -->
-<ng-template [clrIfExpanded]="false">
-    <ng-container>
       <!-- cluster and clusterhostsystems -->
       <clr-tree-node *ngFor="let cluster of clusters"
                      [clrLoading]="loading">
@@ -31,5 +29,3 @@
           {{ host['text'] }}
         </button>
       </clr-tree-node>
-    </ng-container>
-  </ng-template>

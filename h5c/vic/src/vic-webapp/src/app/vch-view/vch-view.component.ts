@@ -50,7 +50,7 @@ import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.ser
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
 import { Observable } from 'rxjs/Observable';
 import { VIC_APPLIANCE_PORT } from '../shared/constants/create-vch-wizard';
-import {State} from 'clarity-angular';
+import {State} from '@clr/angular';
 import {Subscription} from 'rxjs/Subscription';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from './vch.model';
