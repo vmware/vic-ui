@@ -22,25 +22,12 @@
               <clr-icon shape="block"></clr-icon>
                 {{ serverInfo['name'] }}
             </button>
-
-            <ng-container>
-              <clr-tree-node class="form-control"
-                           [class.invalid]="form.invalid && form.getError('invalidComputeResource')"
-                           [clrLoading]="isTreeLoading"
-                           *ngFor="let dc of datacenter">
-                <ng-container *ngIf="dc.objRef.indexOf(serverInfo.serviceGuid) > -1">
-                  <button class="clr-treenode-link">
-                    <clr-icon shape="building"></clr-icon>
-                    {{ dc.text }}
-                  </button>
-                  <vic-compute-resource-treenode #crTreenode
-                                                  [serverInfo]="serverInfo"
-                                                  [datacenter]="dc"
-                                                  (resourceSelected)="selectComputeResource($event)">
-                  </vic-compute-resource-treenode>
-                </ng-container>
-              </clr-tree-node>
-              </ng-container>
+            <ng-template [clrIfExpanded]="false">
+              <vic-compute-resource-treenode #crTreenode
+                                             [datacenter]="dc"
+                                             (resourceSelected)="selectComputeResource($event)">
+              </vic-compute-resource-treenode>
+            </ng-template>
           </clr-tree-node>
         </ng-container>
       </div>
@@ -163,15 +150,16 @@
     <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon>
   </a>
 
-  <section class="form-block mt-0"
+  <section class="form-block"
            *ngIf="inAdvancedMode">
 
-    <div class="alert alert-sm alert-info mt-0 mb-2">
-      <div class="alert-item">
+    <div class="alert alert-info mb-2">
+        <div class="alert-icon-wrapper">
+          <clr-icon class="alert-icon" shape="info-circle"></clr-icon>
+        </div>
         <div class="alert-text">
           The following options will be used for VCH creation only when the advanced mode is open.
         </div>
-      </div>
     </div>
 
     <label>
