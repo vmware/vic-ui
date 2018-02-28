@@ -168,28 +168,8 @@ Deploy VICUI Testbed
     Set To Dictionary  ${testbed_config}  esx_build  5969303
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
-    # ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
-    # ${vc_ip}=  Get From Dictionary  ${vc}  ip
-
-    ## TODO: delete the debugging code
-    @{esxis}=  Create List
-    &{esxi}=  Create Dictionary
-    Set To Dictionary  ${esxi}  name  kjosh-E2E-6135-ESX-5969303-1
-    Set To Dictionary  ${esxi}  ip  10.192.189.88
-    Set To Dictionary  ${esxi}  build  5969303
-    Append To List  ${esxis}  ${esxi}
-    &{esxi}=  Create Dictionary
-    Set To Dictionary  ${esxi}  name  kjosh-E2E-6135-ESX-5969303-2
-    Set To Dictionary  ${esxi}  ip  10.192.48.180
-    Set To Dictionary  ${esxi}  build  5969303
-    Append To List  ${esxis}  ${esxi}
-    Set To Dictionary  ${esxi}  name  kjosh-E2E-6135-ESX-5969303-3
-    Set To Dictionary  ${esxi}  ip  10.161.0.163
-    Set To Dictionary  ${esxi}  build  5969303
-    Append To List  ${esxis}  ${esxi}
-
-    ${vc_ip}=  Set Variable  10.193.13.43
-    ##
+    ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
+    ${vc_ip}=  Get From Dictionary  ${vc}  ip
 
     Set Global Variable  ${ESXIs}  ${esxis}
     Set Global Variable  ${VCIP}  ${vc_ip}

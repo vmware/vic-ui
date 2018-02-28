@@ -302,7 +302,7 @@ Run Testcases On Windows
     ${stdout}  ${robotscript_rc2}=  Execute Command  ${ssh_command2}  return_rc=True
 
     # Store whether the run was successful, print out any error message
-    ${did_all_tests_pass}=  Run Keyword And Return Status  Should Be Equal As Integers  ${robotscript_rc}  0
+    ${did_all_tests_pass}=  Run Keyword And Return Status  Should Be Equal As Integers  ${robotscript_rc2}  0
     Run Keyword Unless  ${did_all_tests_pass}  Log To Console  remote command exited with rc > 0: ${stdout}
 
     # download test results bundle to ../../../%{TEST_RESULTS_FOLDER} and close connection
