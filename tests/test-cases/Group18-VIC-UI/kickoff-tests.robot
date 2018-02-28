@@ -187,6 +187,7 @@ Run Script Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/${test_name}-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|#BUILD_NUMBER|%{BUILD_NUMBER}|g"
     ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g"
