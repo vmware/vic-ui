@@ -26,7 +26,6 @@ pipeline:
       ROBOT_SCRIPT: #ROBOT_SCRIPT
     commands:
       - set -e
-      - export $(cat testbed-information-${BUILD_NUMBER} | xargs)
       - pip install pexpect
       - cd $UI_TEST_CASES_FOLDER
       - if [ $TEST_OS = "Mac" ] ; then robot --log container_log.html --report container_report.html --output container_output.xml --test *Mac -C ansi -d ../../../$TEST_RESULTS_FOLDER $ROBOT_SCRIPT ; fi
