@@ -159,24 +159,45 @@ Prepare VIC UI Testbed
 *** Test Cases ***
 Deploy VICUI Testbed
     # remove testbed-information if it exists
-    ${ti_exists}=  Run Keyword And Return Status  OperatingSystem.Should Exist  testbed-information
-    Run Keyword If  ${ti_exists}  Remove File  testbed-information
+    ${ti_exists}=  Run Keyword And Return Status  OperatingSystem.Should Exist  testbed-information-%{BUILD_NUMBER}
+    Run Keyword If  ${ti_exists}  Remove File  testbed-information-%{BUILD_NUMBER}
 
     &{testbed_config}=  Create Dictionary
 
-    Set To Dictionary  ${testbed_config}  esx_num  3
+    Set To Dictionary  ${testbed_config}  esx_num  2
     Set To Dictionary  ${testbed_config}  esx_build  5969303
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
-    ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
-    ${vc_ip}=  Get From Dictionary  ${vc}  ip
+    # ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
+    # ${vc_ip}=  Get From Dictionary  ${vc}  ip
 
+    ## TODO: delete the debugging code
+    @{esxis}=  Create List
+    &{esxi}=  Create Dictionary
+    Set To Dictionary  ${esxi}  name  kjosh-E2E-6135-ESX-5969303-1
+    Set To Dictionary  ${esxi}  ip  10.192.189.88
+    Set To Dictionary  ${esxi}  build  5969303
+    Append To List  ${esxis}  ${esxi}
+    &{esxi}=  Create Dictionary
+    Set To Dictionary  ${esxi}  name  kjosh-E2E-6135-ESX-5969303-2
+    Set To Dictionary  ${esxi}  ip  10.192.48.180
+    Set To Dictionary  ${esxi}  build  5969303
+    Append To List  ${esxis}  ${esxi}
+    Set To Dictionary  ${esxi}  name  kjosh-E2E-6135-ESX-5969303-3
+    Set To Dictionary  ${esxi}  ip  10.161.0.163
+    Set To Dictionary  ${esxi}  build  5969303
+    Append To List  ${esxis}  ${esxi}
+
+    ${vc_ip}=  Set Variable  10.193.13.43
+
+    ##
     ${testbed-information-content}=  Catenate  SEPARATOR=\n
     ...  TEST_VSPHERE_VER=65
     ...  TEST_VC_IP=${vc_ip}
     ...  TEST_URL_ARRAY=${vc_ip}
     ...  TEST_USERNAME=Administrator@vsphere.local
     ...  TEST_PASSWORD=Admin\!23
+    ...  TEST_DATASTORE=datastore1
     ...  EXTERNAL_NETWORK=vm-network
     ...  TEST_TIMEOUT=30m
     ...  GOVC_INSECURE=1
@@ -184,31 +205,29 @@ Deploy VICUI Testbed
     ...  GOVC_PASSWORD=Admin\!23
     ...  GOVC_URL=${vc_ip}\n
 
-    Create File  testbed-information  ${testbed-information-content}
+    Create File  testbed-information-%{BUILD_NUMBER}  ${testbed-information-content}
 
 Deploy VCH
-    Load Nimbus Testbed Env
+    ${file}=  Evaluate  'testbed-information-%{BUILD_NUMBER}'
+    Load Nimbus Testbed Env  ${file}
     ${uname_v}=  Run  uname -v
     ${is_macos}=  Run Keyword And Return Status  Should Contain  ${uname_v}  Darwin
     ${vic-machine-binary}=  Run Keyword If  ${is_macos}  Set Variable  vic-machine-darwin  ELSE  Set Variable  vic-machine-linux
     ${vic-ui-binary}=  Run Keyword If  ${is_macos}  Set Variable  vic-ui-darwin  ELSE  Set Variable  vic-ui-linux
     Set Environment Variable  TEST_RESOURCE  ${TEST_RESOURCE}
     Install VIC Appliance For VIC UI  ui-nightly-run-bin/${vic-machine-binary}  ui-nightly-run-bin/appliance.iso  ui-nightly-run-bin/bootstrap.iso
-    Append To File  testbed-information  VCH-PARAMS=%{VCH-PARAMS}\n
-
-    Append To File  testbed-information  TEST_OS=%{TEST_OS}\n
-    Append To File  testbed-information  DRONE_BUILD_NUMBER=%{DRONE_BUILD_NUMBER}\n
-    Append To File  testbed-information  BRIDGE_NETWORK=%{BRIDGE_NETWORK}\n
-    Append To File  testbed-information  TEST_URL=%{TEST_URL}\n
-    Append To File  testbed-information  VCH_VM_NAME=%{VCH-NAME}\n
-    Append To File  testbed-information  VCH-IP=%{VCH-IP}\n
-    Append To File  testbed-information  VIC-ADMIN=%{VIC-ADMIN}\n
-    Append To File  testbed-information  GOVC_RESOURCE_POOL=%{GOVC_RESOURCE_POOL}\n
-    Append To File  testbed-information  GOVC_DATASTORE=%{GOVC_DATASTORE}\n
-    Append To File  testbed-information  HOST_TYPE=%{HOST_TYPE}\n
-    Append To File  testbed-information  DATASTORE_TYPE=%{DATASTORE_TYPE}\n
-    Append To File  testbed-information  vicmachinetls=${vicmachinetls}\n
+    Append To File  ${file}  VCH-PARAMS=%{VCH-PARAMS}\n
+    Append To File  ${file}  BRIDGE_NETWORK=%{BRIDGE_NETWORK}\n
+    Append To File  ${file}  TEST_URL=%{TEST_URL}\n
+    Append To File  ${file}  VCH_VM_NAME=%{VCH-NAME}\n
+    Append To File  ${file}  VCH-IP=%{VCH-IP}\n
+    Append To File  ${file}  VIC-ADMIN=%{VIC-ADMIN}\n
+    Append To File  ${file}  GOVC_RESOURCE_POOL=%{GOVC_RESOURCE_POOL}\n
+    Append To File  ${file}  GOVC_DATASTORE=%{GOVC_DATASTORE}\n
+    Append To File  ${file}  HOST_TYPE=%{HOST_TYPE}\n
+    Append To File  ${file}  DATASTORE_TYPE=%{DATASTORE_TYPE}\n
+    Append To File  ${file}  vicmachinetls=${vicmachinetls}\n
 
     ${vc_fingerprint}=  Run  ui-nightly-run-bin/${vic-ui-binary} info --user ${TEST_VC_USERNAME} --password ${TEST_VC_PASSWORD} --target ${TEST_VC_IP} --key com.vmware.vic.noop 2>&1 | grep -o "(thumbprint.*)" | awk -F= '{print $2}' | sed 's/.$//'
-    Append To File  testbed-information  VC_FINGERPRINT=${vc_fingerprint}\n
-    Append To File  testbed-information  TEST_THUMBPRINT=${vc_fingerprint}\n
+    Append To File  ${file}  VC_FINGERPRINT=${vc_fingerprint}\n
+    Append To File  ${file}  TEST_THUMBPRINT=${vc_fingerprint}\n
