@@ -217,6 +217,8 @@ Run Testcases On Mac
     Put File  ../../../ui-nightly-run-bin/vic-ui-darwin  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${MACOS_HOST_USER}@${MACOS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../ui-nightly-run-bin ${MACOS_HOST_USER}@${MACOS_HOST_IP}:${remote_vic_root} 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     # update local repo
     ${update_repo_command}=  Catenate
@@ -227,6 +229,10 @@ Run Testcases On Mac
     ...  git rebase vmware/master
     ${stdout}  ${stderr}  ${rc}=  Execute Command  ${update_repo_command}  return_stderr=True  return_rc=True
     Run Keyword Unless  ${rc} == 0  Log To Console  ${stderr}
+
+    # Sync tests
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../tests ${MACOS_HOST_USER}@${MACOS_HOST_IP}:${remote_vic_root} 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     # copy binaries
     ${stdout}  ${stderr}  ${rc}=  Execute Command  cp -rvf ${remote_scratch_folder}/scripts ${remote_vic_root}/  return_stderr=True  return_rc=True
@@ -271,19 +277,29 @@ Run Testcases On Windows
     Put File  ../../../vic-ui-windows.exe  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../ui-nightly-run-bin ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     Execute Command  rm -rf ${REMOTE_RESULTS_FOLDER}
     Execute Command  mkdir -p ${REMOTE_RESULTS_FOLDER}
 
-    # remotely run robot test
+    # sync repo
     ${ssh_command}=  Catenate
     ...  cd ${remote_vic_root} &&
     ...  git remote update &&
     ...  git checkout -f master &&
-    ...  git rebase vmware/master &&
+    ...  git rebase vmware/master
+    ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
+
+    # sync tests
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../tests ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+
+    # remotely run robot test
+    ${ssh_command2}=  Catenate
     ...  cd tests/test-cases/Group18-VIC-UI &&
     ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-3-VIC-UI-Upgrader.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
-    ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
+    ${stdout}  ${robotscript_rc2}=  Execute Command  ${ssh_command2}  return_rc=True
 
     # Store whether the run was successful, print out any error message
     ${did_all_tests_pass}=  Run Keyword And Return Status  Should Be Equal As Integers  ${robotscript_rc}  0
