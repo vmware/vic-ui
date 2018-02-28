@@ -153,7 +153,6 @@ Get Testbed Information
     Set Environment Variable  GOVC_INSECURE  1
     ${file}=  Evaluate  'testbed-information-%{BUILD_NUMBER}'
     Load Nimbus Testbed Env  ${file}
-    Move File  ${file}  tests/test-cases/Group18-VIC-UI/${file}
     # Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
     # ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/test-cases/Group18-VIC-UI/setup-testbed.robot > tests/test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
     # Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
@@ -215,7 +214,7 @@ Run Script Test With Config
     Should Be Equal As Integers  ${rc}  0
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --local --timeout \"1h0m0s\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -283,7 +282,7 @@ Run Plugin Test With Config
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \]\tH5 Client plugin test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --local --timeout \"1h0m0s\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
