@@ -357,19 +357,19 @@ Launch Installer Tests
     :FOR  ${config}  IN  @{INSTALLER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Installer Test  18-1-VIC-UI-Installer  ${INSTALLER_TEST_RESULTS_DICT}
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Installer Test,${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Launch Uninstaller Tests
     :FOR  ${config}  IN  @{UNINSTALLER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Uninstaller Test  18-2-VIC-UI-Uninstaller  ${UNINSTALLER_TEST_RESULTS_DICT}
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Uninstaller Test,${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Launch Upgrader Tests
     :FOR  ${config}  IN  @{UPGRADER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Upgrader Test  18-3-VIC-UI-Upgrader  ${UPGRADER_TEST_RESULTS_DICT}
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Upgrader Test,${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
+
+Cleanup VCH
+    Uninstall VCH
 
 # All H5 Client plugin tests are now migrated to Protractor
 # Launch Plugin Tests
