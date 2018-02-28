@@ -53,8 +53,9 @@ Set Fileserver And Thumbprint In Configs
     Create File  ${UI_INSTALLER_PATH}/configs  ${results}
 
 Load Nimbus Testbed Env
-    Should Exist  testbed-information
-    ${envs}=  OperatingSystem.Get File  testbed-information
+    [Arguments]  ${file}=testbed-information
+    Should Exist  ${file}
+    ${envs}=  OperatingSystem.Get File  ${file}
     @{envs}=  Split To Lines  ${envs}
     :FOR  ${item}  IN  @{envs}
     \  @{kv}=  Split String  ${item}  =

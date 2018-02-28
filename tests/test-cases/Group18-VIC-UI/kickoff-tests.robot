@@ -55,7 +55,6 @@ Check Drone
     Log  Checking Drone version...
     Log  return code: ${rc}, output: ${drone_ver}  DEBUG
     Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
-    Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
 
 Check Govc
     ${rc}=  Run And Return Rc  govc
@@ -152,13 +151,15 @@ Setup Test Matrix
 
 Get Testbed Information
     Set Environment Variable  GOVC_INSECURE  1
-    Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
-    ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/test-cases/Group18-VIC-UI/setup-testbed.robot > tests/test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
-    Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
-    ${testbed-setup-log}=  OperatingSystem.Get File  tests/test-cases/Group18-VIC-UI/setup-testbed.log
-    Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${testbed-setup-log}
-    Load Nimbus Testbed Env
-    Move File  testbed-information  tests/test-cases/Group18-VIC-UI/testbed-information
+    ${file}=  Evaluate  'testbed-information-%{BUILD_NUMBER}'
+    Load Nimbus Testbed Env  ${file}
+    Move File  ${file}  tests/test-cases/Group18-VIC-UI/${file}
+    # Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
+    # ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/test-cases/Group18-VIC-UI/setup-testbed.robot > tests/test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
+    # Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
+    # ${testbed-setup-log}=  OperatingSystem.Get File  tests/test-cases/Group18-VIC-UI/setup-testbed.log
+    # Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${testbed-setup-log}
+    # Load Nimbus Testbed Env
 
 Get Integration Container Id
     ${rc}  ${out}=  Run And Return Rc And Output  docker ps --filter status=running --filter ancestor=gcr.io/eminent-nation-87317/vic-integration-test:1.33 -l --format={{.ID}}
@@ -214,7 +215,7 @@ Run Script Test With Config
     Should Be Equal As Integers  ${rc}  0
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
@@ -282,7 +283,7 @@ Run Plugin Test With Config
     Set To Dictionary  ${PLUGIN_TEST_RESULTS_DICT}  ${dict_key}  \[ FAILED \]\tH5 Client plugin test - Portlets / VC${vc_version} / ESX build ${esx_build} / VC build ${vc_build} / ${os} / ${selenium_browser_normalized}
 
     # run drone
-    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" --timeout.inactivity \"1h0m0s\" --repo.trusted .drone.local.tests.yml
+    ${drone-exec-string}=  Set Variable  drone exec --timeout \"1h0m0s\" .drone.local.tests.yml
     ${pid}=  Start Process  bash  -c  ${drone-exec-string}  stdout=${test_results_folder}/stdout.log  stderr=STDOUT
     ${docker-ps}=  Wait Until Keyword Succeeds  30x  5s  Get Integration Container Id
     Log To Console  Drone worker \@ ${docker-ps}
