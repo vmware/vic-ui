@@ -169,8 +169,6 @@ Delete VIC Machine
 
 Uninstall VCH
     [Arguments]  ${remove_plugin}=${FALSE}
-    Log To Console  Gathering logs from the test server...
-    Gather Logs From Test Server
     Log To Console  Deleting the VCH appliance...
     ${uname_v}=  Run  uname -v
     ${is_macos}=  Run Keyword And Return Status  Should Contain  ${uname_v}  Darwin
