@@ -213,7 +213,7 @@ Run Testcases On Mac
     # log into macOS host and copy required files
     Open SSH Connection  ${MACOS_HOST_IP}  ${MACOS_HOST_USER}  ${MACOS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
-    Put File  testbed-information  ${remote_vic_root}/tests/test-cases/Group18-VIC-UI/  mode=0700
+    Put File  ../../../testbed-information-%{BUILD_NUMBER}  ${remote_vic_root}/  mode=0700
     Put File  ../../../ui-nightly-run-bin/vic-ui-darwin  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${MACOS_HOST_USER}@${MACOS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
@@ -236,7 +236,7 @@ Run Testcases On Mac
     # remotely run robot test
     ${run_tests_command}=  Catenate
     ...  cd ${remote_vic_root}/tests/test-cases/Group18-VIC-UI 2>&1 &&
-    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-3-VIC-UI-Upgrader.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-3-VIC-UI-Upgrader.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${rc}=  Execute Command  ${run_tests_command}  return_rc=True
 
     # Store whether the run was successful
@@ -265,9 +265,9 @@ Run Testcases On Windows
     # log into Windows host and copy required files
     Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
-    Put File  testbed-information  ${remote_vic_root}/tests/test-cases/Group18-VIC-UI/
+    Put File  ../../../testbed-information-%{BUILD_NUMBER}  ${remote_vic_root}/
     Put File  ../../../scripts/plugin-manifest  ${remote_vic_root}/scripts/
-    Put File  ../../../scripts/vCenterForWindows/configs-7312210  ${remote_vic_root}/scripts/vCenterForWindows/
+    Put File  ../../../scripts/vCenterForWindows/configs  ${remote_vic_root}/scripts/vCenterForWindows/
     Put File  ../../../vic-ui-windows.exe  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
@@ -282,7 +282,7 @@ Run Testcases On Windows
     ...  git checkout -f master &&
     ...  git rebase vmware/master &&
     ...  cd tests/test-cases/Group18-VIC-UI &&
-    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-3-VIC-UI-Upgrader.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-3-VIC-UI-Upgrader.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
 
     # Store whether the run was successful, print out any error message

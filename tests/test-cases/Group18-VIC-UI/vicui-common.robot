@@ -106,7 +106,7 @@ Set Absolute Script Paths
     ${is_windows}=  Run Keyword And Return Status  Should Contain  ${out}  Windows
     Run Keyword If  ${is_windows}  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/vCenterForWindows  ELSE  Set Suite Variable  ${UI_INSTALLER_PATH}  ${UI_INSTALLERS_ROOT}/VCSA
     Should Exist  ${UI_INSTALLER_PATH}
-    ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs-%{TEST_VCSA_BUILD}
+    ${configs_content}=  OperatingSystem.GetFile  ${UI_INSTALLER_PATH}/configs
     Set Suite Variable  ${configs}  ${configs_content}
     Run Keyword If  %{TEST_VSPHERE_VER} == 65  Set Suite Variable  ${plugin_folder}  plugin-packages  ELSE  Set Suite Variable  ${plugin_folder}  vsphere-client-serenity
 
@@ -327,8 +327,6 @@ Prepare VIC Engine Binaries
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
     Run  cp -rf scripts/ui/vCenterForWindows/utils* 2>/dev/null
-    Run  cp scripts/VCSA/configs scripts/VCSA/configs-${vc-build}
-    Run  cp scripts/vCenterForWindows/configs scripts/vCenterForWindows/configs-${vc-build}
 
 Open SSH Connection
   [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
