@@ -28,18 +28,12 @@ ${ALL_TESTS_PASSED}            ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
-    # ova url is checked here. should be taken in runtime as a variable
-    # e.g. robot --variable ova_url:https://storage.googleapis.com/vic-product-ova-builds/build-to-test.ova
-    Variable Should Exist  ${ova_url}
-
     ${ts}=  Get Current Date  result_format=epoch  exclude_millis=True
     Set Suite Variable  ${time_start}  ${ts}
     Cleanup Previous Test Logs
     Check Working Dir
     Check Drone
     Check Govc
-    Install VIC Product OVA  6.5u1d  ${BUILD_7312210_IP}  %{OVA_ESX_IP_VC65U1D}  %{OVA_ESX_DATASTORE_VC65U1D}
-    Get Vic Engine Binaries
     Setup Test Matrix
 
 Check Working Dir
@@ -314,7 +308,7 @@ Cleanup Testbed
     Terminate All Processes  kill=True
 
     # Delete all transient and sensitive information
-    Run  rm -rf .drone.local.tests.yml testbed-information tests/test-cases/Group18-VIC-UI/testbed-information /tmp/sdk/ >/dev/null 2>&1
+    Run  rm -rf .drone.local.tests.yml testbed-information /tmp/sdk/ >/dev/null 2>&1
     Run  rm -rf Kickoff-Tests* VCH-0*
 
     # Revert some modified local files
@@ -322,7 +316,6 @@ Cleanup Testbed
 
     # Delete binaries
     Run  rm -rf vicui-test-report-*.zip
-    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL}
     Run  rm -rf tests/test-cases/Group18-VIC-UI/*VCH-0*
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*

@@ -43,7 +43,8 @@ ${ENV_HTML_SDK_HOME}                  /tmp/sdk/html-client-sdk
 *** Keywords ***
 Set Fileserver And Thumbprint In Configs
     [Arguments]  ${fake}=${FALSE}
-    Run Keyword If  ${fake} == ${FALSE}  Create File  ${UI_INSTALLER_PATH}/configs  ${configs}
+    Run Keyword If  ${fake} == ${FALSE}  Copy File  ../../../ui-nightly-run-bin/ui/VCSA/configs  ../../../scripts/VCSA/
+    Run Keyword If  ${fake} == ${FALSE}  Copy File  ../../../ui-nightly-run-bin/ui/vCenterForWindows/configs  ../../../scripts/vCenterForWindows/
     Return From Keyword If  ${fake} == ${FALSE}
 
     ${fileserver_url}=  Set Variable  https://256.256.256.256/
@@ -227,7 +228,8 @@ Run GOVC
     [Return]  ${rc}
 
 Install VIC Product OVA
-    [Arguments]  ${vcenter-build}  ${target-vc-ip}  ${ova-esx-host-ip}  ${ova-esx-datastore}
+    [Arguments]  ${target-vc-ip}  ${ova-esx-host-ip}  ${ova-esx-datastore}
+    ${buildnum}=  Set Variable  %{BUILD_NUMBER}
     Variable Should Exist  ${ova_url}
     ${ova-name}=  Fetch From Right  ${ova_url}  /
     Log  OVA filename is: ${ova-name}
@@ -247,7 +249,7 @@ Install VIC Product OVA
     ${ova_found}=  Run Keyword And Return Status  Should Be True  ${rc} == 0
 
     # if ova is already found in the target VC, get IP and break out of the keyword
-    Run Keyword If  ${ova_found}  Set Environment Variable  OVA_IP_${vcenter-build}  ${ova_ip}
+    Run Keyword If  ${ova_found}  Set Environment Variable  OVA_IP_${buildnum}  ${ova_ip}
     Return From Keyword If  ${ova_found}
 
     # check if OVA file is locally available already and download if there's none
@@ -265,18 +267,18 @@ Install VIC Product OVA
     :FOR  ${line}  IN  @{output}
     \   ${status}=  Run Keyword And Return Status  Should Contain  ${line}  Received IP address:
     \   ${ip}=  Run Keyword If  ${status}  Fetch From Right  ${line}  ${SPACE}
-    \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP_${vcenter-build}  ${ip}
+    \   Run Keyword If  ${status}  Set Environment Variable  OVA_IP_${buildnum}  ${ip}
 
     Log To Console  \nWaiting for Getting Started Page to Come Up...
     :FOR  ${i}  IN RANGE  24
-    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP_${vcenter-build}}:9443/register 2>/dev/null
+    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP_${buildnum}}:9443/register 2>/dev/null
     \   Exit For Loop If  '200' in '''${out}'''
     \   Sleep  5s
     Log To Console  ${rc}
     Log To Console  ${out}
     Should Contain  ${out}  200
 
-    Log  %{OVA_IP_${vcenter-build}}
+    Log  %{OVA_IP_${buildnum}}
 
 Download VIC OVA
     [Arguments]  ${url}  ${local_path}
@@ -294,20 +296,19 @@ Cleanup VIC Product OVA
     Run Keyword if  ${rc} == 0  Log To Console  \nVIC Product OVA deployment ${ova_target_vm_name} is cleaned up on test server ${target-vc-ip}
 
 Get Vic Engine Binaries
-    Log To Console  \nDownloading VIC engine for VCSA 6.5u1d...
+    Log To Console  \nDownloading VIC engine for build # %{BUILD_NUMBER}...
     ${target_dir}=  Set Variable  bin
-    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  6.5u1d  /tmp/vic.tar.gz
+    ${results}=  Wait Until Keyword Succeeds  5x  15 sec  Download VIC Engine Tarball From OVA  /tmp/vic.tar.gz
     Should Be True  ${results}
-    # prepare vic engine binaries as well as store configs for the OVA deployed on 6.5 instance
-    Prepare VIC Engine Binaries  7312210
+    Prepare VIC Engine Binaries
 
 Download VIC Engine Tarball From OVA
-    [Arguments]  ${vcenter-build}  ${filename}
-    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_${vcenter-build}}:9443/files
+    [Arguments]  ${filename}
+    ${rc}  ${out}=  Run And Return Rc And Output  curl -sLk https://%{OVA_IP_%{BUILD_NUMBER}}:9443/files
     Should Be Equal As Integers  ${rc}  0
     ${ret}  ${tarball_file}=  Should Match Regexp  ${out}  (vic_\\d+\.tar\.gz|vic_v\\d\.\\d\.\\d\.tar\.gz|vic_v\\d\.\\d\.\\d\-rc\\d\.tar\.gz|vic_\\d\.\\d\.\\d\-dev\.tar\.gz)
     Should Not Be Empty  ${tarball_file}
-    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_${vcenter-build}}:9443/files/${tarball_file} -O ${filename}
+    ${rc}=  Run And Return Rc  wget --no-check-certificate https://%{OVA_IP_%{BUILD_NUMBER}}:9443/files/${tarball_file} -O ${filename}
     Should Be Equal As Integers  ${rc}  0
     OperatingSystem.File Should Exist  ${filename}
     Set Suite Variable  ${buildNumber}  ${tarball_file}
@@ -315,7 +316,6 @@ Download VIC Engine Tarball From OVA
     [Return]  ${rc} == 0
 
 Prepare VIC Engine Binaries
-    [Arguments]  ${vc-build}
     Log  Extracting binary files...
     ${rc1}=  Run And Return Rc  mkdir -p ui-nightly-run-bin
     ${rc2}=  Run And Return Rc  tar xvzf /tmp/vic.tar.gz -C ui-nightly-run-bin --strip 1
@@ -326,7 +326,6 @@ Prepare VIC Engine Binaries
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
-    Run  cp -rf scripts/ui/vCenterForWindows/utils* 2>/dev/null
 
 Open SSH Connection
   [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds

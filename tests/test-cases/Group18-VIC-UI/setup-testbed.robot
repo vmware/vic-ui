@@ -164,7 +164,7 @@ Deploy VICUI Testbed
 
     &{testbed_config}=  Create Dictionary
 
-    Set To Dictionary  ${testbed_config}  esx_num  2
+    Set To Dictionary  ${testbed_config}  esx_num  3
     Set To Dictionary  ${testbed_config}  esx_build  5969303
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
@@ -189,8 +189,11 @@ Deploy VICUI Testbed
     Append To List  ${esxis}  ${esxi}
 
     ${vc_ip}=  Set Variable  10.193.13.43
-
     ##
+
+    Set Global Variable  ${ESXIs}  ${esxis}
+    Set Global Variable  ${VCIP}  ${vc_ip}
+
     ${testbed-information-content}=  Catenate  SEPARATOR=\n
     ...  TEST_VSPHERE_VER=65
     ...  TEST_VC_IP=${vc_ip}
@@ -206,6 +209,13 @@ Deploy VICUI Testbed
     ...  GOVC_URL=${vc_ip}\n
 
     Create File  testbed-information-%{BUILD_NUMBER}  ${testbed-information-content}
+
+Deploy Product OVA
+    ${esxi_ova}=  Get From List  ${ESXIs}  2
+    ${ip}=  Get From Dictionary  ${esxi_ova}  ip
+
+    Install VIC Product OVA  ${VCIP}  ${ip}  datastore1 (2)
+    Get Vic Engine Binaries
 
 Deploy VCH
     ${file}=  Evaluate  'testbed-information-%{BUILD_NUMBER}'
