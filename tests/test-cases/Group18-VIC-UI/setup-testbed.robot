@@ -46,6 +46,19 @@ Deploy Esx
 
     [Return]  %{NIMBUS_USER}-${name}  ${esx1-ip}
 
+Deploy ESXi Server On Nimbus Async
+    [Arguments]  ${name}  ${build}=None
+    Log To Console  \nDeploying Nimbus ESXi server: ${name}
+    ${out}=  Run Secret SSHPASS command  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  'nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
+    [Return]  ${out}
+
+Deploy VC On Nimbus Async
+    [Arguments]  ${name}  ${build}
+    Log To Console  \nDeploying Nimbus VC server: ${name}
+    ${cmd}=  Evaluate  'nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
+    ${out}=  Start Process  sshpass -p '%{NIMBUS_PASSWORD}' ssh -o StrictHostKeyChecking\=no %{NIMBUS_USER}@%{NIMBUS_GW} ${cmd}  shell=True
+    [Return]  ${out}
+
 Deploy Vcsa
     [Arguments]  ${name}  ${build}  ${esxi_list}  ${logfile}=None
     Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
