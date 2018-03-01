@@ -182,8 +182,33 @@ Deploy VICUI Testbed
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
     ${start_time}=  Get Time  epoch
-    ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
+    # ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
+    # ${vc_ip}=  Get From Dictionary  ${vc}  ip
+    
+    #####
+    ${esxis}=  Create List
+    &{vc}=  Create Dictionary
+    &{esx}=  Create Dictionary
+    Set To Dictionary  ${esx}  name  kjosh-E2E-4628-ESX-5969303-1
+    Set To Dictionary  ${esx}  ip  10.160.54.122
+    Set To Dictionary  ${esx}  build  5969303
+    Append To List  ${esxis}  ${esx}
+    &{esx}=  Create Dictionary
+    Set To Dictionary  ${esx}  name  kjosh-E2E-4628-ESX-5969303-2
+    Set To Dictionary  ${esx}  ip  10.160.55.124
+    Set To Dictionary  ${esx}  build  5969303
+    Append To List  ${esxis}  ${esx}
+    &{esx}=  Create Dictionary
+    Set To Dictionary  ${esx}  name  kjosh-E2E-4628-ESX-5969303-3
+    Set To Dictionary  ${esx}  ip  10.193.50.135
+    Set To Dictionary  ${esx}  build  5969303
+    Append To List  ${esxis}  ${esx}
+    Set To Dictionary  ${vc}  name  kjosh-E2E-4628-VC-7515524
+    Set To Dictionary  ${vc}  ip  10.161.234.113
+    Set To Dictionary  ${vc}  build  7515524
     ${vc_ip}=  Get From Dictionary  ${vc}  ip
+    #####
+
     ${end_time}=  Get Time  epoch
     ${elapsed_time}=  Evaluate  ${end_time} - ${start_time}
     Log To Console  \nTook ${elapsed_time} seconds to deploy testbed VMs\n
