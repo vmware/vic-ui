@@ -24,58 +24,35 @@ Destroy Testbed
     Log To Console  Destroying VM(s) ${name}
     Run Keyword And Ignore Error  Kill Nimbus Server  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  ${name}
 
-Deploy Esx
-    [Arguments]  ${name}  ${build}=None  ${logfile}=None
-    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
-    Execute Command  rm -rf public_html/pxe/*
-
-    ${output}=  Execute Command  nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}
-    Log  ${output}
-    Run Keyword If  ${logfile} is not None  Create File  ${logfile}  ${output}
-    Should Contain  ${output}  To manage this VM use
-
-    ${esx1-ip}=  Get IP  ${name}
-    Remove Environment Variable  GOVC_PASSWORD
-    Remove Environment Variable  GOVC_USERNAME
-    Set Environment Variable  GOVC_INSECURE  1
-    Set Environment Variable  GOVC_URL  root:@${esx1-ip}
-    ${out}=  Run  govc host.account.update -id root -password e2eFunctionalTest
-    Should Be Empty  ${out}
-    Log To Console  Successfully deployed %{NIMBUS_USER}-${name}. IP: ${esx1-ip}
-    Close Connection
-
-    [Return]  %{NIMBUS_USER}-${name}  ${esx1-ip}
+Run SSHPASS And Log To File
+    [Arguments]  ${host}  ${user}  ${password}  ${cmd}  ${logfile}=STDOUT
+    ${out}=  Start Process  sshpass -p ${password} ssh -o StrictHostKeyChecking\=no ${user}@${host} ${cmd}  shell=True  stdout=${logfile}  stderr=STDOUT
+    [Return]  ${out}
 
 Deploy ESXi Server On Nimbus Async
     [Arguments]  ${name}  ${build}=None
     Log To Console  \nDeploying Nimbus ESXi server: ${name}
-    ${out}=  Run Secret SSHPASS command  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  'nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
+    ${cmd}=  Evaluate  'nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
+    ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
     [Return]  ${out}
 
 Deploy VC On Nimbus Async
-    [Arguments]  ${name}  ${build}
+    [Arguments]  ${name}  ${build}=None
     Log To Console  \nDeploying Nimbus VC server: ${name}
     ${cmd}=  Evaluate  'nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
-    ${out}=  Start Process  sshpass -p '%{NIMBUS_PASSWORD}' ssh -o StrictHostKeyChecking\=no %{NIMBUS_USER}@%{NIMBUS_GW} ${cmd}  shell=True
+    ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
     [Return]  ${out}
 
-Deploy Vcsa
-    [Arguments]  ${name}  ${build}  ${esxi_list}  ${logfile}=None
+Configure Vcsa
+    [Arguments]  ${name}  ${esxi_list}
     Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
-
-    # run nimbus command and make sure deployment was successful
-    ${output}=  Execute Command  nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}
-    Log  ${output}
-    Run Keyword If  ${logfile} is not None  Create File  ${logfile}  ${output}
-    Should Contain  ${output}  To manage this VM use
-    
     ${vc-ip}=  Get IP  ${name}
+    Close Connection
+
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  Administrator@vsphere.local
     Set Environment Variable  GOVC_PASSWORD  Admin!23
     Set Environment Variable  GOVC_URL  ${vc-ip}
-    Log To Console  Successfully deployed %{NIMBUS_USER}-${name}. IP: ${vc-ip}
-    Close Connection
 
     # create a datacenter
     Log To Console  Create a datacenter on the VC
@@ -145,27 +122,50 @@ Prepare VIC UI Testbed
     :FOR  ${idx}  IN RANGE  1  ${esxnum}
     \  ${name}=  Evaluate  '${randname_snippet}-ESX-${esxbuild}-${idx}'
     \  Append To List  ${esxi_names}  ${name}
-    \  Log To Console  \nDeploying Nimbus ESXi server: ${name}
-    \  ${vm_name}  ${vm_ip}=  Deploy Esx  ${name}  ${esxbuild}
-    \  &{vm}=  Create Dictionary
-    \  Set To Dictionary  ${vm}  name  ${vm_name}
-    \  Set To Dictionary  ${vm}  ip  ${vm_ip}
-    \  Set To Dictionary  ${vm}  build  ${esxbuild}
-    \  ${idx}=  Get Index from List  ${esxi_names}  ${name}
-    \  ${standalone_host_idx}=  Evaluate  ${esxnum} - 2
-    \  Run Keyword If  ${idx} == ${standalone_host_idx}  Set To Dictionary  ${vm}  standalone  ${TRUE}
-    \  Append To List  ${esxi_deploy_results}  ${vm}
-
-    Log To Console  \nESXi deployment completed
+    \  ${pid}=  Deploy ESXi Server On Nimbus Async  ${name}  ${esxbuild}
+    \  Append To List  ${pids}  ${pid}
 
     ${vcbuild}=  Get From Dictionary  ${testbed_config}  vc_build
     ${vc_name}=  Evaluate  '${randname_snippet}-VC-${vcbuild}'
-    Log To Console  \nDeploying Nimbus vCenter server: ${vc_name}
-    ${vm_name}  ${vm_ip}=  Deploy Vcsa  ${vc_name}  ${vcbuild}  ${esxi_deploy_results}
+    ${vc_deploy_pid}=  Deploy VC On Nimbus Async  ${vc_name}  ${vcbuild}
+
+    # wait until all processes end
+    :FOR  ${pid}  IN  @{pids}
+    \  ${results}=  Wait For Process  ${pid}
+    \  Should Contain  ${results.stdout}  To manage this VM use
+
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
+    Remove Environment Variable  GOVC_PASSWORD
+    Remove Environment Variable  GOVC_USERNAME
+    Set Environment Variable  GOVC_INSECURE  1
+    :FOR  ${esxi_name}  IN  @{esxi_names}
+    \  ${esxi_ip}=  Get IP  ${esxi_name}
+    \  &{vm}=  Create Dictionary
+    \  Set To Dictionary  ${vm}  name  %{NIMBUS_USER}-${esxi_name}
+    \  Set To Dictionary  ${vm}  ip  ${esxi_ip}
+    \  Set To Dictionary  ${vm}  build  ${esxbuild}
+    \  ${idx}=  Get Index from List  ${esxi_names}  ${esxi_name}
+    \  ${standalone_host_idx}=  Evaluate  ${esxnum} - 2
+    \  Run Keyword If  ${idx} == ${standalone_host_idx}  Set To Dictionary  ${vm}  standalone  ${TRUE}
+    \  Append To List  ${esxi_deploy_results}  ${vm}
+    \  # set root password for the esxi vms
+    \  Set Environment Variable  GOVC_URL  root:@${esxi_ip}
+    \  ${out}=  Run  govc host.account.update -id root -password e2eFunctionalTest
+    \  Should Be Empty  ${out}
+    \  Log To Console  Successfully deployed %{NIMBUS_USER}-${esxi_name}. IP: ${esxi_ip}
+    Close Connection
+
+    Log To Console  \nESXi deployment completed
+    
+    ${vc_deploy_results}=  Wait For Process  ${vc_deploy_pid}
+    Should Contain  ${vc_deploy_results.stdout}  To manage this VM use
+    ${vm_name}  ${vm_ip}=  Configure Vcsa  ${vc_name}  ${esxi_deploy_results}
     &{vc_deploy_results}=  Create Dictionary
     Set To Dictionary  ${vc_deploy_results}  name  ${vm_name}
     Set To Dictionary  ${vc_deploy_results}  ip  ${vm_ip}
     Set To Dictionary  ${vc_deploy_results}  build  ${vcbuild}
+
+    Log To Console  \nVC deployment completed
 
     [Return]  ${esxi_deploy_results}  ${vc_deploy_results}
 
@@ -181,8 +181,12 @@ Deploy VICUI Testbed
     Set To Dictionary  ${testbed_config}  esx_build  5969303
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
+    ${start_time}=  Get Time  epoch
     ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
     ${vc_ip}=  Get From Dictionary  ${vc}  ip
+    ${end_time}=  Get Time  epoch
+    ${elapsed_time}=  Evaluate  ${end_time} - ${start_time}
+    Log To Console  \nTook ${elapsed_time} seconds to deploy testbed VMs\n
 
     Set Global Variable  ${ESXIs}  ${esxis}
     Set Global Variable  ${VCIP}  ${vc_ip}
