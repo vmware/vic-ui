@@ -270,15 +270,22 @@ Run Testcases On Windows
     ...  git rebase vmware/master
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
 
-    # sync tests
+    # sync tests and configs file
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../tests ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts/vCenterForWindows/configs ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/scripts/vCenterForWindows/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     # remotely run robot test
     ${ssh_command2}=  Catenate
-    ...  cd tests/test-cases/Group18-VIC-UI &&
-    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
-    ${stdout}  ${robotscript_rc2}=  Execute Command  ${ssh_command2}  return_rc=True
+    ...  ls -la
+    # ...  cd tests/test-cases/Group18-VIC-UI &&
+    # ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /cygdrive/c/Python27/Scripts/robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot
+    # ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /cygdrive/c/Python27/Scripts/robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > /cygdrive/c${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+
+    ${stdout}  ${robotscript_rc2}  ${robotscript_stderr}=  Execute Command  ${ssh_command2}  return_rc=True  return_stderr=True
+    Log To Console  returning stdout:  ${stdout}
+    Log To Console  returning stderr: ${robotscript_stderr}
 
     # Store whether the run was successful, print out any error message
     ${did_all_tests_pass}=  Run Keyword And Return Status  Should Be Equal As Integers  ${robotscript_rc2}  0

@@ -280,8 +280,10 @@ Run Testcases On Windows
     ...  git rebase vmware/master
     ${stdout}  ${robotscript_rc}=  Execute Command  ${ssh_command}  return_rc=True
 
-    # sync tests
+    # sync tests and configs file
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../tests ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
+    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts/vCenterForWindows/configs ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/scripts/vCenterForWindows/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
     
     # remotely run robot test
