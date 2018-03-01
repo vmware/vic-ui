@@ -219,8 +219,10 @@ Run Testcases On Mac
     # remotely run robot test
     ${run_tests_command}=  Catenate
     ...  cd ${remote_vic_root}/tests/test-cases/Group18-VIC-UI 2>&1 &&
-    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot > ${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /usr/local/bin/robot -d ${REMOTE_RESULTS_FOLDER} --include anyos --include unixlike --test TestCase-* 18-1-VIC-UI-Installer.robot 2>&1
     ${stdout}  ${rc}=  Execute Command  ${run_tests_command}  return_rc=True
+    Create File  ${results_folder}/remote_stdouterr.log  ${stdout}
+    Log To Console  ${stdout}
 
     # Store whether the run was successful
     ${remote_command_successful}=  Run Keyword And Return Status  Should Be Equal As Integers  ${rc}  0
@@ -231,17 +233,13 @@ Run Testcases On Mac
     Execute Command  rm -rf ${REMOTE_RESULTS_FOLDER} ${remote_vic_root}/tests/test-cases/Group18-VIC-UI/*.log 2>&1
     Close Connection
 
-    OperatingSystem.File Should Exist  ${results_folder}/remote_stdouterr.log
-    ${remote_stdouterr}=  OperatingSystem.Get File  ${results_folder}/remote_stdouterr.log
-    Log To Console  ${remote_stdouterr}
-
     # report pass or fail
     Should Be True  ${remote_command_successful}
 
 # Run the test cases above in Windows
 Run Testcases On Windows
     ${results_folder}=  Set Variable  ../../../%{TEST_RESULTS_FOLDER}
-    ${remote_vic_root}=  Set Variable  /cygdrive/c/Users/IEUser/vic-ui
+    ${remote_vic_root}=  Set Variable  /cygdrive/c/Users/Administrator/vic-ui
     ${remote_scratch_folder}=  Set Variable  /tmp/vic-ui-e2e-scratch
     OperatingSystem.Create Directory  ${results_folder}
 
@@ -250,13 +248,10 @@ Run Testcases On Windows
     Execute Command  mkdir -p ${remote_scratch_folder}
     Put File  ../../../testbed-information-%{BUILD_NUMBER}  ${remote_vic_root}/
     Put File  ../../../scripts/plugin-manifest  ${remote_vic_root}/scripts/
-    Put File  ../../../scripts/vCenterForWindows/configs  ${remote_vic_root}/scripts/vCenterForWindows/
-    Put File  ../../../vic-ui-windows.exe  ${remote_vic_root}/
+    Put File  ../../../ui-nightly-run-bin/vic-ui-windows.exe  ${remote_vic_root}/
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_scratch_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
-    Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
-    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../ui-nightly-run-bin ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     Execute Command  rm -rf ${REMOTE_RESULTS_FOLDER}
@@ -273,28 +268,22 @@ Run Testcases On Windows
     # sync tests and configs file
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../tests ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
-    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../scripts/vCenterForWindows/configs ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/scripts/vCenterForWindows/ 2>&1
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../ui-nightly-run-bin/ui/vCenterForWindows/configs ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/scripts/vCenterForWindows/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
 
     # remotely run robot test
     ${ssh_command2}=  Catenate
-    ...  ls -la
-    # ...  cd tests/test-cases/Group18-VIC-UI &&
-    # ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /cygdrive/c/Python27/Scripts/robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot
-    # ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /cygdrive/c/Python27/Scripts/robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot > /cygdrive/c${REMOTE_RESULTS_FOLDER}/remote_stdouterr.log 2>&1
-
-    ${stdout}  ${robotscript_rc2}  ${robotscript_stderr}=  Execute Command  ${ssh_command2}  return_rc=True  return_stderr=True
-    Log To Console  returning stdout:  ${stdout}
-    Log To Console  returning stderr: ${robotscript_stderr}
+    ...  cd ${remote_vic_root}/tests/test-cases/Group18-VIC-UI &&
+    ...  TEST_VCSA_BUILD=%{TEST_VCSA_BUILD} BUILD_NUMBER=%{BUILD_NUMBER} /cygdrive/c/Python27/Scripts/robot.bat -d ${REMOTE_RESULTS_FOLDER} --include anyos --include windows --test TestCase-* 18-1-VIC-UI-Installer.robot 2>&1
+    ${stdout}  ${robotscript_rc2}=  Execute Command  ${ssh_command2}  return_rc=True
+    Create File  ${results_folder}/remote_stdouterr.log  ${stdout}
+    Log To Console  ${stdout}
 
     # Store whether the run was successful, print out any error message
     ${did_all_tests_pass}=  Run Keyword And Return Status  Should Be Equal As Integers  ${robotscript_rc2}  0
     Run Keyword Unless  ${did_all_tests_pass}  Log To Console  remote command exited with rc > 0: ${stdout}
 
     # download test results bundle to ../../../%{TEST_RESULTS_FOLDER} and close connection
-    ${rc}  ${out}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${REMOTE_RESULTS_FOLDER}/* ${results_folder} 2>&1
-    Run Keyword Unless  ${rc} == 0  Log  scp failed fetching robot test stdout/stderr log: ${out}  ERROR
-    Should Be Equal As Integers  ${rc}  0
     ${rc}  ${out}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:/cygdrive/c${REMOTE_RESULTS_FOLDER}/* ${results_folder} 2>&1
     Run Keyword Unless  ${rc} == 0  Log  scp failed fetching output.xml file: ${out}  ERROR
     Should Be Equal As Integers  ${rc}  0
@@ -308,10 +297,6 @@ Run Testcases On Windows
 
     # fix permission issue for files fetched from the remote host
     Run  chmod -R 644 ${results_folder}/*
-
-    OperatingSystem.File Should Exist  ${results_folder}/remote_stdouterr.log
-    ${remote_stdouterr}=  OperatingSystem.Get File  ${results_folder}/remote_stdouterr.log
-    Log To Console  ${remote_stdouterr}
 
     # report pass or fail
     Should Be True  ${did_all_tests_pass}

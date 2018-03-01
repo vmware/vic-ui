@@ -21,7 +21,7 @@ Library  XML
 *** Variables ***
 ${MACOS_HOST_IP}                      10.25.201.232
 ${UBUNTU_HOST_IP}                     10.20.121.145
-${WINDOWS_HOST_IP}                    10.25.200.225
+${WINDOWS_HOST_IP}                    10.25.200.93
 ${BUILD_5310538_IP}                   10.25.200.231
 ${BUILD_7312210_IP}                   10.25.201.234
 ${VC_FINGERPRINT_7312210}             FE:31:A9:D1:48:D7:0E:1D:44:75:F8:D9:64:50:8B:B9:30:93:EF:63
@@ -30,7 +30,7 @@ ${TEST_DATACENTER}                    /Datacenter
 ${TEST_RESOURCE}                      /Datacenter/host/Cluster/Resources
 ${MACOS_HOST_USER}                    browseruser
 ${MACOS_HOST_PASSWORD}                ca*hc0w
-${WINDOWS_HOST_USER}                  IEUser
+${WINDOWS_HOST_USER}                  Administrator
 ${WINDOWS_HOST_PASSWORD}              Passw0rd!
 ${vic_macmini_fileserver_url}         https://${MACOS_HOST_IP}:3443/vsphere-plugins/
 ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:8B:86:5F:AD:79:CE
