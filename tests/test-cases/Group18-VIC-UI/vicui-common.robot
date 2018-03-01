@@ -42,9 +42,9 @@ ${ENV_HTML_SDK_HOME}                  /tmp/sdk/html-client-sdk
 
 *** Keywords ***
 Set Fileserver And Thumbprint In Configs
-    [Arguments]  ${fake}=${FALSE}
-    Run Keyword If  ${fake} == ${FALSE}  Copy File  ../../../ui-nightly-run-bin/ui/VCSA/configs  ../../../scripts/VCSA/
-    Run Keyword If  ${fake} == ${FALSE}  Copy File  ../../../ui-nightly-run-bin/ui/vCenterForWindows/configs  ../../../scripts/vCenterForWindows/
+    [Arguments]  ${fake}=${FALSE}  ${root}=../../..
+    Run Keyword If  ${fake} == ${FALSE}  Copy File  ${root}/ui-nightly-run-bin/ui/VCSA/configs  ${root}/scripts/VCSA/
+    Run Keyword If  ${fake} == ${FALSE}  Copy File  ${root}/ui-nightly-run-bin/ui/vCenterForWindows/configs  ${root}/scripts/vCenterForWindows/
     Return From Keyword If  ${fake} == ${FALSE}
 
     ${fileserver_url}=  Set Variable  https://256.256.256.256/
@@ -129,10 +129,11 @@ Reset Configs
     Should Exist  ${UI_INSTALLER_PATH}/configs
 
 Force Install Vicui Plugin
+    [Arguments]  ${root}=../../..
     ${rc}  ${ver}=  Run And Return Rc And Output  ver
     ${is_windows}=  Run Keyword And Return Status  Should Contain  ${ver}  Windows
     ${vic-ui-binary}=  Run Keyword If  ${is_windows}  Set Variable  ..\\..\\..\\vic-ui-windows  ELSE  Set Variable  ../../../vic-ui-linux
-    Set Fileserver And Thumbprint In Configs
+    Set Fileserver And Thumbprint In Configs  ${FALSE}  ${root}
     Run Keyword Unless  ${is_windows}  Append To File  ${UI_INSTALLER_PATH}/configs  BYPASS_PLUGIN_VERIFICATION=1\n
     Run Keyword If  ${is_windows}  Interact With Script  install  -f -i ${TEST_VC_IP} -u ${TEST_VC_USERNAME} -p ${TEST_VC_PASSWORD}  ${EMPTY}  True  ELSE  Install Plugin Successfully  ${TEST_VC_IP}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}  ${TRUE}  None  ${TRUE}
     Run Keyword Unless  ${is_windows}  Reset Configs
@@ -245,7 +246,7 @@ Install VIC Product OVA
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
     Set Environment Variable  GOVC_PASSWORD  Admin!23
-    ${rc}  ${ova_ip}=  Run And Return Rc And Output  govc vm.ip ${ova-name}
+    ${rc}  ${ova_ip}=  Run And Return Rc And Output  govc vm.ip -dc=Datacenter ${ova-name}
     ${ova_found}=  Run Keyword And Return Status  Should Be True  ${rc} == 0
 
     # if ova is already found in the target VC, get IP and break out of the keyword

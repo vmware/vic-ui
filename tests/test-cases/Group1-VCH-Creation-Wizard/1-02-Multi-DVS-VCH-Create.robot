@@ -31,7 +31,7 @@ Cleanup Testbed After Protractor Test Completes
     Run  git reset --hard HEAD 2>&1
 
     # Delete binaries
-    Run  rm -rf vic*.tar.gz ui-nightly-run-bin
+    Run  rm -rf vic*.tar.gz
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
 
@@ -47,13 +47,6 @@ Cleanup Testbed After Protractor Test Completes
 
 *** Test Cases ***
 [ Windows 10 - Chrome ] Create a VCH on a Multi Distributed Switches Environment
-    Set Environment Variable  TEST_VCSA_BUILD  7312210
-    Set Environment Variable  TEST_VSPHERE_VER  65
-    Set Environment Variable  VC_FINGERPRINT  ${VC_FINGERPRINT_7312210}
-    Set Global Variable  ${TEST_VC_IP}  ${BUILD_7312210_IP}
-    Set Global Variable  ${TEST_VC_USERNAME}  administrator@vsphere.local
-    Set Global Variable  ${TEST_VC_PASSWORD}  Admin!23
-
     # Add %{TEST_ESX1_IP} to VC
     Run  govc host.remove -dc=Datacenter -host.ip=%{TEST_ESX1_IP}
     ${rc}  ${out}=  Run And Return Rc And Output  govc host.add -dc=Datacenter -hostname %{TEST_ESX1_IP} -username root -password ca*hc0w -noverify
