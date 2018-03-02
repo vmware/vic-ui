@@ -171,6 +171,40 @@ Prepare VIC UI Testbed
 
     [Return]  ${esxi_deploy_results}  ${vc_deploy_results}
 
+Register Root CA Certificate With Windows
+    [Arguments]  ${cert_file}
+    ${basename}=  Run  basename ${cert_file}
+    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
+    SSHLibrary.Put File  ${cert_file}  /cygdrive/c/certs/${basename}
+
+    # register ca
+    ${cmd}=  Evaluate  'powershell -Command \'Import-Certificate -FilePath "C:\certs\${basename}" -CertStoreLocation "Cert:\LocalMachine\Root\" -Verbose\''
+    Log To Console  Registering Root CA:  ${cmd}...\n
+    ${stdout}=  Execute Command  powershell ${cmd}
+    Log To Console  ${stdout}
+
+    Close Connection
+
+Register VC CA Cert With Windows
+    [Arguments]  ${vc_ip}
+    Log To Console  \nDownloading Root CA from VC...\n
+    ${file}=  Evaluate  '/tmp/vc_ca_%{BUILD_NUMBER}.zip'
+    ${rc}=  Run And Return Rc  curl -sLk -o ${file} https://${vc_ip}/certs/download.zip
+    Should Be Equal As Integers  ${rc}  0
+    Run  unzip -od /tmp/ ${file}
+    ${rc}=  Run And Return Rc  find /tmp/certs/win/*.crt -exec mv {} /tmp/certs/win/vc_ca_cert.crt
+    Should Be Equal As Integers  ${rc}  0
+    
+    # delete previously registered CA
+    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
+    ${cmd}=  Evaluate  'powershell -Command \'Get-ChildItem -Path cert:\LocalMachine\Root | Where-Object { $_.subject -Match "OU=VMware Engineering.*" } | Remove-Item\''
+    Log To Console  Deleting previously registered VC Root CA:  ${cmd}...\n
+    ${stdout}=  Execute Command  powershell ${cmd}
+    Log To Console  ${stdout}
+    Close Connection
+
+    Register Root CA Certificate With Windows  /tmp/certs/win/vc_ca_cert.crt
+
 *** Test Cases ***
 Deploy VICUI Testbed
     # remove testbed-information if it exists
@@ -184,9 +218,35 @@ Deploy VICUI Testbed
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
     ${start_time}=  Get Time  epoch
-    ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
-    ${vc_ip}=  Get From Dictionary  ${vc}  ip
+    # ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
+    # ${vc_ip}=  Get From Dictionary  ${vc}  ip
 
+    #####
+    ${esxis}= Create List
+    &{vc}= Create Dictionary
+    &{esx}= Create Dictionary
+    Set To Dictionary ${esx} name kjosh-E2E-8041-ESX-5969303-1
+    Set To Dictionary ${esx} ip 10.160.153.99
+    Set To Dictionary ${esx} build 5969303
+    Append To List ${esxis} ${esx}
+    &{esx}= Create Dictionary
+    Set To Dictionary ${esx} name kjosh-E2E-8041-ESX-5969303-2
+    Set To Dictionary ${esx} ip 10.160.206.128
+    Set To Dictionary ${esx} build 5969303
+    Append To List ${esxis} ${esx}
+    &{esx}= Create Dictionary
+    Set To Dictionary ${esx} name kjosh-E2E-8041-ESX-5969303-3
+    Set To Dictionary ${esx} ip 10.160.112.227
+    Set To Dictionary ${esx} build 5969303
+    Append To List ${esxis} ${esx}
+    Set To Dictionary ${vc} name kjosh-E2E-8041-VC-7515524
+    Set To Dictionary ${vc} ip 10.192.213.68
+    Set To Dictionary ${vc} build 7515524
+    ${vc_ip}= Get From Dictionary ${vc} ip
+    #####
+
+    Register VC CA Cert With Windows  ${vc_ip}
+    
     ${end_time}=  Get Time  epoch
     ${elapsed_time}=  Evaluate  ${end_time} - ${start_time}
     Log To Console  \nTook ${elapsed_time} seconds to deploy testbed VMs\n
