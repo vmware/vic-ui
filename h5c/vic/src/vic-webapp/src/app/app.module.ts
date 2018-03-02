@@ -17,7 +17,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpModule, XSRFStrategy } from '@angular/http';
+import { Http, HttpModule, XSRFStrategy } from '@angular/http';
 import { ClarityModule } from '@clr/angular';
 
 import {
@@ -31,10 +31,10 @@ import {
 } from './shared/index';
 import { ActionDevService } from './services/action-dev.service';
 import { AppErrorHandler } from './shared/appErrorHandler';
-
 import { AppRoutingModule, routedComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DisableCookieXSRFStrategy } from './shared/utils/disable-cookie-xsrf-strategy';
+import { HttpInterceptorService } from './services/http-interceptor.service';
 
 @NgModule({
   imports: [
@@ -59,7 +59,8 @@ import { DisableCookieXSRFStrategy } from './shared/utils/disable-cookie-xsrf-st
     I18nService,
     Vic18nService,
     RefreshService,
-    { provide: ErrorHandler, useClass: AppErrorHandler }
+    { provide: ErrorHandler, useClass: AppErrorHandler },
+    { provide: Http, useClass: HttpInterceptorService }
   ],
   bootstrap: [AppComponent]
 })

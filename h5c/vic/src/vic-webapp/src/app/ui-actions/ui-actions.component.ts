@@ -18,6 +18,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { GlobalsService } from '../shared';
 import * as bus from 'framebus';
+import { VCH_VIEW_ID, VIC_OBJ_ID } from '../shared/constants/resources.path';
 
 @Component({
   selector: 'vic-ui-actions',
@@ -48,8 +49,8 @@ export class UiActionsComponent implements OnInit {
       this.globalService
         .getWebPlatform()
         .sendNavigationRequest(
-          'com.vmware.vic.customtab-vch',
-          'urn:vic:vic:Root:vic%25252Fvic-root'
+          VCH_VIEW_ID,
+          VIC_OBJ_ID
         );
     });
   }
