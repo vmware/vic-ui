@@ -44,15 +44,11 @@ Deploy VC On Nimbus Async
     [Return]  ${out}
 
 Configure Vcsa
-    [Arguments]  ${name}  ${esxi_list}
-    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
-    ${vc-ip}=  Get IP  ${name}
-    Close Connection
-
+    [Arguments]  ${name}  ${vc_fqdn}  ${esxi_list}
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  Administrator@vsphere.local
     Set Environment Variable  GOVC_PASSWORD  Admin!23
-    Set Environment Variable  GOVC_URL  ${vc-ip}
+    Set Environment Variable  GOVC_URL  ${vc_fqdn}
 
     # create a datacenter
     Log To Console  Create a datacenter on the VC
@@ -104,7 +100,7 @@ Configure Vcsa
     \  Log  ${out}
     \  Should Contain  ${out}  OK
 
-    [Return]  %{NIMBUS_USER}-${name}  ${vc-ip}
+    [Return]  %{NIMBUS_USER}-${name}
 
 Prepare VIC UI Testbed
     [Arguments]  ${testbed_config}
@@ -161,49 +157,17 @@ Prepare VIC UI Testbed
     
     ${vc_deploy_results}=  Wait For Process  ${vc_deploy_pid}
     Should Contain  ${vc_deploy_results.stdout}  To manage this VM use
-    ${vm_name}  ${vm_ip}=  Configure Vcsa  ${vc_name}  ${esxi_deploy_results}
+    ${ret}  ${vc_fqdn}=  Should Match Regexp  ${vc_deploy_results.stdout}  principal network identity: (.*)
+
+    ${vm_name}=  Configure Vcsa  ${vc_name}  ${vc_fqdn}  ${esxi_deploy_results}
     &{vc_deploy_results}=  Create Dictionary
     Set To Dictionary  ${vc_deploy_results}  name  ${vm_name}
-    Set To Dictionary  ${vc_deploy_results}  ip  ${vm_ip}
+    Set To Dictionary  ${vc_deploy_results}  ip  ${vc_fqdn}
     Set To Dictionary  ${vc_deploy_results}  build  ${vcbuild}
 
     Log To Console  \nVC deployment completed
 
     [Return]  ${esxi_deploy_results}  ${vc_deploy_results}
-
-Register Root CA Certificate With Windows
-    [Arguments]  ${cert_file}
-    ${basename}=  Run  basename ${cert_file}
-    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
-    SSHLibrary.Put File  ${cert_file}  /cygdrive/c/certs/${basename}
-
-    # register ca
-    ${cmd}=  Evaluate  'powershell -Command \'Import-Certificate -FilePath "C:\certs\${basename}" -CertStoreLocation "Cert:\LocalMachine\Root\" -Verbose\''
-    Log To Console  Registering Root CA:  ${cmd}...\n
-    ${stdout}=  Execute Command  powershell ${cmd}
-    Log To Console  ${stdout}
-
-    Close Connection
-
-Register VC CA Cert With Windows
-    [Arguments]  ${vc_ip}
-    Log To Console  \nDownloading Root CA from VC...\n
-    ${file}=  Evaluate  '/tmp/vc_ca_%{BUILD_NUMBER}.zip'
-    ${rc}=  Run And Return Rc  curl -sLk -o ${file} https://${vc_ip}/certs/download.zip
-    Should Be Equal As Integers  ${rc}  0
-    Run  unzip -od /tmp/ ${file}
-    ${rc}=  Run And Return Rc  find /tmp/certs/win/*.crt -exec mv {} /tmp/certs/win/vc_ca_cert.crt
-    Should Be Equal As Integers  ${rc}  0
-    
-    # delete previously registered CA
-    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
-    ${cmd}=  Evaluate  'powershell -Command \'Get-ChildItem -Path cert:\LocalMachine\Root | Where-Object { $_.subject -Match "OU=VMware Engineering.*" } | Remove-Item\''
-    Log To Console  Deleting previously registered VC Root CA:  ${cmd}...\n
-    ${stdout}=  Execute Command  powershell ${cmd}
-    Log To Console  ${stdout}
-    Close Connection
-
-    Register Root CA Certificate With Windows  /tmp/certs/win/vc_ca_cert.crt
 
 *** Test Cases ***
 Deploy VICUI Testbed
@@ -218,46 +182,20 @@ Deploy VICUI Testbed
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
     ${start_time}=  Get Time  epoch
-    # ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
-    # ${vc_ip}=  Get From Dictionary  ${vc}  ip
-
-    #####
-    ${esxis}= Create List
-    &{vc}= Create Dictionary
-    &{esx}= Create Dictionary
-    Set To Dictionary ${esx} name kjosh-E2E-8041-ESX-5969303-1
-    Set To Dictionary ${esx} ip 10.160.153.99
-    Set To Dictionary ${esx} build 5969303
-    Append To List ${esxis} ${esx}
-    &{esx}= Create Dictionary
-    Set To Dictionary ${esx} name kjosh-E2E-8041-ESX-5969303-2
-    Set To Dictionary ${esx} ip 10.160.206.128
-    Set To Dictionary ${esx} build 5969303
-    Append To List ${esxis} ${esx}
-    &{esx}= Create Dictionary
-    Set To Dictionary ${esx} name kjosh-E2E-8041-ESX-5969303-3
-    Set To Dictionary ${esx} ip 10.160.112.227
-    Set To Dictionary ${esx} build 5969303
-    Append To List ${esxis} ${esx}
-    Set To Dictionary ${vc} name kjosh-E2E-8041-VC-7515524
-    Set To Dictionary ${vc} ip 10.192.213.68
-    Set To Dictionary ${vc} build 7515524
-    ${vc_ip}= Get From Dictionary ${vc} ip
-    #####
-
-    Register VC CA Cert With Windows  ${vc_ip}
+    ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
+    ${vc_fqdn}=  Get From Dictionary  ${vc}  ip
     
     ${end_time}=  Get Time  epoch
     ${elapsed_time}=  Evaluate  ${end_time} - ${start_time}
     Log To Console  \nTook ${elapsed_time} seconds to deploy testbed VMs\n
 
     Set Global Variable  ${ESXIs}  ${esxis}
-    Set Global Variable  ${VCIP}  ${vc_ip}
+    Set Global Variable  ${VCIP}  ${vc_fqdn}
 
     ${testbed-information-content}=  Catenate  SEPARATOR=\n
     ...  TEST_VSPHERE_VER=65
-    ...  TEST_VC_IP=${vc_ip}
-    ...  TEST_URL_ARRAY=${vc_ip}
+    ...  TEST_VC_IP=${vc_fqdn}
+    ...  TEST_URL_ARRAY=${vc_fqdn}
     ...  TEST_USERNAME=Administrator@vsphere.local
     ...  TEST_PASSWORD=Admin\!23
     ...  TEST_DATASTORE=datastore1
@@ -266,7 +204,7 @@ Deploy VICUI Testbed
     ...  GOVC_INSECURE=1
     ...  GOVC_USERNAME=Administrator@vsphere.local
     ...  GOVC_PASSWORD=Admin\!23
-    ...  GOVC_URL=${vc_ip}\n
+    ...  GOVC_URL=${vc_fqdn}\n
 
     Create File  testbed-information-%{BUILD_NUMBER}  ${testbed-information-content}
 
@@ -277,6 +215,7 @@ Deploy Product OVA
     Install VIC Product OVA  ${VCIP}  ${ip}  datastore1 (2)
     ${ova_ip}=  Evaluate  '%{OVA_IP_%{BUILD_NUMBER}}'
     Append To File  testbed-information-%{BUILD_NUMBER}  OVA_IP=${ova_ip}\n
+    Register VIC Machine Server CA With Windows  ${ova_ip}
     Get Vic Engine Binaries
 
 Deploy VCH

@@ -332,3 +332,62 @@ Open SSH Connection
   [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
   Open Connection  ${host}  port=${port}
   Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
+
+Register Root CA Certificate With Windows
+    [Arguments]  ${cert_file}
+    ${basename}=  Run  basename ${cert_file}
+    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
+    SSHLibrary.Put File  ${cert_file}  /cygdrive/c/certs/${basename}
+
+    # register ca
+    Log To Console  Registering Root CA...
+    ${stdout}  ${rc}=  Execute Command  powershell -Command 'Import-Certificate -FilePath "C:\\certs\\${basename}" -CertStoreLocation "Cert:\\LocalMachine\\Root\\" -Verbose' 2>&1  return_rc=True
+    Should Be Equal As Integers  ${rc}  0
+    Log To Console  ${stdout}
+
+    Close Connection
+
+Register VIC Machine Server CA With Windows
+    [Arguments]  ${ova_ip}
+    Log To Console  \nDownloading Root CA for VIC Machine server...
+    Open SSH Connection  ${ova_ip}  root  Admin\!23
+    ${out}  ${rc}=  Execute Command  docker cp vic-machine-server:/certs/ca.crt /tmp/vic-machine-server-ca.crt  return_rc=True
+    SSHLibrary.Get File  /tmp/vic-machine-server-ca.crt  /tmp/
+    Close Connection
+
+    # delete previously registered CA
+    Delete VIC Machine Server CA
+
+    OperatingSystem.File Should Exist  /tmp/vic-machine-server-ca.crt
+    Register Root CA Certificate With Windows  /tmp/vic-machine-server-ca.crt
+
+Delete VIC Machine Server CA
+    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
+    Log To Console  Deleting VIC Machine Server Root CA...
+    ${stdout}  ${rc}=  Execute Command  powershell -Command 'Get-ChildItem -Path cert:\\LocalMachine\\Root | Where-Object { \$_.subject -Match "OU=Containers on vSphere" } | Remove-Item' 2>&1  return_rc=True
+    Log To Console  ${stdout}
+    Should Be Equal As Integers  ${rc}  0
+    Close Connection
+
+Delete VC Root CA
+    Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
+    Log To Console  Deleting VC Root CA...
+    ${stdout}  ${rc}=  Execute Command  powershell -Command 'Get-ChildItem -Path cert:\\LocalMachine\\Root | Where-Object { \$_.subject -Match "OU=VMware Engineering.*" } | Remove-Item' 2>&1  return_rc=True
+    Log To Console  ${stdout}
+    Should Be Equal As Integers  ${rc}  0
+    Close Connection
+
+Register VC CA Cert With Windows
+    [Arguments]  ${vc_fqdn}
+    Log To Console  \nDownloading Root CA from VC...
+    ${file}=  Evaluate  '/tmp/vc_ca_%{BUILD_NUMBER}.zip'
+    ${rc}=  Run And Return Rc  curl -sLk -o ${file} https://${vc_fqdn}/certs/download.zip
+    Should Be Equal As Integers  ${rc}  0
+    Run  unzip -od /tmp/ ${file}
+    ${rc}  ${out}=  Run And Return Rc And Output  find /tmp/certs/win/*.crt -exec mv {} /tmp/certs/win/vc_ca_cert.crt \\;
+    Should Be Equal As Integers  ${rc}  0
+
+    # delete previously registered CA
+    Delete VC Root CA
+
+    Register Root CA Certificate With Windows  /tmp/certs/win/vc_ca_cert.crt

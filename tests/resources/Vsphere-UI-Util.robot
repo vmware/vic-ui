@@ -76,6 +76,8 @@ Prepare Testbed For Protractor Tests
     Set Global Variable  ${TEST_VC_USERNAME}  %{TEST_USERNAME}
     Set Global Variable  ${TEST_VC_PASSWORD}  %{TEST_PASSWORD}
 
+    Register VC CA Cert With Windows  ${TEST_VC_IP}
+
 Prepare Protractor
     [Arguments]  ${VCSA_IP}  ${SELENIUM_GRID_IP}  ${BROWSER}
     # cache the original content of the protractor configuration file

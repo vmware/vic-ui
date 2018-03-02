@@ -24,6 +24,8 @@ ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resour
 
 *** Keywords ***
 Cleanup Testbed After Protractor Test Completes
+    Delete VC Root CA
+
     # Delete all vic-machine generated artifacts
     Run  rm -rf VCH-0*
 
