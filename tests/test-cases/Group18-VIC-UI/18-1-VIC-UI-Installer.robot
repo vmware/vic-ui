@@ -246,6 +246,7 @@ Run Testcases On Windows
     # log into Windows host and copy required files
     Open SSH Connection  ${WINDOWS_HOST_IP}  ${WINDOWS_HOST_USER}  ${WINDOWS_HOST_PASSWORD}
     Execute Command  mkdir -p ${remote_scratch_folder}
+    Execute Command  mkdir -p ${remote_vic_root}/ui-nightly-run-bin
     Put File  ../../../testbed-information-%{BUILD_NUMBER}  ${remote_vic_root}/
     Put File  ../../../scripts/plugin-manifest  ${remote_vic_root}/scripts/
     Put File  ../../../ui-nightly-run-bin/vic-ui-windows.exe  ${remote_vic_root}/
@@ -268,8 +269,11 @@ Run Testcases On Windows
     # sync tests and configs file
     ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../tests ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
-    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../ui-nightly-run-bin/ui/vCenterForWindows/configs ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/scripts/vCenterForWindows/ 2>&1
+    ${rc}  ${output}=  Run And Return Rc And Output  sshpass -p "${WINDOWS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r ../../../ui-nightly-run-bin/ui ${WINDOWS_HOST_USER}@${WINDOWS_HOST_IP}:${remote_vic_root}/ui-nightly-run-bin/ 2>&1
     Run Keyword Unless  ${rc} == 0  Log To Console  ${output}
+
+    ${stdout}=  Execute Command  cp -rvf ${remote_vic_root}/ui-nightly-run-bin/ui/* ${remote_vic_root}/scripts/
+    Log To Console  ${stdout}
 
     # remotely run robot test
     ${ssh_command2}=  Catenate
