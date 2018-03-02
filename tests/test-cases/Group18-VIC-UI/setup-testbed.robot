@@ -85,8 +85,10 @@ Configure Vcsa
     ${out}=  Run  govc dvs.create -dc=Datacenter test-ds
     Should Contain  ${out}  OK
 
-    # make three port groups
-    Log To Console  Create three new distributed switch port groups for management and vm network traffic
+    # make four port groups
+    Log To Console  Create four new distributed switch port groups for management and vm network traffic
+    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds bridge
+    Should Contain  ${out}  OK
     ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds management
     Should Contain  ${out}  OK
     ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds vm-network
