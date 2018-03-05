@@ -18,6 +18,9 @@ Resource  ../../resources/Util.robot
 Resource  ./vicui-common.robot
 Suite Teardown  Close All Connections
 
+*** Variables ***
+${ESXIS_NUM}  3
+
 *** Keywords ***
 Destroy Testbed
     [Arguments]  ${name}
@@ -177,7 +180,7 @@ Deploy VICUI Testbed
 
     &{testbed_config}=  Create Dictionary
 
-    Set To Dictionary  ${testbed_config}  esx_num  3
+    Set To Dictionary  ${testbed_config}  esx_num  ${ESXIS_NUM}
     Set To Dictionary  ${testbed_config}  esx_build  5969303
     Set To Dictionary  ${testbed_config}  vc_build  7515524
 
@@ -192,6 +195,10 @@ Deploy VICUI Testbed
     Set Global Variable  ${ESXIs}  ${esxis}
     Set Global Variable  ${VCIP}  ${vc_fqdn}
 
+    ${last_esxi_index}=  Evaluate  ${ESXIS_NUM} - 1
+    ${standalone_esxi}=  Get From List  ${esxis}  ${last_esxi_index}
+    ${standalone_esxi_ip}=  Get From Dictionary  ${standalone_esxi}  ip
+
     ${testbed-information-content}=  Catenate  SEPARATOR=\n
     ...  TEST_VSPHERE_VER=65
     ...  TEST_VC_IP=${vc_fqdn}
@@ -204,7 +211,8 @@ Deploy VICUI Testbed
     ...  GOVC_INSECURE=1
     ...  GOVC_USERNAME=Administrator@vsphere.local
     ...  GOVC_PASSWORD=Admin\!23
-    ...  GOVC_URL=${vc_fqdn}\n
+    ...  GOVC_URL=${vc_fqdn}
+    ...  STANDALONE_ESX1_IP=${standalone_esxi_ip}\n
 
     Create File  testbed-information-%{BUILD_NUMBER}  ${testbed-information-content}
 
