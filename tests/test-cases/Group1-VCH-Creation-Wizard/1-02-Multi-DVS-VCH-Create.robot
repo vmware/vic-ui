@@ -16,11 +16,12 @@
 Documentation  Test 1-02 - Multi DVS VCH Create
 Resource  ../../resources/Util.robot
 Resource  ../Group18-VIC-UI/vicui-common.robot
-Suite Setup  Prepare Testbed For Protractor Tests
+Suite Setup  Deploy Esxi And Prepare Testbed
 Suite Teardown  Cleanup Testbed After Protractor Test Completes
 
 *** Variables ***
 ${OVA_UTIL_ROBOT}  https://github.com/vmware/vic-product/raw/master/tests/resources/OVA-Util.robot
+${ESX_NAME}  vicui-e2e-multi-dvs-esx
 
 *** Keywords ***
 Cleanup Testbed After Protractor Test Completes
@@ -44,16 +45,23 @@ Cleanup Testbed After Protractor Test Completes
     Destroy Dangling VCHs Created By Protractor  ${TEST_VC_IP}  %{VC_FINGERPRINT}  ${TEST_VC_USERNAME}  ${TEST_VC_PASSWORD}
 
     Run  govc object.destroy '/Datacenter/network/DSwitch 2'
-    Run  govc host.remove -dc=Datacenter -host.ip=%{TEST_ESX1_IP}
+    Run  govc host.remove -dc=Datacenter -host.ip=%{STANDALONE_ESX1_IP}
 
+    # kill nimbus esxi created for this test suite
+    ${out}=  Destroy Testbed  %{NIMBUS_USER}-${ESX_NAME}
+
+Deploy Esxi And Prepare Testbed
+    ${vm_name}  ${vm_ip}=  Deploy ESXi On Nimbus And Get Info  ${ESX_NAME}  5969303
+    Set Environment Variable  STANDALONE_ESX1_IP  ${vm_ip}
+    Prepare Testbed For Protractor Tests
+
+    # Add %{STANDALONE_ESX1_IP} to VC
+    Run  govc host.remove -dc=Datacenter -host.ip=%{STANDALONE_ESX1_IP}
+    ${rc}  ${out}=  Run And Return Rc And Output  govc host.add -dc=Datacenter -hostname %{STANDALONE_ESX1_IP} -username root -password e2eFunctionalTest -noverify
+    Should Be Equal As Integers  ${rc}  0
 
 *** Test Cases ***
 [ Windows 10 - Chrome ] Create a VCH on a Multi Distributed Switches Environment
-    # Add %{TEST_ESX1_IP} to VC
-    Run  govc host.remove -dc=Datacenter -host.ip=%{TEST_ESX1_IP}
-    ${rc}  ${out}=  Run And Return Rc And Output  govc host.add -dc=Datacenter -hostname %{TEST_ESX1_IP} -username root -password ca*hc0w -noverify
-    Should Be Equal As Integers  ${rc}  0
-
     # create a new distributed switch and add a new host
     Run  govc object.destroy '/Datacenter/network/DSwitch 2'
     ${rc}=  Run And Return Rc  govc dvs.create -dc=Datacenter 'DSwitch 2'
@@ -68,21 +76,21 @@ Cleanup Testbed After Protractor Test Completes
     Log To Console  ${out}
     Should Be Equal As Integers  ${rc}  0
 
-    # add %{TEST_ESX1_IP} to DSwitch 2
-    ${rc}  ${out}=  Run And Return Rc And Output  govc dvs.add -dvs='DSwitch 2' -pnic=vmnic1 -host.ip=%{TEST_ESX1_IP} %{TEST_ESX1_IP}
+    # add %{STANDALONE_ESX1_IP} to DSwitch 2
+    ${rc}  ${out}=  Run And Return Rc And Output  govc dvs.add -dvs='DSwitch 2' -pnic=vmnic1 -host.ip=%{STANDALONE_ESX1_IP} %{STANDALONE_ESX1_IP}
     Log To Console  ${out}
     Should Be Equal As Integers  ${rc}  0
 
     # install the plugin only the first time
     Set Absolute Script Paths  ./scripts
-    Force Install Vicui Plugin
+    Force Install Vicui Plugin  .
     Reboot vSphere Client  ${TEST_VC_IP}
 
-    Log To Console  OVA IP is %{OVA_IP_6.5u1d}
-    Prepare Protractor  ${BUILD_7312210_IP}  ${WINDOWS_HOST_IP}  chrome
+    Log To Console  OVA IP is %{OVA_IP}
+    Prepare Protractor  ${TEST_VC_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && export TEST_ESX1_IP=%{TEST_ESX1_IP} && npm run e2e -- --specs=e2e/vch-create-wizard/2-multi-dvswitch.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && export STANDALONE_ESX1_IP=%{STANDALONE_ESX1_IP} && npm run e2e -- --specs=e2e/vch-create-wizard/2-multi-dvswitch.e2e-spec.ts
     Log  ${out}
     Log To Console  ${out}
 

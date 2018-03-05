@@ -391,3 +391,114 @@ Register VC CA Cert With Windows
     Delete VC Root CA
 
     Register Root CA Certificate With Windows  /tmp/certs/win/vc_ca_cert.crt
+
+Run SSHPASS And Log To File
+    [Arguments]  ${host}  ${user}  ${password}  ${cmd}  ${logfile}=STDOUT
+    ${out}=  Start Process  sshpass -p ${password} ssh -o StrictHostKeyChecking\=no ${user}@${host} ${cmd}  shell=True  stdout=${logfile}  stderr=STDOUT
+    [Return]  ${out}
+
+Deploy ESXi Server On Nimbus Async
+    [Arguments]  ${name}  ${build}=None
+    Log To Console  \nDeploying Nimbus ESXi server: ${name}
+    ${cmd}=  Evaluate  'nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
+    ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
+    [Return]  ${out}
+
+Deploy VC On Nimbus Async
+    [Arguments]  ${name}  ${build}=None
+    Log To Console  \nDeploying Nimbus VC server: ${name}
+    ${cmd}=  Evaluate  'nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
+    ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
+    [Return]  ${out}
+
+Configure Vcsa
+    [Arguments]  ${name}  ${vc_fqdn}  ${esxi_list}
+    Set Environment Variable  GOVC_INSECURE  1
+    Set Environment Variable  GOVC_USERNAME  Administrator@vsphere.local
+    Set Environment Variable  GOVC_PASSWORD  Admin!23
+    Set Environment Variable  GOVC_URL  ${vc_fqdn}
+
+    # create a datacenter
+    Log To Console  Create a datacenter on the VC
+    ${out}=  Run  govc datacenter.create Datacenter
+    Should Be Empty  ${out}
+
+    # make a cluster
+    Log To Console  Create a cluster on the datacenter
+    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster
+    Should Be Empty  ${out}
+    ${out}=  Run  govc cluster.change -dc=Datacenter -drs-enabled=true /Datacenter/host/Cluster
+    Should Be Empty  ${out}
+
+    # add the esx host to the cluster
+    :FOR  ${esxi}  IN  @{esxi_list}
+    \  ${esxi_name}=  Get From Dictionary  ${esxi}  name
+    \  ${esxi_ip}=  Get From Dictionary  ${esxi}  ip
+    \  ${is_standalone}=  Run Keyword And Return Status  Dictionary Should Contain Key  ${esxi}  standalone
+    \  Run Keyword Unless  ${is_standalone}  Log To Console  Add ESX host ${esxi_name} to Cluster
+    \  Run Keyword If  ${is_standalone}  Log To Console  Add standalone ESX host ${esxi_name}
+    \  ${out_cluster}=  Run Keyword Unless  ${is_standalone}  Run  govc cluster.add -dc=Datacenter -cluster=/Datacenter/host/Cluster -username=root -password=e2eFunctionalTest -noverify=true -hostname=${esxi_ip}
+    \  ${out_standalone}=  Run Keyword If  ${is_standalone}  Run  govc host.add -dc=Datacenter -username=root -password=e2eFunctionalTest -noverify=true -hostname=${esxi_ip}
+    \  Run Keyword Unless  ${is_standalone}  Log  ${out_cluster}
+    \  Run Keyword Unless  ${is_standalone}  Should Contain  ${out_cluster}  OK
+    \  Run Keyword If  ${is_standalone}  Log  ${out_standalone}
+    \  Run Keyword If  ${is_standalone}  Should Contain  ${out_standalone}  OK
+
+    # create a distributed switch
+    Log To Console  Create a distributed switch
+    ${out}=  Run  govc dvs.create -dc=Datacenter test-ds
+    Should Contain  ${out}  OK
+
+    # make four port groups
+    Log To Console  Create four new distributed switch port groups for management and vm network traffic
+    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds bridge
+    Should Contain  ${out}  OK
+    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds management
+    Should Contain  ${out}  OK
+    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds vm-network
+    Should Contain  ${out}  OK
+    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds network
+    Should Contain  ${out}  OK
+
+    :FOR  ${esxi}  IN  @{esxi_list}
+    \  ${esxi_name}=  Get From Dictionary  ${esxi}  name
+    \  ${esxi_ip}=  Get From Dictionary  ${esxi}  ip
+    \  Log To Console  Add the ESXi host ${esxi_name} to the portgroups
+    \  ${out}=  Run  govc dvs.add -dvs=test-ds -pnic=vmnic1 -host.ip=${esxi_ip} ${esxi_ip}
+    \  Log  ${out}
+    \  Should Contain  ${out}  OK
+
+    [Return]  %{NIMBUS_USER}-${name}
+
+Deploy ESXi On Nimbus And Get Info
+    [Arguments]  ${name}  ${build}
+    ${pid}=  Deploy ESXi Server On Nimbus Async  ${name}  ${build}
+    ${results}=  Wait For Process  ${pid}
+    Should Contain  ${results.stdout}  To manage this VM use
+
+    # remember previous govc env vars
+    ${govc_url}=  Set Variable  %{GOVC_URL}
+    ${govc_username}=  Set Variable  %{GOVC_USERNAME}
+    ${govc_password}=  Set Variable  %{GOVC_PASSWORD}
+
+    Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
+    Remove Environment Variable  GOVC_PASSWORD
+    Remove Environment Variable  GOVC_USERNAME
+    Set Environment Variable  GOVC_INSECURE  1
+    
+    ${esxi_ip}=  Get IP  ${name}
+    Close Connection
+    Set Environment Variable  GOVC_URL  root:@${esxi_ip}
+    ${out}=  Run  govc host.account.update -id root -password e2eFunctionalTest
+    Set Environment Variable  GOVC_URL  ${govc_url}
+    Set Environment Variable  GOVC_USERNAME  ${govc_username}
+    Set Environment Variable  GOVC_PASSWORD  ${govc_password}
+    Should Be Empty  ${out}
+    Log To Console  Successfully deployed %{NIMBUS_USER}-${name}. IP: ${esxi_ip}
+    [Return]  %{NIMBUS_USER}-${name}  ${esxi_ip}
+
+Destroy Testbed
+    [Arguments]  ${name}
+    Log To Console  Destroying VM(s) ${name}
+    ${out}=  Kill Nimbus Server  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  ${name}
+    Log  ${out}

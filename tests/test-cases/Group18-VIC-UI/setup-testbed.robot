@@ -22,89 +22,6 @@ Suite Teardown  Close All Connections
 ${ESXIS_NUM}  3
 
 *** Keywords ***
-Destroy Testbed
-    [Arguments]  ${name}
-    Log To Console  Destroying VM(s) ${name}
-    Run Keyword And Ignore Error  Kill Nimbus Server  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  ${name}
-
-Run SSHPASS And Log To File
-    [Arguments]  ${host}  ${user}  ${password}  ${cmd}  ${logfile}=STDOUT
-    ${out}=  Start Process  sshpass -p ${password} ssh -o StrictHostKeyChecking\=no ${user}@${host} ${cmd}  shell=True  stdout=${logfile}  stderr=STDOUT
-    [Return]  ${out}
-
-Deploy ESXi Server On Nimbus Async
-    [Arguments]  ${name}  ${build}=None
-    Log To Console  \nDeploying Nimbus ESXi server: ${name}
-    ${cmd}=  Evaluate  'nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
-    ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
-    [Return]  ${out}
-
-Deploy VC On Nimbus Async
-    [Arguments]  ${name}  ${build}=None
-    Log To Console  \nDeploying Nimbus VC server: ${name}
-    ${cmd}=  Evaluate  'nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
-    ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
-    [Return]  ${out}
-
-Configure Vcsa
-    [Arguments]  ${name}  ${vc_fqdn}  ${esxi_list}
-    Set Environment Variable  GOVC_INSECURE  1
-    Set Environment Variable  GOVC_USERNAME  Administrator@vsphere.local
-    Set Environment Variable  GOVC_PASSWORD  Admin!23
-    Set Environment Variable  GOVC_URL  ${vc_fqdn}
-
-    # create a datacenter
-    Log To Console  Create a datacenter on the VC
-    ${out}=  Run  govc datacenter.create Datacenter
-    Should Be Empty  ${out}
-
-    # make a cluster
-    Log To Console  Create a cluster on the datacenter
-    ${out}=  Run  govc cluster.create -dc=Datacenter Cluster
-    Should Be Empty  ${out}
-    ${out}=  Run  govc cluster.change -dc=Datacenter -drs-enabled=true /Datacenter/host/Cluster
-    Should Be Empty  ${out}
-
-    # add the esx host to the cluster
-    :FOR  ${esxi}  IN  @{esxi_list}
-    \  ${esxi_name}=  Get From Dictionary  ${esxi}  name
-    \  ${esxi_ip}=  Get From Dictionary  ${esxi}  ip
-    \  ${is_standalone}=  Run Keyword And Return Status  Dictionary Should Contain Key  ${esxi}  standalone
-    \  Run Keyword Unless  ${is_standalone}  Log To Console  Add ESX host ${esxi_name} to Cluster
-    \  Run Keyword If  ${is_standalone}  Log To Console  Add standalone ESX host ${esxi_name}
-    \  ${out_cluster}=  Run Keyword Unless  ${is_standalone}  Run  govc cluster.add -dc=Datacenter -cluster=/Datacenter/host/Cluster -username=root -password=e2eFunctionalTest -noverify=true -hostname=${esxi_ip}
-    \  ${out_standalone}=  Run Keyword If  ${is_standalone}  Run  govc host.add -dc=Datacenter -username=root -password=e2eFunctionalTest -noverify=true -hostname=${esxi_ip}
-    \  Run Keyword Unless  ${is_standalone}  Log  ${out_cluster}
-    \  Run Keyword Unless  ${is_standalone}  Should Contain  ${out_cluster}  OK
-    \  Run Keyword If  ${is_standalone}  Log  ${out_standalone}
-    \  Run Keyword If  ${is_standalone}  Should Contain  ${out_standalone}  OK
-
-    # create a distributed switch
-    Log To Console  Create a distributed switch
-    ${out}=  Run  govc dvs.create -dc=Datacenter test-ds
-    Should Contain  ${out}  OK
-
-    # make four port groups
-    Log To Console  Create four new distributed switch port groups for management and vm network traffic
-    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds bridge
-    Should Contain  ${out}  OK
-    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds management
-    Should Contain  ${out}  OK
-    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds vm-network
-    Should Contain  ${out}  OK
-    ${out}=  Run  govc dvs.portgroup.add -nports 12 -dc=Datacenter -dvs=test-ds network
-    Should Contain  ${out}  OK
-
-    :FOR  ${esxi}  IN  @{esxi_list}
-    \  ${esxi_name}=  Get From Dictionary  ${esxi}  name
-    \  ${esxi_ip}=  Get From Dictionary  ${esxi}  ip
-    \  Log To Console  Add the ESXi host ${esxi_name} to the portgroups
-    \  ${out}=  Run  govc dvs.add -dvs=test-ds -pnic=vmnic1 -host.ip=${esxi_ip} ${esxi_ip}
-    \  Log  ${out}
-    \  Should Contain  ${out}  OK
-
-    [Return]  %{NIMBUS_USER}-${name}
-
 Prepare VIC UI Testbed
     [Arguments]  ${testbed_config}
     ${randname_snippet}=  Evaluate  'E2E-' + str(random.randint(1000,9999))  modules=random
@@ -195,10 +112,6 @@ Deploy VICUI Testbed
     Set Global Variable  ${ESXIs}  ${esxis}
     Set Global Variable  ${VCIP}  ${vc_fqdn}
 
-    ${last_esxi_index}=  Evaluate  ${ESXIS_NUM} - 1
-    ${standalone_esxi}=  Get From List  ${esxis}  ${last_esxi_index}
-    ${standalone_esxi_ip}=  Get From Dictionary  ${standalone_esxi}  ip
-
     ${testbed-information-content}=  Catenate  SEPARATOR=\n
     ...  TEST_VSPHERE_VER=65
     ...  TEST_VC_IP=${vc_fqdn}
@@ -211,8 +124,7 @@ Deploy VICUI Testbed
     ...  GOVC_INSECURE=1
     ...  GOVC_USERNAME=Administrator@vsphere.local
     ...  GOVC_PASSWORD=Admin\!23
-    ...  GOVC_URL=${vc_fqdn}
-    ...  STANDALONE_ESX1_IP=${standalone_esxi_ip}\n
+    ...  GOVC_URL=${vc_fqdn}\n
 
     Create File  testbed-information-%{BUILD_NUMBER}  ${testbed-information-content}
 
