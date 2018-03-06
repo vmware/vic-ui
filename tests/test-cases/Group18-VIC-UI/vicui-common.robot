@@ -400,14 +400,14 @@ Run SSHPASS And Log To File
 Deploy ESXi Server On Nimbus Async
     [Arguments]  ${name}  ${build}=None
     Log To Console  \nDeploying Nimbus ESXi server: ${name}
-    ${cmd}=  Evaluate  'nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
+    ${cmd}=  Evaluate  'USER=svc.vic-ui nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
     ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
     [Return]  ${out}
 
 Deploy VC On Nimbus Async
     [Arguments]  ${name}  ${build}=None
     Log To Console  \nDeploying Nimbus VC server: ${name}
-    ${cmd}=  Evaluate  'nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
+    ${cmd}=  Evaluate  'USER=svc.vic-ui nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
     ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
     [Return]  ${out}
 
