@@ -16,7 +16,7 @@
 Documentation  Test 1-01 - Basic VCH Create
 Resource  ../../resources/Util.robot
 Resource  ../Group18-VIC-UI/vicui-common.robot
-Suite Setup  Prepare Testbed For Protractor Tests
+Suite Setup  Prepare Testbed For Protractor Tests And Install Plugin
 Suite Teardown  Cleanup Testbed After Protractor Test Completes
 
 *** Variables ***
@@ -48,13 +48,14 @@ Cleanup Testbed After Protractor Test Completes
     Run  govc object.destroy -dc Datacenter /Datacenter/host/Cluster3
     Run  govc object.destroy -dc Datacenter2 /Datacenter2
 
-*** Test Cases ***
-[ Windows 10 - Chrome ] Create And Delete VCH On A Single Cluster Environment
-    # install the plugin only the first time
+Prepare Testbed For Protractor Tests And Install Plugin
+    Prepare Testbed For Protractor Tests
     Set Absolute Script Paths  ./scripts
     Force Install Vicui Plugin  .
     Reboot vSphere Client  ${TEST_VC_IP}
 
+*** Test Cases ***
+[ Windows 10 - Chrome ] Create And Delete VCH On A Single Cluster Environment
     Log To Console  OVA IP is %{OVA_IP}
     Prepare Protractor  ${TEST_VC_IP}  ${WINDOWS_HOST_IP}  chrome
 
