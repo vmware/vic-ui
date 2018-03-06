@@ -51,9 +51,12 @@ Cleanup Testbed After Protractor Test Completes
     ${out}=  Destroy Testbed  %{NIMBUS_USER}-${ESX_NAME}
 
 Deploy Esxi And Prepare Testbed
+    Prepare Testbed For Protractor Tests
     ${vm_name}  ${vm_ip}=  Deploy ESXi On Nimbus And Get Info  ${ESX_NAME}  5969303
     Set Environment Variable  STANDALONE_ESX1_IP  ${vm_ip}
-    Prepare Testbed For Protractor Tests
+    Set Environment Variable  GOVC_URL  ${TEST_VC_IP}
+    Set Environment Variable  GOVC_USERNAME  ${TEST_VC_USERNAME}
+    Set Environment Variable  GOVC_PASSWORD  ${TEST_VC_PASSWORD}
 
     # Add %{STANDALONE_ESX1_IP} to VC
     Run  govc host.remove -dc=Datacenter -host.ip=%{STANDALONE_ESX1_IP}

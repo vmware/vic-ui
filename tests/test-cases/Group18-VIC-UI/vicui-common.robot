@@ -476,23 +476,18 @@ Deploy ESXi On Nimbus And Get Info
     ${results}=  Wait For Process  ${pid}
     Should Contain  ${results.stdout}  To manage this VM use
 
-    # remember previous govc env vars
-    ${govc_url}=  Set Variable  %{GOVC_URL}
-    ${govc_username}=  Set Variable  %{GOVC_USERNAME}
-    ${govc_password}=  Set Variable  %{GOVC_PASSWORD}
-
     Open SSH Connection  %{NIMBUS_GW}  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  retry_interval=30 sec
-    Remove Environment Variable  GOVC_PASSWORD
-    Remove Environment Variable  GOVC_USERNAME
+    ${govc_username_set}=  Run Keyword And Return Status  Environment Variable Should Be Set  GOVC_USERNAME
+    ${govc_password_set}=  Run Keyword And Return Status  Environment Variable Should Be Set  GOVC_PASSWORD
+    Run Keyword If  ${govc_username_set}  Remove Environment Variable  GOVC_USERNAME
+    Run Keyword If  ${govc_password_set}  Remove Environment Variable  GOVC_PASSWORD
+
     Set Environment Variable  GOVC_INSECURE  1
     
     ${esxi_ip}=  Get IP  ${name}
     Close Connection
     Set Environment Variable  GOVC_URL  root:@${esxi_ip}
     ${out}=  Run  govc host.account.update -id root -password e2eFunctionalTest
-    Set Environment Variable  GOVC_URL  ${govc_url}
-    Set Environment Variable  GOVC_USERNAME  ${govc_username}
-    Set Environment Variable  GOVC_PASSWORD  ${govc_password}
     Should Be Empty  ${out}
     Log To Console  Successfully deployed %{NIMBUS_USER}-${name}. IP: ${esxi_ip}
     [Return]  %{NIMBUS_USER}-${name}  ${esxi_ip}
