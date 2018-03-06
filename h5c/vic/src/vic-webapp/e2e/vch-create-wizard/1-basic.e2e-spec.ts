@@ -196,11 +196,10 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should redirect to VCH VM and display Create Wizard menu items', () => {
     page.navigateToVchVm(namePrefix + specRunId);
-    // wait for VM summary page to be ready
-    browser.wait(function () {
-      return browser.isElementPresent(by.cssContainingText('.summary-name-label', namePrefix + specRunId));
-    }, defaultTimeout * 6);
-    page.clickByCSS('.summary-action-link');
+    browser.switchTo().defaultContent();
+    browser.sleep(defaultTimeout);
+    page.waitForElementToBePresent('a.summary-action-link');
+    page.clickByCSS('a.summary-action-link');
     // wait for menu items to be calculated
     browser.sleep(defaultTimeout);
     page.clickByText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions');
