@@ -20,6 +20,8 @@ export const VSPHERE_SERVEROBJ_VIEWEXT_KEY =
     'vsphere.core.inventory.serverObjectViewsExtension';
 export const VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY =
     'vsphere.core.viTree.hostsAndClustersView';
+export const VCH_VIEW_ID = 'com.vmware.vic.customtab-vch';
+export const VIC_OBJ_ID = 'urn:vic:vic:Root:vic%25252Fvic-root';
 export const WS_SUMMARY = {
     keys: {
         VENDOR: 'vic_workspace.summary.vendor.label',
