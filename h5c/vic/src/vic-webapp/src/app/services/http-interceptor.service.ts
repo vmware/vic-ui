@@ -21,7 +21,7 @@ export class HttpInterceptorService extends Http {
     return super.request(url, options).catch((error: Response) => {
       if ((error.status === 401 || error.status === 403)) {
         console.error('The authentication session expired or the user is not authorized.');
-        // send nav request to H5 to trigger session alert
+        // send nav request to H5 client to trigger session alert
         this.globalsService
         .getWebPlatform()
         .sendNavigationRequest(
@@ -29,8 +29,6 @@ export class HttpInterceptorService extends Http {
           VIC_OBJ_ID
         );
         return Observable.throw(error);
-      } else {
-        super.request(url, options);
       }
     });
   }
