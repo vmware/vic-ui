@@ -28,8 +28,8 @@ export class HttpInterceptorService extends Http {
           VCH_VIEW_ID,
           VIC_OBJ_ID
         );
-        return Observable.throw(error);
       }
+      return Observable.throw(error);
     });
   }
 }
