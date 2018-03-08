@@ -44,30 +44,30 @@ To test functionality of Portlets of the VIC UI plugin in the vSphere Client
     - In an SSH session or macOS Terminal, deploy a VCH using the `vic-machine` binary
       ```
       user $ cd /tmp/vic
-      user $ ./vic-machine-linux create --target tina.eng.vmware.com --user administrator@vsphere.local --password Admin\!23 --name E2E-TEST-VCH --bridge-network bridge --image-store datastore1 --compute-resource Cluster --no-tlsverify --thumbprint 39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB
+      user $ ./vic-machine-linux create --target `VC_IP_OR_FQDN` --user administrator@vsphere.local --password Admin\!23 --name E2E-TEST-VCH --bridge-network bridge --image-store datastore1 --compute-resource Cluster --no-tlsverify --thumbprint `THUMBPRINT_OF_THE_VC`
       (take a note of the value of DOCKER_HOST from the output, as it will be used to create a container below)
       ```
-    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
-    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Open the browser to navigate to https://`VC_IP_OR_FQDN`/vsphere-client
+    - Log in as admin user
     - Navigate to Administration -> Client Plug-Ins
     - Verify if an entry named “vSphere Integrated Containers-FlexClient" exists
 
   - Test 2.1: Verify if VCH VM Portlet exists
-    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
-    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Open the browser to navigate to https://`VC_IP_OR_FQDN`/vsphere-client
+    - Log in as admin user
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
     - Verify the visibility of portlet "Virtual Container Host"
 
   - Test 2.2: Verify if VCH VM Portlet displays correct information while VM is OFF
-    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
-    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Open the browser to navigate to https://`VC_IP_OR_FQDN`/vsphere-client
+    - Log in as admin user
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
     - Power off the VM
     - Verify in the "Virtual Container Host" portlet if "Docker API endpoint" equals `-`
 
   - Test 2.3: Verify if VCH VM Portlet displays correct information while VM is ON
-    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
-    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Open the browser to navigate to https://`VC_IP_OR_FQDN`/vsphere-client
+    - Log in as admin user
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of VM "E2E-TEST-VCH"
     - Power off the VM
     - Verify in the "Virtual Container Host" portlet if "Docker API endpoint" displays the correct connection information
@@ -77,15 +77,15 @@ To test functionality of Portlets of the VIC UI plugin in the vSphere Client
       ```
       user $ docker -H #.#.#.#:2376 --tls run -itd busybox /bin/top
       ```
-    - Open the browser to navigate to https://tina.eng.vmware.com/vsphere-client
-    - Log in as admin user (administrator@vsphere.local / Admin!23)
+    - Open the browser to navigate to https://`VC_IP_OR_FQDN`/vsphere-client
+    - Log in as admin user
     - Navigate to the "Hosts and Clusters" page and open the Summary tab of the container VM that just got created
     - Verify the visibility of portlet "Container"
 
   - Cleanup: Destroy VCH and Container VM
     - In an SSH session or macOS Terminal, delete the VCH and its Container VMs using the `vic-machine` binary
       ```
-      ./vic-machine-linux delete --target tina.eng.vmware.com --user administrator@vsphere.local --password Admin\!23 --name E2E-TEST-VCH --compute-resource Cluster --thumbprint 39:4F:92:58:9B:4A:CD:93:F3:73:8F:D2:13:1C:46:DD:4E:92:46:AB --force
+      ./vic-machine-linux delete --target `VC_IP_OR_FQDN` --user administrator@vsphere.local --name E2E-TEST-VCH --compute-resource Cluster --thumbprint `THUMBPRINT_OF_THE_VC` --force
       ```
 - HTML5 Client plugin
   - Test cases for the H5 Client plugin are basically identical to those of the Flex Client plugin except there are some more cases to test the visibility of the shortcut icon to the vSphere Integrated Containers page in the H5 Client and basic navigation.
