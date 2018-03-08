@@ -350,7 +350,7 @@ Register Root CA Certificate With Windows
 Register VIC Machine Server CA With Windows
     [Arguments]  ${ova_ip}
     Log To Console  \nDownloading Root CA for VIC Machine server...
-    Open SSH Connection  ${ova_ip}  root  Admin\!23
+    Open SSH Connection  ${ova_ip}  root  Bl*ckwalnut0
     ${out}  ${rc}=  Execute Command  docker cp vic-machine-server:/certs/ca.crt /tmp/vic-machine-server-ca.crt  return_rc=True
     SSHLibrary.Get File  /tmp/vic-machine-server-ca.crt  /tmp/
     Close Connection
@@ -413,9 +413,15 @@ Deploy VC On Nimbus Async
 
 Configure Vcsa
     [Arguments]  ${name}  ${vc_fqdn}  ${esxi_list}
+    Open SSH Connection  ${vc_fqdn}  root  Admin\!23  retry_interval=30 sec
+    ${stdout}  ${rc}=  Execute Command  /usr/lib/vmware-vmafd/bin/dir-cli password change --account administrator@vsphere.local --current 'Admin!23' --new 'Bl*ckwalnut0' 2>&1  return_rc=True
+    Should Be Equal As Integers  ${rc}  0
+    Log To Console  ${stdout}
+    Close Connection
+
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  Administrator@vsphere.local
-    Set Environment Variable  GOVC_PASSWORD  Admin!23
+    Set Environment Variable  GOVC_PASSWORD  Bl*ckwalnut0
     Set Environment Variable  GOVC_URL  ${vc_fqdn}
 
     # create a datacenter
