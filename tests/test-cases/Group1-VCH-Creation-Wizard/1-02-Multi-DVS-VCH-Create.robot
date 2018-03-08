@@ -48,7 +48,7 @@ Cleanup Testbed After Protractor Test Completes
     Run  govc host.remove -dc=Datacenter -host.ip=%{STANDALONE_ESX1_IP}
 
     # kill nimbus esxi created for this test suite
-    ${out}=  Destroy Testbed  svc.vic-ui-${ESX_NAME}
+    ${out}=  Destroy Testbed  %{NIMBUS_USER}-${ESX_NAME}
 
 Deploy Esxi And Prepare Testbed
     Prepare Testbed For Protractor Tests

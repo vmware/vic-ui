@@ -400,20 +400,20 @@ Run SSHPASS And Log To File
 Deploy ESXi Server On Nimbus Async
     [Arguments]  ${name}  ${build}=None
     Log To Console  \nDeploying Nimbus ESXi server: ${name}
-    ${cmd}=  Evaluate  'USER=svc.vic-ui nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
+    ${cmd}=  Evaluate  'nimbus-esxdeploy ${name} --disk\=50000000 --memory\=8192 --lease=1 --nics 2 ${build}'
     ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
     [Return]  ${out}
 
 Deploy VC On Nimbus Async
     [Arguments]  ${name}  ${build}=None
     Log To Console  \nDeploying Nimbus VC server: ${name}
-    ${cmd}=  Evaluate  'USER=svc.vic-ui nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
+    ${cmd}=  Evaluate  'nimbus-vcvadeploy --lease\=1 --useQaNgc --vcvaBuild ${build} ${name}'
     ${out}=  Run SSHPASS And Log To File  %{NIMBUS_GW}  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  ${cmd}  sshpass-stdout-${name}.log
     [Return]  ${out}
 
 Configure Vcsa
     [Arguments]  ${name}  ${vc_fqdn}  ${esxi_list}
-    Open SSH Connection  ${vc_fqdn}  root  Admin\!23  retry_interval=30 sec
+    Open SSH Connection  ${vc_fqdn}  root  vmware  retry_interval=30 sec
     ${stdout}  ${rc}=  Execute Command  /usr/lib/vmware-vmafd/bin/dir-cli password change --account administrator@vsphere.local --current 'Admin!23' --new 'Bl*ckwalnut0' 2>&1  return_rc=True
     Should Be Equal As Integers  ${rc}  0
     Log To Console  ${stdout}
@@ -474,7 +474,7 @@ Configure Vcsa
     \  Log  ${out}
     \  Should Contain  ${out}  OK
 
-    [Return]  svc.vic-ui-${name}
+    [Return]  %{NIMBUS_USER}-${name}
 
 Deploy ESXi On Nimbus And Get Info
     [Arguments]  ${name}  ${build}
@@ -495,8 +495,8 @@ Deploy ESXi On Nimbus And Get Info
     Set Environment Variable  GOVC_URL  root:@${esxi_ip}
     ${out}=  Run  govc host.account.update -id root -password e2eFunctionalTest
     Should Be Empty  ${out}
-    Log To Console  Successfully deployed svc.vic-ui-${name}. IP: ${esxi_ip}
-    [Return]  svc.vic-ui-${name}  ${esxi_ip}
+    Log To Console  Successfully deployed %{NIMBUS_USER}-${name}. IP: ${esxi_ip}
+    [Return]  %{NIMBUS_USER}-${name}  ${esxi_ip}
 
 Destroy Testbed
     [Arguments]  ${name}

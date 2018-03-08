@@ -59,7 +59,7 @@ Prepare VIC UI Testbed
     :FOR  ${esxi_name}  IN  @{esxi_names}
     \  ${esxi_ip}=  Get IP  ${esxi_name}
     \  &{vm}=  Create Dictionary
-    \  Set To Dictionary  ${vm}  name  svc.vic-ui-${esxi_name}
+    \  Set To Dictionary  ${vm}  name  %{NIMBUS_USER}-${esxi_name}
     \  Set To Dictionary  ${vm}  ip  ${esxi_ip}
     \  Set To Dictionary  ${vm}  build  ${esxbuild}
     \  ${idx}=  Get Index from List  ${esxi_names}  ${esxi_name}
@@ -70,7 +70,7 @@ Prepare VIC UI Testbed
     \  Set Environment Variable  GOVC_URL  root:@${esxi_ip}
     \  ${out}=  Run  govc host.account.update -id root -password e2eFunctionalTest
     \  Should Be Empty  ${out}
-    \  Log To Console  Successfully deployed svc.vic-ui-${esxi_name}. IP: ${esxi_ip}
+    \  Log To Console  Successfully deployed %{NIMBUS_USER}-${esxi_name}. IP: ${esxi_ip}
     Close Connection
 
     Log To Console  \nESXi deployment completed
