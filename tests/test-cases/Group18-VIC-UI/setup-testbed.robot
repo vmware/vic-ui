@@ -117,13 +117,13 @@ Deploy VICUI Testbed
     ...  TEST_VC_IP=${vc_fqdn}
     ...  TEST_URL_ARRAY=${vc_fqdn}
     ...  TEST_USERNAME=Administrator@vsphere.local
-    ...  TEST_PASSWORD=Admin\!23
+    ...  TEST_PASSWORD=Bl*ckwalnut0
     ...  TEST_DATASTORE=datastore1
     ...  EXTERNAL_NETWORK=vm-network
     ...  TEST_TIMEOUT=30m
     ...  GOVC_INSECURE=1
     ...  GOVC_USERNAME=Administrator@vsphere.local
-    ...  GOVC_PASSWORD=Admin\!23
+    ...  GOVC_PASSWORD=Bl*ckwalnut0
     ...  GOVC_URL=${vc_fqdn}\n
 
     Create File  testbed-information-%{BUILD_NUMBER}  ${testbed-information-content}

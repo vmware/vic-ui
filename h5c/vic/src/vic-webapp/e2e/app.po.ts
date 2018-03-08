@@ -39,7 +39,7 @@ export class VicWebappPage {
   private inputUsername = '#username';
   private username = 'administrator@vsphere.local';
   private inputPassword = '#password';
-  private password = 'Admin!23';
+  private password = 'Bl*ckwalnut0';
   private submit = '#submit';
   private defaultTimeout = 5000;
   private extendedTimeout = 10000;

@@ -245,7 +245,7 @@ Install VIC Product OVA
     Set Environment Variable  GOVC_URL  ${target-vc-ip}
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  administrator@vsphere.local
-    Set Environment Variable  GOVC_PASSWORD  Admin!23
+    Set Environment Variable  GOVC_PASSWORD  Bl*ckwalnut0
     ${rc}  ${ova_ip}=  Run And Return Rc And Output  govc vm.ip -dc=Datacenter ${ova-name}
     ${ova_found}=  Run Keyword And Return Status  Should Be True  ${rc} == 0
 
@@ -259,8 +259,8 @@ Install VIC Product OVA
     Run Keyword Unless  ${ova_exists}  Download VIC OVA  ${ova_url}  ${ova_local_path}
 
     Log To Console  \nInstalling VIC appliance...
-    Log To Console  \novftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'\n
-    ${output}=  Run  ovftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Admin!23' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Admin!23@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'
+    Log To Console  \novftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Bl*ckwalnut0' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Bl*ckwalnut0@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'\n
+    ${output}=  Run  ovftool --datastore='${ova-esx-datastore}' --noSSLVerify --acceptAllEulas --name=${ova-name} --diskMode=thin --powerOn --X:waitForIp --X:injectOvfEnv --X:enableHiddenProperties --prop:appliance.root_pwd='Bl*ckwalnut0' --prop:appliance.permit_root_login=True --net:"Network"="VM Network" ${ova_local_path} 'vi://administrator@vsphere.local:Bl*ckwalnut0@${target-vc-ip}${TEST_DATACENTER}/host/${ova-esx-host-ip}'
     Should Contain  ${output}  Completed successfully
     Should Contain  ${output}  Received IP address:
 
@@ -272,7 +272,7 @@ Install VIC Product OVA
 
     Log To Console  \nWaiting for Getting Started Page to Come Up...
     :FOR  ${i}  IN RANGE  24
-    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Admin!23"}' https://%{OVA_IP_${buildnum}}:9443/register 2>/dev/null
+    \   ${rc}  ${out}=  Run And Return Rc And Output  curl -k -w "\%{http_code}\\n" --header "Content-Type: application/json" -X POST --data '{"target":"${target-vc-ip}:443","user":"administrator@vsphere.local","password":"Bl*ckwalnut0"}' https://%{OVA_IP_${buildnum}}:9443/register 2>/dev/null
     \   Exit For Loop If  '200' in '''${out}'''
     \   Sleep  5s
     Log To Console  ${rc}

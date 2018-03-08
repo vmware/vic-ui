@@ -120,7 +120,7 @@ Set Up Testbed For NGCTESTS
     Environment Variable Should Be Set  TEST_VC_IP
     ${ESX_HOST_PASSWORD}=  Set Variable  ca*hc0w
     ${TEST_VC_USERNAME}=   Set Variable  administrator@vsphere.local
-    ${TEST_VC_PASSWORD}=   Set Variable  Admin\!23
+    ${TEST_VC_PASSWORD}=   Set Variable  Bl*ckwalnut0
 
     Download And Unzip SUITA
     # set up common testbed provider, host provider and vicenvprovider configurations here according to the content of vicui-common.robot

@@ -44,7 +44,7 @@ To test functionality of Portlets of the VIC UI plugin in the vSphere Client
     - In an SSH session or macOS Terminal, deploy a VCH using the `vic-machine` binary
       ```
       user $ cd /tmp/vic
-      user $ ./vic-machine-linux create --target `VC_IP_OR_FQDN` --user administrator@vsphere.local --password Admin\!23 --name E2E-TEST-VCH --bridge-network bridge --image-store datastore1 --compute-resource Cluster --no-tlsverify --thumbprint `THUMBPRINT_OF_THE_VC`
+      user $ ./vic-machine-linux create --target `VC_IP_OR_FQDN` --user administrator@vsphere.local --password Bl*ckwalnut0 --name E2E-TEST-VCH --bridge-network bridge --image-store datastore1 --compute-resource Cluster --no-tlsverify --thumbprint `THUMBPRINT_OF_THE_VC`
       (take a note of the value of DOCKER_HOST from the output, as it will be used to create a container below)
       ```
     - Open the browser to navigate to https://`VC_IP_OR_FQDN`/vsphere-client

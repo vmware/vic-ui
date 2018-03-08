@@ -132,7 +132,7 @@ Is vSphere Client Ready
     Should Not Contain  ${out}  is still initializing
 
 Cleanup Plugins From VC
-    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Admin!23
+    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Bl*ckwalnut0
     Close All Browsers
     Log To Console  Removing VIC UI plugins from ${VC_TARGET}...
     # remove plugins
@@ -145,7 +145,7 @@ Cleanup Plugins From VC
     Log To Console  ${out2}
 
 Destroy Dangling VCHs Created By Protractor
-    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Admin!23
+    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Bl*ckwalnut0
     Set Environment Variable  GOVC_URL  ${VC_TARGET}
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  ${VC_USERNAME}
