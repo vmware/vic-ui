@@ -468,7 +468,7 @@ Configure Vcsa
     \  Log  ${out}
     \  Should Contain  ${out}  OK
 
-    [Return]  %{NIMBUS_USER}-${name}
+    [Return]  svc.vic-ui-${name}
 
 Deploy ESXi On Nimbus And Get Info
     [Arguments]  ${name}  ${build}
@@ -489,8 +489,8 @@ Deploy ESXi On Nimbus And Get Info
     Set Environment Variable  GOVC_URL  root:@${esxi_ip}
     ${out}=  Run  govc host.account.update -id root -password e2eFunctionalTest
     Should Be Empty  ${out}
-    Log To Console  Successfully deployed %{NIMBUS_USER}-${name}. IP: ${esxi_ip}
-    [Return]  %{NIMBUS_USER}-${name}  ${esxi_ip}
+    Log To Console  Successfully deployed svc.vic-ui-${name}. IP: ${esxi_ip}
+    [Return]  svc.vic-ui-${name}  ${esxi_ip}
 
 Destroy Testbed
     [Arguments]  ${name}
