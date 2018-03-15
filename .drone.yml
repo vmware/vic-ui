@@ -4,9 +4,10 @@ workspace:
   path: src/github.com/vmware/vic-ui
 
 clone:
-  image: plugins/git
-  tags: true
-  recursive: false
+  git:
+    image: plugins/git
+    tags: true
+    recursive: false
 
 pipeline:
   check-org-membership:
