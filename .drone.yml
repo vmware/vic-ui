@@ -1,14 +1,14 @@
-workspace:
 
+workspace:
   base: /go
   path: src/github.com/vmware/vic-ui
+
+clone:
+  image: plugins/git
+  tags: true
+  recursive: false
+
 pipeline:
-
-  clone:
-    image: plugins/git
-    tags: true
-    recursive: false
-
   check-org-membership:
     image: 'wdc-harbor-ci.eng.vmware.com/default-project/vic-integration-test:1.44'
     pull: true
