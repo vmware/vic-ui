@@ -184,9 +184,10 @@ Deploy Nimbus Testbed
 
 Kill Nimbus Server
     [Arguments]  ${user}  ${password}  ${name}
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open SSH Connection  %{NIMBUS_GW}  ${user}  ${password}  retry_interval=30 sec
     ${out}=  Execute Command  nimbus-ctl kill ${name}
     Close connection
+    [Return]  ${out}
 
 Cleanup Nimbus PXE folder
     [Arguments]  ${user}  ${password}

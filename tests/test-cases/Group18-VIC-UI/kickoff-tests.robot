@@ -28,18 +28,12 @@ ${ALL_TESTS_PASSED}            ${TRUE}
 
 *** Keywords ***
 Prepare Testbed
-    # ova url is checked here. should be taken in runtime as a variable
-    # e.g. robot --variable ova_url:https://storage.googleapis.com/vic-product-ova-builds/build-to-test.ova
-    Variable Should Exist  ${ova_url}
-
     ${ts}=  Get Current Date  result_format=epoch  exclude_millis=True
     Set Suite Variable  ${time_start}  ${ts}
     Cleanup Previous Test Logs
     Check Working Dir
     Check Drone
     Check Govc
-    Install VIC Product OVA  6.5u1d  ${BUILD_7312210_IP}  %{OVA_ESX_IP_VC65U1D}  %{OVA_ESX_DATASTORE_VC65U1D}
-    Get Vic Engine Binaries
     Setup Test Matrix
 
 Check Working Dir
@@ -55,7 +49,6 @@ Check Drone
     Log  Checking Drone version...
     Log  return code: ${rc}, output: ${drone_ver}  DEBUG
     Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
-    Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
 
 Check Govc
     ${rc}=  Run And Return Rc  govc
@@ -105,35 +98,35 @@ Setup Test Matrix
     # skip matrix
     @{skip_test_config_matrix}=  Create List
     # There's currently a version clash between the Selenium standalone binary and HSUIA project
-    Append To List  ${skip_test_config_matrix}  65,5310538,7312210,Windows,Firefox,Firefox
+    Append To List  ${skip_test_config_matrix}  65,5969303,7515524,Windows,Firefox,Firefox
     # There's a H5C bug in IE11 that appears only when automatically tested
-    Append To List  ${skip_test_config_matrix}  65,5310538,7312210,Windows,IExplorer,IE11
+    Append To List  ${skip_test_config_matrix}  65,5969303,7515524,Windows,IExplorer,IE11
     Set Global Variable  ${SKIP_TEST_MATRIX}  ${skip_test_config_matrix}
 
     # installer test matrix
     @{installer_test_config_matrix}=  Create List
     &{installer_test_results_dict}=  Create Dictionary
-    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Ubuntu
-    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Mac
-    Append To List  ${installer_test_config_matrix}  65,5310538,7312210,Windows
+    Append To List  ${installer_test_config_matrix}  65,5969303,7515524,Ubuntu
+    Append To List  ${installer_test_config_matrix}  65,5969303,7515524,Mac
+    Append To List  ${installer_test_config_matrix}  65,5969303,7515524,Windows
     Set Global Variable  ${INSTALLER_TEST_MATRIX}        ${installer_test_config_matrix}
     Set Global Variable  ${INSTALLER_TEST_RESULTS_DICT}  ${installer_test_results_dict}
 
     # uninstaller test matrix
     @{uninstaller_test_config_matrix}=  Create List
     &{uninstaller_test_results_dict}=  Create Dictionary
-    Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Ubuntu
-    Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Mac
-    Append To List  ${uninstaller_test_config_matrix}  65,5310538,7312210,Windows
+    Append To List  ${uninstaller_test_config_matrix}  65,5969303,7515524,Ubuntu
+    Append To List  ${uninstaller_test_config_matrix}  65,5969303,7515524,Mac
+    Append To List  ${uninstaller_test_config_matrix}  65,5969303,7515524,Windows
     Set Global Variable  ${UNINSTALLER_TEST_MATRIX}        ${uninstaller_test_config_matrix}
     Set Global Variable  ${UNINSTALLER_TEST_RESULTS_DICT}  ${uninstaller_test_results_dict}
 
     # upgrader test matrix
     @{upgrader_test_config_matrix}=  Create List
     &{upgrader_test_results_dict}=  Create Dictionary
-    Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Ubuntu
-    Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Mac
-    Append To List  ${upgrader_test_config_matrix}  65,5310538,7312210,Windows
+    Append To List  ${upgrader_test_config_matrix}  65,5969303,7515524,Ubuntu
+    Append To List  ${upgrader_test_config_matrix}  65,5969303,7515524,Mac
+    Append To List  ${upgrader_test_config_matrix}  65,5969303,7515524,Windows
     Set Global Variable  ${UPGRADER_TEST_MATRIX}        ${upgrader_test_config_matrix}
     Set Global Variable  ${UPGRADER_TEST_RESULTS_DICT}  ${upgrader_test_results_dict}
 
@@ -142,23 +135,24 @@ Setup Test Matrix
     &{plugin_test_results_dict}=  Create Dictionary
     # vSphere H5C and Flex Client are not supported  on Linux
     # https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.upgrade.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
-    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Mac,Chrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Mac,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Windows,Chrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Windows,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  65,5310538,7312210,Windows,IExplorer,IE11
+    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Mac,Chrome,Chrome
+    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Mac,Firefox,Firefox
+    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Windows,Chrome,Chrome
+    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Windows,Firefox,Firefox
+    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Windows,IExplorer,IE11
     Set Global Variable  ${PLUGIN_TEST_MATRIX}        ${plugin_test_config_matrix}
     Set Global Variable  ${PLUGIN_TEST_RESULTS_DICT}  ${plugin_test_results_dict}
 
 Get Testbed Information
     Set Environment Variable  GOVC_INSECURE  1
-    Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
-    ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/test-cases/Group18-VIC-UI/setup-testbed.robot > tests/test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
-    Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
-    ${testbed-setup-log}=  OperatingSystem.Get File  tests/test-cases/Group18-VIC-UI/setup-testbed.log
-    Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${testbed-setup-log}
-    Load Nimbus Testbed Env
-    Move File  testbed-information  tests/test-cases/Group18-VIC-UI/testbed-information
+    ${file}=  Evaluate  'testbed-information-%{BUILD_NUMBER}'
+    Load Nimbus Testbed Env  ${file}
+    # Log To Console  Testbed setup is in progress. See setup-testbed.log for detailed logs.
+    # ${results}=  Run Process  bash  -c  robot --exclude presetup -C ansi tests/test-cases/Group18-VIC-UI/setup-testbed.robot > tests/test-cases/Group18-VIC-UI/setup-testbed.log 2>&1
+    # Run Keyword If  ${results.rc} == 0  Log To Console  Testbed setup done
+    # ${testbed-setup-log}=  OperatingSystem.Get File  tests/test-cases/Group18-VIC-UI/setup-testbed.log
+    # Run Keyword Unless  ${results.rc} == 0  Fatal Error  Failed to fetch testbed information! See error below:\n${testbed-setup-log}
+    # Load Nimbus Testbed Env
 
 Get Integration Container Id
     ${rc}  ${out}=  Run And Return Rc And Output  docker ps --filter status=running --filter ancestor=gcr.io/eminent-nation-87317/vic-integration-test:1.33 -l --format={{.ID}}
@@ -187,6 +181,7 @@ Run Script Test With Config
     ${test_results_folder}=  Set Variable  ui-test-results/${test_name}-${dict_key}
     ${sed-replace-command}=  Catenate
     ...  sed -e "s/\#TEST_VSPHERE_VER/${vc_version}/g"
+    ...  -e "s|#BUILD_NUMBER|%{BUILD_NUMBER}|g"
     ...  -e "s|\#TEST_VCSA_BUILD|${vc_build}|g"
     ...  -e "s|\#TEST_OS|${os}|g"
     ...  -e "s|\#TEST_RESULTS_FOLDER|${test_results_folder}|g"
@@ -313,7 +308,7 @@ Cleanup Testbed
     Terminate All Processes  kill=True
 
     # Delete all transient and sensitive information
-    Run  rm -rf .drone.local.tests.yml testbed-information tests/test-cases/Group18-VIC-UI/testbed-information /tmp/sdk/ >/dev/null 2>&1
+    Run  rm -rf .drone.local.tests.yml testbed-information /tmp/sdk/ >/dev/null 2>&1
     Run  rm -rf Kickoff-Tests* VCH-0*
 
     # Revert some modified local files
@@ -321,7 +316,6 @@ Cleanup Testbed
 
     # Delete binaries
     Run  rm -rf vicui-test-report-*.zip
-    Run  rm -rf ${LATEST_VIC_ENGINE_TARBALL}
     Run  rm -rf tests/test-cases/Group18-VIC-UI/*VCH-0*
     Run  rm -rf scripts/plugin-packages/com.vmware.vic-v1*
     Run  rm -rf scripts/vsphere-client-serenity/com.vmware.vic.ui-v1*
@@ -356,19 +350,19 @@ Launch Installer Tests
     :FOR  ${config}  IN  @{INSTALLER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Installer Test  18-1-VIC-UI-Installer  ${INSTALLER_TEST_RESULTS_DICT}
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Installer Test,${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Launch Uninstaller Tests
     :FOR  ${config}  IN  @{UNINSTALLER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Uninstaller Test  18-2-VIC-UI-Uninstaller  ${UNINSTALLER_TEST_RESULTS_DICT}
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Uninstaller Test,${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
 
 Launch Upgrader Tests
     :FOR  ${config}  IN  @{UPGRADER_TEST_MATRIX}
     \    Run Script Test With Config  ${config}  Upgrader Test  18-3-VIC-UI-Upgrader  ${UPGRADER_TEST_RESULTS_DICT}
     \    ${is_skipped}=  Run Keyword And Return Status  List Should Contain Value  ${SKIP_TEST_MATRIX}  Upgrader Test,${config}
-    \    Run Keyword Unless  ${is_skipped}  Uninstall VCH  ${TRUE}
+
+Cleanup VCH
+    Uninstall VCH
 
 # All H5 Client plugin tests are now migrated to Protractor
 # Launch Plugin Tests

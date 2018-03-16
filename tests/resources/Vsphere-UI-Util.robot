@@ -65,15 +65,18 @@ Prepare Testbed For Protractor Tests
     Log  Checking Drone version...
     Log  return code: ${rc}, output: ${drone_ver}  DEBUG
     Run Keyword If  ${rc} > ${0}  Fatal Error  Drone is required to run tests!
-    Run Keyword If  '0.5.0' not in '${drone_ver}'  Fatal Error  Drone 0.5.0 is required to run tests!
 
     # Make sure the govc binary exists (it should not return RC 127)
     ${rc}=  Run And Return Rc  govc
     Should Be True  ${rc} != 127
 
-    # Ensure product OVA is deployed and ready
-    Install VIC Product OVA  6.5u1d  ${BUILD_7312210_IP}  %{OVA_ESX_IP_VC65U1D}  %{OVA_ESX_DATASTORE_VC65U1D}
-    Get Vic Engine Binaries
+    Load Nimbus Testbed Env  testbed-information-%{BUILD_NUMBER}
+    Set Environment Variable  TEST_VCSA_BUILD  7515524
+    Set Environment Variable  OVA_IP_%{BUILD_NUMBER}  %{OVA_IP}
+    Set Global Variable  ${TEST_VC_USERNAME}  %{TEST_USERNAME}
+    Set Global Variable  ${TEST_VC_PASSWORD}  %{TEST_PASSWORD}
+
+    Register VC CA Cert With Windows  ${TEST_VC_IP}
 
 Prepare Protractor
     [Arguments]  ${VCSA_IP}  ${SELENIUM_GRID_IP}  ${BROWSER}
@@ -129,7 +132,7 @@ Is vSphere Client Ready
     Should Not Contain  ${out}  is still initializing
 
 Cleanup Plugins From VC
-    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Admin!23
+    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Bl*ckwalnut0
     Close All Browsers
     Log To Console  Removing VIC UI plugins from ${VC_TARGET}...
     # remove plugins
@@ -142,7 +145,7 @@ Cleanup Plugins From VC
     Log To Console  ${out2}
 
 Destroy Dangling VCHs Created By Protractor
-    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Admin!23
+    [Arguments]  ${VC_TARGET}  ${VCSA_FINGERPRINT}  ${VC_USERNAME}=administrator@vsphere.local  ${VC_PASSWORD}=Bl*ckwalnut0
     Set Environment Variable  GOVC_URL  ${VC_TARGET}
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_USERNAME  ${VC_USERNAME}
