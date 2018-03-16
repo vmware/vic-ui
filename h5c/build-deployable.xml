@@ -45,10 +45,7 @@
       <condition property="BUILD_MODE" value="prod" else="dev">
          <equals arg1="prod" arg2="${env.BUILD_MODE}" casesensitive="false"/>
       </condition>
-      <condition property="ANGULAR_APP_ROOT" value="dist" else="build-dev">
-         <equals arg1="${BUILD_MODE}" arg2="prod" casesensitive="false"/>
-      </condition>
-      <replaceregexp file="${basedir}/vic/src/main/webapp/plugin.xml" match="(\/vsphere-client\/vic\/resources\/)(build\-dev|dist)" replace="\1${ANGULAR_APP_ROOT}" byline="true"/>
+      <replaceregexp file="${basedir}/vic/src/main/webapp/plugin.xml" match="(\/vsphere-client\/vic\/resources\/)(build\-dev|dist)" replace="\1dist" byline="true"/>
       <echo>Build mode is ${BUILD_MODE}</echo>
    </target>
 
