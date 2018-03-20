@@ -1,10 +1,10 @@
-# Copyright 2016-2017 VMware, Inc. All Rights Reserved.
+# Copyright 2018 VMware, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#	http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,6 @@
 
 *** Settings ***
 Documentation  This resource contains any keywords related to using the Nimbus cluster
-
 *** Variables ***
 ${ESX_VERSION}  ob-5969303  #6.5 RTM vsphere65u1
 ${VC_VERSION}  ob-5973321   #6.5 RTM vsphere65u1
@@ -35,11 +34,27 @@ Get IP
     ${ip}=  Fetch From Right  ${out}  ${SPACE}
     [Return]  ${ip}
 
+Fetch POD
+      [Arguments]  ${name}
+      ${out}=  Execute Command  nimbus-ctl list | grep ${name}
+      Should Not Be Empty  ${out}
+      ${len}=  Get Line Count  ${out}
+      Should Be Equal As Integers  ${len}  1
+      ${pod}=  Fetch From Left  ${out}  :
+      [return]  ${pod}
+
+Custom Testbed Keepalive
+    [Tags]  secret
+    [Arguments]  ${folder}
+    ${out}=  Run Secret SSHPASS command  %{NIMBUS_USER}  '%{NIMBUS_PASSWORD}'  touch ${folder}
+    [Return]  ${out}
+
 Deploy Nimbus ESXi Server
     [Arguments]  ${user}  ${password}  ${version}=${ESX_VERSION}  ${tls_disabled}=True
     ${name}=  Evaluate  'ESX-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     Log To Console  \nDeploying Nimbus ESXi server: ${name}
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
 
     :FOR  ${IDX}  IN RANGE  1  5
     \   ${out}=  Execute Command  nimbus-esxdeploy ${name} --disk=48000000 --ssd=24000000 --memory=8192 --lease=1 --nics 2 ${version}
@@ -61,6 +76,7 @@ Deploy Nimbus ESXi Server
     # Let's set a password so govc doesn't complain
     Remove Environment Variable  GOVC_PASSWORD
     Remove Environment Variable  GOVC_USERNAME
+    Remove Environment Variable  GOVC_DATACENTER
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_URL  root:@${ip}
     ${out}=  Run  govc host.account.update -id root -password ${NIMBUS_ESX_PASSWORD}
@@ -74,6 +90,7 @@ Set Host Password
     [Arguments]  ${ip}  ${NIMBUS_ESX_PASSWORD}
     Remove Environment Variable  GOVC_PASSWORD
     Remove Environment Variable  GOVC_USERNAME
+    Remove Environment Variable  GOVC_DATACENTER
     Set Environment Variable  GOVC_INSECURE  1
     Set Environment Variable  GOVC_URL  root:@${ip}
     ${out}=  Run  govc host.account.update -id root -password ${NIMBUS_ESX_PASSWORD}
@@ -89,7 +106,8 @@ Deploy Multiple Nimbus ESXi Servers in Parallel
     \     ${name}=  Evaluate  'ESX-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     \     Append To List  ${names}  ${name}
 
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
 
     @{processes}=  Create List
     :FOR  ${name}  IN  @{names}
@@ -106,7 +124,7 @@ Deploy Multiple Nimbus ESXi Servers in Parallel
     :FOR  ${name}  IN  @{names}
     \    ${ip}=  Get IP  ${name}
     \    ${ip}=  Evaluate  $ip if $ip else ''
-    \    Run Keyword If  '${ip}'  Set To Dictionary  ${ips}  ${name}  ${ip}
+    \    Run Keyword If  '${ip}'  Set To Dictionary  ${ips}  ${user}-${name}  ${ip}
 
     # Let's set a password so govc doesn't complain
     ${just_ips}=  Get Dictionary Values  ${ips}
@@ -121,8 +139,8 @@ Deploy Nimbus vCenter Server
     [Arguments]  ${user}  ${password}  ${version}=${VC_VERSION}
     ${name}=  Evaluate  'VC-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     Log To Console  \nDeploying Nimbus vCenter server: ${name}
-
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
 
     :FOR  ${IDX}  IN RANGE  1  5
     \   ${out}=  Execute Command  nimbus-vcvadeploy --lease=1 --vcvaBuild ${version} ${name}
@@ -171,10 +189,12 @@ Deploy Nimbus vCenter Server Async
 
 Deploy Nimbus Testbed
     [Arguments]  ${user}  ${password}  ${testbed}
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
 
     :FOR  ${IDX}  IN RANGE  1  5
     \   ${out}=  Execute Command  nimbus-testbeddeploy --lease=1 ${testbed}
+    \   Log  ${out}
     \   # Make sure the deploy actually worked
     \   ${status}=  Run Keyword And Return Status  Should Contain  ${out}  "deployment_result"=>"PASS"
     \   Return From Keyword If  ${status}  ${out}
@@ -184,20 +204,21 @@ Deploy Nimbus Testbed
 
 Kill Nimbus Server
     [Arguments]  ${user}  ${password}  ${name}
-    Open SSH Connection  %{NIMBUS_GW}  ${user}  ${password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
     ${out}=  Execute Command  nimbus-ctl kill ${name}
+    Log  ${out}
     Close connection
-    [Return]  ${out}
 
 Cleanup Nimbus PXE folder
     [Arguments]  ${user}  ${password}
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
     ${out}=  Execute Command  rm -rf public_html/pxe/*
     Close connection
 
 Nimbus Cleanup
     [Arguments]  ${vm_list}  ${collect_log}=True  ${dontDelete}=${false}
-    Run Keyword If  ${collect_log}  Run Keyword And Continue On Failure  Gather Logs From Test Server
     Run Keyword And Ignore Error  Cleanup Nimbus PXE folder  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     Return From Keyword If  ${dontDelete}
     ${list}=  Catenate  @{vm_list}
@@ -214,8 +235,10 @@ Gather Host IPs
     \   ${idx}=  Evaluate  ${idx}+1
 
 Create a VSAN Cluster
+    [Arguments]  ${name}=vic-vmotion
     Log To Console  \nStarting basic VSAN cluster deploy...
-    ${out}=  Deploy Nimbus Testbed  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  --plugin testng --lease 1 --noStatsDump --noSupportBundles --vcvaBuild ${VC_VERSION} --esxPxeDir ${ESX_VERSION} --esxBuild ${ESX_VERSION} --testbedName vcqa-vsan-simple-pxeBoot-vcva --runName vic-vmotion
+    Run Keyword And Ignore Error  Nimbus Cleanup  ${list}  ${false}
+    ${out}=  Deploy Nimbus Testbed  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}  --plugin testng --lease 1 --noStatsDump --noSupportBundles --vcvaBuild ${VC_VERSION} --esxPxeDir ${ESX_VERSION} --esxBuild ${ESX_VERSION} --testbedName vcqa-vsan-simple-pxeBoot-vcva --runName ${name}
     Should Contain  ${out}  .vcva-${VC_VERSION}' is up. IP:
     ${out}=  Split To Lines  ${out}
     :FOR  ${line}  IN  @{out}
@@ -275,7 +298,8 @@ Create a Simple VC Cluster
     ${output}=  Wait For Process  ${pid}
     Should Contain  ${output.stdout}  Overall Status: Succeeded
 
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  %{NIMBUS_USER}  %{NIMBUS_PASSWORD}
     ${vc_ip}=  Get IP  ${vc}
     Close Connection
 
@@ -375,8 +399,8 @@ Deploy Nimbus NFS Datastore
     [Arguments]  ${user}  ${password}  ${additional-args}=
     ${name}=  Evaluate  'NFS-' + str(random.randint(1000,9999)) + str(time.clock())  modules=random,time
     Log To Console  \nDeploying Nimbus NFS server: ${name}
-
-    Open SSH Connection  %{NIMBUS_GW}  %{user}  %{password}  retry_interval=30 sec
+    Open Connection  %{NIMBUS_GW}
+    Wait Until Keyword Succeeds  2 min  30 sec  Login  ${user}  ${password}
 
     ${out}=  Execute Command  nimbus-nfsdeploy ${name} ${additional-args}
     # Make sure the deploy actually worked
@@ -398,3 +422,15 @@ Change ESXi Server Password
     ${out}=  Run  govc host.account.update -id root -password ${password}
     Should Be Empty  ${out}
 
+Check License Features
+    ${out}=  Run  govc object.collect -json $(govc object.collect -s - content.licenseManager) licenses | jq '.[].Val.LicenseManagerLicenseInfo[].Properties[] | select(.Key == "feature") | .Value'
+    Should Contain  ${out}  serialuri
+    Should Contain  ${out}  dvs
+
+# Abruptly power off the host
+Power Off Host
+    [Arguments]  ${host}
+    Open Connection  ${host}  prompt=:~]
+    Login  root  ${NIMBUS_ESX_PASSWORD}
+    ${out}=  Execute Command  poweroff -d 0 -f
+    Close connection
