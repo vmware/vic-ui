@@ -15,18 +15,21 @@
 */
 
 import {Component} from '@angular/core';
-import {ConfigureVchBase} from '../../configure-vch-base';
 import {ConfigureVchService} from '../../configure-vch.service';
 import {GlobalsService} from '../../../shared/globals.service';
 import {ActivatedRoute} from '@angular/router';
+import {ConfigureVchBase} from '../../configure-vch-base';
+import {globalProperties} from '../../../../environments/properties';
 
 @Component({
-  selector: 'vic-configure-vch-view-general',
-  styleUrls: ['./configure-vch-view-general.component.scss'],
-  templateUrl: './configure-vch-view-general.component.html'
+  selector: 'vic-configure-vch-modal-compute',
+  styleUrls: ['./configure-vch-modal-compute.component.scss'],
+  templateUrl: './configure-vch-modal-compute.component.html'
 })
 
-export class ConfigureVchViewGeneralComponent extends ConfigureVchBase {
+export class ConfigureVchModalComputeComponent extends ConfigureVchBase {
+
+  public helpLink = globalProperties.vhcDocsCompute;
 
   constructor(protected globalsService: GlobalsService,
               protected configureVchService: ConfigureVchService,
@@ -34,3 +37,4 @@ export class ConfigureVchViewGeneralComponent extends ConfigureVchBase {
     super(globalsService, configureVchService, activatedRoute);
   }
 }
+

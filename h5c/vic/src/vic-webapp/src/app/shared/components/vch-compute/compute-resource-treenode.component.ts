@@ -24,13 +24,12 @@ import {
   ElementRef,
   Renderer
 } from '@angular/core';
-import { DC_CLUSTER, DC_STANDALONE_HOST } from '../../shared/constants';
+import { DC_CLUSTER, DC_STANDALONE_HOST } from '../../../shared/constants';
+import {ComputeResource} from '../../../interfaces/compute.resource';
+import {ServerInfo} from '../../vSphereClientSdkTypes';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {GlobalsService} from '../../globals.service';
 
-import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { Observable } from 'rxjs/Observable';
-import { GlobalsService } from '../../shared';
-import { ComputeResource } from '../../interfaces/compute.resource';
-import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
 
 /**
  * Component that renders a tree view of the inventory items on the selected Datacenter
@@ -39,7 +38,7 @@ import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
 
 @Component({
   selector: 'vic-compute-resource-treenode',
-  styleUrls: ['./compute-capacity.scss'],
+  styleUrls: ['./vch-compute.component.scss'],
   templateUrl: './compute-resource-treenode.template.html'
 })
 export class ComputeResourceTreenodeComponent implements OnInit {
