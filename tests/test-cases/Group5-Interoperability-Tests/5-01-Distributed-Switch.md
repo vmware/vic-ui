@@ -2,7 +2,7 @@ Test 5-01 - Distributed Switch
 =======
 
 # Purpose:
-To verify the VIC OVA appliance works in a variety of different vCenter networking configurations
+To verify the VIC OVA appliance and Wizard UI works in a variety of different vCenter networking configurations
 
 # References:
 [1 - VMware Distributed Switch Feature](https://www.vmware.com/products/vsphere/features/distributed-switch.html)
