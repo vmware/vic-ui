@@ -2,7 +2,7 @@ Test 5-04 - Multiple Cluster
 =======
 
 # Purpose:
-To verify the VIC OVA appliance works when the vCenter appliance has multiple clusters within the datacenter
+To verify the VIC OVA appliance and Wizard UI works when the vCenter appliance has multiple clusters within the datacenter
 
 # References:
 [1 - VMware vCenter Server Availability Guide](http://www.vmware.com/files/pdf/techpaper/vmware-vcenter-server-availability-guide.pdf)
