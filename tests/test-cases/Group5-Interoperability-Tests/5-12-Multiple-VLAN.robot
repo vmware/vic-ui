@@ -40,11 +40,6 @@ Multiple VLAN Setup And Install OVA With UI Plugin
     Set Global Variable  ${OVA_USERNAME_ROOT}  root
     Set Global Variable  ${OVA_PASSWORD_ROOT}  e2eFunctionalTest
 
-    # pending steps:
-    #
-    # install OVA with UI plugin and initialize
-    # verify OVA components
-
 *** Test Cases ***
 Test1
     Log To Console  \nStarting test1...
@@ -55,8 +50,10 @@ Test1
 
     # pending steps:
     #
-    # install VIC
-    # verify wizard ui scenario
+    # install OVA and initialize
+    # verify OVA components
+    # create VCH using wizard UI
+    # run docker commands
 
 Test2
     Log To Console  \nStarting test2...
@@ -67,6 +64,8 @@ Test2
 
     # pending steps:
     #
-    # install VIC
-    # verify wizard ui scenario
+    # install OVA and initialize
+    # verify OVA components
+    # create VCH using wizard UI
+    # run docker commands
     
