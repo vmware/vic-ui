@@ -73,8 +73,8 @@ Simple VSAN
     #
     # install OVA and initialize
     # verify OVA components
-    # install VIC
-    # verify wizard ui scenario
+    # create VCH using wizard UI
+    # run docker commands
     # cleanup
 
     ${out}=  Run  govc datastore.vsan.dom.ls -ds %{TEST_DATASTORE} -l -o
