@@ -13,11 +13,12 @@ This test requires access to VMWare Nimbus cluster for dynamic ESXi and vCenter 
 # Test Steps:
 1. Deploy two new vCenters in Nimbus each with one ESXi host configured
 2. Establish an enhanced link between the two vCenters
-3. Install the VIC OVA appliance 
-4. Run regression tests on the VIC OVA appliance and Wizard UI
+3. Install the VIC OVA appliance
+4. Walk through completing the install and use the VCH creation wizard to create a VCH
+5. Run a variety of docker commands on the VCH appliance
 
 # Expected Outcome:
-The VIC OVA appliance should deploy without error and regression tests should pass
+The VCH and VIC appliance should deploy without error and each of the docker commands executed against it should return without error
 
 # Possible Problems:
 None
