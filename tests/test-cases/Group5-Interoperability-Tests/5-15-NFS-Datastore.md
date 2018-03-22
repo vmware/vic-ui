@@ -14,11 +14,12 @@ This test requires access to VMware Nimbus cluster for dynamic ESXi and vCenter 
 1. Deploy a new vCenter with a simple cluster
 2. Deploy an NFS server
 3. Create a new datastore out of a NFS share on the NFS server
-4. Install the VIC OVA appliance into one of the datacenters
-5. Run regression tests on the VIC OVA appliance and Wizard UI
+4. Install the VIC OVA appliance
+5. Walk through completing the install and use the VCH creation wizard to create a VCH
+6. Run a variety of docker commands on the VCH appliance
 
 # Expected Outcome:
-The VIC OVA appliance should deploy without error and regression tests should pass
+The VCH and VIC appliance should deploy without error and each of the docker commands executed against it should return without error
 
 # Possible Problems:
 None
