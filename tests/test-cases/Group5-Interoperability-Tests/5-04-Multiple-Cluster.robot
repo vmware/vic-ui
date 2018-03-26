@@ -90,4 +90,3 @@ Test
     # verify OVA components
     # install VCH using wizard UI
     # run docker commands
-    
