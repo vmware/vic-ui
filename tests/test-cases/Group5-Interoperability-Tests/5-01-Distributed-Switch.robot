@@ -87,3 +87,4 @@ Test
     # verify OVA components
     # install VIC
     # verify wizard ui scenario
+    
