@@ -176,4 +176,3 @@ Test
     # verify OVA components
     # create VCH using wizard UI
     # run docker commands
-    
