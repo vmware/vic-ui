@@ -79,4 +79,3 @@ Simple VSAN
 
     ${out}=  Run  govc datastore.vsan.dom.ls -ds %{TEST_DATASTORE} -l -o
     Should Be Empty  ${out}
-    
