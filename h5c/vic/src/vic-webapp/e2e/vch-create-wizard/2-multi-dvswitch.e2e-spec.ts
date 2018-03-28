@@ -59,7 +59,7 @@ describe('VCH Create Wizard with multiple DV Switches', () => {
 
   it('should login', () => {
     page.login();
-    page.waitUntilStable();
+    page.waitLoginFinish();
     expect(browser.getCurrentUrl()).toContain('/ui');
   });
 

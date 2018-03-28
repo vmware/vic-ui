@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { browser, by, element } from 'protractor';
+import {browser, by, element, protractor} from 'protractor';
 
 import { PROTRACTOR_JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
@@ -51,13 +51,14 @@ describe('VCH Create Wizard - Basic', () => {
   });
 
   it('should redirect to login', () => {
+    browser.driver.manage().window().maximize();
     page.navigateTo();
     expect(browser.getCurrentUrl()).toContain('SSO');
   });
 
   it('should login', () => {
     page.login();
-    page.waitUntilStable();
+    page.waitLoginFinish();
     expect(browser.getCurrentUrl()).toContain('/ui');
   });
 
@@ -202,7 +203,17 @@ describe('VCH Create Wizard - Basic', () => {
     page.clickByCSS('a.summary-action-link');
     // wait for menu items to be calculated
     browser.sleep(defaultTimeout);
-    page.clickByText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions');
+    const allVicActions = element(by.cssContainingText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions'));
+
+    browser.driver.getCapabilities().then(caps => {
+      browser.browserName = caps.get('browserName');
+      if (browser.browserName.toLowerCase() === 'chrome') {
+        browser.actions().mouseMove(allVicActions).click().perform();
+      } else {
+        page.clickByText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions');
+      }
+    });
+
     browser.sleep(defaultTimeout);
     expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'New Virtual Container Host...'))).toBeTruthy();
     expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'Delete Virtual Container Host'))).toBeTruthy();
@@ -210,8 +221,11 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should navigate to vch list', () => {
     page.navigateToHome();
+    page.waitUntilUrlContains('controlcenter');
     page.navigateToVicPlugin();
+    page.waitUntilUrlContains('vic.objectView_collection');
     page.navigateToSummaryTab();
+    page.waitUntilUrlContains('vic.customtab-vch');
     page.navigateToVchTab();
     expect(browser.getCurrentUrl()).toContain('customtab-vch');
   });
