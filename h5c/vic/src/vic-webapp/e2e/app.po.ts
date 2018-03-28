@@ -12,6 +12,7 @@
 */
 
 import { browser, by, element, ElementFinder } from 'protractor';
+import {defaultTimeout} from './vch-create-wizard/common';
 
 export class VicWebappPage {
 
@@ -71,10 +72,14 @@ export class VicWebappPage {
     this.clickByCSS(this.h5cActionMenuLogOut);
   }
 
-  waitUntilStable() {
+  waitLoginFinish() {
+    this.waitUntilUrlContains('serverObjectViewsExtension');
+  }
+
+  waitUntilUrlContains(str: string) {
     browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
-        return url.indexOf('/ui') > -1;
+        return url.indexOf(str) > -1;
       });
     }, this.opsTimeout);
   }
@@ -121,6 +126,7 @@ export class VicWebappPage {
   }
 
   selectComputeResource(name: string = 'Cluster') {
+    browser.sleep(defaultTimeout);
     this.waitForElementToBePresent(this.datacenterTreenodeCaret);
     element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
       if (collapsed) {
@@ -137,6 +143,7 @@ export class VicWebappPage {
   }
 
   selectBridgeNetwork(name: string = 'bridge') {
+    browser.sleep(defaultTimeout);
     this.waitForElementToBePresent(this.selectorBridgeNetwork);
     this.clickByText(this.selectorBridgeNetwork + ' option', name);
   }
