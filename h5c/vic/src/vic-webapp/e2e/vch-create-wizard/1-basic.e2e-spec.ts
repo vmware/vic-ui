@@ -238,7 +238,6 @@ describe('VCH Create Wizard - Basic', () => {
   it('should verify the created vch has been deleted', () => {
     let vchFound = false;
     page.switchFrame(iframeTabs);
-    page.waitForElementToBePresent(dataGridCell);
     const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
     element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
       vchFound = present;
