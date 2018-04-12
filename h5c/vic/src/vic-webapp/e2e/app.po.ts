@@ -42,9 +42,9 @@ export class VicWebappPage {
   private inputPassword = '#password';
   private password = 'Bl*ckwalnut0';
   private submit = '#submit';
-  private defaultTimeout = 5000;
+  private defaultTimeout = 10000;
   private extendedTimeout = 10000;
-  private opsTimeout = 60000;
+  private opsTimeout = 80000;
 
   navigateTo() {
     browser.waitForAngularEnabled(false);
@@ -292,7 +292,7 @@ export class VicWebappPage {
         const taskTargetTxt = element(by.css(this.latestTask + ' td:nth-of-type(2)')).getText();
         const endTimeTxt = element(by.css(this.latestTask + ' td:nth-of-type(7)')).getText();
 
-        browser.sleep(1000);
+        browser.sleep(6000);
         return taskNameTxt.then(taskNameValue => {
           return taskTargetTxt.then(targetNameValue => {
             return endTimeTxt.then(endTimeValue => {
