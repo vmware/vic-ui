@@ -111,7 +111,7 @@ export class VicWebappPage {
     this.clickByCSS(this.tabBtnVchs);
     browser.wait(() => {
       return browser.getCurrentUrl().then(v => {
-        browser.sleep(100);
+        browser.sleep(6000);
         return v.indexOf('customtab-vch') > -1;
       });
     }, this.opsTimeout);
