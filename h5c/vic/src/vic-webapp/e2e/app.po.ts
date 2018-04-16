@@ -42,9 +42,9 @@ export class VicWebappPage {
   private inputPassword = '#password';
   private password = 'Bl*ckwalnut0';
   private submit = '#submit';
-  private defaultTimeout = 5000;
+  private defaultTimeout = 10000;
   private extendedTimeout = 10000;
-  private opsTimeout = 60000;
+  private opsTimeout = 80000;
 
   navigateTo() {
     browser.waitForAngularEnabled(false);
@@ -111,7 +111,7 @@ export class VicWebappPage {
     this.clickByCSS(this.tabBtnVchs);
     browser.wait(() => {
       return browser.getCurrentUrl().then(v => {
-        browser.sleep(100);
+        browser.sleep(6000);
         return v.indexOf('customtab-vch') > -1;
       });
     }, this.opsTimeout);
@@ -170,7 +170,7 @@ export class VicWebappPage {
   createVch() {
     this.clickByText('Button', 'Finish');
     browser.switchTo().defaultContent();
-    this.waitForElementToBeGone(this.iframeModal, this.extendedTimeout * 6);
+    this.waitForElementToBeGone(this.iframeModal, this.extendedTimeout * 8);
     this.switchFrame(this.iframeTabs);
   }
 
@@ -292,7 +292,7 @@ export class VicWebappPage {
         const taskTargetTxt = element(by.css(this.latestTask + ' td:nth-of-type(2)')).getText();
         const endTimeTxt = element(by.css(this.latestTask + ' td:nth-of-type(7)')).getText();
 
-        browser.sleep(1000);
+        browser.sleep(6000);
         return taskNameTxt.then(taskNameValue => {
           return taskTargetTxt.then(targetNameValue => {
             return endTimeTxt.then(endTimeValue => {
