@@ -39,7 +39,7 @@ pipeline:
       - 'make vic-ui-plugins'
     when:
       repo: vmware/vic-ui
-      branch: [master, 'releases/*', 'refs/tags/*']
+      branch: [master, 'releases/*']
 
   bundle:
     image: 'gcr.io/eminent-nation-87317/vic-integration-test:1.36'
@@ -60,7 +60,7 @@ pipeline:
     when:
       repo: vmware/vic-ui
       event: [push, tag]
-      branch: [master, 'releases/*', 'refs/tags/*']
+      branch: [master, 'releases/*']
 
   publish-gcs-builds-on-pass:
     image: 'victest/drone-gcs:1'
@@ -90,8 +90,7 @@ pipeline:
     cache_control: 'public,max-age=3600'
     when:
       repo: vmware/vic-ui
-      event: [push, tag]
-      branch: ['refs/tags/*']
+      event: tag
       status: success
 
   report-coverage:
