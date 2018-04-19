@@ -237,3 +237,36 @@ export const dvsHostsEntries = [
       ]}
   })
 ];
+
+export const dcMockData = [
+  {
+    text: 'ha-datacenter',
+    spriteCssClass: 'vsphere-icon-datacenter',
+    hasChildren: true,
+    objRef: 'urn:vmomi:Datacenter:datacenter-2:196f7764-7aec-42d8-9def-6b5899b7e0e1',
+    nodeTypeId: 'Datacenter',
+    aliases: [
+      'urn:vmomi:Folder:group-h4:196f7764-7aec-42d8-9def-6b5899b7e0e1',
+      'urn:vmomi:Folder:group-v3:196f7764-7aec-42d8-9def-6b5899b7e0e1',
+      'urn:vmomi:Folder:group-s5:196f7764-7aec-42d8-9def-6b5899b7e0e1',
+      'urn:vmomi:Folder:group-n6:196f7764-7aec-42d8-9def-6b5899b7e0e1']
+  }
+];
+
+export const dcClustersAndStandAloneHosts = [
+  {
+    text: '10.161.75.158 (Reboot Required)',
+    spriteCssClass: 'vsphere-icon-host-warning',
+    hasChildren: true,
+    objRef: 'urn:vmomi:HostSystem:host-15:196f7764-7aec-42d8-9def-6b5899b7e0e1',
+    nodeTypeId: 'DcStandaloneHost',
+    aliases: ['urn:vmomi:ResourcePool:resgroup-14:196f7764-7aec-42d8-9def-6b5899b7e0e1']
+  }
+];
+
+export const computeResourcesRealName = [
+  {
+    name: '10.161.75.158',
+    id: 'urn:vmomi:HostSystem:host-15:196f7764-7aec-42d8-9def-6b5899b7e0e1'
+  }
+];

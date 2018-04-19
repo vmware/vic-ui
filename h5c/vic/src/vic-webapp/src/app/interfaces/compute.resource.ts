@@ -20,4 +20,5 @@ export interface ComputeResource {
   objRef: string;
   aliases: string[];
   isEmpty: boolean;
+  realName?: string;
 }

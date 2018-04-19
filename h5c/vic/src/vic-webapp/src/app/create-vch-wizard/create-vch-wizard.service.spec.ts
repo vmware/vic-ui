@@ -31,7 +31,9 @@ import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Globals, GlobalsService } from '../shared';
 import {
-  dcDSwitchPorGroupsList, dvsHostsEntries,
+  computeResourcesRealName,
+  dcClustersAndStandAloneHosts,
+  dcDSwitchPorGroupsList, dcMockData, dvsHostsEntries,
   folderDSwitchList, folderDSwitchPorGroupsList,
   netWorkingResources
 } from './mocks/create-vch-wizard-mocked-data';
@@ -136,5 +138,20 @@ describe('CreateVchWizardService', () => {
           expect(data.length).toBe(3);
           });
 
-    })
+    });
+
+    it('should return a list of Compute Resources with a property called realName', async() => {
+      spyOn(service, 'getDatacenter').and.returnValue(Observable.of(dcMockData));
+      spyOn<any>(service, 'getDcClustersAndStandAloneHosts').and.returnValue(Observable.of(dcClustersAndStandAloneHosts));
+      spyOn<any>(service, 'getComputeResourceRealName').and.returnValue(Observable.of(computeResourcesRealName[0]));
+
+      service.getClustersList(null)
+        .subscribe(data => {
+          expect(data.length).toBe(1);
+          expect(data[0].realName).toBeTruthy();
+          expect(data[0].realName).toBe(computeResourcesRealName[0].name);
+        });
+
+    });
+
 });
