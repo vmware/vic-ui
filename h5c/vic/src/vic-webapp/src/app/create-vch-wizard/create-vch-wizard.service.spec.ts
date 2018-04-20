@@ -30,6 +30,11 @@ import { MockBackend, MockConnection } from '@angular/http/testing';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Globals, GlobalsService } from '../shared';
+import {
+  dcDSwitchPorGroupsList, dvsHostsEntries,
+  folderDSwitchList, folderDSwitchPorGroupsList,
+  netWorkingResources
+} from './mocks/create-vch-wizard-mocked-data';
 
 describe('CreateVchWizardService', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -114,4 +119,22 @@ describe('CreateVchWizardService', () => {
         body: 'not an array of string values'
       })));
     });
+
+    it('should retrieve a list of distributed port groups', async() => {
+      spyOn(service, 'getNetworkingTree').and.returnValue(Observable.of(netWorkingResources));
+      spyOn<any>(service, 'getDvsFromNetworkFolders').and.returnValue(Observable.of(folderDSwitchList));
+      spyOn<any>(service, 'getDvsPortGroups').and.returnValue([...folderDSwitchPorGroupsList, ...dcDSwitchPorGroupsList]);
+      spyOn<any>(service, 'getDvsHostsEntries').and.returnValue(dvsHostsEntries);
+
+      service.getDistributedPortGroups(null, '10.192.109.234')
+        .subscribe(data => {
+            expect(data.length).toBe(8);
+          });
+
+      service.getDistributedPortGroups(null, 'New Cluster')
+        .subscribe(data => {
+          expect(data.length).toBe(3);
+          });
+
+    })
 });
