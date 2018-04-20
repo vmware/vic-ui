@@ -54,7 +54,7 @@ pipeline:
       - 'mkdir bundle'
       - 'mkdir bundle-release'
       - 'cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle'
-      - 'cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle-release/vic_ui_`git describe --tags $(git rev-list --tags --max-count=1)`.tar.gz'
+      - 'cp $BIN/vic_ui_${DRONE_BUILD_NUMBER}.tar.gz bundle-release/vic_ui_`git describe --tags --abbrev=0`.tar.gz'
       - 'rm -rf $BIN'
       - 'ls -la bundle'
     when:
