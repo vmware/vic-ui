@@ -79,9 +79,9 @@ export class ComputeResourceTreenodeComponent implements OnInit {
     this.createWzService
       .getClustersList(serverInfo.serviceGuid)
       .subscribe(val => {
-        // const filteredByDc = val.filter(v => v['datacenterObjRef'] === dc.objRef);
-        this.clusters = val.filter(v => v.nodeTypeId === DC_CLUSTER);
-        this.standaloneHosts = val.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
+        const filteredByDc = val.filter(v => v['datacenterObjRef'] === this.datacenter.objRef);
+        this.clusters = filteredByDc.filter(v => v.nodeTypeId === DC_CLUSTER);
+        this.standaloneHosts = filteredByDc.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
 
         if (!this.clusters.length) {
           this.loading = false;
