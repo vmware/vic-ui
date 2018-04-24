@@ -345,10 +345,10 @@ export class CreateVchWizardComponent implements OnInit {
       processedPayload.network.public['gateway'] = {
         address: payload.networks.publicNetworkGateway
       };
+    }
 
-      if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
-        processedPayload.network.public['nameservers'] = payload.networks.dnsServer;
-      }
+    if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
+      processedPayload.network.public['nameservers'] = payload.networks.dnsServer;
     }
 
     if (payload.networks.clientNetwork) {
