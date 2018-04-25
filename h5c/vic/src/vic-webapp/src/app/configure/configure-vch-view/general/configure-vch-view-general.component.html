@@ -1,0 +1,14 @@
+<ng-container *ngIf="vchInfo | async as vchUIModel; else loadingContent">
+  <vic-configure-vch-view-container [title]="'General'"
+                                    [vchUiModelKey]="'general'"
+                                    [vchId]="vchId">
+    <vic-vch-general [readOnly]="true"
+                     [model]="vchUIModel.general">
+    </vic-vch-general>
+  </vic-configure-vch-view-container>
+</ng-container>
+<ng-template #loadingContent>
+        <span class="spinner spinner-md">
+          Loading...
+        </span>
+</ng-template>

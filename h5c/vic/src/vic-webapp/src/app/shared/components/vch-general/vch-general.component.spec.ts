@@ -18,19 +18,19 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import { By } from '@angular/platform-browser';
 import {ClarityModule} from '@clr/angular';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
-import {VchCreationWizardGeneralComponent} from './general.component';
+import {VchGeneralComponent} from './vch-general.component';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
 
 describe('VchCreationWizardGeneralComponent', () => {
 
   const ValidVCHName = 'unique-vm-container-host';
   const InvalidVCHName = 'vm-container-host';
 
-  let component: VchCreationWizardGeneralComponent;
-  let fixture: ComponentFixture<VchCreationWizardGeneralComponent>;
+  let component: VchGeneralComponent;
+  let fixture: ComponentFixture<VchGeneralComponent>;
   let service: CreateVchWizardService;
 
   beforeEach(() => {
@@ -61,13 +61,13 @@ describe('VchCreationWizardGeneralComponent', () => {
         }
       ],
       declarations: [
-        VchCreationWizardGeneralComponent
+        VchGeneralComponent
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VchCreationWizardGeneralComponent);
+    fixture = TestBed.createComponent(VchGeneralComponent);
     component = fixture.componentInstance;
     component.onPageLoad();
     service = fixture.debugElement.injector.get(CreateVchWizardService);

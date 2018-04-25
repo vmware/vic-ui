@@ -19,8 +19,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClarityModule } from '@clr/angular';
-import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
-import { ComputeResourceTreenodeComponent } from './compute-capacity/compute-resource-treenode.component';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { GlobalsService } from 'app/shared';
@@ -33,8 +31,10 @@ import { RefreshService } from '../shared/refresh.service';
 import { SecurityComponent } from './security/security.component';
 import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { SummaryComponent } from './summary/summary.component';
-import { VchCreationWizardGeneralComponent } from './general/general.component';
 import { RegistryAccessComponent } from './registry-access/registry-access.component';
+import {VchGeneralComponent} from '../shared/components/vch-general/vch-general.component';
+import {VchComputeComponent} from '../shared/components/vch-compute/vch-compute.component';
+import {ComputeResourceTreenodeComponent} from '../shared/components/vch-compute/compute-resource-treenode.component';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -88,8 +88,8 @@ describe('CreateVchWizardComponent', () => {
       ],
       declarations: [
         CreateVchWizardComponent,
-        VchCreationWizardGeneralComponent,
-        ComputeCapacityComponent,
+        VchGeneralComponent,
+        VchComputeComponent,
         ComputeResourceTreenodeComponent,
         StorageCapacityComponent,
         NetworksComponent,
