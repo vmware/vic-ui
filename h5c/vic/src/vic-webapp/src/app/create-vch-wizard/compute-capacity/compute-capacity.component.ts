@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   getNumericValidatorsArray,
@@ -30,6 +30,7 @@ import { getMorIdFromObjRef } from '../../shared/utils/object-reference';
 import 'rxjs/add/observable/timer';
 import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
 import { flattenArray } from '../../shared/utils/array-utils';
+import { I18nService } from '../../shared';
 
 const endpointMemoryDefaultValue = 2048;
 
@@ -39,6 +40,13 @@ const endpointMemoryDefaultValue = 2048;
   styleUrls: ['./compute-capacity.scss']
 })
 export class ComputeCapacityComponent implements OnInit {
+
+  @Input()
+  public set vchName(vchName: string) {
+    this._currentVchName = vchName;
+    this.validateVMGroupsNameAndDrs(this.vmsGroups, this.isClusterDrsEnabled);
+  }
+
   public form: FormGroup;
   public datacenter: any[] = [];
   public dcObj: ComputeResource;
@@ -53,8 +61,14 @@ export class ComputeCapacityComponent implements OnInit {
   };
   public selectedObjectName: string;
   public selectedResourceObjRef: string;
-  private _selectedComputeResource: string;
   public serversInfo: ServerInfo[];
+  public selectedResourceIsCluster = false;
+  public vmGroupNameIsValid = false;
+  public isClusterDrsEnabled = false;
+  public vmsGroups = [];
+
+  private _selectedComputeResource: string;
+  private _currentVchName: string;
 
   @ViewChildren(ComputeResourceTreenodeComponent)
   treenodeComponents: QueryList<ComputeResourceTreenodeComponent>;
@@ -62,7 +76,8 @@ export class ComputeCapacityComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private createWzService: CreateVchWizardService,
-    private globalsService: GlobalsService
+    private globalsService: GlobalsService,
+    public i18n: I18nService
   ) {
     // create a FormGroup instance
     this.form = formBuilder.group({
@@ -92,6 +107,9 @@ export class ComputeCapacityComponent implements OnInit {
       endpointMemory: [
         endpointMemoryDefaultValue,
         getNumericValidatorsArray(false)
+      ],
+      vmHostAffinity: [
+        false
       ]
     });
   }
@@ -151,6 +169,7 @@ export class ComputeCapacityComponent implements OnInit {
     const resourceObj = payload.obj.objRef;
     const dcObj = payload.datacenterObj.objRef;
     this.dcObj = payload.datacenterObj;
+    this.selectedResourceIsCluster = isCluster;
 
     let computeResource = `/${this.dcObj.text}/host`;
     let resourceObjForResourceAllocations = resourceObj;
@@ -159,6 +178,7 @@ export class ComputeCapacityComponent implements OnInit {
       computeResource = `${computeResource}/${payload.obj.text}`;
       resourceObjForResourceAllocations = payload.obj.aliases[0];
     } else {
+      this.form.controls['vmHostAffinity'].setValue(false);
       computeResource = payload.parentClusterObj ?
         `${computeResource}/${payload.parentClusterObj.text}/${payload.obj.text}` :
         `${computeResource}/${payload.obj.text}`;
@@ -178,60 +198,90 @@ export class ComputeCapacityComponent implements OnInit {
         });
     }
 
-    // update resource limit & reservation info
-    this.createWzService.getResourceAllocationsInfo(resourceObjForResourceAllocations, isCluster)
-    .subscribe(response => {
-      const cpu = response['cpu'];
-      const memory = response['memory'];
-      this.resourceLimits = response;
+    // if it is a cluster, we get the cluster vm groups, otherwise set to empty array observable
+    const vmGroupsObs: Observable<any[]> = isCluster ?
+      this.createWzService.getClusterVMGroups(this.selectedResourceObjRef) : Observable.of([]);
 
-      // set max limit validator for cpu maxUsage
-      this.form.get('cpuLimit').setValidators([
-        ...getNumericValidatorsArray(true),
-        Validators.max(cpu['maxUsage'])
-      ]);
+    const isDrsEnabled: Observable<boolean> = isCluster ?
+      this.createWzService.getClusterDrsStatus(this.selectedResourceObjRef) : Observable.of(false);
 
-      // set max limit validator for memory maxUsage
-      this.form.get('memoryLimit').setValidators([
-        ...getNumericValidatorsArray(true),
-        Validators.max(memory['maxUsage'])
-      ]);
+    const allocationsObs: Observable<any[]> = this.createWzService
+      .getResourceAllocationsInfo(resourceObjForResourceAllocations, isCluster);
 
-      if (this.inAdvancedMode) {
-        // set max limit validator for endpointMemory
-        this.form.get('endpointMemory').setValidators([
-          ...getNumericValidatorsArray(false),
+    Observable.zip(allocationsObs, vmGroupsObs, isDrsEnabled)
+      .subscribe(([allocationsInfo, groups, drsStatus]) => {
+        const cpu = allocationsInfo['cpu'];
+        const memory = allocationsInfo['memory'];
+        this.resourceLimits = allocationsInfo;
+        this.vmsGroups = groups;
+
+        // set max limit validator for cpu maxUsage
+        this.form.get('cpuLimit').setValidators([
+          ...getNumericValidatorsArray(true),
+          Validators.max(cpu['maxUsage'])
+        ]);
+
+        // set max limit validator for memory maxUsage
+        this.form.get('memoryLimit').setValidators([
+          ...getNumericValidatorsArray(true),
           Validators.max(memory['maxUsage'])
         ]);
 
-        // set max limit validator for cpu unreservedForPool
-        this.form.get('cpuReservation').setValidators([
-          ...getNumericValidatorsArray(false),
-          Validators.max(cpu['unreservedForPool'])
-        ]);
+        // validates the name of the group and drsStatus
+        this.validateVMGroupsNameAndDrs(this.vmsGroups, drsStatus);
 
-        // set max limit validator for memory unreservedForPool
-        this.form.get('memoryReservation').setValidators([
-          ...getNumericValidatorsArray(false),
-          Validators.max(memory['unreservedForPool'])
-        ]);
+        if (this.inAdvancedMode) {
+          // set max limit validator for endpointMemory
+          this.form.get('endpointMemory').setValidators([
+            ...getNumericValidatorsArray(false),
+            Validators.max(memory['maxUsage'])
+          ]);
 
-        // This prevents the next button from getting disabled when the user selects a host or cluster that has less RAM
-        // available for VM endpoint than the default value. As a solution, we set the smaller value between the default
-        // value and memory['maxUsage']
-        this.form.get('endpointMemory').setValue(Math.min(memory['maxUsage'], endpointMemoryDefaultValue) + '');
-      } else {
-        this.form.get('endpointMemory').setValidators([]);
-        this.form.get('cpuReservation').setValidators([]);
-        this.form.get('memoryReservation').setValidators([]);
-      }
+          // set max limit validator for cpu unreservedForPool
+          this.form.get('cpuReservation').setValidators([
+            ...getNumericValidatorsArray(false),
+            Validators.max(cpu['unreservedForPool'])
+          ]);
 
-      this.form.get('cpuLimit').updateValueAndValidity();
-      this.form.get('memoryLimit').updateValueAndValidity();
-      this.form.get('endpointMemory').updateValueAndValidity();
-      this.form.get('cpuReservation').updateValueAndValidity();
-      this.form.get('memoryReservation').updateValueAndValidity();
-    });
+          // set max limit validator for memory unreservedForPool
+          this.form.get('memoryReservation').setValidators([
+            ...getNumericValidatorsArray(false),
+            Validators.max(memory['unreservedForPool'])
+          ]);
+
+          // This prevents the next button from getting disabled when the user selects a host or cluster that has less RAM
+          // available for VM endpoint than the default value. As a solution, we set the smaller value between the default
+          // value and memory['maxUsage']
+          this.form.get('endpointMemory').setValue(Math.min(memory['maxUsage'], endpointMemoryDefaultValue) + '', { emitEvent: false });
+        } else {
+          this.form.get('endpointMemory').setValidators([]);
+          this.form.get('cpuReservation').setValidators([]);
+          this.form.get('memoryReservation').setValidators([]);
+        }
+
+        this.form.get('cpuLimit').updateValueAndValidity();
+        this.form.get('memoryLimit').updateValueAndValidity();
+        this.form.get('endpointMemory').updateValueAndValidity();
+        this.form.get('cpuReservation').updateValueAndValidity();
+        this.form.get('memoryReservation').updateValueAndValidity();
+      });
+  }
+
+  /**
+   * Validates if there is a group on the selectedResource with the same name as the VCH. Group name is valid if there is either not a group
+   * or if there is a group and that group does not contain a name matching the current vch name.
+   */
+  private validateVMGroupsNameAndDrs(groups: any[], drsStatus: boolean) {
+    const clusterGroups = 'ClusterComputeResource/configurationEx/group';
+    this.vmGroupNameIsValid = !groups[clusterGroups] ||
+      (groups[clusterGroups] && !groups[clusterGroups]
+        .some(group => group['name'] === this._currentVchName));
+
+    this.isClusterDrsEnabled = drsStatus;
+
+    if (!this.vmGroupNameIsValid || !this.isClusterDrsEnabled) {
+      this.form.controls['vmHostAffinity'].setValue(false);
+    }
   }
 
   get selectedComputeResource() {
@@ -273,6 +323,7 @@ export class ComputeCapacityComponent implements OnInit {
         results['memoryShares'] = this.form.get('memoryShares').value;
         results['endpointCpu'] = this.form.get('endpointCpu').value;
         results['endpointMemory'] = this.form.get('endpointMemory').value;
+        results['vmHostAffinity'] = this.form.get('vmHostAffinity').value;
       }
       return Observable.of({ computeCapacity: results });
     }

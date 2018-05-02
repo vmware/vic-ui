@@ -412,5 +412,64 @@
       <span>MB</span>
 
     </div>
+
+    <!-- VM-Host Affinity -->
+    <ng-container *ngIf="selectedResourceIsCluster">
+      <div class="form-group row">
+        <div class="col-xs-4">
+          <label for="vm-host-affinity" class="affinity-label">
+            {{ i18n.translate('vch.computeCapacity.vmHostAffinity.title') }}
+          </label>
+        </div>
+        <div class="col-xs-8">
+            <div class="checkbox">
+              <input type="checkbox" id="vm-host-affinity" formControlName="vmHostAffinity"
+                   [attr.disabled]="(!vmGroupNameIsValid || !isClusterDrsEnabled) ? '' : null">
+              <label class="text-nowrap"
+                     [ngClass]="{'affinity-disabled': (!vmGroupNameIsValid || !isClusterDrsEnabled)}"
+                     for="vm-host-affinity">
+                {{ i18n.translate('vch.computeCapacity.vmHostAffinity.label') }}
+              </label>
+              <span class="affinity-help">
+                <clr-signpost>
+                  <clr-signpost-content [clrPosition]="'top-left'" *clrIfOpen>
+                  <span>
+                    {{ i18n.translate('vch.computeCapacity.vmHostAffinity.info') }}
+                  </span>
+                  </clr-signpost-content>
+                </clr-signpost>
+              </span>
+
+              <div class="affinity-alerts" *ngIf="(!isClusterDrsEnabled || !vmGroupNameIsValid)">
+                <div class="row">
+                  <div class="col-xs-1">
+                    <div class="alert-icon-wrapper">
+                      <clr-icon class="alert-icon" shape="info-circle"></clr-icon>
+                    </div>
+                  </div>
+                  <div class="col-xs-11">
+                    <div class="alert-items">
+                      <div class="alert-item static" *ngIf="!vmGroupNameIsValid">
+                        <div class="alert-text">
+                          {{ i18n.translate('vch.computeCapacity.vmHostAffinity.groupNameError') }}
+                        </div>
+                      </div>
+                      <div class="alert-item static" *ngIf="!isClusterDrsEnabled">
+                        <div class="alert-text">
+                          {{ i18n.translate('vch.computeCapacity.vmHostAffinity.drsError') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+        </div>
+      </div>
+
+    </ng-container>
+    <!-- end -> VM-Host Affinity -->
+
   </section>
 </form>

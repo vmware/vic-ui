@@ -57,6 +57,27 @@ export class CreateVchWizardService {
         this.getUserSession();
     }
 
+    getClusterConfiguration(objRef: string): Observable<any[]> {
+      const url = `/ui/data/properties/${objRef}?properties=configuration`;
+      return this.http.get(url)
+        .catch(e => Observable.throw(e))
+        .map(response => response.json());
+    }
+
+    getClusterDrsStatus(objRef: string): Observable<boolean> {
+      return this.getClusterConfiguration(objRef)
+        .map(response => {
+          return response['configuration']['drsConfig']['enabled'];
+        })
+    }
+
+    getClusterVMGroups(objRef: string): Observable<any[]> {
+      const url = `/ui/data/properties/${objRef}?properties=ClusterComputeResource/configurationEx/group`;
+      return this.http.get(url)
+        .catch(e => Observable.throw(e))
+        .map(response => response.json());
+    }
+
     getUserSession() {
         const webPlatform = <any>this.globalsService.getWebPlatform();
         if (typeof webPlatform.getUserSession === 'function') {
