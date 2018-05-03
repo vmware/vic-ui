@@ -289,4 +289,36 @@
             </propertyConditions>
       </metadata>
    </extension>
+
+    <extension id="com.vmware.vic.vchConfigureView">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>Virtual Container Host</name>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/build-dev/index.html?view=configure-vch-view</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+        <metadata>
+            <objectType>VirtualMachine</objectType>
+            <propertyConditions>
+                <com.vmware.data.query.CompositeConstraint>
+                    <nestedConstraints>
+                        <com.vmware.data.query.PropertyConstraint>
+                            <propertyName>isVCH</propertyName>
+                            <comparator>EQUALS</comparator>
+                            <comparableValue>
+                                <Boolean>true</Boolean>
+                            </comparableValue>
+                        </com.vmware.data.query.PropertyConstraint>
+                    </nestedConstraints>
+                    <conjoiner>AND</conjoiner>
+                </com.vmware.data.query.CompositeConstraint>
+            </propertyConditions>
+        </metadata>
+    </extension>
+
 </plugin>

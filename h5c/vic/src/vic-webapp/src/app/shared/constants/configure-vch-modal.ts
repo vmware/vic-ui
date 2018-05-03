@@ -1,5 +1,5 @@
 /*
- Copyright 2017 VMware, Inc. All Rights Reserved.
+ Copyright 2018 VMware, Inc. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+import {environment} from '../../../environments/environment';
 
-export * from './resources.path';
-export * from './portlets.text';
-export * from './vicvms';
-export * from './create-vch-wizard';
-export * from './configure-vch-modal';
-export * from './delete-vch-modal';
-export * from './nodetype';
+export const CONFIGURE_VCH_MODAL_URL =
+  `/ui/vic/resources/${environment.production ? 'dist' : 'build-dev'}/index.html?view=configure-vch-modal`;
+export const CONFIGURE_VCH_MODAL_WIDTH = 800;
+export const CONFIGURE_VCH_MODAL_HEIGHT = 600;

@@ -1,7 +1,5 @@
-import 'rxjs/add/observable/timer';
-
 /*
- Copyright 2017 VMware, Inc. All Rights Reserved.
+ Copyright 2018 VMware, Inc. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,58 +13,28 @@ import 'rxjs/add/observable/timer';
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ipOrFqdnPattern, numberPattern, supportedCharsPattern } from '../../shared/utils/validators';
-
-import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { Observable } from 'rxjs/Observable';
-import { VIC_APPLIANCE_PORT } from '../../shared/constants/create-vch-wizard';
+import {Component, ViewChild} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/timer';
+import {CreateVchWizardService} from '../create-vch-wizard.service';
+import {VchGeneralModel, VchGeneralComponent} from '../../shared/components/vch-general.component';
 
 @Component({
   selector: 'vic-vch-creation-general',
   templateUrl: './general.html',
   styleUrls: ['./general.scss']
 })
-export class VchCreationWizardGeneralComponent implements OnInit {
-  public form: FormGroup;
-  public vicApplianceIp: string;
+export class VchCreationWizardGeneralComponent {
+  model: VchGeneralModel = {
+    name: 'virtual-container-host',
+    containerNameConvention: '',
+    debug: 0,
+    syslogAddress: ''
+  };
+  vicApplianceIp: string;
+  @ViewChild('component') component: VchGeneralComponent;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private createWzService: CreateVchWizardService
-  ) {
-    this.form = formBuilder.group({
-      name: [
-        'virtual-container-host',
-        [
-          Validators.required,
-          Validators.maxLength(80),
-          Validators.pattern(supportedCharsPattern)
-        ]
-      ],
-      containerNameConventionPrefix: '',
-      containerNameConvention: '{name}',
-      containerNameConventionPostfix: '',
-      debug: '0',
-      syslogTransport: 'tcp',
-      syslogHost: [
-        '',
-        [
-          Validators.pattern(ipOrFqdnPattern)
-        ]
-      ],
-      syslogPort: [
-        '',
-        [
-          Validators.maxLength(5),
-          Validators.pattern(numberPattern)
-        ]
-      ]
-    });
-  }
-
-  ngOnInit() { }
+  constructor(private createWzService: CreateVchWizardService) { }
 
   onPageLoad() { }
 
@@ -78,52 +46,29 @@ export class VchCreationWizardGeneralComponent implements OnInit {
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    return Observable.zip(
-      this.createWzService.getVicApplianceIp(),
-      this.createWzService.checkVchNameUniqueness(this.form.get('name').value)
-    )
-    .catch(err => {
-      // if any failure occurrs, unset the vicApplianceIp var
-      this.vicApplianceIp = null;
-      return Observable.throw(err);
-    })
-    .switchMap((arr) => {
-      this.vicApplianceIp = arr[0];
+    return Observable
+      .zip(
+        this.createWzService.getVicApplianceIp(),
+        this.createWzService.checkVchNameUniqueness(this.component.form.get('name').value)
+      )
+      .catch(err => {
+        // if any failure occurrs, unset the vicApplianceIp var
+        this.vicApplianceIp = null;
+        return Observable.throw(err);
+      })
+      .switchMap((arr) => {
+        this.vicApplianceIp = arr[0];
 
-      const isUnique = arr[1];
-      if (!isUnique) {
-          this.form.get('name').setErrors({
+        const isUnique = arr[1];
+        if (!isUnique) {
+          this.component.form.get('name').setErrors({
             resourcePoolExists: true
           });
           return Observable.throw(
             ['There is already a VirtualApp or ResourcePool that exists with the same name']);
         }
 
-        const results = {
-          general: {
-            name: this.form.get('name').value,
-            debug: this.form.get('debug').value
-          }
-        };
-
-        const containerNameConventionPrefixValue = this.form.get('containerNameConventionPrefix').value;
-        const containerNameConventionValue = this.form.get('containerNameConvention').value;
-        const containerNameConventionPostfixValue = this.form.get('containerNameConventionPostfix').value;
-
-        if (containerNameConventionPrefixValue.trim() || containerNameConventionPostfixValue.trim()) {
-          results['general']['containerNameConvention'] =
-            containerNameConventionPrefixValue + containerNameConventionValue + containerNameConventionPostfixValue;
-        }
-
-        const syslogTransportValue = this.form.get('syslogTransport').value;
-        const syslogHostValue = this.form.get('syslogHost').value;
-        const syslogPortValue = this.form.get('syslogPort').value;
-
-        if (syslogHostValue && syslogPortValue) {
-          results['general']['syslogAddress'] = `${syslogTransportValue}://${syslogHostValue}:${syslogPortValue}`;
-        }
-
-        return Observable.of(results);
-    });
+        return Observable.of({general: this.component.model});
+      });
   }
 }
