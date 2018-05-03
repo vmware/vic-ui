@@ -27,6 +27,34 @@ const appRoutes: Routes = [
     { path: 'vch-view', loadChildren: './vch-view/vch-view.module#VicVchViewModule' },
     { path: 'container-view', loadChildren: './container-view/container-view.module#VicContainerViewModule' },
     { path: 'create-vch', loadChildren: './create-vch-wizard/create-vch-wizard.module#CreateVchWizardModule' },
+    {
+      path: 'configure-vch-view-general',
+      loadChildren: './configure/configure-vch-view/general/configure-vch-view-general.module#ConfigureVchViewGeneralModule'
+    },
+    {
+      path: 'configure-vch-view-compute',
+      loadChildren: './configure/configure-vch-view/compute/configure-vch-view-compute.module#ConfigureVchViewComputeModule'
+    },
+    {
+      path: 'configure-vch-view-network',
+      loadChildren: './configure/configure-vch-view/network/configure-vch-view-network.module#ConfigureVchViewNetworkModule'
+    },
+    {
+      path: 'configure-vch-view-operations',
+      loadChildren: './configure/configure-vch-view/operations/configure-vch-view-operations.module#ConfigureVchViewOperationsModule'
+    },
+    {
+      path: 'configure-vch-view-registry',
+      loadChildren: './configure/configure-vch-view/registry/configure-vch-view-registry.module#ConfigureVchViewRegistryModule'
+    },
+    {
+      path: 'configure-vch-view-security',
+      loadChildren: './configure/configure-vch-view/security/configure-vch-view-security.module#ConfigureVchViewSecurityModule'
+    },
+    {
+      path: 'configure-vch-view-storage',
+      loadChildren: './configure/configure-vch-view/storage/configure-vch-view-storage.module#ConfigureVchViewStorageModule'
+    },
     { path: 'delete-vch', loadChildren: './delete-vch-modal/delete-vch-modal.module#DeleteVchModalModule' },
     { path: 'ui-actions', loadChildren: './ui-actions/ui-actions.module#UiActionsModule' }
 ];
