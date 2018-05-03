@@ -1,9 +1,9 @@
 <!-- Copyright 2017-2018 VMware, Inc. All Rights Reserved. -->
-      <!-- cluster and clusterhostsystems -->
-      <clr-tree-node *ngFor="let cluster of clusters"
-                     [clrLoading]="loading">
-        <button #btnEl class="clr-treenode-link cc-resource"
-                *ngIf="!cluster.isEmpty"
+<!-- cluster and clusterhostsystems -->
+  <ng-container *ngFor="let cluster of clusters">
+      <clr-tree-node *ngIf="!cluster.isEmpty" [clrLoading]="loading">
+        <button #btnEl
+                class="clr-treenode-link cc-resource"
                 (click)="selectResource($event, cluster)">
           <clr-icon shape="cluster"></clr-icon>
           {{ cluster['text'] }}
@@ -20,12 +20,13 @@
           </ng-container>
         </ng-template>
       </clr-tree-node>
+  </ng-container>
 
-      <!-- standalone hosts -->
-      <clr-tree-node *ngFor="let host of standaloneHosts">
-        <button #btnEl class="clr-treenode-link cc-resource"
-                (click)="selectResource($event, host)">
-          <clr-icon shape="host"></clr-icon>
-          {{ host['text'] }}
-        </button>
-      </clr-tree-node>
+  <!-- standalone hosts -->
+  <clr-tree-node *ngFor="let host of standaloneHosts">
+    <button #btnEl class="clr-treenode-link cc-resource"
+            (click)="selectResource($event, host)">
+      <clr-icon shape="host"></clr-icon>
+      {{ host['text'] }}
+    </button>
+  </clr-tree-node>

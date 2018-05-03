@@ -23,23 +23,24 @@
                 {{ serverInfo['name'] }}
             </button>
             <ng-template [clrIfExpanded]="true">
-              <clr-tree-node class="form-control"
-                           [class.invalid]="form.invalid && form.getError('invalidComputeResource')"
-                           [clrLoading]="isTreeLoading"
-                           *ngFor="let dc of datacenter">
-                  <button class="clr-treenode-link"
-                          *ngIf="dc.objRef.indexOf(serverInfo.serviceGuid) > -1">
-                    <clr-icon shape="building"></clr-icon>
-                    {{ dc.text }}
-                  </button>
-                  <ng-template [clrIfExpanded]="true">
-                    <vic-compute-resource-treenode #crTreenode
-                                                    [serverInfo]="serverInfo"
-                                                    [datacenter]="dc"
-                                                    (resourceSelected)="selectComputeResource($event)">
-                    </vic-compute-resource-treenode>
-                  </ng-template>
-              </clr-tree-node>
+              <ng-container *ngFor="let dc of datacenter">
+                <clr-tree-node class="form-control"
+                               [class.invalid]="form.invalid && form.getError('invalidComputeResource')"
+                               [clrLoading]="isTreeLoading"
+                               *ngIf="dc.objRef.indexOf(serverInfo.serviceGuid) > -1">
+                    <button class="clr-treenode-link">
+                      <clr-icon shape="building"></clr-icon>
+                      {{ dc.text }}
+                    </button>
+                    <ng-template [clrIfExpanded]="true">
+                      <vic-compute-resource-treenode #crTreenode
+                                                      [serverInfo]="serverInfo"
+                                                      [datacenter]="dc"
+                                                      (resourceSelected)="selectComputeResource($event)">
+                      </vic-compute-resource-treenode>
+                    </ng-template>
+                </clr-tree-node>
+              </ng-container>
             </ng-template>
           </clr-tree-node>
         </ng-container>
