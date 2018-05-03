@@ -63,10 +63,13 @@ public class ThumbprintTrustManager implements javax.net.ssl.TrustManager, javax
    public static void checkThumbprint(String thumbprint) throws CertificateException {
 	   synchronized(ThumbprintTrustManager.class) {
 		   if (_thumbprints.contains(thumbprint)) {
+			   _logger.info("expected one of this thumbprints: " +_thumbprints + "\n" + "actual thumbprint: " + "["+thumbprint+"]" 
+					   + "...thumbprints matching ok!");
 			   return;
 		   }
 		   
-		   _logger.error("Server certificate chain is not trusted " + "and thumbprint doesn't match");
+		   _logger.error("Server certificate chain is not trusted " + "and thumbprint doesn't match\n" + "expected one " + "of this "
+				   + _thumbprints + "\n" + "actual: " + "["+ thumbprint +"]" + "...matching failed!!");
 		   throw new CertificateException("Server certificate chain is not trusted " + "and thumbprint doesn't match");
 	   }
    }
