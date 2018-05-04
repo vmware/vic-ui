@@ -289,4 +289,142 @@
             </propertyConditions>
       </metadata>
    </extension>
+
+    <!-- VCH VM Configure Left Nav Category -->
+    <extension id="com.vmware.vic.vchConfigureCategory">
+        <extendedPoint>vsphere.core.vm.manageCategories</extendedPoint>
+        <object>
+            <label>Virtual Container Host</label>
+        </object>
+        <metadata>
+            <objectType>VirtualMachine</objectType>
+            <propertyConditions>
+                <com.vmware.data.query.CompositeConstraint>
+                    <nestedConstraints>
+                        <com.vmware.data.query.PropertyConstraint>
+                            <propertyName>isVCH</propertyName>
+                            <comparator>EQUALS</comparator>
+                            <comparableValue>
+                                <Boolean>true</Boolean>
+                            </comparableValue>
+                        </com.vmware.data.query.PropertyConstraint>
+                    </nestedConstraints>
+                    <conjoiner>AND</conjoiner>
+                </com.vmware.data.query.CompositeConstraint>
+            </propertyConditions>
+        </metadata>
+    </extension>
+
+    <!-- VCH VM Configure General -->
+    <extension id="com.vmware.vic.vchConfigureGeneral">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>General</name>
+            <categoryUid>com.vmware.vic.vchConfigureCategory</categoryUid>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=configure-vch-view-general</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+    </extension>
+
+    <!-- VCH VM Configure Compute -->
+    <extension id="com.vmware.vic.vchConfigureCompute">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>Compute Capacity</name>
+            <categoryUid>com.vmware.vic.vchConfigureCategory</categoryUid>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=configure-vch-view-compute</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+    </extension>
+
+    <!-- VCH VM Configure Storage -->
+    <extension id="com.vmware.vic.vchConfigureStorage">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>Storage Capacity</name>
+            <categoryUid>com.vmware.vic.vchConfigureCategory</categoryUid>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=configure-vch-view-storage</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+    </extension>
+
+    <!-- VCH VM Configure Network -->
+    <extension id="com.vmware.vic.vchConfigureNetwork">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>Network</name>
+            <categoryUid>com.vmware.vic.vchConfigureCategory</categoryUid>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=configure-vch-view-network</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+    </extension>
+
+    <!-- VCH VM Configure Security -->
+    <extension id="com.vmware.vic.vchConfigureSecurity">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>Security</name>
+            <categoryUid>com.vmware.vic.vchConfigureCategory</categoryUid>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=configure-vch-view-security</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+    </extension>
+
+    <!-- VCH VM Configure Registry -->
+    <extension id="com.vmware.vic.vchConfigureRegistry">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>Registry Access</name>
+            <categoryUid>com.vmware.vic.vchConfigureCategory</categoryUid>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=configure-vch-view-registry</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+    </extension>
+
+    <!-- VCH VM Configure User -->
+    <extension id="com.vmware.vic.vchConfigureOperations">
+        <extendedPoint>vsphere.core.vm.manageViews</extendedPoint>
+        <object>
+            <name>Operations User</name>
+            <categoryUid>com.vmware.vic.vchConfigureCategory</categoryUid>
+            <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+                <object>
+                    <root>
+                        <url>/vsphere-client/vic/resources/dist/index.html?view=configure-vch-view-operations</url>
+                    </root>
+                </object>
+            </componentClass>
+        </object>
+    </extension>
+
 </plugin>
