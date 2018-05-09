@@ -18,22 +18,40 @@ import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {ClarityModule} from '@clr/angular';
 import {ConfigureVchViewComputeComponent} from './configure-vch-view-compute.component';
+import {ConfigureVchService} from '../../configure-vch.service';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {ReactiveFormsModule} from '@angular/forms';
+import {SharedModule} from '../../../shared/shared.module';
+import {ConfigureVchViewContainerModule} from '../configure-vch-view-container.module';
 
 const routes: Routes = [
   {path: '', component: ConfigureVchViewComputeComponent},
   {path: ':id', component: ConfigureVchViewComputeComponent}
 ];
 
+const declarations = [
+  ConfigureVchViewComputeComponent
+];
+
 @NgModule({
   imports: [
+    ReactiveFormsModule,
     CommonModule,
     ClarityModule,
-    RouterModule.forChild(routes)
+    SharedModule,
+    RouterModule.forChild(routes),
+    ConfigureVchViewContainerModule
   ],
   declarations: [
-    ConfigureVchViewComputeComponent
+    ...declarations
   ],
-  exports: [ConfigureVchViewComputeComponent]
+  exports: [
+    ...declarations
+  ],
+  providers: [
+    ConfigureVchService,
+    CreateVchWizardService
+  ]
 })
 export class ConfigureVchViewComputeModule {
 }

@@ -1,0 +1,19 @@
+<div class="configure-view-wrapper">
+  <div class="row configure-view-header">
+    <div class="col-xs-6 left configure-view-header-title">
+      <h3>{{title}}</h3>
+    </div>
+    <div class="col-xs-6 right configure-view-header-button">
+      <button class="btn btn-sm btn-outline"
+              (click)="launchVchConfigureModal()"
+              type="button">
+        Edit...
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

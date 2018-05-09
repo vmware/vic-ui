@@ -1,5 +1,5 @@
 /*
- Copyright 2017 VMware, Inc. All Rights Reserved.
+ Copyright 2018 VMware, Inc. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
  limitations under the License.
 */
 
-export * from './resources.path';
-export * from './portlets.text';
-export * from './vicvms';
-export * from './create-vch-wizard';
-export * from './configure-vch-modal';
-export * from './delete-vch-modal';
-export * from './nodetype';
+.configure-view-wrapper {
+  padding: 20px;
+}
+
+.configure-view-header-title h3 {
+  margin-top: .25rem;
+}
+
+.configure-view-header-button {
+  text-align: right;
+}

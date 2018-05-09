@@ -27,6 +27,8 @@ const appRoutes: Routes = [
     { path: 'vch-view', loadChildren: './vch-view/vch-view.module#VicVchViewModule' },
     { path: 'container-view', loadChildren: './container-view/container-view.module#VicContainerViewModule' },
     { path: 'create-vch', loadChildren: './create-vch-wizard/create-vch-wizard.module#CreateVchWizardModule' },
+    { path: 'delete-vch', loadChildren: './delete-vch-modal/delete-vch-modal.module#DeleteVchModalModule' },
+    { path: 'ui-actions', loadChildren: './ui-actions/ui-actions.module#UiActionsModule' },
     {
       path: 'configure-vch-view-general',
       loadChildren: './configure/configure-vch-view/general/configure-vch-view-general.module#ConfigureVchViewGeneralModule'
@@ -55,8 +57,14 @@ const appRoutes: Routes = [
       path: 'configure-vch-view-storage',
       loadChildren: './configure/configure-vch-view/storage/configure-vch-view-storage.module#ConfigureVchViewStorageModule'
     },
-    { path: 'delete-vch', loadChildren: './delete-vch-modal/delete-vch-modal.module#DeleteVchModalModule' },
-    { path: 'ui-actions', loadChildren: './ui-actions/ui-actions.module#UiActionsModule' }
+    {
+      path: 'configure-vch-modal-general',
+      loadChildren: './configure/configure-vch-modal/general/configure-vch-modal-general.module#ConfigureVchModalGeneralModule'
+    },
+    {
+      path: 'configure-vch-modal-compute',
+      loadChildren: './configure/configure-vch-modal/compute/configure-vch-modal-compute.module#ConfigureVchModalComputeModule'
+    }
 ];
 
 export const extensionToRoutes = {};
