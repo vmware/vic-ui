@@ -23,8 +23,10 @@ import { Observable } from 'rxjs/Observable';
 import { RefreshService } from 'app/shared';
 import { VIC_APPLIANCE_PORT } from '../shared/constants';
 import { Wizard } from '@clr/angular';
-import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
+import {VchComputeComponent} from '../shared/components/vch-compute/vch-compute.component';
+import {processPayloadFromUiToApi} from '../shared/utils/vch/vch-utils';
+import {resizeModalToParentFrame} from '../shared/utils/modal-resize';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -33,7 +35,7 @@ import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
 })
 export class CreateVchWizardComponent implements OnInit {
   @ViewChild('wizardlg') wizard: Wizard;
-  @ViewChild('computeCapacityStep') computeCapacity: ComputeCapacityComponent;
+  @ViewChild('computeCapacityStep') computeCapacity: VchComputeComponent;
   public loading = false;
   public errorFlag = false;
   public errorMsgs: string[];
@@ -66,41 +68,7 @@ export class CreateVchWizardComponent implements OnInit {
    * with the H5 Client properly through WEB_PLATFORM.openModalDialog()
    */
   resizeToParentFrame(p: Window = parent) {
-    // "context error" warning shows up during unit tests (but they still pass).
-    // this can be avoided by running the logic a tick later
-    setTimeout(() => {
-      const clrModalEl = p.document.querySelector('clr-modal');
-      // resize only if the parent modal is there. this prevents the unit tests from failing
-      if (clrModalEl === null) {
-        return;
-      }
-      const pluginIframeEl = <HTMLElement>clrModalEl.querySelector('plugin-iframe');
-      const targetIframeEl = <HTMLElement>clrModalEl.querySelector('iframe');
-      const modalContentEl = <HTMLElement>clrModalEl.querySelector('.modal-content');
-      const modalHeaderEl = <HTMLElement>clrModalEl.querySelector('.modal-header');
-      const modalBodyEl = <HTMLElement>clrModalEl.querySelector('.modal-body');
-      const modalDialogEl = <HTMLElement>clrModalEl.querySelector('.modal-dialog');
-
-      if (modalHeaderEl !== null) {
-        modalHeaderEl.parentNode.removeChild(modalHeaderEl);
-      }
-
-      this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
-      this.renderer.setElementStyle(modalBodyEl, 'height', '75vh');
-      this.renderer.setElementStyle(modalBodyEl, 'max-height', '75vh');
-      this.renderer.setElementStyle(targetIframeEl, 'width', '100%');
-      this.renderer.setElementStyle(targetIframeEl, 'height', '100%');
-      // wrapper element that encapsulates iframe tag
-      // available from 6.5u1
-      if (pluginIframeEl !== null) {
-        this.renderer.setElementStyle(pluginIframeEl, 'height', '100%');
-      }
-      this.renderer.setElementStyle(
-        this.elRef.nativeElement.querySelector('clr-wizard'),
-        'height',
-        '100vh'
-      );
-    });
+    return resizeModalToParentFrame(this.renderer, this.elRef, '75vh', p);
   }
 
   /**
@@ -154,7 +122,6 @@ export class CreateVchWizardComponent implements OnInit {
         ).subscribe(([cloneTicket, payload, applianceIp]) => {
 
         if (payload) {
-
           this.errorFlag = false;
           this.loading = true;
 
@@ -166,7 +133,7 @@ export class CreateVchWizardComponent implements OnInit {
               (this.computeCapacity.dcId ? '/datacenter/' + this.computeCapacity.dcId : '') +
               '/vch?' + 'thumbprint=' + payload.security.thumbprint;
 
-              const body = this.processPayload(payload);
+              const body = processPayloadFromUiToApi(payload);
 
               const options  = new RequestOptions({ headers: new Headers({
                   'Content-Type': 'application/json',
@@ -220,300 +187,4 @@ export class CreateVchWizardComponent implements OnInit {
     return this._cachedData;
   }
 
-  /**
-   * Transform wizard payload before sending it to vic-machine-service API
-   */
-  processPayload(payload) {
-
-    const processedPayload = {
-      'name': payload.general.name,
-      'compute': {
-        'cpu': {
-          'limit': {
-            // TODO: use selected unit from payload once units selectors are implemented
-            'units': 'MHz',
-            'value': parseInt(payload.computeCapacity.cpu, 10)
-          }
-        },
-        'memory': {
-          'limit': {
-            'units': 'MiB',
-            'value': parseInt(payload.computeCapacity.memory, 10)
-          }
-        },
-        'resource': {
-          'name': payload.computeCapacity.computeResource
-        }
-      },
-      'storage': {
-        'image_stores': [
-          payload.storageCapacity.imageStore + (payload.storageCapacity.fileFolder || '')
-        ],
-        'base_image_size': {
-          'units': payload.storageCapacity.baseImageSizeUnit,
-          'value': parseInt(payload.storageCapacity.baseImageSize, 10)
-        }
-      },
-      'network': {
-        'bridge': {
-          'ip_range': payload.networks.bridgeNetworkRange,
-          'port_group': {'name': payload.networks.bridgeNetwork}
-        },
-        'public': {
-          'port_group': {'name': payload.networks.publicNetwork}
-        }
-      },
-      'auth': {},
-      'container': {}
-    };
-
-    // General ---------------------------------------------------------------------------------------------------------
-
-    // TODO: add vch vm name template
-
-    if (payload.general.debug) {
-      processedPayload['debug'] = parseInt(payload.general.debug, 10);
-    }
-
-    if (payload.general.syslogAddress) {
-      processedPayload['syslog_addr'] = payload.general.syslogAddress;
-    }
-
-    if (payload.general.containerNameConvention) {
-      processedPayload.container['name_convention'] = payload.general.containerNameConvention;
-    }
-
-    // Compute ---------------------------------------------------------------------------------------------------------
-
-    if (payload.computeCapacity.cpuReservation) {
-      processedPayload.compute.cpu['reservation'] = {
-        units: 'MHz',
-        value: parseInt(payload.computeCapacity.cpuReservation, 10)
-      };
-      processedPayload.compute.cpu['shares'] = {
-        level: payload.computeCapacity.cpuShares
-      };
-      processedPayload.compute.memory['reservation'] = {
-        units: 'MiB',
-        value: parseInt(payload.computeCapacity.memoryReservation, 10)
-      };
-      processedPayload.compute.memory['shares'] = {
-        level: payload.computeCapacity.memoryShares
-      };
-    }
-
-    // Endpoint --------------------------------------------------------------------------------------------------------
-
-    processedPayload['endpoint'] = {
-      operations_credentials: {
-        user: payload.operations.opsUser,
-        password: payload.operations.opsPassword
-      }
-    };
-
-    if (payload.operations.opsGrantPerms) {
-      processedPayload['endpoint']['operations_credentials']['grant_permissions'] = payload.operations.opsGrantPerms;
-    }
-
-    if (payload.computeCapacity.endpointCpu) {
-      processedPayload['endpoint']['cpu'] = {
-        sockets: parseInt(payload.computeCapacity.endpointCpu, 10)
-      };
-
-      processedPayload['endpoint']['memory'] = {
-        units: 'MiB',
-        value: parseInt(payload.computeCapacity.endpointMemory, 10)
-      };
-    }
-
-    // Storage ---------------------------------------------------------------------------------------------------------
-
-    if (payload.storageCapacity.volumeStore.length) {
-      processedPayload.storage['volume_stores'] = payload.storageCapacity.volumeStore.map(vol => {
-        return {
-          datastore: vol.volDatastore + (vol.volFileFolder || ''),
-          label: vol.dockerVolName
-        };
-      })
-    }
-
-    // Networks --------------------------------------------------------------------------------------------------------
-
-    if (payload.networks.publicNetworkIp) {
-      processedPayload.network.public['static'] = payload.networks.publicNetworkIp;
-
-      processedPayload.network.public['gateway'] = {
-        address: payload.networks.publicNetworkGateway
-      };
-    }
-
-    if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
-      processedPayload.network.public['nameservers'] = payload.networks.dnsServer;
-    }
-
-    if (payload.networks.clientNetwork) {
-      processedPayload.network['client'] = {
-        port_group: {
-          name: payload.networks.publicNetwork
-        }
-      };
-
-      if (payload.networks.clientNetworkIp) {
-        processedPayload.network['client']['static'] = {
-          ip: payload.networks.clientNetworkIp
-        };
-
-        processedPayload.network['client']['gateway'] = {
-          address: payload.networks.clientNetworkGateway
-        };
-
-        if (payload.networks.clientNetworkRouting && payload.networks.clientNetworkRouting.length) {
-          processedPayload.network['client']['gateway']['routing_destinations'] = payload.networks.clientNetworkRouting;
-        }
-
-        if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
-          processedPayload.network['client']['nameservers'] = payload.networks.dnsServer;
-        }
-      }
-    }
-
-    if (payload.networks.managementNetwork) {
-      processedPayload.network['management'] = {
-        port_group: {
-          name: payload.networks.managementNetwork
-        }
-      };
-
-      if (payload.networks.managementNetworkIp) {
-        processedPayload.network['management']['static'] = {
-          ip: payload.networks.managementNetworkIp
-        };
-
-        processedPayload.network['management']['gateway'] = {
-          address: payload.networks.managementNetworkGateway
-        };
-
-        if (payload.networks.managementNetworkRouting && payload.networks.managementNetworkRouting.length) {
-          processedPayload.network['management']['gateway']['routing_destinations'] = payload.networks.managementNetworkRouting;
-        }
-
-        if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
-          processedPayload.network['management']['nameservers'] = payload.networks.dnsServer;
-        }
-      }
-    }
-
-    if (payload.networks.containerNetworks && payload.networks.containerNetworks.length) {
-      processedPayload.network['container'] = payload.networks.containerNetworks.map(net => {
-        const network = {
-          port_group: {
-            name: net.containerNetwork
-          }
-        };
-
-        if (net.containerNetworkDns) {
-          network['nameservers'] = [net.containerNetworkDns];
-        }
-
-        if (net.containerNetworkLabel) {
-          network['alias'] = net.containerNetworkLabel;
-        }
-
-        if (net.containerNetworkFirewall) {
-          network['firewall'] = net.containerNetworkFirewall;
-        }
-
-        if (net.containerNetworkIpRange) {
-          network['ip_ranges'] = [net.containerNetworkIpRange];
-
-          network['gateway'] = {
-            address: net.containerNetworkGateway
-          };
-        }
-
-        return network;
-      });
-    }
-
-    // Auth ------------------------------------------------------------------------------------------------------------
-
-    let auth: any;
-
-    auth = {
-      client: {},
-      server: {}
-    };
-
-    if (payload.security.noTlsverify) {
-      auth.client = {'no_tls_verify': true};
-    } else {
-      auth.client = {'certificate_authorities': payload.security['tlsCa'].map(cert => ({pem: cert.content}))};
-    }
-
-    if (payload.security.tlsCname) {
-      auth.server = {
-        generate: {
-          size: {
-            value: parseInt(payload.security.certificateKeySize, 10),
-            units: 'bit'
-          },
-          cname: payload.security.tlsCname
-        },
-      };
-
-      if (payload.security.organization) {
-        auth.server.generate['organization'] = [payload.security.organization]
-      }
-    } else if (payload.security.tlsServerCert) {
-      auth.server = {
-        certificate: {pem: payload.security.tlsServerCert.content},
-        private_key: {pem: payload.security.tlsServerKey.content}
-      }
-    } else {
-      auth.server = {
-        generate: {
-          size: {
-            value: 2048,
-            units: 'bit'
-          },
-          organization: [payload.general.name],
-          cname: payload.general.name
-        }
-      }
-    }
-
-    processedPayload['auth'] = auth;
-
-    // Registry --------------------------------------------------------------------------------------------------------
-
-    const registry: any = {};
-
-    if (payload.registry.whitelistRegistry && payload.registry.whitelistRegistry.length) {
-      registry['whitelist'] = payload.registry.whitelistRegistry;
-    }
-
-    if (payload.registry.insecureRegistry && payload.registry.insecureRegistry.length) {
-      registry['insecure'] = payload.registry.insecureRegistry;
-    }
-
-    if (payload.registry.registryCa && payload.registry.registryCa.length) {
-      registry['certificate_authorities'] = payload.registry.registryCa.map(cert => ({pem: cert.content}));
-    }
-
-    if (payload.networks.httpProxy || payload.networks.httpsProxy) {
-      registry['image_fetch_proxy'] = {};
-
-      if (payload.networks.httpProxy) {
-        registry['image_fetch_proxy']['http'] = payload.networks.httpProxy;
-      }
-
-      if (payload.networks.httpsProxy) {
-        registry['image_fetch_proxy']['https'] = payload.networks.httpsProxy;
-      }
-    }
-
-    processedPayload['registry'] = registry;
-
-    return processedPayload;
-  }
 }
