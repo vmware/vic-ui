@@ -122,67 +122,72 @@ describe('VicContainerViewComponent', () => {
         expect(rowElementsLength).toBe(10);
     }));
 
-    fit('should navigate correctly through the VCHs pages', async(() => {
-        fixture.componentInstance.ngOnInit();
-        fixture.componentInstance.reloadContainers();
-        fixture.detectChanges();
+    it('should navigate correctly through the VCHs pages', async(() => {
         let paginationText: DebugElement;
         let nextPageButton: DebugElement;
         let previousPageButton: DebugElement;
         let rowElements: DebugElement [];
-        let firstElement: DebugElement [];
+        let vchFirstRow: DebugElement [];
         let rowElementsLength = 0;
+
+        fixture.componentInstance.ngOnInit();
+        fixture.componentInstance.reloadContainers();
+        fixture.detectChanges();
         paginationText = fixture.debugElement.query(By.css('div.datagrid-foot-description'));
         nextPageButton = fixture.debugElement.query(By.css('button.pagination-next'));
 
-        // on the first page, check first element, check total of elements per page
-        firstElement = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        // cheking on the first page
+        rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+        rowElementsLength = rowElements.length;
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
 
-        expect(firstElement[0].nativeElement.textContent).toContain('Container-VM-0');
+        expect(rowElementsLength).toBe(10);
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-0');
         expect(paginationText.nativeElement.textContent).toContain('1 - 10 of 30');
 
-        // advancing to the second page, cheking first element, cheking total of elements per page
+        // advancing and checking on the second page
         nextPageButton.triggerEventHandler('click', null);
         fixture.detectChanges();
         rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
         rowElementsLength = rowElements.length;
-        firstElement = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
 
         expect(rowElementsLength).toBe(10);
-        expect(firstElement[0].nativeElement.textContent).toContain('Container-VM-10');
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-10');
         expect(paginationText.nativeElement.textContent).toContain('11 - 20 of 30');
 
-        // advancing to the third page, checking first element, checking the total of the elements per page
+        // advancing and checking on the third page
         nextPageButton.triggerEventHandler('click', null);
         fixture.detectChanges();
-        firstElement = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
         rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
         rowElementsLength = rowElements.length;
 
         expect(rowElementsLength).toBe(10);
-        expect(firstElement[0].nativeElement.textContent).toContain('Container-VM-20');
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-20');
         expect(paginationText.nativeElement.textContent).toContain('21 - 30 of 30');
 
-        // returning to the second page checking the total of the elements per page
+        // returning and checking on the second page
         previousPageButton = fixture.debugElement.query(By.css('button.pagination-previous'));
         previousPageButton.triggerEventHandler('click', null);
         fixture.detectChanges();
-        firstElement = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
         rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
         rowElementsLength = rowElements.length;
 
         expect(rowElementsLength).toBe(10);
-        expect(firstElement[0].nativeElement.textContent).toContain('Container-VM-10');
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-10');
         expect(paginationText.nativeElement.textContent).toContain('11 - 20 of 30');
 
-        // returning to the first page checking the total of the elements per page
+        // returning and checking on the first page
         previousPageButton.triggerEventHandler('click', null);
         fixture.detectChanges();
-        firstElement = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
         rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
         rowElementsLength = rowElements.length;
+
         expect(rowElementsLength).toBe(10);
-        expect(firstElement[0].nativeElement.textContent).toContain('Container-VM-0');
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-0');
         expect(paginationText.nativeElement.textContent).toContain('1 - 10 of 30');
     }));
 
