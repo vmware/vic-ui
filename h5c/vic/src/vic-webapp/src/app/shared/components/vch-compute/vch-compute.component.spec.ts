@@ -16,19 +16,22 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ClarityModule} from '@clr/angular';
-import {ComputeCapacityComponent} from './compute-capacity.component';
 import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TestScheduler} from 'rxjs/Rx';
-import { GlobalsService } from '../../shared';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {GlobalsService} from '../../globals.service';
+import {VchComputeComponent} from './vch-compute.component';
+import {CapitalizePipe} from '../../pipes/capitalize.pipe';
+import {ConfigureVchService} from '../../../configure/configure-vch.service';
+import {HttpClientModule} from '@angular/common/http';
 
 describe('ComputeCapacityComponent', () => {
 
-  let component: ComputeCapacityComponent;
-  let fixture: ComponentFixture<ComputeCapacityComponent>;
+  let component: VchComputeComponent;
+  let fixture: ComponentFixture<VchComputeComponent>;
   let service: CreateVchWizardService;
 
   const MaxLimit = 4096;
@@ -43,9 +46,11 @@ describe('ComputeCapacityComponent', () => {
       imports: [
         ReactiveFormsModule,
         HttpModule,
+        HttpClientModule,
         ClarityModule
       ],
       providers: [
+        ConfigureVchService,
         {
           provide: CreateVchWizardService,
           useValue: {
@@ -100,14 +105,15 @@ describe('ComputeCapacityComponent', () => {
         }
       ],
       declarations: [
-        ComputeCapacityComponent,
-        ComputeResourceTreenodeComponent
+        VchComputeComponent,
+        ComputeResourceTreenodeComponent,
+        CapitalizePipe
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ComputeCapacityComponent);
+    fixture = TestBed.createComponent(VchComputeComponent);
     component = fixture.componentInstance;
 
     spyOn(component, 'onPageLoad').and.callFake(() => {
