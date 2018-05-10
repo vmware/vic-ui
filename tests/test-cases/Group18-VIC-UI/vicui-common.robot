@@ -329,7 +329,7 @@ Prepare VIC Engine Binaries
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
 
 Open SSH Connection
-  [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
+  [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=4 minutes  ${retry_interval}=12 seconds
   Open Connection  ${host}  port=${port}
   Wait until keyword succeeds  ${retry}  ${retry_interval}  Login  ${user}  ${pass}
 
@@ -452,7 +452,7 @@ Configure Vcsa
 
     # create a distributed switch
     Log To Console  Create a distributed switch
-    ${out}=  Run  govc dvs.create -dc=Datacenter test-ds
+    ${out}=  Run  govc dvs.create -dc=Datacenter -product-version 6.5.0 test-ds
     Should Contain  ${out}  OK
 
     # make four port groups
