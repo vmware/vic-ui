@@ -16,23 +16,37 @@
 
 import { ClarityModule } from '@clr/angular';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { NgModel } from '@angular/forms/src/directives/ng_model';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { VicOvaVerificationComponent } from './vic-ova-verification.component';
+import {VchGeneralComponent} from './components/vch-general/vch-general.component';
+import {CliCommandComponent} from './components/cli-command/cli-command.component';
+import {VchComputeComponent} from './components/vch-compute/vch-compute.component';
+import {CapitalizePipe} from './pipes/capitalize.pipe';
+import {ComputeResourceTreenodeComponent} from './components/vch-compute/compute-resource-treenode.component';
+
+const declarations = [
+  VicOvaVerificationComponent,
+  VchGeneralComponent,
+  VchComputeComponent,
+  ComputeResourceTreenodeComponent,
+  CliCommandComponent,
+  CapitalizePipe
+];
 
 @NgModule({
   imports: [
     CommonModule,
     ClarityModule.forChild(),
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [
-    VicOvaVerificationComponent
+    ...declarations
   ],
   providers: [],
   exports: [
-    VicOvaVerificationComponent
+    ...declarations
   ]
 })
 export class SharedModule {}

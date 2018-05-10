@@ -1,0 +1,16 @@
+<ng-container *ngIf="vchInfo | async as vchUIModel; else loadingContent">
+  <vic-configure-vch-modal-container [title]="'Compute Capacity'"
+                                     [helpLink]="helpLink"
+                                     [modelChangedPayload]="currentModelEmitter.asObservable()"
+                                     [vchId]="vchId">
+    <vic-vch-compute #configureContent
+                     [model]="vchUIModel.computeCapacity"
+                     (modelChanged)="modelChange($event)">
+    </vic-vch-compute>
+  </vic-configure-vch-modal-container>
+</ng-container>
+<ng-template #loadingContent>
+  <span class="spinner spinner-md">
+    Loading...
+  </span>
+</ng-template>

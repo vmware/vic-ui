@@ -15,13 +15,13 @@
 */
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ClarityModule} from '@clr/angular';
-import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
 import {Globals, GlobalsService} from '../../shared';
 import {ServerInfo} from '../../shared/vSphereClientSdkTypes';
+import {ComputeResourceTreenodeComponent} from '../../shared/components/vch-compute/compute-resource-treenode.component';
 
 describe('ComputeResourceTreenodeComponent', () => {
 
