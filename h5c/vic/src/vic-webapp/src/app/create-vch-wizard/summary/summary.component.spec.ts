@@ -15,46 +15,35 @@
 */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { By } from '@angular/platform-browser';
 import { ClarityModule } from '@clr/angular';
-import { CreateVchWizardService } from './../create-vch-wizard.service';
 import { HttpModule } from '@angular/http';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Observable } from 'rxjs/Observable';
-import { ReactiveFormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { SummaryComponent } from './summary.component';
-import { TestScheduler } from 'rxjs/Rx';
+import {CliCommandComponent} from '../../shared/components/cli-command/cli-command.component';
 
 describe('SummaryComponent', () => {
 
-  let scheduler: TestScheduler;
   let component: SummaryComponent;
   let fixture: ComponentFixture<SummaryComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        FormsModule,
         ReactiveFormsModule,
         HttpModule,
         ClarityModule,
         NoopAnimationsModule
       ],
       declarations: [
-        SummaryComponent
+        SummaryComponent,
+        CliCommandComponent
       ]
     });
   });
 
   beforeEach(() => {
-    // Set up TestScheduler to be used with Jasmine assertion
-    scheduler = new TestScheduler((a, b) => expect(a).toEqual(b));
-    const originalTimer = Observable.timer;
-
-    // Monkey-patch Observable.timer to handle its async behavior using the TestScheduler
-    spyOn(Observable, 'timer').and.callFake(
-      (initialDelay, dueTime) => originalTimer.call(this, initialDelay, dueTime, scheduler)
-    );
-
     fixture = TestBed.createComponent(SummaryComponent);
     component = fixture.componentInstance;
     component.payload = {
@@ -69,32 +58,10 @@ describe('SummaryComponent', () => {
       security: {},
       operations: {}
     };
-    // component.form.get('targetOS').setValue('windows');
     component.onPageLoad();
-  });
-
-  it('should copy cli command to clipboard', () => {
-    component.form.get('targetOS').setValue('darwin');
-    component.copyCliCommandToClipboard();
-
-    // copySucceeded is set to false or true here to show an error or success message respectively
-    expect(component.copySucceeded).not.toBe(null);
-
-    // Schedule a time lapse
-    scheduler.schedule(() => {
-      // We expect it to return to null here to remove any error/success message
-      expect(component.copySucceeded).toBe(null);
-    }, 1500, null);
-
-    // Advance in time to run the expect test inside the scheduler
-    scheduler.flush();
   });
 
   it('should be created', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should start with a valid form', () => {
-    // expect(component.form.valid).toBe(true);
   });
 });

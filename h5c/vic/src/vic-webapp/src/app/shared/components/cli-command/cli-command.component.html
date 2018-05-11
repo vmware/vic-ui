@@ -1,0 +1,52 @@
+<!-- Copy CLI -->
+<div [formGroup]="form">
+  <div class="form-group row p1 mb10 cli-row">
+    <div class="col-xs-4">
+      <label for="target-os">Copy CLI command</label>
+    </div>
+    <div class="col-xs-3">
+      <div class="select">
+        <select id="target-os" formControlName="targetOS">
+          <option value="">Select Platform</option>
+          <option value="windows">Windows</option>
+          <option value="darwin">macOS</option>
+          <option value="linux">Linux</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-xs-5">
+      <button class="btn btn-link btn-copy" [disabled]="disabled" (click)="copyCliCommand()">
+        <clr-icon shape="copy"></clr-icon>
+      </button>
+      <!--<button class="btn btn-link" [disabled]="disabled" (click)="copyCliCommand()">
+        <clr-icon class="cursor-pointer" shape="copy"></clr-icon>
+      </button>-->
+    </div>
+  </div>
+  <!-- Copy Success Indicator-->
+  <div class="form-group row mb10 copy-alert-row"
+       *ngIf="copySucceeded !== null">
+    <div class="col-xs-12">
+
+      <clr-alert [clrAlertSizeSmall]="true"
+                 [clrAlertType]="copySucceeded ? 'alert-success' : 'alert-danger'">
+        <div class="alert-item">
+          <ng-container>
+            <span class="alert-text">
+              {{ copySucceeded ? 'Successfully copied to clipboard' : 'Could not copy to clipboard!' }}
+            </span>
+          </ng-container>
+
+        </div>
+      </clr-alert>
+    </div>
+  </div>
+  <!-- CLI Textarea -->
+  <div class="form-group row" *ngIf="(cliCommand | async) && showCliCommand">
+    <div class="col-xs-12">
+          <textarea id="cliCommand"
+                    readonly
+                    formControlName="cliCommand"></textarea>
+    </div>
+  </div>
+</div>

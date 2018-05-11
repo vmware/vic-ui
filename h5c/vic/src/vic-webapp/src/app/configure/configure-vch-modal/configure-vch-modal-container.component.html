@@ -1,0 +1,55 @@
+<div class="clr-wizard clr-wizard--inline">
+  <clr-modal #modal>
+    <div class="modal-title">
+      <h3>{{title}}</h3>
+      <div class="separator"></div>
+      <h6>Virtual Container Host</h6>
+      <a *ngIf="helpLink"
+         [href]="helpLink"
+         target="_blank">
+        <clr-icon shape="help" class="is-info"></clr-icon>
+      </a>
+    </div>
+
+    <div class="modal-body">
+      <div class="clr-wizard-content">
+
+        <div class="spinner" *ngIf="loading"></div>
+
+        <clr-alert *ngIf="errorFlag"
+                   [clrAlertType]="'alert-danger'"
+                   [clrAlertClosable]="false">
+          <!-- errors -->
+          <div class="alert-item">
+            <div class="alert-text" *ngFor="let errMsg of errorMsgs">
+              {{errMsg}}
+            </div>
+          </div>
+        </clr-alert>
+
+        <div class="clr-wizard-page pt-0">
+          <!-- current VCH edit component -->
+          <ng-content></ng-content>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+
+      <!-- CLI Command -->
+      <div class="wizzard-cli-container">
+        <vic-cli-command [disabled]="isCurrentContentInvalid()"
+                         [commandType]="'configure'"
+                         [showCliCommand]="false"
+                         [payload]="modelChangedPayload">
+                         <!--[payload]="currentTabModelPayload.asObservable()">-->
+        </vic-cli-command>
+      </div>
+
+      <div class="clr-wizard-footer-buttons">
+        <button class="btn btn-outline" type="button" (click)="onCancel()">Cancel</button>
+        <button class="btn btn-primary" type="button" [disabled]="isCurrentContentInvalid()" (click)="onSave()">Save</button>
+      </div>
+    </div>
+
+  </clr-modal>
+</div>

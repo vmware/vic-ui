@@ -32,8 +32,8 @@
     </div>
   </clr-alert>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="generalStep.form.invalid"
-                   clrWizardPagePreventDefault="true"
+  <clr-wizard-page clrWizardPagePreventDefault="true"
+                   [clrWizardPageNextDisabled]="!generalStep.form || generalStep.form.invalid"
                    (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(generalStep.onCommit())"
@@ -48,12 +48,13 @@
     </ng-template>
     <ng-template clrPageNavTitle>General</ng-template>
 
-    <vic-vch-creation-general #generalStep></vic-vch-creation-general>
+    <!--<vic-vch-creation-general #generalStep></vic-vch-creation-general>-->
+    <vic-vch-general #generalStep></vic-vch-general>
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="computeCapacityStep.form.invalid"
-                   clrWizardPagePreventDefault="true"
+  <clr-wizard-page clrWizardPagePreventDefault="true"
+                   [clrWizardPageNextDisabled]="!computeCapacityStep.form || computeCapacityStep.form.invalid"
                    (clrWizardPageOnLoad)="onPageLoad(computeCapacityStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(computeCapacityStep.onCommit())"
@@ -68,7 +69,8 @@
     </ng-template>
     <ng-template clrPageNavTitle>Compute Capacity</ng-template>
 
-    <vic-vch-creation-compute-capacity #computeCapacityStep [vchName]="generalStep.form.controls.name.value"></vic-vch-creation-compute-capacity>
+    <vic-vch-compute #computeCapacityStep></vic-vch-compute>
+    <!--<vic-vch-creation-compute-capacity #computeCapacityStep></vic-vch-creation-compute-capacity>-->
 
   </clr-wizard-page>
 
@@ -133,7 +135,7 @@
     </ng-template>
     <ng-template clrPageNavTitle>Security</ng-template>
 
-    <vic-vch-creation-security [vchName]="generalStep.form.get('name').value"
+    <vic-vch-creation-security [vchName]="generalStep.model?.name"
                                [datacenter]="computeCapacityStep.dcObj"
                                #securityStep>
     </vic-vch-creation-security>

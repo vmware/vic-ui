@@ -473,7 +473,7 @@ export class CreateVchWizardService {
      * Recursively queries the H5 Client for a datacenter associated with the resource
      * @param resourceObjRef
      */
-    getDatacenterForResource(resourceObjRef: string) {
+    getDatacenterForResource(resourceObjRef: string): Observable<any> {
       if (resourceObjRef.split(':')[2] === 'Datacenter') {
         return this.http.get(`/ui/data/properties/${resourceObjRef}?properties=name`)
           .catch(e => Observable.throw(e))
