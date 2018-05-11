@@ -16,19 +16,22 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ClarityModule} from '@clr/angular';
-import {ComputeCapacityComponent} from './compute-capacity.component';
-import {ComputeResourceTreenodeComponent} from './compute-resource-treenode.component';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
+import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
 import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TestScheduler} from 'rxjs/Rx';
-import {AppAlertService, GlobalsService, I18nService} from '../../shared';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {GlobalsService} from '../../globals.service';
+import {VchComputeComponent} from './vch-compute.component';
+import {CapitalizePipe} from '../../pipes/capitalize.pipe';
+import {ConfigureVchService} from '../../../configure/configure-vch.service';
+import {HttpClientModule} from '@angular/common/http';
 
 describe('ComputeCapacityComponent', () => {
 
-  let component: ComputeCapacityComponent;
-  let fixture: ComponentFixture<ComputeCapacityComponent>;
+  let component: VchComputeComponent;
+  let fixture: ComponentFixture<VchComputeComponent>;
   let service: CreateVchWizardService;
 
   const MaxLimit = 4096;
@@ -43,11 +46,11 @@ describe('ComputeCapacityComponent', () => {
       imports: [
         ReactiveFormsModule,
         HttpModule,
+        HttpClientModule,
         ClarityModule
       ],
       providers: [
-        AppAlertService,
-        I18nService,
+        ConfigureVchService,
         {
           provide: CreateVchWizardService,
           useValue: {
@@ -108,14 +111,15 @@ describe('ComputeCapacityComponent', () => {
         }
       ],
       declarations: [
-        ComputeCapacityComponent,
-        ComputeResourceTreenodeComponent
+        VchComputeComponent,
+        ComputeResourceTreenodeComponent,
+        CapitalizePipe
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ComputeCapacityComponent);
+    fixture = TestBed.createComponent(VchComputeComponent);
     component = fixture.componentInstance;
 
     spyOn(component, 'onPageLoad').and.callFake(() => {
@@ -184,8 +188,9 @@ describe('ComputeCapacityComponent', () => {
 
     // Validate result
     setDefaultRequiredValues();
+    component.updateCurrentModel();
     component.onCommit().subscribe( r => {
-      expect(r.computeCapacity.cpu).toBe('1');
+      expect(r.computeCapacity.cpuLimit).toBe('1');
     });
   });
 
@@ -219,8 +224,9 @@ describe('ComputeCapacityComponent', () => {
 
     // Validate result
     setDefaultRequiredValues();
+    component.updateCurrentModel();
     component.onCommit().subscribe( r => {
-      expect(r.computeCapacity.memory).toBe('1');
+      expect(r.computeCapacity.memoryLimit).toBe('1');
     });
   });
 
@@ -241,54 +247,4 @@ describe('ComputeCapacityComponent', () => {
     component.form.get('cpuReservation').setValue('test');
     expect(component.form.get('cpuReservation').hasError('pattern')).toBeTruthy();
   });
-
-  it('should validate if selected element is a Cluster', () => {
-    spyOn(service, 'getClusterVMGroups').and.callThrough();
-    spyOn(service, 'getClusterDrsStatus').and.callThrough();
-
-    component.toggleAdvancedMode();
-    component.selectComputeResource({datacenterObj: component.datacenter, obj: {text: 'new Cluster 1', nodeTypeId: 'DcStandaloneHost'}});
-    expect(component.selectedResourceIsCluster).toBeFalsy();
-
-    component.selectComputeResource(
-      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
-    expect(component.selectedResourceIsCluster).toBeTruthy();
-  });
-
-  it('should validate if Cluster has DRS option enabled or disabled', () => {
-    spyOn(service, 'getClusterVMGroups').and.callThrough();
-    const drsStatusSpy = spyOn(service, 'getClusterDrsStatus');
-
-    drsStatusSpy.and.returnValue(Observable.of(true));
-    component.toggleAdvancedMode();
-    component.selectComputeResource(
-      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
-    expect(component.isClusterDrsEnabled).toBeTruthy();
-
-    drsStatusSpy.and.returnValue(Observable.of(false));
-    component.toggleAdvancedMode();
-    component.selectComputeResource(
-      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
-    expect(component.isClusterDrsEnabled).toBeFalsy();
-  });
-
-  it('should validate if Cluster VM Host Group Name already exists', () => {
-    component.vchName = 'test';
-
-    spyOn(service, 'getClusterDrsStatus').and.returnValue(Observable.of(true));
-    const clusterVMGroups = spyOn(service, 'getClusterVMGroups');
-
-    clusterVMGroups.and.returnValue(Observable.of({'ClusterComputeResource/configurationEx/group': []}));
-    component.toggleAdvancedMode();
-    component.selectComputeResource(
-      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
-    expect(component.vmGroupNameIsValid).toBeTruthy();
-
-    clusterVMGroups.and.returnValue(Observable.of({'ClusterComputeResource/configurationEx/group': [{name: 'test'}]}));
-    component.toggleAdvancedMode();
-    component.selectComputeResource(
-      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
-    expect(component.vmGroupNameIsValid).toBeFalsy();
-  });
-
 });
