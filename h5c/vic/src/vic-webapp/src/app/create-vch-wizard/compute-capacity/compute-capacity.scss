@@ -20,3 +20,36 @@
     border-color: $clr-red;
   }
 }
+
+.affinity-disabled {
+  color: #ccc;
+}
+
+.affinity-label {
+  font-size: .66667rem;
+  letter-spacing: .01em;
+  font-weight: 400;
+  color: #000;
+  margin-top: 1rem;
+}
+
+.affinity-help {
+  height: 10px;
+}
+
+.affinity-help button {
+  margin-top: 0px !important;
+}
+
+.affinity-alerts .alert-icon {
+  color: #c92100;
+}
+
+.affinity-alerts .alert-items {
+  padding-left: 0px;
+  padding-top: 0px;
+}
+
+.affinity-alerts .alert-item {
+  margin-bottom: 0px;
+}

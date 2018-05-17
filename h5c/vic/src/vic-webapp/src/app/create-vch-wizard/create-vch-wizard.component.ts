@@ -154,7 +154,6 @@ export class CreateVchWizardComponent implements OnInit {
         ).subscribe(([cloneTicket, payload, applianceIp]) => {
 
         if (payload) {
-
           this.errorFlag = false;
           this.loading = true;
 
@@ -300,6 +299,9 @@ export class CreateVchWizardComponent implements OnInit {
       processedPayload.compute.memory['shares'] = {
         level: payload.computeCapacity.memoryShares
       };
+      processedPayload.compute['affinity'] = {
+        use_vm_group: payload.computeCapacity.vmHostAffinity
+      }
     }
 
     // Endpoint --------------------------------------------------------------------------------------------------------

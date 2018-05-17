@@ -68,7 +68,7 @@
     </ng-template>
     <ng-template clrPageNavTitle>Compute Capacity</ng-template>
 
-    <vic-vch-creation-compute-capacity #computeCapacityStep></vic-vch-creation-compute-capacity>
+    <vic-vch-creation-compute-capacity #computeCapacityStep [vchName]="generalStep.form.controls.name.value"></vic-vch-creation-compute-capacity>
 
   </clr-wizard-page>
 
