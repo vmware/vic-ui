@@ -23,7 +23,7 @@ import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.co
 import { ComputeResourceTreenodeComponent } from './compute-capacity/compute-resource-treenode.component';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
-import { GlobalsService } from 'app/shared';
+import { AppAlertService, GlobalsService, I18nService } from 'app/shared';
 import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { NetworksComponent } from './networks/networks.component';
@@ -52,6 +52,8 @@ describe('CreateVchWizardComponent', () => {
         BrowserAnimationsModule
       ],
       providers: [
+        I18nService,
+        AppAlertService,
         {
           provide: GlobalsService, useValue: {
             getWebPlatform: () => {
