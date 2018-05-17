@@ -17,13 +17,13 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ClarityModule} from '@clr/angular';
 import {ComputeCapacityComponent} from './compute-capacity.component';
-import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
+import {ComputeResourceTreenodeComponent} from './compute-resource-treenode.component';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TestScheduler} from 'rxjs/Rx';
-import { GlobalsService } from '../../shared';
+import {AppAlertService, GlobalsService, I18nService} from '../../shared';
 
 describe('ComputeCapacityComponent', () => {
 
@@ -46,6 +46,8 @@ describe('ComputeCapacityComponent', () => {
         ClarityModule
       ],
       providers: [
+        AppAlertService,
+        I18nService,
         {
           provide: CreateVchWizardService,
           useValue: {
@@ -77,6 +79,12 @@ describe('ComputeCapacityComponent', () => {
                 nodeTypeId: 'DcCluster',
                 aliases: ['cluster']
               }]);
+            },
+            getClusterVMGroups() {
+              return Observable.of([]);
+            },
+            getClusterDrsStatus() {
+              return Observable.of([]);
             }
           }
         },
@@ -233,4 +241,54 @@ describe('ComputeCapacityComponent', () => {
     component.form.get('cpuReservation').setValue('test');
     expect(component.form.get('cpuReservation').hasError('pattern')).toBeTruthy();
   });
+
+  it('should validate if selected element is a Cluster', () => {
+    spyOn(service, 'getClusterVMGroups').and.callThrough();
+    spyOn(service, 'getClusterDrsStatus').and.callThrough();
+
+    component.toggleAdvancedMode();
+    component.selectComputeResource({datacenterObj: component.datacenter, obj: {text: 'new Cluster 1', nodeTypeId: 'DcStandaloneHost'}});
+    expect(component.selectedResourceIsCluster).toBeFalsy();
+
+    component.selectComputeResource(
+      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
+    expect(component.selectedResourceIsCluster).toBeTruthy();
+  });
+
+  it('should validate if Cluster has DRS option enabled or disabled', () => {
+    spyOn(service, 'getClusterVMGroups').and.callThrough();
+    const drsStatusSpy = spyOn(service, 'getClusterDrsStatus');
+
+    drsStatusSpy.and.returnValue(Observable.of(true));
+    component.toggleAdvancedMode();
+    component.selectComputeResource(
+      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
+    expect(component.isClusterDrsEnabled).toBeTruthy();
+
+    drsStatusSpy.and.returnValue(Observable.of(false));
+    component.toggleAdvancedMode();
+    component.selectComputeResource(
+      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
+    expect(component.isClusterDrsEnabled).toBeFalsy();
+  });
+
+  it('should validate if Cluster VM Host Group Name already exists', () => {
+    component.vchName = 'test';
+
+    spyOn(service, 'getClusterDrsStatus').and.returnValue(Observable.of(true));
+    const clusterVMGroups = spyOn(service, 'getClusterVMGroups');
+
+    clusterVMGroups.and.returnValue(Observable.of({'ClusterComputeResource/configurationEx/group': []}));
+    component.toggleAdvancedMode();
+    component.selectComputeResource(
+      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
+    expect(component.vmGroupNameIsValid).toBeTruthy();
+
+    clusterVMGroups.and.returnValue(Observable.of({'ClusterComputeResource/configurationEx/group': [{name: 'test'}]}));
+    component.toggleAdvancedMode();
+    component.selectComputeResource(
+      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
+    expect(component.vmGroupNameIsValid).toBeFalsy();
+  });
+
 });
