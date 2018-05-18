@@ -40,6 +40,7 @@ import { VicContainerViewComponent } from './container-view.component';
 import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
 import { VicVmViewService } from '../services/vm-view.service';
 import { WS_CONTAINER } from '../shared/constants';
+import { DebugElement } from '@angular/core';
 
 let responseProperlyFormatted = true;
 
@@ -47,6 +48,7 @@ class VicVmViewServiceStub {
     private containersSubj: Subject<ContainerVm[]>;
     public containers$: Observable<ContainerVm[]>;
     private data: ContainerVm[] = [];
+    public totalContainersCount: number;
 
     constructor() {
         this.containersSubj = new Subject<ContainerVm[]>();
@@ -67,6 +69,7 @@ class VicVmViewServiceStub {
                     this.data.push(new ContainerVm(cResponse[objId]));
                 }
             }
+            this.totalContainersCount = this.data.length;
             this.containersSubj.next(this.data);
         } catch (e) {
             this.containersSubj.error('error');
@@ -116,7 +119,76 @@ describe('VicContainerViewComponent', () => {
         fixture.detectChanges();
         const rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
         const rowElementsLength = rowElements.length;
-        expect(rowElementsLength).toBe(30);
+        expect(rowElementsLength).toBe(10);
+    }));
+
+    it('should navigate correctly through the VCHs pages', async(() => {
+        let paginationText: DebugElement;
+        let nextPageButton: DebugElement;
+        let previousPageButton: DebugElement;
+        let rowElements: DebugElement [];
+        let vchFirstRow: DebugElement [];
+        let rowElementsLength = 0;
+
+        fixture.componentInstance.ngOnInit();
+        fixture.componentInstance.reloadContainers();
+        fixture.detectChanges();
+        paginationText = fixture.debugElement.query(By.css('div.datagrid-foot-description'));
+        nextPageButton = fixture.debugElement.query(By.css('button.pagination-next'));
+
+        // cheking on the first page
+        rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+        rowElementsLength = rowElements.length;
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+
+        expect(rowElementsLength).toBe(10);
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-0');
+        expect(paginationText.nativeElement.textContent).toContain('1 - 10 of 30');
+
+        // advancing and checking on the second page
+        nextPageButton.triggerEventHandler('click', null);
+        fixture.detectChanges();
+        rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+        rowElementsLength = rowElements.length;
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+
+        expect(rowElementsLength).toBe(10);
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-10');
+        expect(paginationText.nativeElement.textContent).toContain('11 - 20 of 30');
+
+        // advancing and checking on the third page
+        nextPageButton.triggerEventHandler('click', null);
+        fixture.detectChanges();
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+        rowElementsLength = rowElements.length;
+
+        expect(rowElementsLength).toBe(10);
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-20');
+        expect(paginationText.nativeElement.textContent).toContain('21 - 30 of 30');
+
+        // returning and checking on the second page
+        previousPageButton = fixture.debugElement.query(By.css('button.pagination-previous'));
+        previousPageButton.triggerEventHandler('click', null);
+        fixture.detectChanges();
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+        rowElementsLength = rowElements.length;
+
+        expect(rowElementsLength).toBe(10);
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-10');
+        expect(paginationText.nativeElement.textContent).toContain('11 - 20 of 30');
+
+        // returning and checking on the first page
+        previousPageButton.triggerEventHandler('click', null);
+        fixture.detectChanges();
+        vchFirstRow = fixture.debugElement.queryAll(By.css('.datagrid-cell'));
+        rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+        rowElementsLength = rowElements.length;
+
+        expect(rowElementsLength).toBe(10);
+        expect(vchFirstRow[0].nativeElement.textContent).toContain('Container-VM-0');
+        expect(paginationText.nativeElement.textContent).toContain('1 - 10 of 30');
     }));
 
     it('should render zero row for malformed data', async(() => {
