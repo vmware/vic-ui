@@ -32,8 +32,8 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y openjdk-7-jdk maven ant ant-optional google-chrome-stable yarn=0.24.6-1
   - export PATH=/usr/share/yarn/bin:$PATH
-  - export TAG=$(git for-each-ref --format="%(refname:short)" --sort=authordate --count=1 refs/tags)
-  - export TAG_NUM=$(git for-each-ref --format="%(refname:short)" --sort=-authordate --count=1 refs/tags | cut -c 2-)
+  - export TAG=$(git describe --tags --abbrev=0)
+  - export TAG_NUM=$(git describe --tags --abbrev=0 | cut -c 2-)
 branches:
   only:
     - new-master
