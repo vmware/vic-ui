@@ -29,7 +29,6 @@ import { Observable } from 'rxjs/Observable';
 import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { RefreshService } from '../shared/refresh.service';
 import { SecurityComponent } from './security/security.component';
-import { StorageCapacityComponent } from './storage-capacity/storage-capacity.component';
 import { SummaryComponent } from './summary/summary.component';
 import { RegistryAccessComponent } from './registry-access/registry-access.component';
 import {VchGeneralComponent} from '../shared/components/vch-general/vch-general.component';
@@ -39,6 +38,7 @@ import {CapitalizePipe} from '../shared/pipes/capitalize.pipe';
 import {CliCommandComponent} from '../shared/components/cli-command/cli-command.component';
 import {ConfigureVchService} from '../configure/configure-vch.service';
 import {HttpClientModule} from '@angular/common/http';
+import {VchStorageComponent} from '../shared/components/vch-storage/vch-storage.component';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -98,8 +98,8 @@ describe('CreateVchWizardComponent', () => {
         CreateVchWizardComponent,
         VchGeneralComponent,
         VchComputeComponent,
+        VchStorageComponent,
         ComputeResourceTreenodeComponent,
-        StorageCapacityComponent,
         NetworksComponent,
         SecurityComponent,
         RegistryAccessComponent,

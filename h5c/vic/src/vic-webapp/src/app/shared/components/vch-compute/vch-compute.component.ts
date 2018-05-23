@@ -279,7 +279,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     }
   }
 
-  onCommit(): Observable<any> {
+  onCommit(): Observable<{computeCapacity: VchUiCompute}> {
     const errs: string[] = [];
     let formErrors = null;
 
@@ -294,13 +294,6 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
       return Observable.throw(errs);
     } else {
       return Observable.of({ computeCapacity: this.model });
-    }
-  }
-
-  onPageLoad() {
-    // if compute resource is already selected return here
-    if (this.selectedComputeResource) {
-      return;
     }
   }
 

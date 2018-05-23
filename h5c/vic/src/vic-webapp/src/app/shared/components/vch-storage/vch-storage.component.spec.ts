@@ -17,15 +17,21 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {Observable} from 'rxjs/Observable';
-import {StorageCapacityComponent} from './storage-capacity.component';
+import {VchStorageComponent} from './vch-storage.component';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {GlobalsService} from '../../globals.service';
+import {ConfigureVchService} from '../../../configure/configure-vch.service';
+import {HttpClientModule} from '@angular/common/http';
+import {VchUiStorage} from '../../../interfaces/vch';
+import {AppAlertService} from '../../app-alert.service';
+import {I18nService} from '../../i18n.service';
 
 describe('StorageCapacityComponent', () => {
 
   const datastoreName = 'datastore';
-  let component: StorageCapacityComponent;
-  let fixture: ComponentFixture<StorageCapacityComponent>;
+  let component: VchStorageComponent;
+  let fixture: ComponentFixture<VchStorageComponent>;
   let service: CreateVchWizardService;
 
   beforeEach(() => {
@@ -33,9 +39,13 @@ describe('StorageCapacityComponent', () => {
       imports: [
         ReactiveFormsModule,
         HttpModule,
+        HttpClientModule,
         ClarityModule
       ],
       providers: [
+        AppAlertService,
+        I18nService,
+        ConfigureVchService,
         {
           provide: CreateVchWizardService,
           useValue: {
@@ -45,16 +55,34 @@ describe('StorageCapacityComponent', () => {
               }]);
             }
           }
+        },
+        {
+          provide: GlobalsService,
+          useValue: {
+            getWebPlatform () {
+              return {
+                getUserSession () {
+                  return {
+                    serversInfo: [{
+                      name: 'server.vpshere.local',
+                      serviceGuid: 'aaaa-bbb-ccc',
+                      thumbprint: 'AA:BB:CC'
+                    }]
+                  }
+                }
+              }
+            }
+          }
         }
       ],
       declarations: [
-        StorageCapacityComponent
+        VchStorageComponent
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StorageCapacityComponent);
+    fixture = TestBed.createComponent(VchStorageComponent);
     component = fixture.componentInstance;
     component.onPageLoad();
 
@@ -82,7 +110,7 @@ describe('StorageCapacityComponent', () => {
   });
 
   it('should validate volume store fields', () => {
-    const controls = component.form.get('volumeStores')['controls'][0]['controls'];
+    const controls = component.form.get('volumeStore')['controls'][0]['controls'];
 
     controls['volDatastore'].setValue(datastoreName);
     expect(controls['dockerVolName'].enabled).toBeTruthy();
@@ -93,37 +121,48 @@ describe('StorageCapacityComponent', () => {
     expect(controls['dockerVolName'].errors['pattern']).toBeTruthy();
 
     // Set Docker Volume Name to something correct
-    controls['dockerVolName'].setValue('volume name');
+    controls['dockerVolName'].setValue('volumeName');
     expect(controls['dockerVolName'].valid).toBeTruthy();
   });
 
   it('should add and remove volume data store entries', () => {
     component.addNewVolumeDatastoreEntry();
-    expect(component.form.get('volumeStores')['controls'].length).toBe(2);
+    expect(component.form.get('volumeStore')['controls'].length).toBe(2);
     component.removeVolumeDatastoreEntry(1);
-    expect(component.form.get('volumeStores')['controls'].length).toBe(1);
+    expect(component.form.get('volumeStore')['controls'].length).toBe(1);
   });
 
   it('should have folder fields that begin with a slash', () => {
     const folderName = 'folder';
     const expectedFolderName = '/folder';
-    component.form.get('imageStore').setValue(datastoreName);
-    component.form.get('fileFolder').setValue(folderName);
 
-    const controls = component.form.get('volumeStores')['controls'][0]['controls'];
-    controls['volDatastore'].setValue(datastoreName);
-    controls['volFileFolder'].setValue(folderName);
-    controls['dockerVolName'].setValue('volume');
+    const dataModel: VchUiStorage = {
+      baseImageSize: '8',
+      baseImageSizeUnit: 'GiB',
+      fileFolder: folderName,
+      imageStore: datastoreName,
+      volumeStore: [{
+        volDatastore: datastoreName,
+        volFileFolder: folderName,
+        dockerVolName: 'volume'
+      }]
+    };
 
+    component.model = dataModel;
+    // in order to call a private / protected method to force models update...
+    component['setFormValues'](dataModel);
+    component['updateCurrentModel']();
     component.onCommit().subscribe( r => {
       expect(r.storageCapacity.fileFolder).toBe(expectedFolderName);
       expect(r.storageCapacity.volumeStore[0].volFileFolder).toBe(expectedFolderName);
     });
 
     // should not add an extra slash
-    component.form.get('fileFolder').setValue(expectedFolderName);
-    controls['volFileFolder'].setValue(expectedFolderName);
-
+    dataModel.fileFolder = expectedFolderName;
+    dataModel.volumeStore[0].volFileFolder = expectedFolderName;
+    // in order to call a private / protected method to force models update...
+    component['setFormValues'](dataModel);
+    component['updateCurrentModel']();
     component.onCommit().subscribe( r => {
       expect(r.storageCapacity.fileFolder).toBe(expectedFolderName);
       expect(r.storageCapacity.volumeStore[0].volFileFolder).toBe(expectedFolderName);

@@ -401,7 +401,29 @@ export function processPayloadFromApiToUi (vch: VchApi): VchUi {
       endpointCpu: vch.endpoint.cpu.sockets,
       endpointMemory: vch.endpoint.memory.value,
       computeResource: vch.compute.resource.id
+    },
+    storageCapacity: {
+      baseImageSize: vch.storage.base_image_size ? vch.storage.base_image_size.value : null,
+      baseImageSizeUnit: vch.storage.base_image_size ? vch.storage.base_image_size.units : null,
+      imageStore: getDSNameAndFolder(vch.storage.image_stores[0]).name,
+      fileFolder: getDSNameAndFolder(vch.storage.image_stores[0]).folderPath,
+      volumeStore: vch.storage.volume_stores.map(vol => {
+        return ({
+          dockerVolName: vol.label,
+          volDatastore: getDSNameAndFolder(vol.datastore).name,
+          volFileFolder: getDSNameAndFolder(vol.datastore).folderPath
+        })
+      }),
+
     }
   };
   return uiModel;
+}
+
+function getDSNameAndFolder(fullPath: string): {name: string; folderPath: string} {
+  const str = decodeURI(fullPath);
+  return ({
+    name: str.split('://')[1].split('/')[0],
+    folderPath: str.split('://')[1].split('/').slice(1).join('/')
+  });
 }

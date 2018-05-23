@@ -2,7 +2,7 @@ import {getNumericValidatorsArray} from '../shared/utils/validators';
 
 export type CpuUnit = 'B' | 'MHz';
 export type MemoryUnit = 'MiB';
-export type ImageSizeUnit = 'MB' | 'GB';
+export type ImageSizeUnit = 'MiB' | 'GiB';
 export type ServerCertSizeUnit = 'bit'
 export type SharesLevel = 'low' | 'normal' | 'high';
 export type FirewallPolicyType = 'Closed' | 'Outbound' | 'Peers' | 'Published' | 'Open';
@@ -164,6 +164,20 @@ export interface VchApiStorage {
   }
 }
 
+export interface VchUiStorage {
+  baseImageSize: number | string;
+  baseImageSizeUnit: ImageSizeUnit;
+  fileFolder: string;
+  imageStore: string;
+  volumeStore?: VchUiStorageVolumeStore[];
+}
+
+export interface VchUiStorageVolumeStore {
+  dockerVolName: string;
+  volDatastore: string;
+  volFileFolder: string;
+}
+
 // VCH Auth
 export interface VchApiAuth {
   no_tls?: true,
@@ -237,11 +251,12 @@ export interface VchApiContainer {
   name_convention?: string
 }
 
-
+// VCH Generals
 export interface VchUi {
   general?: VchUiGeneral;
   computeCapacity?: VchUiCompute;
+  storageCapacity?: VchUiStorage;
 }
 
-export type VchUiModelTypes = VchUiGeneral | VchUiCompute;
-export type VchUiModelKeys = 'general' | 'compute';
+export type VchUiModelTypes = VchUiGeneral | VchUiCompute | VchUiStorage;
+export type VchUiModelKeys = 'general' | 'compute' | 'storage';

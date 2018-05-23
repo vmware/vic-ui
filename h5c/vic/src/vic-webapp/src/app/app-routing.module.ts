@@ -64,6 +64,10 @@ const appRoutes: Routes = [
     {
       path: 'configure-vch-modal-compute',
       loadChildren: './configure/configure-vch-modal/compute/configure-vch-modal-compute.module#ConfigureVchModalComputeModule'
+    },
+    {
+      path: 'configure-vch-modal-storage',
+      loadChildren: './configure/configure-vch-modal/storage/configure-vch-modal-storage.module#ConfigureVchModalStorageModule'
     }
 ];
 

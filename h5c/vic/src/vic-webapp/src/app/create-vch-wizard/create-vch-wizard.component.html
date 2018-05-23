@@ -32,6 +32,7 @@
     </div>
   </clr-alert>
 
+  <!-- GENERAL PAGE -->
   <clr-wizard-page clrWizardPagePreventDefault="true"
                    [clrWizardPageNextDisabled]="!generalStep.form || generalStep.form.invalid"
                    (clrWizardPageOnLoad)="onPageLoad(generalStep.onPageLoad())"
@@ -48,11 +49,11 @@
     </ng-template>
     <ng-template clrPageNavTitle>General</ng-template>
 
-    <!--<vic-vch-creation-general #generalStep></vic-vch-creation-general>-->
     <vic-vch-general #generalStep></vic-vch-general>
 
   </clr-wizard-page>
 
+  <!-- COMPUTE PAGE -->
   <clr-wizard-page clrWizardPagePreventDefault="true"
                    [clrWizardPageNextDisabled]="!computeCapacityStep.form || computeCapacityStep.form.invalid"
                    (clrWizardPageOnLoad)="onPageLoad(computeCapacityStep.onPageLoad())"
@@ -70,11 +71,11 @@
     <ng-template clrPageNavTitle>Compute Capacity</ng-template>
 
     <vic-vch-compute #computeCapacityStep></vic-vch-compute>
-    <!--<vic-vch-creation-compute-capacity #computeCapacityStep></vic-vch-creation-compute-capacity>-->
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="storageCapacityStep.form.invalid"
+  <!-- STORAGE PAGE -->
+  <clr-wizard-page [clrWizardPageNextDisabled]="!storageCapacityStep.form || storageCapacityStep.form.invalid"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(storageCapacityStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
@@ -90,9 +91,7 @@
     </ng-template>
     <ng-template clrPageNavTitle>Storage Capacity</ng-template>
 
-    <vic-vch-creation-storage-capacity #storageCapacityStep
-                                       [resourceObjRef]="computeCapacityStep.selectedResourceObjRef">
-    </vic-vch-creation-storage-capacity>
+    <vic-vch-storage #storageCapacityStep [resourceObjRef]="computeCapacityStep.selectedResourceObjRef"></vic-vch-storage>
 
   </clr-wizard-page>
 

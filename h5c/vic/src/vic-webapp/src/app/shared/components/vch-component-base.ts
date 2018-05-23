@@ -30,6 +30,7 @@ export abstract class VchComponentBase implements OnInit, OnDestroy {
     if (this.model) {
       this.isConfigure = true;
       this.setFormValues(this.model);
+      this.onPageLoad();
     } else {
       this.model = this.initialModel;
     }

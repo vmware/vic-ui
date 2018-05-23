@@ -1,1 +1,14 @@
-Storage
+<ng-container *ngIf="vchInfo | async as vchUIModel; else loadingContent">
+  <vic-configure-vch-view-container [title]="'Storage'"
+                                    [vchUiModelKey]="'storage'"
+                                    [vchId]="vchId">
+    <vic-vch-storage [readOnly]="true"
+                     [model]="vchUIModel.storageCapacity">
+    </vic-vch-storage>
+  </vic-configure-vch-view-container>
+</ng-container>
+<ng-template #loadingContent>
+        <span class="spinner spinner-md">
+          Loading...
+        </span>
+</ng-template>

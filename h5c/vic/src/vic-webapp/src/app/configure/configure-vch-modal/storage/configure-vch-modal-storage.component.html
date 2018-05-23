@@ -1,0 +1,17 @@
+<ng-container *ngIf="resourceObjRefObs | async as info; else loadingContent">
+  <vic-configure-vch-modal-container [title]="'Storage Capacity'"
+                                     [helpLink]="helpLink"
+                                     [modelChangedPayload]="currentModelEmitter.asObservable()"
+                                     [vchId]="vchId">
+    <vic-vch-storage #configureContent
+                     [model]="info.vchUIModel.storageCapacity"
+                     [resourceObjRef]="info.resourceObjRef"
+                     (modelChanged)="modelChange($event)">
+    </vic-vch-storage>
+  </vic-configure-vch-modal-container>
+</ng-container>
+<ng-template #loadingContent>
+  <span class="spinner spinner-md">
+    Loading...
+  </span>
+</ng-template>
