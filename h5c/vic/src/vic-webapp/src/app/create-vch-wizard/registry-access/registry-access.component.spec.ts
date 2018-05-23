@@ -14,10 +14,11 @@
  limitations under the License.
 */
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {ReactiveFormsModule} from '@angular/forms';
+import {ReactiveFormsModule, FormGroup} from '@angular/forms';
 import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
 import {RegistryAccessComponent} from './registry-access.component';
+import { FormBuilder, FormArray, FormControl} from '@angular/forms';
 
 describe('RegistryAccessComponent', () => {
 
@@ -31,8 +32,9 @@ describe('RegistryAccessComponent', () => {
         HttpModule,
         ClarityModule
       ],
-      declarations: [
-        RegistryAccessComponent
+      declarations: [RegistryAccessComponent],
+      providers: [
+        FormBuilder
       ]
     });
   });
@@ -57,6 +59,45 @@ describe('RegistryAccessComponent', () => {
 
     component.form.get('useWhitelistRegistry').setValue(true);
     expect(component.form.get('whitelistRegistries').enabled).toBeTruthy();
+  });
+
+  it('should add insecure registry entries without port', () => {
+    let insecureRegistry1, insecureRegistry2: FormGroup;
+    const control = component.form.get('insecureRegistries') as FormArray;
+    component.removeFormArrayEntry('insecureRegistries', 0);
+    // Adding one registry with port
+    insecureRegistry1 = component.createNewFormArrayEntry('insecureRegistries');
+    insecureRegistry1.controls['insecureRegistryIp'].setValue('1.2.3.4');
+    insecureRegistry1.controls['insecureRegistryPort'].setValue('22');
+    control.push(insecureRegistry1);
+    // Adding one registry without port
+    insecureRegistry2 = component.createNewFormArrayEntry('insecureRegistries');
+    insecureRegistry2.controls['insecureRegistryIp'].setValue('4.3.2.1');
+    control.push(insecureRegistry2);
+    console.log(component.form.get('insecureRegistries')['controls'].length);
+    console.log(component.form.get('insecureRegistries').value);
+    component.onCommit().subscribe(
+      res => {
+        console.log('subscribe:', res.registry.insecureRegistry);
+        expect(res.registry.insecureRegistry.length).toBe(2);
+      }
+    )
+  });
+
+  it('should not add insecure registry entries without ip', () => {
+    let insecureRegistry1: FormGroup;
+    const control = component.form.get('insecureRegistries') as FormArray;
+    component.removeFormArrayEntry('insecureRegistries', 0);
+    // Adding one registry without ip
+    insecureRegistry1 = component.createNewFormArrayEntry('insecureRegistries');
+    insecureRegistry1.controls['insecureRegistryPort'].setValue('22');
+    control.push(insecureRegistry1);
+    component.onCommit().subscribe(
+      res => {
+        console.log('subscribe:', res.registry.insecureRegistry);
+        expect(res.registry.insecureRegistry.length).toBe(0);
+      }
+    )
   });
 
   it('should add and remove registry certificate entries', () => {
