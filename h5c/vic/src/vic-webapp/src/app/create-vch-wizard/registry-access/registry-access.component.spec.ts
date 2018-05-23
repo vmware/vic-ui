@@ -74,11 +74,8 @@ describe('RegistryAccessComponent', () => {
     insecureRegistry2 = component.createNewFormArrayEntry('insecureRegistries');
     insecureRegistry2.controls['insecureRegistryIp'].setValue('4.3.2.1');
     control.push(insecureRegistry2);
-    console.log(component.form.get('insecureRegistries')['controls'].length);
-    console.log(component.form.get('insecureRegistries').value);
     component.onCommit().subscribe(
       res => {
-        console.log('subscribe:', res.registry.insecureRegistry);
         expect(res.registry.insecureRegistry.length).toBe(2);
       }
     )
@@ -94,7 +91,6 @@ describe('RegistryAccessComponent', () => {
     control.push(insecureRegistry1);
     component.onCommit().subscribe(
       res => {
-        console.log('subscribe:', res.registry.insecureRegistry);
         expect(res.registry.insecureRegistry.length).toBe(0);
       }
     )
