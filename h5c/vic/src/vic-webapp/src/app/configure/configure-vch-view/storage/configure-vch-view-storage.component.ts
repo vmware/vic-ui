@@ -15,6 +15,10 @@
 */
 
 import {Component} from '@angular/core';
+import {ConfigureVchBase} from '../../configure-vch-base';
+import {ConfigureVchService} from '../../configure-vch.service';
+import {ActivatedRoute} from '@angular/router';
+import {GlobalsService} from '../../../shared/globals.service';
 
 @Component({
   selector: 'vic-configure-vch-view-storage',
@@ -22,6 +26,11 @@ import {Component} from '@angular/core';
   templateUrl: './configure-vch-view-storage.component.html'
 })
 
-export class ConfigureVchViewStorageComponent {
+export class ConfigureVchViewStorageComponent extends ConfigureVchBase {
 
+  constructor(protected globalsService: GlobalsService,
+              protected configureVchService: ConfigureVchService,
+              protected activatedRoute: ActivatedRoute) {
+    super(globalsService, configureVchService, activatedRoute);
+  }
 }

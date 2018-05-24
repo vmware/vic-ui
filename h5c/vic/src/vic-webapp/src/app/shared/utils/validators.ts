@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { Validators } from '@angular/forms';
+import {FormControl, Validators} from '@angular/forms';
 
 /* validation regex */
 export const camelCasePattern = new RegExp(/([a-z])([A-Z])/g);
@@ -51,6 +51,17 @@ export function getNumericValidatorsArray(allowUnlimited: boolean) {
     Validators.pattern(allowUnlimited ? unlimitedOrNumberPattern : numberPattern),
     Validators.min(1)
   ];
+}
+
+export function noBlankSpaces(control: FormControl) {
+  if (control.value.indexOf(' ') !== -1) {
+    return {
+      blankSpaceError: {
+        error: 'blank spaces are not accepted'
+      }
+    }
+  }
+  return null;
 }
 
 

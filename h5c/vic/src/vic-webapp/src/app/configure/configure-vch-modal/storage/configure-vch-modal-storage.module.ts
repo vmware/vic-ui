@@ -17,36 +17,34 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {ClarityModule} from '@clr/angular';
-import {ConfigureVchViewStorageComponent} from './configure-vch-view-storage.component';
-import {SharedModule} from '../../../shared/shared.module';
-import {ConfigureVchViewContainerModule} from '../configure-vch-view-container.module';
-import {ReactiveFormsModule} from '@angular/forms';
 import {ConfigureVchService} from '../../configure-vch.service';
 import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {SharedModule} from '../../../shared/shared.module';
+import {ConfigureVchModalContainerModule} from '../configure-vch-modal-container.module';
+import {ConfigureVchModalStorageComponent} from './configure-vch-modal-storage.component';
 
 const routes: Routes = [
-  {path: '**', component: ConfigureVchViewStorageComponent},
+  {path: '**', component: ConfigureVchModalStorageComponent}
 ];
 
 @NgModule({
   imports: [
-    ReactiveFormsModule,
     CommonModule,
     ClarityModule,
-    SharedModule,
     RouterModule.forChild(routes),
-    ConfigureVchViewContainerModule
+    SharedModule,
+    ConfigureVchModalContainerModule
   ],
   declarations: [
-    ConfigureVchViewStorageComponent
+    ConfigureVchModalStorageComponent
   ],
   exports: [
-    ConfigureVchViewStorageComponent
+    ConfigureVchModalStorageComponent
   ],
   providers: [
     ConfigureVchService,
     CreateVchWizardService
-  ]
+  ],
 })
-export class ConfigureVchViewStorageModule {
+export class ConfigureVchModalStorageModule {
 }

@@ -46,12 +46,12 @@
           <clr-stack-block>
             <clr-stack-label>CPU</clr-stack-label>
             <clr-stack-content>
-              {{ payload?.computeCapacity?.cpu === '0' ? 'Unlimited' : payload?.computeCapacity?.cpu + ' MHz' }}
+              {{ payload?.computeCapacity?.cpuLimit === '0' ? 'Unlimited' : payload?.computeCapacity?.cpuLimit + ' MHz' }}
             </clr-stack-content>
             <clr-stack-block>
               <clr-stack-label>Limit</clr-stack-label>
               <clr-stack-content>
-                {{ payload?.computeCapacity?.cpu === '0' ? 'Unlimited' : payload?.computeCapacity?.cpu + ' MHz' }}
+                {{ payload?.computeCapacity?.cpuLimit === '0' ? 'Unlimited' : payload?.computeCapacity?.cpuLimit + ' MHz' }}
               </clr-stack-content>
             </clr-stack-block>
             <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('cpuReservation')">
@@ -71,12 +71,12 @@
           <clr-stack-block>
             <clr-stack-label>Memory</clr-stack-label>
             <clr-stack-content>
-              {{ payload?.computeCapacity?.memory === '0' ? 'Unlimited' : payload?.computeCapacity?.memory + ' MB' }}
+              {{ payload?.computeCapacity?.memoryLimit === '0' ? 'Unlimited' : payload?.computeCapacity?.memoryLimit + ' MB' }}
             </clr-stack-content>
             <clr-stack-block>
               <clr-stack-label>Limit</clr-stack-label>
               <clr-stack-content>
-                {{ payload?.computeCapacity?.memory === '0' ? 'Unlimited' : payload?.computeCapacity?.memory + ' MB' }}
+                {{ payload?.computeCapacity?.memoryLimit === '0' ? 'Unlimited' : payload?.computeCapacity?.memoryLimit + ' MB' }}
               </clr-stack-content>
             </clr-stack-block>
             <clr-stack-block *ngIf="payload?.computeCapacity?.hasOwnProperty('memoryReservation')">
