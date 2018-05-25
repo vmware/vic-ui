@@ -95,6 +95,7 @@
 
   </clr-wizard-page>
 
+  <!-- NETWORK PAGE -->
   <clr-wizard-page [clrWizardPageNextDisabled]="networksStep.form.invalid"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(networksStep.onPageLoad())"
@@ -111,10 +112,7 @@
     </ng-template>
     <ng-template clrPageNavTitle>Networks</ng-template>
 
-    <vic-vch-creation-networks #networksStep
-                               [datacenter]="computeCapacityStep.dcObj"
-                               [resourceObjName]="computeCapacityStep.selectedObjectName">
-    </vic-vch-creation-networks>
+    <vic-vch-network #networksStep [datacenter]="computeCapacityStep.dcObj" [resourceObjName]="computeCapacityStep.selectedObjectName"></vic-vch-network>
 
   </clr-wizard-page>
 

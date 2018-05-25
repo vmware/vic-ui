@@ -19,6 +19,7 @@ const CONFIGURE_VCH_MODAL_BASE_URL = `/ui/vic/resources/${environment.production
 export const CONFIGURE_VCH_MODAL_GENERAL_URL = `${CONFIGURE_VCH_MODAL_BASE_URL}?view=configure-vch-modal-general`;
 export const CONFIGURE_VCH_MODAL_COMPUTE_URL = `${CONFIGURE_VCH_MODAL_BASE_URL}?view=configure-vch-modal-compute`;
 export const CONFIGURE_VCH_MODAL_STORAGE_URL = `${CONFIGURE_VCH_MODAL_BASE_URL}?view=configure-vch-modal-storage`;
+export const CONFIGURE_VCH_MODAL_NETWORK_URL = `${CONFIGURE_VCH_MODAL_BASE_URL}?view=configure-vch-modal-network`;
 
 export const CONFIGURE_VCH_MODAL_WIDTH = 900;
 export const CONFIGURE_VCH_MODAL_HEIGHT = 600;

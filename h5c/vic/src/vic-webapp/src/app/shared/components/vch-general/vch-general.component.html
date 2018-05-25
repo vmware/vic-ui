@@ -221,7 +221,7 @@
                  aria-haspopup="true"
                  role="tooltip"
                  class="tooltip tooltip-validation tooltip-md tooltip-top-left form-control"
-                 [class.invalid]="isFormControlInvalid('syslogPort')">
+                 [class.invalid]="isFormControlInvalid(form.get('syslogPort'))">
 
             <input id="syslog-port-selector"
                    class="form-control"

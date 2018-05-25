@@ -22,12 +22,45 @@ import { Observable } from 'rxjs/Observable';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TestScheduler } from 'rxjs/Rx';
 import { CliCommandComponent } from './cli-command.component';
+import {VchUiNetwork, VchUiStorage} from '../../../interfaces/vch';
 
 describe('CLI Component', () => {
 
   let scheduler: TestScheduler;
   let component: CliCommandComponent;
   let fixture: ComponentFixture<CliCommandComponent>;
+
+  const storageCapacity: VchUiStorage = {
+    baseImageSize: '8',
+    baseImageSizeUnit: 'GiB',
+    fileFolder: '',
+    imageStore: '',
+    volumeStore: []
+  };
+  const networks: VchUiNetwork = {
+    bridgeNetwork: '',
+    bridgeNetworkRange: '172.16.0.0/12',
+    publicNetwork: '',
+    publicNetworkIp: '',
+    publicNetworkType: 'dhcp',
+    publicNetworkGateway: '',
+    dnsServer: [],
+    clientNetwork: '',
+    clientNetworkIp: '',
+    clientNetworkType: 'dhcp',
+    clientNetworkGateway: '',
+    clientNetworkRouting: '',
+    managementNetwork: '',
+    managementNetworkIp: '',
+    managementNetworkType: 'dhcp',
+    managementNetworkGateway: '',
+    managementNetworkRouting: '',
+    containerNetworks: [],
+    httpProxy: '',
+    httpProxyPort: '',
+    httpsProxy: '',
+    httpsProxyPort: ''
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -56,14 +89,8 @@ describe('CLI Component', () => {
     fixture = TestBed.createComponent(CliCommandComponent);
     component = fixture.componentInstance;
     component.payload = Observable.of({
-      storageCapacity: {
-        imageStore: 'datastore',
-        baseImageSizeUnit: 'GiB',
-        volumeStore: []
-      },
-      networks: {
-        containerNetworks: []
-      },
+      storageCapacity: storageCapacity,
+      networks: networks,
       security: {},
       operations: {}
     });

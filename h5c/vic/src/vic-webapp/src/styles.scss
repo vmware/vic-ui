@@ -15,3 +15,8 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+/* Fixes issue with clr-stack-block when some row bottom borders are not visible */
+.stack-view .stack-block {
+  min-height: 37px;
+}

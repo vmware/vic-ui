@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {
   CONFIGURE_VCH_MODAL_WIDTH, CONFIGURE_VCH_MODAL_HEIGHT, CONFIGURE_VCH_MODAL_COMPUTE_URL,
-  CONFIGURE_VCH_MODAL_GENERAL_URL, CONFIGURE_VCH_MODAL_STORAGE_URL
+  CONFIGURE_VCH_MODAL_GENERAL_URL, CONFIGURE_VCH_MODAL_STORAGE_URL, CONFIGURE_VCH_MODAL_NETWORK_URL
 } from '../../shared/constants/configure-vch-modal';
 import {VchUiModelKeys} from '../../interfaces/vch';
 import {GlobalsService} from '../../shared';
@@ -29,11 +29,14 @@ export class ConfigureVchViewContainerComponent {
       case 'general':
         path = CONFIGURE_VCH_MODAL_GENERAL_URL;
         break;
-      case 'compute':
+      case 'computeCapacity':
         path = CONFIGURE_VCH_MODAL_COMPUTE_URL;
         break;
-      case 'storage':
+      case 'storageCapacity':
         path = CONFIGURE_VCH_MODAL_STORAGE_URL;
+        break;
+      case 'networks':
+        path = CONFIGURE_VCH_MODAL_NETWORK_URL;
         break;
     }
     if (path) {

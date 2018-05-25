@@ -13,18 +13,24 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {Observable} from 'rxjs/Observable';
-import {NetworksComponent} from './networks.component';
+import {VchNetworkComponent} from './vch-network.component';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {GlobalsService} from '../../globals.service';
+import {ConfigureVchService} from '../../../configure/configure-vch.service';
+import {HttpClientModule} from '@angular/common/http';
+import {I18nService} from '../../i18n.service';
+import {AppAlertService} from '../../app-alert.service';
 
 describe('NetworksComponent', () => {
 
-  let component: NetworksComponent;
-  let fixture: ComponentFixture<NetworksComponent>;
+  let component: VchNetworkComponent;
+  let fixture: ComponentFixture<VchNetworkComponent>;
   let service: CreateVchWizardService;
 
   function setDefaultRequiredValues() {
@@ -37,9 +43,13 @@ describe('NetworksComponent', () => {
       imports: [
         ReactiveFormsModule,
         HttpModule,
+        HttpClientModule,
         ClarityModule
       ],
       providers: [
+        AppAlertService,
+        I18nService,
+        ConfigureVchService,
         {
           provide: CreateVchWizardService,
           useValue: {
@@ -49,16 +59,34 @@ describe('NetworksComponent', () => {
               }]);
             }
           }
+        },
+        {
+          provide: GlobalsService,
+          useValue: {
+            getWebPlatform () {
+              return {
+                getUserSession () {
+                  return {
+                    serversInfo: [{
+                      name: 'server.vpshere.local',
+                      serviceGuid: 'aaaa-bbb-ccc',
+                      thumbprint: 'AA:BB:CC'
+                    }]
+                  }
+                }
+              }
+            }
+          }
         }
       ],
       declarations: [
-        NetworksComponent
+        VchNetworkComponent
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NetworksComponent);
+    fixture = TestBed.createComponent(VchNetworkComponent);
     component = fixture.componentInstance;
     component.onPageLoad();
 
