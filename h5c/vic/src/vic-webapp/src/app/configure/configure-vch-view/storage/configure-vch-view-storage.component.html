@@ -1,6 +1,6 @@
 <ng-container *ngIf="vchInfo | async as vchUIModel; else loadingContent">
   <vic-configure-vch-view-container [title]="'Storage'"
-                                    [vchUiModelKey]="'storage'"
+                                    [vchUiModelKey]="'storageCapacity'"
                                     [vchId]="vchId">
     <vic-vch-storage [readOnly]="true"
                      [model]="vchUIModel.storageCapacity">

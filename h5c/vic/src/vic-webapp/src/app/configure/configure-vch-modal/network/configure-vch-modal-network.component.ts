@@ -15,21 +15,23 @@
 */
 
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {ConfigureVchBase} from '../../configure-vch-base';
-import {GlobalsService} from '../../../shared/globals.service';
 import {ConfigureVchService, SelectedComputeResourceInfo} from '../../configure-vch.service';
+import {GlobalsService} from '../../../shared/globals.service';
+import {ConfigureVchBase} from '../../configure-vch-base';
+import {ActivatedRoute} from '@angular/router';
+import {globalProperties} from '../../../../environments/properties';
 import {VchUi} from '../../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 
 @Component({
-  selector: 'vic-configure-vch-view-network',
-  styleUrls: ['./configure-vch-view-network.component.scss'],
-  templateUrl: './configure-vch-view-network.component.html'
+  selector: 'vic-configure-vch-modal-network',
+  styleUrls: ['./configure-vch-modal-network.component.scss'],
+  templateUrl: './configure-vch-modal-network.component.html'
 })
 
-export class ConfigureVchViewNetworkComponent extends ConfigureVchBase implements OnInit {
+export class ConfigureVchModalNetworkComponent extends ConfigureVchBase implements OnInit {
 
+  public helpLink = globalProperties.vhcDocsGeneral;
   public resourceObjRefObs: Observable<{vchUIModel: VchUi, resourceInfo: SelectedComputeResourceInfo}>;
 
   constructor(protected globalsService: GlobalsService,
@@ -57,4 +59,5 @@ export class ConfigureVchViewNetworkComponent extends ConfigureVchBase implement
           .map((resourceInfo: SelectedComputeResourceInfo) => ({vchUIModel: vchInfo, resourceInfo: resourceInfo}))
       })
   }
+
 }

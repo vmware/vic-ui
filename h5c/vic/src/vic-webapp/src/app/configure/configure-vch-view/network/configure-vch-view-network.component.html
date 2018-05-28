@@ -1,1 +1,16 @@
-Network
+<ng-container *ngIf="resourceObjRefObs | async as info; else loadingContent">
+  <vic-configure-vch-view-container [title]="'Network'"
+                                    [vchUiModelKey]="'networks'"
+                                    [vchId]="vchId">
+    <vic-vch-network [readOnly]="true"
+                     [model]="info.vchUIModel.networks"
+                     [datacenter]="info.resourceInfo.datacenterObj"
+                     [resourceObjName]="info.resourceInfo.obj.realName">
+    </vic-vch-network>
+  </vic-configure-vch-view-container>
+</ng-container>
+<ng-template #loadingContent>
+        <span class="spinner spinner-md">
+          Loading...
+        </span>
+</ng-template>

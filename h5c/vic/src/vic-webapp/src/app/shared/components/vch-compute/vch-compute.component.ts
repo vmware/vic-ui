@@ -50,6 +50,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
   public resourceObjForResourceAllocations: string;
 
   private _selectedComputeResource: string;
+  protected readonly apiModelKey = 'computeCapacity';
   protected readonly initialModel: VchUiCompute = {
     cpuLimit: 'Unlimited',
     memoryLimit: 'Unlimited',
@@ -72,7 +73,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     protected configureService: ConfigureVchService
   ) {
     super(formBuilder, createWzService, globalsService, configureService);
-    this.setFormValues(this.initialModel);
+    this.updateCurrentForm(this.initialModel);
   }
 
   // TODO: add units selectors to compute fields
@@ -111,7 +112,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     super.ngOnInit();
   }
 
-  setFormValues(model: VchUiCompute) {
+  updateCurrentForm(model: VchUiCompute) {
     // create a FormGroup instance
     this.form = this.formBuilder.group({
       cpuLimit: [model.cpuLimit || this.initialModel.cpuLimit,
@@ -130,11 +131,6 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
       cpuShares: model.cpuShares || this.initialModel.cpuShares,
       memoryShares: model.memoryShares || this.initialModel.memoryShares
     });
-
-    if (this.model) {
-      this.updateCurrentModel();
-    }
-
   }
 
   updateCurrentModel() {
@@ -157,7 +153,6 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
       if (this._selectedComputeResource) {
         this.model.computeResource = this.selectedComputeResource;
       }
-      this.emitCurrentModel();
     }
   }
 

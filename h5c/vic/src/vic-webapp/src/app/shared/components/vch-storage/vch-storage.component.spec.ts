@@ -150,7 +150,7 @@ describe('StorageCapacityComponent', () => {
 
     component.model = dataModel;
     // in order to call a private / protected method to force models update...
-    component['setFormValues'](dataModel);
+    component['updateFormAndModel'](dataModel);
     component['updateCurrentModel']();
     component.onCommit().subscribe( r => {
       expect(r.storageCapacity.fileFolder).toBe(expectedFolderName);
@@ -161,7 +161,7 @@ describe('StorageCapacityComponent', () => {
     dataModel.fileFolder = expectedFolderName;
     dataModel.volumeStore[0].volFileFolder = expectedFolderName;
     // in order to call a private / protected method to force models update...
-    component['setFormValues'](dataModel);
+    component['updateFormAndModel'](dataModel);
     component['updateCurrentModel']();
     component.onCommit().subscribe( r => {
       expect(r.storageCapacity.fileFolder).toBe(expectedFolderName);

@@ -37,8 +37,6 @@ export class ConfigureVchModalStorageComponent extends ConfigureVchBase implemen
           .loadSelectedComputeResourceInfo(serversInfo, vchInfo.computeCapacity.computeResource)
           .map((resourceInfo: SelectedComputeResourceInfo) => ({vchUIModel: vchInfo, resourceObjRef: resourceInfo.obj.objRef}))
       })
-
-
   }
 
 }

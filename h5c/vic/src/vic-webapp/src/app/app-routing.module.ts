@@ -69,6 +69,11 @@ const appRoutes: Routes = [
       path: 'configure-vch-modal-storage',
       loadChildren: './configure/configure-vch-modal/storage/configure-vch-modal-storage.module#ConfigureVchModalStorageModule'
     }
+  ,
+  {
+    path: 'configure-vch-modal-network',
+    loadChildren: './configure/configure-vch-modal/network/configure-vch-modal-network.module#ConfigureVchModalNetworkModule'
+  }
 ];
 
 export const extensionToRoutes = {};

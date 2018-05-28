@@ -20,7 +20,6 @@ import { ClarityModule } from '@clr/angular';
 import { CommonModule } from '@angular/common';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
-import { NetworksComponent } from './networks/networks.component';
 import { NgModule } from '@angular/core';
 import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { SecurityComponent } from './security/security.component';
@@ -53,7 +52,6 @@ const declarations = [
   ],
   declarations: [
     ...declarations,
-    NetworksComponent
   ],
   providers: [
     CreateVchWizardService,

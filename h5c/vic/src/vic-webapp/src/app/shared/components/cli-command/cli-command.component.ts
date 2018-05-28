@@ -4,6 +4,7 @@ import {getClientOS} from '../../utils/detection';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {camelCasePattern} from '../../utils';
 import {isUploadableFileObject} from '../../utils/model-checker';
+import {VchUi} from '../../../interfaces/vch';
 
 type CommandType = 'create' | 'configure';
 
@@ -15,7 +16,7 @@ type CommandType = 'create' | 'configure';
 export class CliCommandComponent implements OnInit {
 
   @Input()
-  payload: Observable<any>;
+  payload: Observable<VchUi>;
 
   @Input()
   showCliCommand = true;
@@ -43,7 +44,7 @@ export class CliCommandComponent implements OnInit {
       .distinctUntilChanged()
       .startWith(getClientOS());
 
-    const modelPayload: Observable<any> = this.payload;
+    const modelPayload: Observable<VchUi> = this.payload;
 
     this.cliCommand = Observable.combineLatest(
         targetOSStream,
@@ -86,7 +87,7 @@ export class CliCommandComponent implements OnInit {
    * an empty array, and then return the array joined
    * @returns {string} vic-machine compatible arguments
    */
-  toCliArguments(targetOS: string, payloadModel: any): string {
+  toCliArguments(targetOS: string, payloadModel: VchUi): string {
     if (!targetOS || !payloadModel || !this.commandType) {
       return null;
     }
@@ -198,7 +199,7 @@ export class CliCommandComponent implements OnInit {
   /**
    * Transform payload to something vic-machine command friendly
    */
-  private processPayload(payload: any): any {
+  private processPayload(payload: VchUi): any {
     const results = JSON.parse(JSON.stringify(payload));
 
     // transform image store entry
@@ -207,8 +208,9 @@ export class CliCommandComponent implements OnInit {
         results['storageCapacity']['imageStore'] + (results['storageCapacity']['fileFolder'] || '');
       delete results['storageCapacity']['fileFolder'];
 
-      results['storageCapacity']['baseImageSize'] = results['storageCapacity']['baseImageSize']
-        + results['storageCapacity']['baseImageSizeUnit'].replace('i', '');
+      const sizeUnit = results['storageCapacity']['baseImageSizeUnit'] ?
+        results['storageCapacity']['baseImageSizeUnit'].replace('i', '') : '';
+      results['storageCapacity']['baseImageSize'] += sizeUnit;
       delete results['storageCapacity']['baseImageSizeUnit'];
 
       // transform each volume store entry
@@ -223,50 +225,52 @@ export class CliCommandComponent implements OnInit {
     if (results['networks']) {
       if (results['networks']['clientNetworkRouting']) {
         results['networks']['clientNetworkGateway'] =
-          results['networks']['clientNetworkRouting'].join(',') + ':' + results['networks']['clientNetworkGateway'];
+          `${results['networks']['clientNetworkRouting']}:${results['networks']['clientNetworkGateway']}`;
         delete results['networks']['clientNetworkRouting'];
       }
 
       if (results['networks']['managementNetworkRouting']) {
         results['networks']['managementNetworkGateway'] =
-          results['networks']['managementNetworkRouting'].join(',') + ':' + results['networks']['managementNetworkGateway'];
+          `${results['networks']['managementNetworkRouting']}:${results['networks']['managementNetworkGateway']}`;
         delete results['networks']['managementNetworkRouting'];
       }
 
       // transform each container network entry
+      if (results['networks']['containerNetworks']) {
+        const containerNetworksRef = results['networks']['containerNetworks'];
+        results['networks']['containerNetworks'] =
+          containerNetworksRef.map(containerNetObj => {
+            if (containerNetObj['containerNetworkType'] === 'dhcp') {
+              const net = {
+                containerNetwork: containerNetObj['containerNetwork'] +
+                ':' + containerNetObj['containerNetworkLabel'],
+                containerNetworkFirewall: containerNetObj['containerNetwork'] +
+                ':' + containerNetObj['containerNetworkFirewall']
+              };
 
-      const containerNetworksRef = results['networks']['containerNetworks'];
-      results['networks']['containerNetworks'] =
-        containerNetworksRef.map(containerNetObj => {
-          if (containerNetObj['containerNetworkType'] === 'dhcp') {
-            const net = {
-              containerNetwork: containerNetObj['containerNetwork'] +
-              ':' + containerNetObj['containerNetworkLabel'],
-              containerNetworkFirewall: containerNetObj['containerNetwork'] +
-              ':' + containerNetObj['containerNetworkFirewall']
-            };
+              if (containerNetObj['containerNetworkDns']) {
+                net['containerNetworkDns'] = containerNetObj['containerNetwork'] +
+                  ':' + containerNetObj['containerNetworkDns'];
+              }
 
-            if (containerNetObj['containerNetworkDns']) {
-              net['containerNetworkDns'] = containerNetObj['containerNetwork'] +
-                ':' + containerNetObj['containerNetworkDns'];
+              return net;
+            } else {
+              return {
+                containerNetwork: containerNetObj['containerNetwork'] +
+                ':' + containerNetObj['containerNetworkLabel'],
+                containerNetworkIpRange: containerNetObj['containerNetwork'] +
+                ':' + containerNetObj['containerNetworkIpRange'],
+                containerNetworkGateway: containerNetObj['containerNetwork'] +
+                ':' + containerNetObj['containerNetworkGateway'],
+                containerNetworkDns: containerNetObj['containerNetwork'] +
+                ':' + containerNetObj['containerNetworkDns'],
+                containerNetworkFirewall: containerNetObj['containerNetwork'] +
+                ':' + containerNetObj['containerNetworkFirewall']
+              };
             }
+          });
+      }
 
-            return net;
-          } else {
-            return {
-              containerNetwork: containerNetObj['containerNetwork'] +
-              ':' + containerNetObj['containerNetworkLabel'],
-              containerNetworkIpRange: containerNetObj['containerNetwork'] +
-              ':' + containerNetObj['containerNetworkIpRange'],
-              containerNetworkGateway: containerNetObj['containerNetwork'] +
-              ':' + containerNetObj['containerNetworkGateway'],
-              containerNetworkDns: containerNetObj['containerNetwork'] +
-              ':' + containerNetObj['containerNetworkDns'],
-              containerNetworkFirewall: containerNetObj['containerNetwork'] +
-              ':' + containerNetObj['containerNetworkFirewall']
-            };
-          }
-        });
     }
 
     // transform server cert and key

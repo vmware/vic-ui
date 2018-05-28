@@ -25,12 +25,14 @@ import {VchComputeComponent} from './components/vch-compute/vch-compute.componen
 import {CapitalizePipe} from './pipes/capitalize.pipe';
 import {ComputeResourceTreenodeComponent} from './components/vch-compute/compute-resource-treenode.component';
 import {VchStorageComponent} from './components/vch-storage/vch-storage.component';
+import {VchNetworkComponent} from './components/vch-network/vch-network.component';
 
 const declarations = [
   VicOvaVerificationComponent,
   VchGeneralComponent,
   VchComputeComponent,
   VchStorageComponent,
+  VchNetworkComponent,
   ComputeResourceTreenodeComponent,
   CliCommandComponent,
   CapitalizePipe
