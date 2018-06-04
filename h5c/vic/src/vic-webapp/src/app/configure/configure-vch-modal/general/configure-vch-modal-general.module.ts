@@ -24,12 +24,7 @@ import {SharedModule} from '../../../shared/shared.module';
 import {ConfigureVchModalContainerModule} from '../configure-vch-modal-container.module';
 
 const routes: Routes = [
-  {path: '', component: ConfigureVchModalGeneralComponent},
-  {path: ':id', component: ConfigureVchModalGeneralComponent}
-];
-
-const declarations = [
-  ConfigureVchModalGeneralComponent
+  {path: '**', component: ConfigureVchModalGeneralComponent}
 ];
 
 @NgModule({
@@ -41,10 +36,10 @@ const declarations = [
     ConfigureVchModalContainerModule
   ],
   declarations: [
-    ...declarations
+    ConfigureVchModalGeneralComponent
   ],
   exports: [
-    ...declarations
+    ConfigureVchModalGeneralComponent
   ],
   providers: [
     ConfigureVchService,

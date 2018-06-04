@@ -25,12 +25,7 @@ import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wiza
 import {ConfigureVchViewContainerModule} from '../configure-vch-view-container.module';
 
 const routes: Routes = [
-  {path: '', component: ConfigureVchViewGeneralComponent},
-  {path: ':id', component: ConfigureVchViewGeneralComponent}
-];
-
-const declarations = [
-  ConfigureVchViewGeneralComponent
+  {path: '**', component: ConfigureVchViewGeneralComponent}
 ];
 
 @NgModule({
@@ -43,10 +38,10 @@ const declarations = [
     ConfigureVchViewContainerModule
   ],
   declarations: [
-    ...declarations
+    ConfigureVchViewGeneralComponent
   ],
   exports: [
-    ...declarations
+    ConfigureVchViewGeneralComponent
   ],
   providers: [
     ConfigureVchService,

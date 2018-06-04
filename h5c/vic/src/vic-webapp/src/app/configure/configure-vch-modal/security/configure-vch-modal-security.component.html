@@ -1,0 +1,19 @@
+<ng-container *ngIf="resourceObjRefObs | async as info; else loadingContent">
+  <vic-configure-vch-modal-container [title]="i18n.translate('vch.security.secureAccessToVCH')"
+                                     [helpLink]="helpLink"
+                                     [modelChangedPayload]="currentModelEmitter.asObservable()"
+                                     [vchId]="vchId">
+    <vic-vch-security #configureContent
+                      [model]="info.vchUIModel.security"
+                      [datacenter]="info.resourceInfo.datacenterObj"
+                      [vchName]="info.vchUIModel.general.name"
+                      (modelChanged)="modelChange($event)">
+    </vic-vch-security>
+  </vic-configure-vch-modal-container>
+</ng-container>
+<ng-template #loadingContent>
+  <span class="spinner spinner-md">
+    Loading...
+  </span>
+</ng-template>
+

@@ -19,7 +19,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ConfigureVchBase} from '../../configure-vch-base';
 import {GlobalsService} from '../../../shared/globals.service';
 import {ConfigureVchService, SelectedComputeResourceInfo} from '../../configure-vch.service';
-import {VchUi} from '../../../interfaces/vch';
+import {VchView} from '../../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 
 @Component({
@@ -30,7 +30,7 @@ import {Observable} from 'rxjs/Observable';
 
 export class ConfigureVchViewNetworkComponent extends ConfigureVchBase implements OnInit {
 
-  public resourceObjRefObs: Observable<{vchUIModel: VchUi, resourceInfo: SelectedComputeResourceInfo}>;
+  public resourceObjRefObs: Observable<{vchUIModel: VchView, resourceInfo: SelectedComputeResourceInfo}>;
 
   constructor(protected globalsService: GlobalsService,
               protected configureVchService: ConfigureVchService,
@@ -47,7 +47,7 @@ export class ConfigureVchViewNetworkComponent extends ConfigureVchBase implement
       .serversInfo;
 
     this.resourceObjRefObs = this.vchInfo
-      .switchMap((vchInfo: VchUi) => {
+      .switchMap((vchInfo: VchView) => {
         return this.configureVchService
           .loadSelectedComputeResourceInfo(serversInfo, vchInfo.computeCapacity.computeResource)
           .map((resourceInfo: SelectedComputeResourceInfo) => {

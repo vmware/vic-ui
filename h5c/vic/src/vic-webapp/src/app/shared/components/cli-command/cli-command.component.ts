@@ -4,7 +4,7 @@ import {getClientOS} from '../../utils/detection';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {camelCasePattern} from '../../utils';
 import {isUploadableFileObject} from '../../utils/model-checker';
-import {VchUi} from '../../../interfaces/vch';
+import {VchView} from '../../../interfaces/vch';
 
 type CommandType = 'create' | 'configure';
 
@@ -16,7 +16,7 @@ type CommandType = 'create' | 'configure';
 export class CliCommandComponent implements OnInit {
 
   @Input()
-  payload: Observable<VchUi>;
+  payload: Observable<VchView>;
 
   @Input()
   showCliCommand = true;
@@ -44,7 +44,7 @@ export class CliCommandComponent implements OnInit {
       .distinctUntilChanged()
       .startWith(getClientOS());
 
-    const modelPayload: Observable<VchUi> = this.payload;
+    const modelPayload: Observable<VchView> = this.payload;
 
     this.cliCommand = Observable.combineLatest(
         targetOSStream,
@@ -87,7 +87,7 @@ export class CliCommandComponent implements OnInit {
    * an empty array, and then return the array joined
    * @returns {string} vic-machine compatible arguments
    */
-  toCliArguments(targetOS: string, payloadModel: VchUi): string {
+  toCliArguments(targetOS: string, payloadModel: VchView): string {
     if (!targetOS || !payloadModel || !this.commandType) {
       return null;
     }
@@ -199,7 +199,7 @@ export class CliCommandComponent implements OnInit {
   /**
    * Transform payload to something vic-machine command friendly
    */
-  private processPayload(payload: VchUi): any {
+  private processPayload(payload: VchView): any {
     const results = JSON.parse(JSON.stringify(payload));
 
     // transform image store entry

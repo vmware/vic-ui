@@ -23,19 +23,15 @@ import {GlobalsService} from '../../shared/globals.service';
 import {Modal} from '@clr/angular';
 import {ActivatedRoute} from '@angular/router';
 import {
-  VchApi,
-  VchUi,
-  VchUiModelTypes
+  Vch,
+  VchView,
+  VchViewTypes
 } from '../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 import {ConfigureVchService} from '../configure-vch.service';
-import {
-  processPayloadFromUiToApi
-} from '../../shared/utils/vch/vch-utils';
+import {vchViewToVch} from '../../shared/utils/vch/vch-utils';
 import {HttpErrorResponse} from '@angular/common/http';
-import {
-  resizeModalToParentFrame
-} from '../../shared/utils/modal-resize';
+import {resizeModalToParentFrame} from '../../shared/utils/modal-resize';
 import {CONFIGURE_VCH_MODAL_HEIGHT} from '../../shared/constants/configure-vch-modal';
 import {VchComponentBase} from '../../shared/components/vch-component-base';
 
@@ -51,7 +47,7 @@ export class ConfigureVchModalContainerComponent implements OnInit {
   @Input() title: string;
   @Input() vchId: string;
   @Input() helpLink: string;
-  @Input() modelChangedPayload: Observable<VchUiModelTypes>;
+  @Input() modelChangedPayload: Observable<VchViewTypes>;
 
   @ViewChild('modal') modal: Modal;
   @ContentChild('configureContent') currentContent: VchConfigureContents;
@@ -88,12 +84,12 @@ export class ConfigureVchModalContainerComponent implements OnInit {
       this.errorFlag = false;
       this.loading = true;
       this.currentContent.onCommit()
-        .switchMap((payload: VchUi) => {
-          const apiPayload = processPayloadFromUiToApi(payload);
-          return this.configureVchService.patchVch(this.vchId, apiPayload);
+        .switchMap((payload: VchView) => {
+          const vch: Vch = vchViewToVch(payload);
+          return this.configureVchService.patchVch(this.vchId, vch);
         })
         .subscribe(
-          (payload: VchApi) => {
+          (payload: Vch) => {
             this.errorFlag = false;
             this.loading = false;
             this.onCancel();

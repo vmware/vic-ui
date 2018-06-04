@@ -2,7 +2,7 @@ import {
   Component, Input, OnInit, QueryList,
   ViewChildren
 } from '@angular/core';
-import {VchUiCompute} from '../../../interfaces/vch';
+import {VchComputeView} from '../../../interfaces/vch';
 import {ComputeResource} from '../../../interfaces/compute.resource';
 import {FormBuilder, Validators} from '@angular/forms';
 import {ServerInfo} from '../../vSphereClientSdkTypes';
@@ -29,7 +29,7 @@ const endpointMemoryDefaultValue = 2048;
 })
 export class VchComputeComponent extends VchComponentBase implements OnInit {
 
-  @Input() model: VchUiCompute;
+  @Input() model: VchComputeView;
 
   public datacenter: any[] = [];
   public dcObj: ComputeResource;
@@ -51,7 +51,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
 
   private _selectedComputeResource: string;
   protected readonly apiModelKey = 'computeCapacity';
-  protected readonly initialModel: VchUiCompute = {
+  protected readonly initialModel: VchComputeView = {
     cpuLimit: 'Unlimited',
     memoryLimit: 'Unlimited',
     cpuReservation: 1,
@@ -112,7 +112,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     super.ngOnInit();
   }
 
-  updateCurrentForm(model: VchUiCompute) {
+  updateCurrentForm(model: VchComputeView) {
     // create a FormGroup instance
     this.form = this.formBuilder.group({
       cpuLimit: [model.cpuLimit || this.initialModel.cpuLimit,
@@ -135,10 +135,12 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
 
   updateCurrentModel() {
     if (this.form.valid) {
+      let currentModel: VchComputeView = {};
+
       if (this.inAdvancedMode) {
-        this.model = {...this.form.value}
+        currentModel = {...this.form.value}
       } else {
-        this.model = {
+        currentModel = {
           cpuLimit: this.form.value.cpuLimit,
           memoryLimit: this.form.value.memoryLimit,
         }
@@ -147,12 +149,14 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
       // override cpu and memory limits in case of unlimiteds
       const cpuLimitValue = this.form.get('cpuLimit').value;
       const memoryLimitValue = this.form.get('memoryLimit').value;
-      this.model.cpuLimit = unlimitedPattern.test(cpuLimitValue) ? this.initialModel.cpuLimit : cpuLimitValue;
-      this.model.memoryLimit = unlimitedPattern.test(memoryLimitValue) ? this.initialModel.memoryLimit : memoryLimitValue;
+      currentModel.cpuLimit = unlimitedPattern.test(cpuLimitValue) ? this.initialModel.cpuLimit : cpuLimitValue;
+      currentModel.memoryLimit = unlimitedPattern.test(memoryLimitValue) ? this.initialModel.memoryLimit : memoryLimitValue;
 
       if (this._selectedComputeResource) {
-        this.model.computeResource = this.selectedComputeResource;
+        currentModel.computeResource = this.selectedComputeResource;
       }
+
+      this.model = currentModel;
     }
   }
 
@@ -274,7 +278,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     }
   }
 
-  onCommit(): Observable<{computeCapacity: VchUiCompute}> {
+  onCommit(): Observable<{[key: string]: VchComputeView}> {
     const errs: string[] = [];
     let formErrors = null;
 
@@ -288,7 +292,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     if (this.form.invalid) {
       return Observable.throw(errs);
     } else {
-      return Observable.of({ computeCapacity: this.model });
+      return Observable.of({[this.apiModelKey]: this.model});
     }
   }
 

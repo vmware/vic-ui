@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {ipOrFqdnPattern, numberPattern, supportedCharsPattern} from '../../utils/validators';
-import {VchUiGeneral} from '../../../interfaces/vch';
+import {VchGeneralView} from '../../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
 import {VchComponentBase} from '../vch-component-base';
@@ -13,7 +13,7 @@ import {VchComponentBase} from '../vch-component-base';
 })
 export class VchGeneralComponent extends VchComponentBase implements OnInit {
 
-  @Input() model: VchUiGeneral;
+  @Input() model: VchGeneralView;
 
   private containerNameConventionPattern = /^(.*)({id}|{name})(.*)$/;
   private syslogAddressPattern = /^(tcp|udp):\/\/(.*):(.*)$/;
@@ -25,7 +25,7 @@ export class VchGeneralComponent extends VchComponentBase implements OnInit {
   ];
 
   protected readonly apiModelKey = 'general';
-  protected readonly initialModel: VchUiGeneral = {
+  protected readonly initialModel: VchGeneralView = {
     name: 'virtual-container-host',
     containerNameConvention: '',
     debug: this.debugOptions[0].value,
@@ -43,7 +43,7 @@ export class VchGeneralComponent extends VchComponentBase implements OnInit {
     super.ngOnInit();
   }
 
-  protected updateCurrentForm(model: VchUiGeneral) {
+  protected updateCurrentForm(model: VchGeneralView) {
     const [,
       containerNameConventionPrefix = '',
       containerNameConvention = '{name}',
@@ -73,18 +73,19 @@ export class VchGeneralComponent extends VchComponentBase implements OnInit {
 
   protected updateCurrentModel() {
     if (this.form.valid) {
-      this.model.name = this.form.value.name.trim();
-      this.model.debug = this.form.value.debug;
+      const currentModel: VchGeneralView = {
+        name: this.form.value.name.trim(),
+        debug: this.form.value.debug,
+        containerNameConvention: ''
+      };
 
       const prefix = this.form.value.containerNameConventionPrefix.trim();
       const postfix = this.form.value.containerNameConventionPostfix.trim();
 
       if (prefix || postfix) {
-        this.model.containerNameConvention =
-          `${prefix}${this.form.value.containerNameConvention}${postfix}`;
+        currentModel.containerNameConvention = `${prefix}${this.form.value.containerNameConvention}${postfix}`;
       }
 
-      // /!* tslint:disable:no-shadowed-variable *!/
       const {
         syslogTransport,
         syslogHost,
@@ -92,8 +93,10 @@ export class VchGeneralComponent extends VchComponentBase implements OnInit {
       } = this.form.value;
 
       if (syslogHost && syslogPort) {
-        this.model.syslogAddress = `${syslogTransport}://${syslogHost}:${syslogPort}`;
+        currentModel.syslogAddress = `${syslogTransport}://${syslogHost}:${syslogPort}`;
       }
+
+      this.model = currentModel;
     }
   }
 
@@ -104,7 +107,7 @@ export class VchGeneralComponent extends VchComponentBase implements OnInit {
    * an observable of the name or any error
    * @returns {Observable<any>}
    */
-  onCommit(): Observable<{general: VchUiGeneral}> {
+  onCommit(): Observable<{[key: string]: VchGeneralView}> {
     return Observable
       .zip(
         this.createWzService.getVicApplianceIp(),
@@ -126,7 +129,7 @@ export class VchGeneralComponent extends VchComponentBase implements OnInit {
             ['There is already a VirtualApp or ResourcePool that exists with the same name']);
         }
 
-        return Observable.of({general: this.model});
+        return Observable.of({[this.apiModelKey]: this.model});
       });
   }
 

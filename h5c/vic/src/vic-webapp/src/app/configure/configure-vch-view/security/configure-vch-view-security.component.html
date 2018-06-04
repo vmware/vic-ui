@@ -1,1 +1,16 @@
-Security
+<ng-container *ngIf="resourceObjRefObs | async as info; else loadingContent">
+  <vic-configure-vch-view-container [title]="i18n.translate('vch.security.security')"
+                                    [vchUiModelKey]="'security'"
+                                    [vchId]="vchId">
+    <vic-vch-security [readOnly]="true"
+                      [model]="info.vchUIModel.security"
+                      [datacenter]="info.resourceInfo.datacenterObj"
+                      [vchName]="info.vchUIModel.general.name">
+    </vic-vch-security>
+  </vic-configure-vch-view-container>
+</ng-container>
+<ng-template #loadingContent>
+        <span class="spinner spinner-md">
+          Loading...
+        </span>
+</ng-template>

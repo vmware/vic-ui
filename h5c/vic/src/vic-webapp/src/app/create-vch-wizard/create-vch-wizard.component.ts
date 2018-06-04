@@ -25,8 +25,9 @@ import { VIC_APPLIANCE_PORT } from '../shared/constants';
 import { Wizard } from '@clr/angular';
 import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
 import {VchComputeComponent} from '../shared/components/vch-compute/vch-compute.component';
-import {processPayloadFromUiToApi} from '../shared/utils/vch/vch-utils';
+import {vchViewToVch} from '../shared/utils/vch/vch-utils';
 import {resizeModalToParentFrame} from '../shared/utils/modal-resize';
+import {Vch} from '../interfaces/vch';
 
 @Component({
   selector: 'vic-create-vch-wizard',
@@ -133,14 +134,14 @@ export class CreateVchWizardComponent implements OnInit {
               (this.computeCapacity.dcId ? '/datacenter/' + this.computeCapacity.dcId : '') +
               '/vch?' + 'thumbprint=' + payload.security.thumbprint;
 
-              const body = processPayloadFromUiToApi(payload);
+              const vch: Vch = vchViewToVch(payload);
 
               const options  = new RequestOptions({ headers: new Headers({
                   'Content-Type': 'application/json',
                   'X-VMWARE-TICKET': cloneTicket
               })});
 
-              this.http.post(url, JSON.stringify(body), options)
+              this.http.post(url, JSON.stringify(vch), options)
                   .map(response => response.json())
                   .subscribe(response => {
                     this.loading = false;
