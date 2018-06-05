@@ -22,6 +22,8 @@ export class VicWebappPage {
   private buttonComputeResource = 'button.cc-resource';
   private datacenterTreenodeCaret = 'button.clr-treenode-caret';
   private firstDcTreenodeCaretXpath = `(//button[contains(@class,'clr-treenode-caret')])[1]/clr-icon[contains(@dir, 'right')]`;
+  private basicAdvanceButton = 'a.btn.btn-link.pl-0';
+  private buttonHostAffinity = 'label.text-nowrap';
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
@@ -135,6 +137,8 @@ export class VicWebappPage {
     });
 
     this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
+    this.clickByCSS(this.basicAdvanceButton);
+    this.clickByCSS(this.buttonHostAffinity);
   }
 
   selectDatastore(name: string = 'datastore1') {
