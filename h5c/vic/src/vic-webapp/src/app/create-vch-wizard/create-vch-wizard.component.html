@@ -96,7 +96,7 @@
   </clr-wizard-page>
 
   <!-- NETWORK PAGE -->
-  <clr-wizard-page [clrWizardPageNextDisabled]="networksStep.form.invalid"
+  <clr-wizard-page [clrWizardPageNextDisabled]="!networksStep.form || networksStep.form.invalid"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(networksStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
@@ -116,7 +116,8 @@
 
   </clr-wizard-page>
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="securityStep.form.invalid"
+  <!-- SECURITY PAGE -->
+  <clr-wizard-page [clrWizardPageNextDisabled]="!securityStep.form || securityStep.form.invalid"
                    clrWizardPagePreventDefault="true"
                    (clrWizardPageOnLoad)="onPageLoad(securityStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
@@ -132,10 +133,10 @@
     </ng-template>
     <ng-template clrPageNavTitle>Security</ng-template>
 
-    <vic-vch-creation-security [vchName]="generalStep.model?.name"
-                               [datacenter]="computeCapacityStep.dcObj"
-                               #securityStep>
-    </vic-vch-creation-security>
+    <vic-vch-security [vchName]="generalStep.model?.name"
+                      [datacenter]="computeCapacityStep.dcObj"
+                      #securityStep>
+    </vic-vch-security>
 
   </clr-wizard-page>
 

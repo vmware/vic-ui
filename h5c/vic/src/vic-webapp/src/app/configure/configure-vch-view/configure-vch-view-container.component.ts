@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core';
 import {
   CONFIGURE_VCH_MODAL_WIDTH, CONFIGURE_VCH_MODAL_HEIGHT, CONFIGURE_VCH_MODAL_COMPUTE_URL,
-  CONFIGURE_VCH_MODAL_GENERAL_URL, CONFIGURE_VCH_MODAL_STORAGE_URL, CONFIGURE_VCH_MODAL_NETWORK_URL
+  CONFIGURE_VCH_MODAL_GENERAL_URL, CONFIGURE_VCH_MODAL_STORAGE_URL, CONFIGURE_VCH_MODAL_NETWORK_URL, CONFIGURE_VCH_MODAL_SECURITY_URL
 } from '../../shared/constants/configure-vch-modal';
-import {VchUiModelKeys} from '../../interfaces/vch';
+import {VchViewKeys} from '../../interfaces/vch';
 import {GlobalsService} from '../../shared';
 
 @Component({
@@ -15,12 +15,12 @@ export class ConfigureVchViewContainerComponent {
 
   @Input() title: string;
   @Input() vchId: string;
-  @Input() vchUiModelKey: VchUiModelKeys;
+  @Input() vchUiModelKey: VchViewKeys;
 
   constructor(protected globalsService: GlobalsService) {}
 
   /**
-   * Launches the corresponding configure modal based on the current VchUiModelKeys
+   * Launches the corresponding configure modal based on the current VchViewKeys
    */
   launchVchConfigureModal() {
     let path: string;
@@ -37,6 +37,9 @@ export class ConfigureVchViewContainerComponent {
         break;
       case 'networks':
         path = CONFIGURE_VCH_MODAL_NETWORK_URL;
+        break;
+      case 'security':
+        path = CONFIGURE_VCH_MODAL_SECURITY_URL;
         break;
     }
     if (path) {

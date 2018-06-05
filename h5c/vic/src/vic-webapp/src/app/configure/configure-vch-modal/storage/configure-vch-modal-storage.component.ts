@@ -4,7 +4,7 @@ import {ConfigureVchBase} from '../../configure-vch-base';
 import {GlobalsService} from '../../../shared/globals.service';
 import {ConfigureVchService, SelectedComputeResourceInfo} from '../../configure-vch.service';
 import {ActivatedRoute} from '@angular/router';
-import {VchUi} from '../../../interfaces/vch';
+import {VchView} from '../../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 
 @Component({
@@ -15,7 +15,7 @@ import {Observable} from 'rxjs/Observable';
 export class ConfigureVchModalStorageComponent extends ConfigureVchBase implements OnInit {
 
   public helpLink = globalProperties.vhcDocsGeneral;
-  public resourceObjRefObs: Observable<{vchUIModel: VchUi, resourceObjRef: string}>;
+  public resourceObjRefObs: Observable<{vchUIModel: VchView, resourceObjRef: string}>;
 
   constructor(protected globalsService: GlobalsService,
               protected configureVchService: ConfigureVchService,
@@ -32,7 +32,7 @@ export class ConfigureVchModalStorageComponent extends ConfigureVchBase implemen
       .serversInfo;
 
     this.resourceObjRefObs = this.vchInfo
-      .switchMap((vchInfo: VchUi) => {
+      .switchMap((vchInfo: VchView) => {
         return this.configureVchService
           .loadSelectedComputeResourceInfo(serversInfo, vchInfo.computeCapacity.computeResource)
           .map((resourceInfo: SelectedComputeResourceInfo) => ({vchUIModel: vchInfo, resourceObjRef: resourceInfo.obj.objRef}))

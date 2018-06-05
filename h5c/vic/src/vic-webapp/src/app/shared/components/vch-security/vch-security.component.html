@@ -1,0 +1,239 @@
+<!-- Read Only content -->
+<div *ngIf="readOnly; else formContent">
+  <!-- security -->
+  <clr-stack-view>
+    <clr-stack-header></clr-stack-header>
+    <clr-stack-block>
+      <clr-stack-label>{{ i18n.translate('vch.security.secureAccessToVCH') }}</clr-stack-label>
+      <clr-stack-content>{{ model.noTlsverify ? i18n.translate('vch.security.no') : i18n.translate('vch.security.yes') }}</clr-stack-content>
+    </clr-stack-block>
+  </clr-stack-view>
+
+  <!-- client certificates -->
+  <clr-stack-view *ngIf="model.tlsCa.length > 0">
+    <clr-stack-header>{{ i18n.translate('vch.security.clientCertificates') }}</clr-stack-header>
+    <clr-stack-block *ngFor="let clientCert of model.tlsCa">
+      <clr-stack-label>{{ clientCert.name }}</clr-stack-label>
+      <clr-stack-content>
+        {{ i18n.translate('vch.security.expires') }}: {{ clientCert.expires | date : 'mediumDate' }}, {{ i18n.translate('vch.security.thumbprint') }}: {{ clientCert.thumbprint }}
+      </clr-stack-content>
+    </clr-stack-block>
+  </clr-stack-view>
+
+  <!-- server certificates -->
+  <clr-stack-view *ngIf="model.tlsServerCert || model.tlsServerKey">
+    <clr-stack-header>{{ i18n.translate('vch.security.serverCertificates') }}</clr-stack-header>
+    <clr-stack-block>
+      <clr-stack-label>{{ i18n.translate('vch.security.sourceOfCertificates') }}</clr-stack-label>
+      <clr-stack-content>{{ model.serverCertSource }}</clr-stack-content>
+    </clr-stack-block>
+    <clr-stack-block>
+      <clr-stack-label>{{ i18n.translate('vch.security.serverCertificate') }}</clr-stack-label>
+      <clr-stack-content *ngIf="model.tlsServerCert">
+        {{ i18n.translate('vch.security.expires') }}: {{ model.tlsServerCert.expires | date : 'mediumDate'  }}, {{ i18n.translate('vch.security.thumbprint') }}: {{ model.tlsServerCert.thumbprint }}
+      </clr-stack-content>
+    </clr-stack-block>
+    <clr-stack-block>
+      <clr-stack-label>{{ i18n.translate('vch.security.serverPrivateKey') }}</clr-stack-label>
+      <clr-stack-content *ngIf="model.tlsServerKey">
+        {{ i18n.translate('vch.security.expires') }}: {{ model.tlsServerKey.expires | date : 'mediumDate'  }}, {{ i18n.translate('vch.security.thumbprint') }}: {{ model.tlsServerKey.thumbprint }}
+      </clr-stack-content>
+    </clr-stack-block>
+  </clr-stack-view>
+</div>
+
+
+<!-- Form content -->
+<ng-template #formContent>
+  <form class="pt-0" [formGroup]="form" novalidate>
+    <p class="mt-0">{{ i18n.translate('vch.security.dockerApiAccessText') }}</p>
+
+    <!-- Client Certificates -->
+    <section class="form-block">
+      <div class="row flex-items-xs-middle">
+        <div class="col-xs-3 form-block my-0">
+          <label class="my-0" for="use-client-auth">{{ i18n.translate('vch.security.clientCertificates') }}</label>
+        </div>
+        <div class="col-xs">
+          <div class="form-group mb-0 row">
+            <div class="col-xs">
+              <div class="toggle-switch toggle-switch--no-label">
+                <input type="checkbox" id="use-client-auth" formControlName="useClientAuth">
+                <label for="use-client-auth"></label>
+              </div>
+              <span class="text-muted">
+                {{ form.get('useClientAuth').value ? i18n.translate('vch.security.clientsWillNeedAuth') : i18n.translate('vch.security.clientsWillNotNeedAuth') }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="mt-0 mb-1">
+        {{ i18n.translate('vch.security.disablingClientCertificatesInfo') }}<br>
+        <strong>{{ i18n.translate('vch.security.insecureAccessInfo') }}</strong>
+      </p>
+      <div *ngIf="form.get('useClientAuth').value">
+        <p class="mt-0 mb-1">
+          {{ i18n.translate('vch.security.caCertificatesInfo') }}
+        </p>
+        <div class="alert alert-danger mb-1" *ngIf="tlsCaError">
+          <!-- .static hides the alert-item from the Angular component lookup -->
+          <div class="alert-item static">
+            <span class="alert-text">{{ tlsCaError }}</span>
+          </div>
+        </div>
+        <div formArrayName="tlsCas" *ngFor="let tlsCa of form.controls.tlsCas.controls; index as i; last as isLast">
+          <div [formGroupName]="i" class="form-group row mb-0">
+            <div class="col-xs-6 text-truncate">
+            <span class="text-muted" *ngIf="!tlsCaContents[i]" [ngClass]="{'required': i === 0}">
+              {{ i18n.translate('vch.security.selectX509pemFile') }}
+            </span>
+              <span *ngIf="tlsCaContents[i]">
+              {{ tlsCaContents[i].name }}, expires: {{ tlsCaContents[i].expires | date : 'mediumDate'}}
+            </span>
+              <input id="tls-ca-{{i}}"
+                     class="hidden-xs-up"
+                     type="file"
+                     (change)="addFileContent($event, 'tlsCas', i, isLast)">
+              <input type="hidden" formControlName="tlsCa">
+            </div>
+            <div class="col-xs px-0 add-remove-actions">
+              <label class="btn btn-link my-0" for="tls-ca-{{i}}">
+                {{ tlsCaContents[i] ? 'Replace' : 'Select' }}
+              </label>
+              <clr-icon class="is-solid mt-0"
+                        shape="times-circle"
+                        *ngIf="tlsCaContents[i]"
+                        (click)="removeFormArrayEntry('tlsCas', i)">
+              </clr-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Server Certificates -->
+    <section class="form-block" id="security">
+      <label>{{ i18n.translate('vch.security.serverCertificates') }}</label>
+      <div class="form-group row">
+        <div class="col-xs-3">
+          <label>{{ i18n.translate('vch.security.sourceOfCertificates') }}</label>
+        </div>
+        <div class="col-xs">
+          <div class="radio-inline">
+            <input type="radio" [value]="serverCertSourceAutogeneratedConst" formControlName="serverCertSource" id="server-autogen">
+            <label for="server-autogen">{{ i18n.translate('vch.security.autoGenerate') }}</label>
+          </div>
+          <div class="radio-inline">
+            <input type="radio" [value]="serverCertSourceExistingConst" formControlName="serverCertSource" id="server-existing">
+            <label for="server-existing">{{ i18n.translate('vch.security.existing') }}</label>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="form.get('serverCertSource').value === 'autogenerated'">
+        <div class="form-group row mb-0">
+          <div class="col-xs-3">
+            <label class="required" for="tls-cname">{{ i18n.translate('vch.security.commonNameCN') }}</label>
+          </div>
+          <div class="col-xs-4">
+            <label for="tls-cname"
+                   aria-haspopup="true"
+                   role="tooltip"
+                   class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
+                   [class.invalid]="isFormControlInvalid(form.get('tlsCname'))">
+              <input id="tls-cname" class="form-control" type="text" placeholder="*.local" formControlName="tlsCname">
+              <span class="tooltip-content" *ngIf="form.get('tlsCname').hasError('required')">
+              {{ i18n.translate('vch.security.commonNameCNNotEmpty') }}
+            </span>
+            </label>
+          </div>
+          <clr-signpost>
+            <clr-signpost-content [clrPosition]="'left-bottom'" *clrIfOpen>
+              <span>{{ i18n.translate('vch.security.fqdnNotEmpty') }}</span>
+            </clr-signpost-content>
+          </clr-signpost>
+        </div>
+        <div class="form-group row mb-0">
+          <div class="col-xs-3">
+            <label for="organization">{{ i18n.translate('vch.security.organization') }}</label>
+          </div>
+          <div class="col-xs-4">
+            <input id="organization" class="form-control" type="text" formControlName="organization">
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-3">
+            <label class="required" for="certificate-key-size">{{ i18n.translate('vch.security.certKeySize') }}</label>
+          </div>
+          <div class="col-xs-2">
+            <label for="certificate-key-size"
+                   aria-haspopup="true"
+                   role="tooltip"
+                   class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
+                   [class.invalid]="isFormControlInvalid(form.get('certificateKeySize'))">
+              <input id="certificate-key-size" class="form-control" type="text" formControlName="certificateKeySize">
+              <span class="tooltip-content" *ngIf="form.get('certificateKeySize').hasError('required')">
+              {{ i18n.translate('vch.security.certKeySizeNotEmpty') }}
+            </span>
+              <span class="tooltip-content" *ngIf="form.get('certificateKeySize').hasError('pattern')">
+              {{ i18n.translate('vch.security.certKeySizeNumeric') }}
+            </span>
+            </label>
+          </div>
+          <span>{{ i18n.translate('vch.security.bits') }}</span>
+        </div>
+      </div>
+      <div *ngIf="form.get('serverCertSource').value === 'existing'">
+        <p class="mt-0 mb-1">{{ i18n.translate('vch.security.otherCertAuth') }}</p>
+        <div class="alert alert-danger mb-1" *ngIf="tlsServerError">
+          <!-- .static hides the alert-item from the Angular component lookup -->
+          <div class="alert-item static">
+            <span class="alert-text">{{ tlsServerError }}</span>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <div class="col-xs-3">
+            <label class="required" for="tls-server-cert">{{ i18n.translate('vch.security.serverCertificates') }}</label>
+          </div>
+          <div class="col-xs-6">
+            <span class="text-muted" *ngIf="!tlsServerCertContents">{{ i18n.translate('vch.security.selectX509pemFile') }}</span>
+            <span *ngIf="tlsServerCertContents">
+            {{ tlsServerCertContents.name }}, expires: {{ tlsServerCertContents.expires | date : 'mediumDate'}}
+          </span>
+            <input id="tls-server-cert"
+                   class="hidden-xs-up"
+                   type="file"
+                   (change)="addFileContent($event, 'tlsServerCert')">
+            <input type="hidden" formControlName="tlsServerCert">
+          </div>
+          <div class="col-xs px-0 add-remove-actions">
+            <label class="btn btn-link my-0" for="tls-server-cert">
+              {{ tlsServerCertContents ? i18n.translate('vch.security.replace') : i18n.translate('vch.security.select') }}
+            </label>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-3">
+            <label class="required" for="tls-server-key">{{ i18n.translate('vch.security.selectPrivateKeyServer') }}</label>
+          </div>
+          <div class="col-xs-6">
+            <span class="text-muted" *ngIf="!tlsServerKeyContents">{{ i18n.translate('vch.security.selectEncPemFileSelect') }}</span>
+            <span *ngIf="tlsServerKeyContents">
+            {{ tlsServerKeyContents.name }}, {{ i18n.translate('vch.security.algorithm') }}: {{ tlsServerKeyContents.algorithm}}
+          </span>
+            <input id="tls-server-key"
+                   class="hidden-xs-up"
+                   type="file"
+                   (change)="addFileContent($event, 'tlsServerKey')">
+            <input type="hidden" formControlName="tlsServerKey">
+          </div>
+          <div class="col-xs px-0 add-remove-actions">
+            <label class="btn btn-link my-0" for="tls-server-key">
+              {{ tlsServerKeyContents ? i18n.translate('vch.security.replace') : i18n.translate('vch.security.select') }}
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </form>
+</ng-template>

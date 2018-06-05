@@ -15,22 +15,24 @@
 */
 
 import {Component, OnInit} from '@angular/core';
-import {GlobalsService} from '../../../shared/globals.service';
-import {ActivatedRoute} from '@angular/router';
-import {ConfigureVchBase} from '../../configure-vch-base';
 import {ConfigureVchService, SelectedComputeResourceInfo} from '../../configure-vch.service';
+import {GlobalsService} from '../../../shared/globals.service';
+import {ConfigureVchBase} from '../../configure-vch-base';
+import {ActivatedRoute} from '@angular/router';
+import {globalProperties} from '../../../../environments/properties';
 import {VchView} from '../../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 import {I18nService} from '../../../shared/i18n.service';
 
 @Component({
-  selector: 'vic-configure-vch-view-security',
-  styleUrls: ['./configure-vch-view-security.component.scss'],
-  templateUrl: './configure-vch-view-security.component.html'
+  selector: 'vic-configure-vch-modal-security',
+  styleUrls: ['./configure-vch-modal-security.component.scss'],
+  templateUrl: './configure-vch-modal-security.component.html'
 })
 
-export class ConfigureVchViewSecurityComponent extends ConfigureVchBase implements OnInit {
+export class ConfigureVchModalSecurityComponent extends ConfigureVchBase implements OnInit {
 
+  public helpLink = globalProperties.vhcDocsGeneral;
   public resourceObjRefObs: Observable<{vchUIModel: VchView, resourceInfo: SelectedComputeResourceInfo}>;
 
   constructor(protected globalsService: GlobalsService,
@@ -60,4 +62,5 @@ export class ConfigureVchViewSecurityComponent extends ConfigureVchBase implemen
           .map((resourceInfo: SelectedComputeResourceInfo) => ({vchUIModel: vchInfo, resourceInfo: resourceInfo}))
       })
   }
+
 }

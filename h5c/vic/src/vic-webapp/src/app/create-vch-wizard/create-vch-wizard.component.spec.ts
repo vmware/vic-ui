@@ -27,7 +27,6 @@ import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { Observable } from 'rxjs/Observable';
 import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { RefreshService } from '../shared/refresh.service';
-import { SecurityComponent } from './security/security.component';
 import { SummaryComponent } from './summary/summary.component';
 import { RegistryAccessComponent } from './registry-access/registry-access.component';
 import {VchGeneralComponent} from '../shared/components/vch-general/vch-general.component';
@@ -39,6 +38,7 @@ import {ConfigureVchService} from '../configure/configure-vch.service';
 import {HttpClientModule} from '@angular/common/http';
 import {VchStorageComponent} from '../shared/components/vch-storage/vch-storage.component';
 import {VchNetworkComponent} from '../shared/components/vch-network/vch-network.component';
+import {VchSecurityComponent} from '../shared/components/vch-security/vch-security.component';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -70,6 +70,9 @@ describe('CreateVchWizardComponent', () => {
                   };
                 }
               };
+            },
+            isPluginMode: () => {
+              return true;
             }
           }
         },
@@ -101,7 +104,7 @@ describe('CreateVchWizardComponent', () => {
         VchStorageComponent,
         ComputeResourceTreenodeComponent,
         VchNetworkComponent,
-        SecurityComponent,
+        VchSecurityComponent,
         RegistryAccessComponent,
         OperationsUserComponent,
         SummaryComponent,

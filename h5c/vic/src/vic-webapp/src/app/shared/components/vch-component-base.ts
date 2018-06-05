@@ -1,5 +1,5 @@
 import {EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {VchUiModelKeys, VchUiModelTypes} from '../../interfaces/vch';
+import {VchViewKeys, VchViewTypes} from '../../interfaces/vch';
 import {Subscription} from 'rxjs/Subscription';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
 import {Observable} from 'rxjs/Observable';
@@ -9,16 +9,16 @@ import {GlobalsService} from '../globals.service';
 
 export abstract class VchComponentBase implements OnInit, OnDestroy {
 
-  @Input() abstract model: VchUiModelTypes;
+  @Input() abstract model: VchViewTypes;
   @Input() readOnly: boolean;
 
-  @Output() modelChanged: EventEmitter<{[key: string]: VchUiModelTypes}> = new EventEmitter();
+  @Output() modelChanged: EventEmitter<{[key: string]: VchViewTypes}> = new EventEmitter();
 
   public form: FormGroup;
   protected formValueChangesSubscription: Subscription;
   protected isConfigure: boolean;
-  protected abstract readonly initialModel: VchUiModelTypes;
-  protected abstract readonly apiModelKey: VchUiModelKeys;
+  protected abstract readonly initialModel: VchViewTypes;
+  protected abstract readonly apiModelKey: VchViewKeys;
 
   constructor(protected formBuilder?: FormBuilder,
               protected createWzService?: CreateVchWizardService,
@@ -27,35 +27,38 @@ export abstract class VchComponentBase implements OnInit, OnDestroy {
   }
 
   /**
-   * If we are receiving an external model it means that we are on "configure" mode and we should update form and model. If not, we assume
-   * that our model is our inintialModel
+   * If we are receiving an external model means we are on "configure" or "read only" mode. If not, we assume that our model is our
+   * inintialModel. We update the form based on our model and we also subscribe to any further change in the form values in order to update
+   * the model and emit the last model.
    */
   ngOnInit() {
     if (this.model) {
-      this.model = Object.assign({}, this.model);
       this.isConfigure = true;
       this.updateFormAndModel(this.model);
       this.onPageLoad();
     } else {
-      this.model = Object.assign({}, this.initialModel);
+      this.model = this.initialModel;
     }
+
 
     this.formValueChangesSubscription = this.form
       .valueChanges
       .subscribe(value => {
         this.updateCurrentModel();
-        this.emitCurrentModel();
+        if (!this.readOnly) {
+          this.emitCurrentModel();
+        }
       });
   }
 
   /**
    * Updates the form values based on the received model and only if we have an external model (configure mode) we edit and emit
-   * the current model
+   * the current model.
    */
-  protected updateFormAndModel(model: VchUiModelTypes) {
+  protected updateFormAndModel(model: VchViewTypes) {
     this.updateCurrentForm(model);
-    if (this.model && !this.readOnly) {
-      this.updateCurrentModel();
+    this.updateCurrentModel();
+    if (!this.readOnly) {
       this.emitCurrentModel();
     }
   }
@@ -63,7 +66,7 @@ export abstract class VchComponentBase implements OnInit, OnDestroy {
   /**
    * Updates the current form. This should be implemented on each componente based on component form/model logic
    */
-  protected abstract updateCurrentForm(model: VchUiModelTypes);
+  protected abstract updateCurrentForm(model: VchViewTypes);
 
   /**
    * Updates the current model. This should be implemented on each componente based on component form/model logic
@@ -73,13 +76,16 @@ export abstract class VchComponentBase implements OnInit, OnDestroy {
   /**
    * Commits an observable of the current component model.
    */
-  abstract onCommit(): Observable<{[key: string]: VchUiModelTypes}>;
+  abstract onCommit(): Observable<{[key: string]: VchViewTypes}>;
 
   /**
-   * Emits the current model after any change in order to notify to any possible subscriptor
+   * Emits the current model after any change in order to notify to any possible subscriptor but only if the form is valid, we don't want to
+   * propagate an invalid model.
    */
   emitCurrentModel() {
-    this.modelChanged.emit({[this.apiModelKey]: this.model});
+    if (this.isValid()) {
+      this.modelChanged.emit({[this.apiModelKey]: this.model});
+    }
   }
 
   /**
@@ -90,7 +96,7 @@ export abstract class VchComponentBase implements OnInit, OnDestroy {
   }
 
   /**
-   * This should be implemented in order to be used by the creation wizzard component. Components can optionally override implementation
+   * This should be implemented in order to be used by the creation wizard component. Components can optionally override implementation.
    */
   onPageLoad() {}
 

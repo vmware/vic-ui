@@ -16,7 +16,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {VchComponentBase} from '../vch-component-base';
-import {VchContainerNetworkUi, VchUiNetwork} from '../../../interfaces/vch';
+import {VchContainerNetworView, VchNetworkView} from '../../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
 import {GlobalsService} from '../../globals.service';
@@ -36,10 +36,10 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
 
   @Input() resourceObjName: any;
   @Input() datacenter: ComputeResource;
-  @Input() model: VchUiNetwork;
+  @Input() model: VchNetworkView;
 
   protected readonly apiModelKey = 'networks';
-  protected readonly initialModel: VchUiNetwork = {
+  protected readonly initialModel: VchNetworkView = {
     bridgeNetwork: '',
     bridgeNetworkRange: '172.16.0.0/12',
     publicNetwork: '',
@@ -95,7 +95,7 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
     super.ngOnInit();
   }
 
-  protected updateCurrentForm(model: VchUiNetwork) {
+  protected updateCurrentForm(model: VchNetworkView) {
     this.form = this.formBuilder.group({
       bridgeNetwork: [model.bridgeNetwork, Validators.required],
       bridgeNetworkRange: [model.bridgeNetworkRange, Validators.required],
@@ -175,7 +175,7 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
 
   protected updateCurrentModel() {
     if (this.form.valid || this.readOnly) {
-      const currentModel: VchUiNetwork = {
+      const currentModel: VchNetworkView = {
         bridgeNetwork: this.form.get('bridgeNetwork').value,
         publicNetwork: this.form.get('publicNetwork').value,
         publicNetworkType: this.form.get('publicNetworkType').value,
@@ -243,8 +243,8 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
 
   }
 
-  onCommit(): Observable<{ [key: string]: VchUiNetwork }> {
-    return Observable.of({ [this.apiModelKey]: this.model });
+  onCommit(): Observable<{[key: string]: VchNetworkView}> {
+    return Observable.of({[this.apiModelKey]: this.model});
   }
 
   // -----------------------------------------------------------------------------------
@@ -261,7 +261,7 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
     containerNetworks.removeAt(index);
   }
 
-  createNewContainerNetworkEntry(container?: VchContainerNetworkUi) {
+  createNewContainerNetworkEntry(container?: VchContainerNetworView) {
     return this.formBuilder.group({
       containerNetwork: container ? container.containerNetwork : '',
       containerNetworkType: [{value: container ? container.containerNetworkType : 'dhcp', disabled: true}],

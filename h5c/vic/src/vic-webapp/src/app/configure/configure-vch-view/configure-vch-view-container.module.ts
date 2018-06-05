@@ -19,11 +19,6 @@ import {ClarityModule} from '@clr/angular';
 import {SharedModule} from '../../shared/shared.module';
 import {ConfigureVchViewContainerComponent} from './configure-vch-view-container.component';
 
-
-const declarations = [
-  ConfigureVchViewContainerComponent
-];
-
 @NgModule({
   imports: [
     CommonModule,
@@ -31,10 +26,10 @@ const declarations = [
     SharedModule
   ],
   declarations: [
-    ...declarations
+    ConfigureVchViewContainerComponent
   ],
   exports: [
-    ...declarations
+    ConfigureVchViewContainerComponent
   ]
 })
 export class ConfigureVchViewContainerModule {

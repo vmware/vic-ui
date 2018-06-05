@@ -19,34 +19,32 @@ import {RouterModule, Routes} from '@angular/router';
 import {ClarityModule} from '@clr/angular';
 import {ConfigureVchService} from '../../configure-vch.service';
 import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
-import {ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../../../shared/shared.module';
-import {ConfigureVchViewContainerModule} from '../configure-vch-view-container.module';
-import {ConfigureVchViewSecurityComponent} from './configure-vch-view-security.component';
+import {ConfigureVchModalContainerModule} from '../configure-vch-modal-container.module';
+import {ConfigureVchModalSecurityComponent} from './configure-vch-modal-security.component';
 
 const routes: Routes = [
-  {path: '**', component: ConfigureVchViewSecurityComponent}
+  {path: '**', component: ConfigureVchModalSecurityComponent}
 ];
 
 @NgModule({
   imports: [
-    ReactiveFormsModule,
     CommonModule,
     ClarityModule,
-    SharedModule,
     RouterModule.forChild(routes),
-    ConfigureVchViewContainerModule
+    SharedModule,
+    ConfigureVchModalContainerModule
   ],
   declarations: [
-    ConfigureVchViewSecurityComponent
+    ConfigureVchModalSecurityComponent
   ],
   exports: [
-    ConfigureVchViewSecurityComponent
+    ConfigureVchModalSecurityComponent
   ],
   providers: [
     ConfigureVchService,
     CreateVchWizardService
-  ]
+  ],
 })
-export class ConfigureVchViewSecurityModule {
+export class ConfigureVchModalSecurityModule {
 }

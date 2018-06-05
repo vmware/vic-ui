@@ -23,7 +23,7 @@ import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wiza
 import {GlobalsService} from '../../globals.service';
 import {ConfigureVchService} from '../../../configure/configure-vch.service';
 import {HttpClientModule} from '@angular/common/http';
-import {VchUiStorage} from '../../../interfaces/vch';
+import {VchStorageView} from '../../../interfaces/vch';
 import {AppAlertService} from '../../app-alert.service';
 import {I18nService} from '../../i18n.service';
 
@@ -136,7 +136,7 @@ describe('StorageCapacityComponent', () => {
     const folderName = 'folder';
     const expectedFolderName = '/folder';
 
-    const dataModel: VchUiStorage = {
+    const dataModel: VchStorageView = {
       baseImageSize: '8',
       baseImageSizeUnit: 'GiB',
       fileFolder: folderName,
@@ -148,7 +148,6 @@ describe('StorageCapacityComponent', () => {
       }]
     };
 
-    component.model = dataModel;
     // in order to call a private / protected method to force models update...
     component['updateFormAndModel'](dataModel);
     component['updateCurrentModel']();

@@ -31,7 +31,7 @@ import {
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {VirtualContainerHost} from '../vch-view/vch.model';
 import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';
-import {VchApi} from '../interfaces/vch';
+import {Vch} from '../interfaces/vch';
 import {ComputeResource} from '../interfaces/compute.resource';
 import {ServerInfo} from '../shared/vSphereClientSdkTypes';
 
@@ -71,7 +71,7 @@ export class ConfigureVchService {
     );
   }
 
-  getVchInfo(vchIdStr: string): Observable<VchApi> {
+  getVchInfo(vchIdStr: string): Observable<Vch> {
     const vch = <VirtualContainerHost>{id: vchIdStr};
     return this.getServiceHostAndTkt(vch)
       .switchMap(([serviceHost, cloneTicket]) => {
@@ -85,11 +85,11 @@ export class ConfigureVchService {
           'X-VMWARE-TICKET': cloneTicket
         });
 
-        return this.httpClient.get<VchApi>(url, { headers: headers })
+        return this.httpClient.get<Vch>(url, { headers: headers })
       });
   }
 
-  patchVch(vchIdStr: string, payload: VchApi): Observable<VchApi> {
+  patchVch(vchIdStr: string, payload: Vch): Observable<Vch> {
     const vch = <VirtualContainerHost>{id: vchIdStr};
     return this.getServiceHostAndTkt(vch)
       .switchMap(([serviceHost, cloneTicket]) => {
@@ -103,7 +103,7 @@ export class ConfigureVchService {
           'X-VMWARE-TICKET': cloneTicket
         });
 
-        return this.httpClient.patch<VchApi>(url, payload, {headers: headers})
+        return this.httpClient.patch<Vch>(url, payload, {headers: headers})
       });
   }
 

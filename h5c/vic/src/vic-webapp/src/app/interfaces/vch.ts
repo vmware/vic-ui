@@ -7,83 +7,83 @@ export type FirewallPolicyType = 'Closed' | 'Outbound' | 'Peers' | 'Published' |
 
 
 // VCH
-export interface VchApi {
-  version?: string,
-  name?: string,
-  debug?: number,
-  syslog_addr?: string,
-  compute?: VchApiCompute,
-  network?: VchApiNetwork,
-  storage?: VchApiStorage,
-  auth?: VchApiAuth,
-  endpoint?: VchApiEndpoint,
-  registry?: VchApiRegistry,
-  container?: VchApiContainer
-  runtime?: VchApiRuntime,
+export interface Vch {
+  version?: string;
+  name?: string;
+  debug?: number;
+  syslog_addr?: string;
+  compute?: VchCompute;
+  network?: VchNetwork;
+  storage?: VchStorage;
+  auth?: VchAuth;
+  endpoint?: VchEndpoint;
+  registry?: VchRegistry;
+  container?: VchContainer
+  runtime?: VchRuntime;
 }
 
-export interface VchUi {
-  general?: VchUiGeneral;
-  computeCapacity?: VchUiCompute;
-  storageCapacity?: VchUiStorage;
-  networks?: VchUiNetwork;
-  operations?: any,
-  registry?: any,
-  security?: any
+export interface VchView {
+  general?: VchGeneralView;
+  computeCapacity?: VchComputeView;
+  storageCapacity?: VchStorageView;
+  networks?: VchNetworkView;
+  operations?: any;
+  registry?: any;
+  security?: VchSecurityView;
 }
 
 // VCH General
-export interface VchUiGeneral {
+export interface VchGeneralView {
   name: string;
   containerNameConvention: string;
   debug?: number | string;
   syslogAddress?: string;
 }
 
-export interface VchApiGeneral {
+export interface VchGeneral {
   name: string;
   debug?: number;
   syslog_addr?: string;
-  container?: VchApiContainer;
+  container?: VchContainer;
 }
 
 // VCH Compute
-export interface VchApiCompute {
+export interface VchCompute {
   cpu: {
     limit?: {
-      units: CpuUnit,
+      units: CpuUnit;
       value: number
-    },
+    };
     reservation?: {
-      units: CpuUnit,
+      units: CpuUnit;
       value: number
-    },
+    };
     shares?: {
-      number?: number,
+      number?: number;
       level: SharesLevel
     }
-  },
+  };
   memory: {
     limit?: {
-      units: MemoryUnit,
+      units: MemoryUnit;
       value: number
-    },
+    };
     reservation?: {
-      units: MemoryUnit,
+      units: MemoryUnit;
       value: number
-    },
+    };
     shares?: {
-      number?: number,
+      number?: number;
       level: SharesLevel
     }
-  },
+  };
   resource?: {
-    id?: string,
+    id?: string;
     name: string
   }
 }
 
-export interface VchUiCompute {
+export interface VchComputeView {
   cpuLimit?: number | string;
   memoryLimit?: number | string;
   cpuReservation?: number | string;
@@ -96,71 +96,71 @@ export interface VchUiCompute {
 }
 
 // VCH Network
-export interface VchApiNetwork {
+export interface VchNetwork {
   bridge: {
-    ip_range: string,
+    ip_range: string;
     port_group: {
-      id?: string,
+      id?: string;
       name: string
     }
-  },
+  };
   client?: {
     port_group: {
-      id?: string,
+      id?: string;
       name?: string
-    },
+    };
     gateway?: {
-      routing_destinations?: string[],
+      routing_destinations?: string[];
       address: string
-    },
-    nameservers?: string[],
+    };
+    nameservers?: string[];
     static?: string
-  },
+  };
   management?: {
     port_group: {
-      id?: string,
+      id?: string;
       name?: string
-    },
+    };
     gateway?: {
-      routing_destinations?: string[],
+      routing_destinations?: string[];
       address: string
-    },
-    nameservers?: string[],
+    };
+    nameservers?: string[];
     static?: string
-  },
+  };
   public: {
     port_group: {
-      id?: string,
+      id?: string;
       name: string
-    },
+    };
     gateway?: {
-      routing_destinations?: string[],
+      routing_destinations?: string[];
       address: string
-    },
-    nameservers?: string[],
+    };
+    nameservers?: string[];
     static?: string
-  },
-  container?: ContainerNetworkApi[],
-  httpProxy?: string,
+  };
+  container?: ContainerNetwork[];
+  httpProxy?: string;
   httpsProxy?: string
 }
 
-export interface ContainerNetworkApi {
-  alias?: string,
-  firewall?: FirewallPolicyType,
-  nameservers?: string[],
+export interface ContainerNetwork {
+  alias?: string;
+  firewall?: FirewallPolicyType;
+  nameservers?: string[];
   port_group: {
-    id?: string,
+    id?: string;
     name: string
-  },
+  };
   gateway?: {
-    routing_destinations?: string[],
+    routing_destinations?: string[];
     address: string
-  },
+  };
   ip_ranges?: string[]
 }
 
-export interface VchUiNetwork {
+export interface VchNetworkView {
   clientNetwork?: string;
   clientNetworkGateway?: string;
   clientNetworkIp?: string;
@@ -177,7 +177,7 @@ export interface VchUiNetwork {
   managementNetworkIp?: string;
   managementNetworkRouting?: string;
   managementNetworkType?: string;
-  containerNetworks?: VchContainerNetworkUi[];
+  containerNetworks?: VchContainerNetworView[];
   dnsServer?: string[];
   httpProxy?: string;
   httpProxyPort?: string;
@@ -185,7 +185,7 @@ export interface VchUiNetwork {
   httpsProxyPort?: string;
 }
 
-export interface VchContainerNetworkUi {
+export interface VchContainerNetworView {
   containerNetwork: string;
   containerNetworkDns: string;
   containerNetworkFirewall: FirewallPolicyType;
@@ -196,106 +196,125 @@ export interface VchContainerNetworkUi {
 }
 
 // VCH Storage
-export interface VchApiStorage {
-  image_stores: string[],
+export interface VchStorage {
+  image_stores: string[];
   volume_stores?: {
     datastore: string;
     label: string
-    }[],
+    }[];
   base_image_size: {
-    units: ImageSizeUnit,
+    units: ImageSizeUnit;
     value: number | string;
   }
 }
 
-export interface VchUiStorage {
+export interface VchStorageView {
   baseImageSize: number | string;
   baseImageSizeUnit: ImageSizeUnit;
   fileFolder: string;
   imageStore: string;
-  volumeStore?: VchUiStorageVolumeStore[];
+  volumeStore?: VchStorageVolumeStoreView[];
 }
 
-export interface VchUiStorageVolumeStore {
+export interface VchStorageVolumeStoreView {
   dockerVolName: string;
   volDatastore: string;
   volFileFolder: string;
 }
 
-// VCH Auth
-export interface VchApiAuth {
-  no_tls?: true,
+// VCH Security / Auth
+export interface VchAuth {
+  no_tls?: boolean;
   client: {
-    no_tls_verify?: true,
-    certificate_authorities?: [
-      {
-        pem: string
-      }
-      ]
-  },
+    no_tls_verify?: boolean;
+    certificate_authorities?: {pem: string}[]
+  };
   server: {
     certificate?: {
       pem: string
-    },
+    };
     private_key?: {
       pem: string
-    },
+    };
     generate?: {
       size: {
-        units: ServerCertSizeUnit,
+        units: ServerCertSizeUnit;
         value: number
-      },
-      organization?: string[],
+      };
+      organization?: string[];
       cname?: string
     }
   }
 }
 
+export interface VchSecurityView {
+  useClientAuth: boolean;
+  serverCertSource: string;
+  tlsCa?: VchSecurityTlsCaView[];
+  target?: string;
+  thumbprint?: string;
+  user?: string;
+  certificateKeySize?: number;
+  noTlsverify?: boolean;
+  tlsCname?: string;
+  organization?: string;
+  tlsServerCert?: VchSecurityTlsCaView;
+  tlsServerKey?: VchSecurityTlsCaView;
+}
+
+export interface VchSecurityTlsCaView {
+  content: string;
+  expires?: Date;
+  name?: string;
+  thumbprint?: string;
+  algorithm?: string;
+}
+
+export const defaultCertificateKeySize = 2048;
+export const serverCertSourceAutogenerated = 'autogenerated';
+export const serverCertSourceExisting = 'existing';
+
 // VCH Endpoint
-export interface VchApiEndpoint {
+export interface VchEndpoint {
   memory?: {
-    units: MemoryUnit,
+    units: MemoryUnit;
     value: number
-  },
+  };
   cpu?: {
     sockets: number
-  },
+  };
   operations_credentials?: {
-    password: string,
-    user: string,
+    password: string;
+    user: string;
     grant_permissions?: true
   }
 }
 
 // VCH Registry
-export interface VchApiRegistry {
-  insecure?: string[],
-  whitelist?: string[],
-  certificate_authorities?: [
-    {
-      pem: string
-    }
-    ],
+export interface VchRegistry {
+  insecure?: string[];
+  whitelist?: string[];
+  certificate_authorities?: { pem: string }[];
   image_fetch_proxy?: {
-    http?: string,
+    http?: string;
     https?: string
   }
 }
 
 // VCH Runtime
-export interface VchApiRuntime {
-  power_state?: string,
-  upgrade_status?: string,
-  admin_portal?: string,
+export interface VchRuntime {
+  power_state?: string;
+  upgrade_status?: string;
+  admin_portal?: string;
   docker_host?: string
 }
 
 // VCH Container
-export interface VchApiContainer {
+export interface VchContainer {
   name_convention?: string
 }
 
 
 
-export type VchUiModelTypes = VchUi | VchUiGeneral | VchUiCompute | VchUiStorage | VchUiNetwork;
-export type VchUiModelKeys = 'general' | 'computeCapacity' | 'storageCapacity' | 'networks';
+export type VchViewTypes = VchView | VchGeneralView | VchComputeView | VchStorageView | VchNetworkView | VchSecurityView;
+export type VchViewKeys = 'general' | 'computeCapacity' | 'storageCapacity' | 'networks' | 'security';

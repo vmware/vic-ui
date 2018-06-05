@@ -18,6 +18,7 @@ import { fromBase64, stringToArrayBuffer } from 'pvutils';
 import { fromBER } from 'asn1js';
 import Certificate from 'pkijs/build/Certificate';
 import InternalPrivateKeyInfo from 'pkijs/build/PrivateKeyInfo';
+import {X509, KJUR} from 'jsrsasign';
 
 export interface CertificateInfo {
   expires: Date
@@ -60,7 +61,7 @@ export function parseCertificatePEMFileContent(str: string): CertificateInfo {
 
   return {
     expires: certificate.notAfter.value
-  }
+  };
 }
 
 export function parsePrivateKeyPEMFileContent(str: string): PrivateKeyInfo {
@@ -77,4 +78,11 @@ export function parsePrivateKeyPEMFileContent(str: string): PrivateKeyInfo {
   return {
     algorithm: algorithmsMap[privateKey.privateKeyAlgorithm.algorithmId]
   };
+}
+
+export function getThumbprintFromCertificate(str: string): string {
+  const c = new X509();
+  c.readCertPEM(str);
+  const thumb = KJUR.crypto.Util.hashHex(c.hex, 'sha1');
+  return thumb.match(/.{1,2}/g).join(':').toUpperCase();
 }

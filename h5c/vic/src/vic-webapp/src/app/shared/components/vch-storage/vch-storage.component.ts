@@ -5,7 +5,7 @@ import {ConfigureVchService, SelectedComputeResourceInfo} from '../../../configu
 import {GlobalsService} from '../../globals.service';
 import {FormArray, FormBuilder, Validators} from '@angular/forms';
 import {Observable} from 'rxjs/Observable';
-import {VchUiStorage, VchUiStorageVolumeStore} from '../../../interfaces/vch';
+import {VchStorageView, VchStorageVolumeStoreView} from '../../../interfaces/vch';
 import {numberPattern, supportedCharsPattern} from '../../utils/validators';
 import {noBlankSpaces} from '../../utils';
 import {I18nService} from '../../i18n.service';
@@ -23,10 +23,10 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
     }
   }
 
-  @Input() model: VchUiStorage;
+  @Input() model: VchStorageView;
 
   protected readonly apiModelKey = 'storageCapacity';
-  protected readonly initialModel: VchUiStorage = {
+  protected readonly initialModel: VchStorageView = {
     baseImageSize: '8',
     baseImageSizeUnit: 'GiB',
     fileFolder: '',
@@ -36,7 +36,7 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
 
   public formErrMessage = '';
   public datastoresLoading = true;
-  public datastores: VchUiStorageVolumeStore[] = [];
+  public datastores: VchStorageVolumeStoreView[] = [];
   public selectedComputeResourceInfo: Observable<SelectedComputeResourceInfo>;
   private _isSetup = false;
   private readonly dockerVolNameDefault = 'default';
@@ -56,7 +56,7 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
     super.ngOnInit();
   }
 
-  protected updateCurrentForm(model: VchUiStorage) {
+  protected updateCurrentForm(model: VchStorageView) {
     this.form = this.formBuilder.group({
       imageStore: [model.imageStore, Validators.required],
       fileFolder: model.fileFolder,
@@ -69,7 +69,7 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
       ],
       baseImageSizeUnit: model.baseImageSizeUnit,
       enableAnonymousVolumes: model.volumeStore
-        .some((volume: VchUiStorageVolumeStore) => volume.dockerVolName === this.dockerVolNameDefault),
+        .some((volume: VchStorageVolumeStoreView) => volume.dockerVolName === this.dockerVolNameDefault),
       volumeStore: this.formBuilder.array(model.volumeStore.length > 0 ?
         this.getModelVolumesEntries(model.volumeStore) : [this.createNewVolumeDatastoreEntry()])
     });
@@ -77,38 +77,41 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
 
   protected updateCurrentModel() {
     if (this.form.valid) {
-
-      this.model.imageStore = this.form.get('imageStore').value;
+      const currentModel: VchStorageView = {
+        baseImageSize: this.form.get('baseImageSize').value,
+        baseImageSizeUnit: this.form.get('baseImageSizeUnit').value,
+        fileFolder: '',
+        imageStore: this.form.get('imageStore').value,
+      };
 
       if (this.form.get('fileFolder').value) {
         let val = this.form.get('fileFolder').value;
         if (val.length && val.charAt(0) !== '/') {
-          val = '/' + val;
+          val = `/${val}`;
         }
-        this.model.fileFolder = val;
+        currentModel.fileFolder = val;
       }
 
-      this.model.baseImageSize = this.form.get('baseImageSize').value;
-      this.model.baseImageSizeUnit = this.form.get('baseImageSizeUnit').value;
-      this.model.volumeStore = this.form.get('volumeStore').value.filter((vol: VchUiStorageVolumeStore) => vol.volDatastore);
-      this.model.volumeStore.forEach((vol: VchUiStorageVolumeStore) => {
+      currentModel.volumeStore = this.form.get('volumeStore').value.filter((vol: VchStorageVolumeStoreView) => vol.volDatastore);
+      currentModel.volumeStore.forEach((vol: VchStorageVolumeStoreView) => {
         // if volume file folder doesn't start with '/', prepend the value with '/'
         if (vol.volFileFolder.length && vol.volFileFolder.charAt(0) !== '/') {
-          vol.volFileFolder = '/' + vol.volFileFolder;
+          vol.volFileFolder = `/${vol.volFileFolder}`;
         }
       });
+
+      this.model = currentModel;
     }
   }
 
-  onCommit(): Observable<{storageCapacity: VchUiStorage}> {
+  onCommit(): Observable<{[key: string]: VchStorageView}> {
     if (this.form.invalid) {
       if (this.form.get('imageStore').hasError('required')) {
         this.formErrMessage = 'Image store should be selected';
         return Observable.throw(this.formErrMessage);
       }
     }
-
-    return Observable.of({storageCapacity: this.model});
+    return Observable.of({[this.apiModelKey]: this.model});
   }
 
   // -----------------------------------------------------------
@@ -122,7 +125,7 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
       }, err => console.error(err));
   }
 
-  createNewVolumeDatastoreEntry(volumeInfo?: VchUiStorageVolumeStore) {
+  createNewVolumeDatastoreEntry(volumeInfo?: VchStorageVolumeStoreView) {
     return this.formBuilder.group({
       volDatastore: volumeInfo ? volumeInfo.volDatastore : '',
       volFileFolder: volumeInfo ? volumeInfo.volFileFolder : '',
@@ -145,9 +148,9 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
     volStores.removeAt(index);
   }
 
-  getModelVolumesEntries(volumes: VchUiStorageVolumeStore[]) {
-    const defaultVol: VchUiStorageVolumeStore = volumes
-      .find((vol: VchUiStorageVolumeStore) => vol.dockerVolName === this.dockerVolNameDefault);
+  getModelVolumesEntries(volumes: VchStorageVolumeStoreView[]) {
+    const defaultVol: VchStorageVolumeStoreView = volumes
+      .find((vol: VchStorageVolumeStoreView) => vol.dockerVolName === this.dockerVolNameDefault);
 
     // we want the default volume to be the 1st on the list, if there is no default volume then it doesn't mater.
     if (!defaultVol) {
@@ -155,7 +158,7 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
     } else {
       return [
         defaultVol,
-        ...volumes.filter((vol: VchUiStorageVolumeStore) => vol.dockerVolName !== this.dockerVolNameDefault)
+        ...volumes.filter((vol: VchStorageVolumeStoreView) => vol.dockerVolName !== this.dockerVolNameDefault)
       ].map(volumeInfo => this.createNewVolumeDatastoreEntry(volumeInfo));
     }
 

@@ -22,7 +22,6 @@ import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { NgModule } from '@angular/core';
 import { OperationsUserComponent } from './operations-user/operations-user.component';
-import { SecurityComponent } from './security/security.component';
 import { SummaryComponent } from './summary/summary.component';
 import { RegistryAccessComponent } from './registry-access/registry-access.component';
 import { SharedModule } from '../shared/shared.module';
@@ -35,7 +34,6 @@ const routes: Routes = [
 
 const declarations = [
   CreateVchWizardComponent,
-  SecurityComponent,
   RegistryAccessComponent,
   OperationsUserComponent,
   SummaryComponent

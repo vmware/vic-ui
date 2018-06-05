@@ -45,6 +45,7 @@
     "classlist.js": "^1.1.20150312",
     "core-js": "^2.5.0",
     "framebus": "^2.0.8",
+    "jsrsasign": "^8.0.12",
     "mutationobserver-shim": "0.3.2",
     "pkijs": "^2.0.66",
     "rxjs": "^5.3.0",
