@@ -28,7 +28,7 @@ export interface VchView {
   storageCapacity?: VchStorageView;
   networks?: VchNetworkView;
   operations?: any;
-  registry?: any;
+  registry?: VchRegistryView;
   security?: VchSecurityView;
 }
 
@@ -177,7 +177,7 @@ export interface VchNetworkView {
   managementNetworkIp?: string;
   managementNetworkRouting?: string;
   managementNetworkType?: string;
-  containerNetworks?: VchContainerNetworView[];
+  containerNetworks?: VchContainerNetworkView[];
   dnsServer?: string[];
   httpProxy?: string;
   httpProxyPort?: string;
@@ -185,7 +185,7 @@ export interface VchNetworkView {
   httpsProxyPort?: string;
 }
 
-export interface VchContainerNetworView {
+export interface VchContainerNetworkView {
   containerNetwork: string;
   containerNetworkDns: string;
   containerNetworkFirewall: FirewallPolicyType;
@@ -250,7 +250,7 @@ export interface VchAuth {
 export interface VchSecurityView {
   useClientAuth: boolean;
   serverCertSource: string;
-  tlsCa?: VchSecurityTlsCaView[];
+  tlsCa?: TlsCaView[];
   target?: string;
   thumbprint?: string;
   user?: string;
@@ -258,11 +258,11 @@ export interface VchSecurityView {
   noTlsverify?: boolean;
   tlsCname?: string;
   organization?: string;
-  tlsServerCert?: VchSecurityTlsCaView;
-  tlsServerKey?: VchSecurityTlsCaView;
+  tlsServerCert?: TlsCaView;
+  tlsServerKey?: TlsCaView;
 }
 
-export interface VchSecurityTlsCaView {
+export interface TlsCaView {
   content: string;
   expires?: Date;
   name?: string;
@@ -301,6 +301,13 @@ export interface VchRegistry {
   }
 }
 
+export interface VchRegistryView {
+  insecureRegistry: string[],
+  registryCa: TlsCaView[],
+  whitelistRegistry: string[],
+  useWhitelistRegistry: boolean
+}
+
 // VCH Runtime
 export interface VchRuntime {
   power_state?: string;
@@ -316,5 +323,5 @@ export interface VchContainer {
 
 
 
-export type VchViewTypes = VchView | VchGeneralView | VchComputeView | VchStorageView | VchNetworkView | VchSecurityView;
-export type VchViewKeys = 'general' | 'computeCapacity' | 'storageCapacity' | 'networks' | 'security';
+export type VchViewTypes = VchView | VchGeneralView | VchComputeView | VchStorageView | VchNetworkView | VchSecurityView | VchRegistryView;
+export type VchViewKeys = 'general' | 'computeCapacity' | 'storageCapacity' | 'networks' | 'security' | 'registry';

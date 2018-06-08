@@ -17,36 +17,34 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {ClarityModule} from '@clr/angular';
-import {ConfigureVchViewRegistryComponent} from './configure-vch-view-registry.component';
-import {ReactiveFormsModule} from '@angular/forms';
-import {SharedModule} from '../../../shared/shared.module';
-import {ConfigureVchViewContainerModule} from '../configure-vch-view-container.module';
 import {ConfigureVchService} from '../../configure-vch.service';
 import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {SharedModule} from '../../../shared/shared.module';
+import {ConfigureVchModalContainerModule} from '../configure-vch-modal-container.module';
+import {ConfigureVchModalRegistryComponent} from './configure-vch-modal-registry.component';
 
 const routes: Routes = [
-  {path: '**', component: ConfigureVchViewRegistryComponent}
+  {path: '**', component: ConfigureVchModalRegistryComponent}
 ];
 
 @NgModule({
   imports: [
-    ReactiveFormsModule,
     CommonModule,
     ClarityModule,
-    SharedModule,
     RouterModule.forChild(routes),
-    ConfigureVchViewContainerModule
+    SharedModule,
+    ConfigureVchModalContainerModule
   ],
   declarations: [
-    ConfigureVchViewRegistryComponent
+    ConfigureVchModalRegistryComponent
   ],
   exports: [
-    ConfigureVchViewRegistryComponent
+    ConfigureVchModalRegistryComponent
   ],
   providers: [
     ConfigureVchService,
     CreateVchWizardService
-  ]
+  ],
 })
-export class ConfigureVchViewRegistryModule {
+export class ConfigureVchModalRegistryModule {
 }

@@ -23,18 +23,15 @@ import { CreateVchWizardService } from './create-vch-wizard.service';
 import { NgModule } from '@angular/core';
 import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { SummaryComponent } from './summary/summary.component';
-import { RegistryAccessComponent } from './registry-access/registry-access.component';
 import { SharedModule } from '../shared/shared.module';
 import {ConfigureVchService} from '../configure/configure-vch.service';
 
 const routes: Routes = [
-  { path: '', component: CreateVchWizardComponent },
-  { path: ':id', component: CreateVchWizardComponent }
+  { path: '**', component: CreateVchWizardComponent }
 ];
 
 const declarations = [
   CreateVchWizardComponent,
-  RegistryAccessComponent,
   OperationsUserComponent,
   SummaryComponent
 ];

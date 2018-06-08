@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { ComponentFixture, TestBed, async, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -28,7 +28,6 @@ import { Observable } from 'rxjs/Observable';
 import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { RefreshService } from '../shared/refresh.service';
 import { SummaryComponent } from './summary/summary.component';
-import { RegistryAccessComponent } from './registry-access/registry-access.component';
 import {VchGeneralComponent} from '../shared/components/vch-general/vch-general.component';
 import {VchComputeComponent} from '../shared/components/vch-compute/vch-compute.component';
 import {ComputeResourceTreenodeComponent} from '../shared/components/vch-compute/compute-resource-treenode.component';
@@ -39,6 +38,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {VchStorageComponent} from '../shared/components/vch-storage/vch-storage.component';
 import {VchNetworkComponent} from '../shared/components/vch-network/vch-network.component';
 import {VchSecurityComponent} from '../shared/components/vch-security/vch-security.component';
+import {VchRegistryComponent} from '../shared/components/vch-registry/vch-registry.component';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -105,7 +105,7 @@ describe('CreateVchWizardComponent', () => {
         ComputeResourceTreenodeComponent,
         VchNetworkComponent,
         VchSecurityComponent,
-        RegistryAccessComponent,
+        VchRegistryComponent,
         OperationsUserComponent,
         SummaryComponent,
         CapitalizePipe,

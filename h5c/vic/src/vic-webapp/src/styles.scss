@@ -20,3 +20,19 @@
 .stack-view .stack-block {
   min-height: 37px;
 }
+
+/* Forces spinner to be centered on all the vic-configure-container-view */
+.vic-configure-container-view-spinner-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Forces spinner to be centered on all the vic-configure-container-modal */
+.vic-configure-container-modal-spinner-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -130px);
+}

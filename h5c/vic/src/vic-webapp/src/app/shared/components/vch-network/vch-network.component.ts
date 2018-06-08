@@ -16,7 +16,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {VchComponentBase} from '../vch-component-base';
-import {VchContainerNetworView, VchNetworkView} from '../../../interfaces/vch';
+import {VchContainerNetworkView, VchNetworkView} from '../../../interfaces/vch';
 import {Observable} from 'rxjs/Observable';
 import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
 import {GlobalsService} from '../../globals.service';
@@ -261,7 +261,7 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
     containerNetworks.removeAt(index);
   }
 
-  createNewContainerNetworkEntry(container?: VchContainerNetworView) {
+  createNewContainerNetworkEntry(container?: VchContainerNetworkView) {
     return this.formBuilder.group({
       containerNetwork: container ? container.containerNetwork : '',
       containerNetworkType: [{value: container ? container.containerNetworkType : 'dhcp', disabled: true}],

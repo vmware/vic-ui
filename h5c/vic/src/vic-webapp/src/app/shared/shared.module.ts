@@ -27,6 +27,7 @@ import {ComputeResourceTreenodeComponent} from './components/vch-compute/compute
 import {VchStorageComponent} from './components/vch-storage/vch-storage.component';
 import {VchNetworkComponent} from './components/vch-network/vch-network.component';
 import {VchSecurityComponent} from './components/vch-security/vch-security.component';
+import {VchRegistryComponent} from './components/vch-registry/vch-registry.component';
 
 const declarations = [
   VicOvaVerificationComponent,
@@ -35,6 +36,7 @@ const declarations = [
   VchStorageComponent,
   VchNetworkComponent,
   VchSecurityComponent,
+  VchRegistryComponent,
   ComputeResourceTreenodeComponent,
   CliCommandComponent,
   CapitalizePipe

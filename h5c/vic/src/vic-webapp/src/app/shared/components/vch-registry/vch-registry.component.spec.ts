@@ -13,34 +13,82 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule, FormGroup} from '@angular/forms';
 import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
-import {RegistryAccessComponent} from './registry-access.component';
-import { FormBuilder, FormArray, FormControl} from '@angular/forms';
+import {FormBuilder, FormArray} from '@angular/forms';
+import {VchRegistryComponent} from './vch-registry.component';
+import {AppAlertService} from '../../app-alert.service';
+import {I18nService} from '../../i18n.service';
+import {CreateVchWizardService} from '../../../create-vch-wizard/create-vch-wizard.service';
+import {Observable} from 'rxjs/Observable';
+import {GlobalsService} from '../../globals.service';
+import {ConfigureVchService} from '../../../configure/configure-vch.service';
+import {HttpClientModule} from '@angular/common/http';
 
 describe('RegistryAccessComponent', () => {
 
-  let component: RegistryAccessComponent;
-  let fixture: ComponentFixture<RegistryAccessComponent>;
+  let component: VchRegistryComponent;
+  let fixture: ComponentFixture<VchRegistryComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         ReactiveFormsModule,
         HttpModule,
+        HttpClientModule,
         ClarityModule
       ],
-      declarations: [RegistryAccessComponent],
+      declarations: [VchRegistryComponent],
       providers: [
-        FormBuilder
+        AppAlertService,
+        I18nService,
+        FormBuilder,
+        ConfigureVchService,
+        {
+          provide: CreateVchWizardService,
+          useValue: {
+            getUserId() {
+              return Observable.of('userId');
+            },
+            getServerThumbprint() {
+              return Observable.of('serverThumbprint');
+            },
+            getVcHostname() {
+              return Observable.of('vcHostname');
+            }
+          }
+        },
+        {
+          provide: GlobalsService,
+          useValue: {
+            isPluginMode: () => {
+              return true;
+            },
+            getWebPlatform() {
+              return {
+                getUserSession() {
+                  return {
+                    serversInfo: [{
+                      name: 'server.vpshere.local',
+                      serviceGuid: 'aaaa-bbb-ccc',
+                      thumbprint: 'AA:BB:CC'
+                    }]
+                  }
+                }
+              }
+            }
+          }
+        }
       ]
     });
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RegistryAccessComponent);
+    fixture = TestBed.createComponent(VchRegistryComponent);
+    fixture.detectChanges();
     component = fixture.componentInstance;
     component.onPageLoad();
   });
