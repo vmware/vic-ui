@@ -269,7 +269,7 @@ export class VicWebappPage {
       return browser.isElementPresent(by[selectBy](el)).then((v) => {
         if (!v) {
           console.log(el, 'not found yet');
-          browser.sleep(100);
+          browser.sleep(3000);
           return v;
         }
         return element(by[selectBy](el)).isDisplayed();
