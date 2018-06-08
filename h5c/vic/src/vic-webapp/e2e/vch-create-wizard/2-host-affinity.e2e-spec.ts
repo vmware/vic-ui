@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import {browser, by, element, protractor} from 'protractor';
+import {browser, by, element, protractor, $$} from 'protractor';
 
 import { PROTRACTOR_JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
@@ -100,10 +100,8 @@ describe('VCH Create Wizard - Basic', () => {
   });
 
   it('should select a compute resource', () => {
-    page.selectComputeResource();
+    page.selectComputeResourceHA();
   });
-
-// From here modifications for HA
 
   it('should complete compute capacity step', () => {
     page.clickByText('Button', 'Next');
@@ -196,29 +194,39 @@ describe('VCH Create Wizard - Basic', () => {
       expect(status).toBeTruthy();
     });
   });
-// Reconfigure virtual machine
+
   it('should redirect to VCH VM and display Create Wizard menu items', () => {
     page.navigateToVchVm(namePrefix + specRunId);
     browser.switchTo().defaultContent();
     browser.sleep(defaultTimeout);
+    const vch = new RegExp(namePrefix + specRunId);
+    page.waitForElementToBePresent('a[title=Cluster]');
+    page.clickByCSS('a[title=Cluster]');
+    });
+
+  it('should navigate to clusters actions and settings', () => {
+    browser.switchTo().defaultContent();
+    browser.sleep(defaultTimeout);
     page.waitForElementToBePresent('a.summary-action-link');
     page.clickByCSS('a.summary-action-link');
-    // wait for menu items to be calculated
     browser.sleep(defaultTimeout);
-    const allVicActions = element(by.cssContainingText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions'));
-
+    const clustersActions = element(by.cssContainingText('#applicationMenuContainer .k-item .k-link', 'Settings'));
     browser.driver.getCapabilities().then(caps => {
       browser.browserName = caps.get('browserName');
       if (browser.browserName.toLowerCase() === 'chrome') {
-        browser.actions().mouseMove(allVicActions).click().perform();
+        browser.actions().mouseMove(clustersActions).click().perform();
       } else {
-        page.clickByText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions');
+        page.clickByText('#applicationMenuContainer .k-item .k-link', 'Settings');
       }
     });
+  });
 
-    browser.sleep(defaultTimeout);
-    expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'New Virtual Container Host...'))).toBeTruthy();
-    expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'Delete Virtual Container Host'))).toBeTruthy();
+  it('should should validate the additions of the vch to the group', () => {
+    page.waitForElementToBePresentXpath('//div[2]/ul/li[3]/a');
+    page.clickByXpath('//div[2]/ul/li[3]/a');
+    const vch = new RegExp(namePrefix + specRunId);
+    browser.switchTo().defaultContent();
+    expect(element(by.css('span[title=' + vch + ']')).isPresent).toBeTruthy();
   });
 
   it('should navigate to vch list', () => {
@@ -235,7 +243,6 @@ describe('VCH Create Wizard - Basic', () => {
   it('should delete created vch', () => {
     page.deleteVch(namePrefix + specRunId);
   });
-
 
   it('should verify the created vch has been deleted', () => {
     let vchFound = false;

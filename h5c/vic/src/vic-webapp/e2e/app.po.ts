@@ -27,6 +27,7 @@ export class VicWebappPage {
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
+  private iconHostAndClustersShortcut = '.controlcenter-shortcut-icon';
   private iconVicRoot = 'span[title="vSphere Integrated Containers"]:last-of-type';
   private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
@@ -99,6 +100,12 @@ export class VicWebappPage {
     this.clickByCSS(this.iconVicShortcut);
   }
 
+  navigateToHostAndClusters() {
+    // click host and cluster shortcut icon
+    this.waitForElementToBePresent(this.iconHostAndClustersShortcut);
+    this.clickByCSS(this.iconHostAndClustersShortcut);
+  }
+
   navigateToSummaryTab() {
     // click vic link
     browser.sleep(this.defaultTimeout);
@@ -135,9 +142,20 @@ export class VicWebappPage {
         this.clickByXpath(this.firstDcTreenodeCaretXpath);
       }
     });
+    this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
+  }
 
+  selectComputeResourceHA(name: string = 'Cluster') {
+    browser.sleep(defaultTimeout);
+    this.waitForElementToBePresent(this.datacenterTreenodeCaret);
+    element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
+      if (collapsed) {
+        this.clickByXpath(this.firstDcTreenodeCaretXpath);
+      }
+    });
     this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
     this.clickByCSS(this.basicAdvanceButton);
+    this.waitForElementToBePresent(this.buttonHostAffinity);
     this.clickByCSS(this.buttonHostAffinity);
   }
 
@@ -269,6 +287,19 @@ export class VicWebappPage {
   }
 
   waitForElementToBePresent(el, timeout = this.opsTimeout, selectBy = 'css') {
+    browser.wait(function () {
+      return browser.isElementPresent(by[selectBy](el)).then((v) => {
+        if (!v) {
+          console.log(el, 'not found yet');
+          browser.sleep(100);
+          return v;
+        }
+        return element(by[selectBy](el)).isDisplayed();
+      });
+    }, timeout);
+  };
+
+  waitForElementToBePresentXpath(el, timeout = this.opsTimeout, selectBy = 'xpath') {
     browser.wait(function () {
       return browser.isElementPresent(by[selectBy](el)).then((v) => {
         if (!v) {
