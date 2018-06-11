@@ -1,8 +1,9 @@
 import {Component, Input} from '@angular/core';
 import {
   CONFIGURE_VCH_MODAL_WIDTH, CONFIGURE_VCH_MODAL_HEIGHT, CONFIGURE_VCH_MODAL_COMPUTE_URL,
-  CONFIGURE_VCH_MODAL_GENERAL_URL, CONFIGURE_VCH_MODAL_STORAGE_URL, CONFIGURE_VCH_MODAL_NETWORK_URL, CONFIGURE_VCH_MODAL_SECURITY_URL
-} from '../../shared/constants/configure-vch-modal';
+  CONFIGURE_VCH_MODAL_GENERAL_URL, CONFIGURE_VCH_MODAL_STORAGE_URL, CONFIGURE_VCH_MODAL_NETWORK_URL,
+  CONFIGURE_VCH_MODAL_SECURITY_URL, CONFIGURE_VCH_MODAL_REGISTRY_URL
+} from '../../shared/constants';
 import {VchViewKeys} from '../../interfaces/vch';
 import {GlobalsService} from '../../shared';
 
@@ -40,6 +41,9 @@ export class ConfigureVchViewContainerComponent {
         break;
       case 'security':
         path = CONFIGURE_VCH_MODAL_SECURITY_URL;
+        break;
+      case 'registry':
+        path = CONFIGURE_VCH_MODAL_REGISTRY_URL;
         break;
     }
     if (path) {

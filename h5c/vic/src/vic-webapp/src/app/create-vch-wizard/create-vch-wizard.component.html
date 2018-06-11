@@ -32,6 +32,7 @@
     </div>
   </clr-alert>
 
+
   <!-- GENERAL PAGE -->
   <clr-wizard-page clrWizardPagePreventDefault="true"
                    [clrWizardPageNextDisabled]="!generalStep.form || generalStep.form.invalid"
@@ -39,7 +40,6 @@
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(generalStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
-
     <ng-template clrPageTitle>
       General Settings
       <a href="https://vmware.github.io/vic-product/assets/files/html/1.4/vic_vsphere_admin/vch_general_settings.html"
@@ -48,10 +48,9 @@
       </a>
     </ng-template>
     <ng-template clrPageNavTitle>General</ng-template>
-
     <vic-vch-general #generalStep></vic-vch-general>
-
   </clr-wizard-page>
+
 
   <!-- COMPUTE PAGE -->
   <clr-wizard-page clrWizardPagePreventDefault="true"
@@ -60,7 +59,6 @@
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(computeCapacityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
-
     <ng-template clrPageTitle>
       Compute Capacity
       <a href="https://vmware.github.io/vic-product/assets/files/html/1.4/vic_vsphere_admin/vch_compute.html"
@@ -69,10 +67,9 @@
       </a>
     </ng-template>
     <ng-template clrPageNavTitle>Compute Capacity</ng-template>
-
     <vic-vch-compute #computeCapacityStep></vic-vch-compute>
-
   </clr-wizard-page>
+
 
   <!-- STORAGE PAGE -->
   <clr-wizard-page [clrWizardPageNextDisabled]="!storageCapacityStep.form || storageCapacityStep.form.invalid"
@@ -81,7 +78,6 @@
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(storageCapacityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
-
     <ng-template clrPageTitle>
       Storage Capacity
       <a href="https://vmware.github.io/vic-product/assets/files/html/1.4/vic_vsphere_admin/vch_storage.html"
@@ -90,10 +86,9 @@
       </a>
     </ng-template>
     <ng-template clrPageNavTitle>Storage Capacity</ng-template>
-
     <vic-vch-storage #storageCapacityStep [resourceObjRef]="computeCapacityStep.selectedResourceObjRef"></vic-vch-storage>
-
   </clr-wizard-page>
+
 
   <!-- NETWORK PAGE -->
   <clr-wizard-page [clrWizardPageNextDisabled]="!networksStep.form || networksStep.form.invalid"
@@ -102,7 +97,6 @@
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(networksStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
-
     <ng-template clrPageTitle>
       Configure Networks
       <a href="https://vmware.github.io/vic-product/assets/files/html/1.4/vic_vsphere_admin/vch_networking.html"
@@ -111,10 +105,9 @@
       </a>
     </ng-template>
     <ng-template clrPageNavTitle>Networks</ng-template>
-
     <vic-vch-network #networksStep [datacenter]="computeCapacityStep.dcObj" [resourceObjName]="computeCapacityStep.selectedObjectName"></vic-vch-network>
-
   </clr-wizard-page>
+
 
   <!-- SECURITY PAGE -->
   <clr-wizard-page [clrWizardPageNextDisabled]="!securityStep.form || securityStep.form.invalid"
@@ -123,7 +116,6 @@
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(securityStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
-
     <ng-template clrPageTitle>
       Security
       <a href="https://vmware.github.io/vic-product/assets/files/html/1.4/vic_vsphere_admin/vch_security.html"
@@ -132,21 +124,20 @@
       </a>
     </ng-template>
     <ng-template clrPageNavTitle>Security</ng-template>
-
     <vic-vch-security [vchName]="generalStep.model?.name"
                       [datacenter]="computeCapacityStep.dcObj"
                       #securityStep>
     </vic-vch-security>
-
   </clr-wizard-page>
 
+
+  <!-- REGISTRY PAGE -->
   <clr-wizard-page [clrWizardPageNextDisabled]="registryAccessStep.form.invalid"
                    [clrWizardPagePreventDefault]="true"
                    (clrWizardPageOnLoad)="onPageLoad(registryAccessStep.onPageLoad())"
                    (clrWizardPageOnCancel)="onCancel()"
                    (clrWizardPageOnCommit)="onCommit(registryAccessStep.onCommit())"
                    (clrWizardPagePrevious)="goBack()">
-
     <ng-template clrPageTitle>
       Registry Access
       <a href="https://vmware.github.io/vic-product/assets/files/html/1.4/vic_vsphere_admin/vch_security.html"
@@ -155,10 +146,9 @@
       </a>
     </ng-template>
     <ng-template clrPageNavTitle>Registry Access</ng-template>
-
-    <vic-vch-creation-registry-access #registryAccessStep></vic-vch-creation-registry-access>
-
+    <vic-vch-registry #registryAccessStep></vic-vch-registry>
   </clr-wizard-page>
+
 
   <clr-wizard-page [clrWizardPageNextDisabled]="operationsUserStep.form.invalid"
                    clrWizardPagePreventDefault="true"

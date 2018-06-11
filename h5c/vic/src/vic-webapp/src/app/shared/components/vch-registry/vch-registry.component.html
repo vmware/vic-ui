@@ -1,0 +1,191 @@
+<!-- Read Only content -->
+<div *ngIf="readOnly; else formContent">
+  <!-- white list mode -->
+  <clr-stack-view>
+    <clr-stack-header></clr-stack-header>
+    <clr-stack-block>
+      <clr-stack-label>{{ i18n.translate('vch.registry.whiteRegistryMode') }}</clr-stack-label>
+      <clr-stack-content>{{ model.useWhitelistRegistry ?
+        i18n.translate('vch.registry.yes') : i18n.translate('vch.registry.no') }}</clr-stack-content>
+    </clr-stack-block>
+  </clr-stack-view>
+
+  <!-- Registry Access -->
+  <ng-container *ngIf="model.useWhitelistRegistry; else insecureRegistryAccess">
+    <!-- White list -->
+    <clr-stack-view *ngIf="model.whitelistRegistry.length > 0">
+      <clr-stack-header>{{ i18n.translate('vch.registry.registryAccess') }}</clr-stack-header>
+      <clr-stack-block *ngFor="let whiteListReg of form.get('whitelistRegistries')['controls']; let idx = index;">
+        <clr-stack-label>{{ i18n.translate('vch.registry.whitelistRegistry') }} {{idx + 1}}</clr-stack-label>
+        <clr-stack-content>
+          {{ whiteListReg.get('whitelistRegistry').value }}, {{ whiteListReg.get('whitelistRegType').value }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-view>
+  </ng-container>
+  <ng-template #insecureRegistryAccess>
+    <!-- Insecure Registry Access -->
+    <clr-stack-view *ngIf="model.insecureRegistry.length > 0">
+      <clr-stack-header>{{ i18n.translate('vch.registry.registryAccess') }}</clr-stack-header>
+      <clr-stack-block *ngFor="let insecureAccess of model.insecureRegistry; let idx = index;">
+        <clr-stack-label>{{ i18n.translate('vch.registry.insecureRegistry') }} {{idx + 1}}</clr-stack-label>
+        <clr-stack-content>
+          {{ insecureAccess }}
+        </clr-stack-content>
+      </clr-stack-block>
+    </clr-stack-view>
+  </ng-template>
+
+
+  <!-- Additional Registry Certificates -->
+  <clr-stack-view *ngIf="model.registryCa.length > 0">
+    <clr-stack-header>{{ i18n.translate('vch.registry.additionalRegistryCertificates') }}</clr-stack-header>
+    <clr-stack-block *ngFor="let aditionalCert of model.registryCa">
+      <clr-stack-label>{{ aditionalCert.name }}</clr-stack-label>
+      <clr-stack-content>
+        {{ i18n.translate('vch.security.expires') }}: {{ aditionalCert.expires | date : 'mediumDate' }}, {{ i18n.translate('vch.security.thumbprint') }}: {{ aditionalCert.thumbprint }}
+      </clr-stack-content>
+    </clr-stack-block>
+  </clr-stack-view>
+</div>
+
+<!-- Form content -->
+<ng-template #formContent>
+  <form class="pt-0" [formGroup]="form" novalidate>
+    <p class="mt-0">{{ i18n.translate('vch.registry.defineAccesToVchForRegistries') }}</p>
+    <section class="form-block" id="registry">
+      <div class="toggle-switch">
+        <input type="checkbox" id="use-whitelist-registry" formControlName="useWhitelistRegistry">
+        <label for="use-whitelist-registry">{{ i18n.translate('vch.registry.whiteRegistryMode') }}</label>
+      </div>
+      <div class="mb-2" *ngIf="form.get('useWhitelistRegistry').value">
+        <p class="mt-1 mb-2">{{ i18n.translate('vch.registry.thisVchCanAccess') }}</p>
+        <div formArrayName="whitelistRegistries"
+             *ngFor="let whitelistRegistry of form.get('whitelistRegistries')['controls']; let i=index">
+          <div [formGroupName]="i" class="form-group row mb-0">
+            <div class="col-xs-3">
+              <label *ngIf="i === 0" class="required">{{ i18n.translate('vch.registry.whitelistRegistries') }}</label>
+            </div>
+            <div class="col-xs-5">
+              <label aria-haspopup="true"
+                     role="tooltip"
+                     class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
+                     [class.invalid]="isFormControlInvalid(form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry)">
+                <input class="form-control"
+                       type="text"
+                       placeholder="IP/FQDN:Port, CIDR or wildcard domain"
+                       formControlName="whitelistRegistry">
+                <span class="tooltip-content" *ngIf="form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry.hasError('required')">
+                {{ i18n.translate('vch.registry.whitelistRegistryNotEmpte') }}
+              </span>
+                <span class="tooltip-content" *ngIf="form.get('whitelistRegistries')['controls'][i]['controls'].whitelistRegistry.hasError('pattern')">
+                {{ i18n.translate('vch.registry.ipAddFqdnCidrWilcardNotValid') }}
+              </span>
+              </label>
+            </div>
+            <div class="col-xs-2">
+              <div class="select form-control">
+                <select formControlName="whitelistRegType">
+                  <option value="secure">Secure</option>
+                  <option value="insecure">Insecure</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-xs-1 px-0 add-remove-actions">
+              <clr-icon class="is-solid"
+                        shape="times-circle"
+                        (click)="removeFormArrayEntry('whitelistRegistries', i)"
+                        *ngIf="i > 0">
+              </clr-icon>
+              <clr-icon class="is-solid"
+                        shape="plus-circle"
+                        (click)="addNewFormArrayEntry('whitelistRegistries')"
+                        *ngIf="i === form.get('whitelistRegistries')['controls'].length - 1">
+              </clr-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-block mb-2" *ngIf="!form.get('useWhitelistRegistry').value">
+        <p class="mt-1 mb-2">{{ i18n.translate('vch.registry.thisVchCanAccessAllSecureRegistries') }}</p>
+        <label>Insecure registry access</label>
+        <p class="mt-0 mb-1">{{ i18n.translate('vch.registry.AddRegistriesSubText') }}</p>
+        <div formArrayName="insecureRegistries"
+             *ngFor="let insecureRegistry of form.get('insecureRegistries')['controls']; let j=index">
+          <div [formGroupName]="j" class="form-group row mb-0">
+            <div class="col-xs-4">
+              <input class="form-control"
+                     type="text"
+                     placeholder="IP or FQDN"
+                     formControlName="insecureRegistryIp">
+            </div>
+            <span class="mx-0 px-0">:</span>
+            <div class="col-xs-2">
+              <label aria-haspopup="true"
+                     role="tooltip"
+                     class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+                     [class.invalid]="isFormControlInvalid(form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort)">
+                <input class="form-control"
+                       placeholder="Port"
+                       type="text"
+                       formControlName="insecureRegistryPort">
+                <span class="tooltip-content" *ngIf="form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort.hasError('maxlength')">
+                {{ i18n.translate('vch.registry.portDigitsLongError') }}
+              </span>
+                <span class="tooltip-content" *ngIf="form.get('insecureRegistries')['controls'][j]['controls'].insecureRegistryPort.hasError('pattern')">
+                {{ i18n.translate('vch.registry.portShouldBeNumeric') }}
+              </span>
+              </label>
+            </div>
+            <div class="col-xs-1 px-0 add-remove-actions">
+              <clr-icon class="is-solid"
+                        shape="times-circle"
+                        (click)="removeFormArrayEntry('insecureRegistries', j)"
+                        *ngIf="j > 0">
+              </clr-icon>
+              <clr-icon class="is-solid"
+                        shape="plus-circle"
+                        (click)="addNewFormArrayEntry('insecureRegistries')"
+                        *ngIf="j === form.get('insecureRegistries')['controls'].length - 1">
+              </clr-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+      <label>{{ i18n.translate('vch.registry.additionalRegistryCertificates') }}</label>
+      <p class="mt-0 mb-1">
+        {{ i18n.translate('vch.registry.addRegCertsSubText') }}
+      </p>
+      <div class="alert alert-danger mb-1" *ngIf="registryCaError">
+        <div class="alert-item">
+          <span class="alert-text">{{ registryCaError }}</span>
+        </div>
+      </div>
+      <div formArrayName="registryCas" *ngFor="let registryCa of form.get('registryCas')['controls']; index as i; last as isLast">
+        <div [formGroupName]="i" class="form-group row mb-0">
+          <div class="col-xs-6 text-truncate">
+            <span class="text-muted" *ngIf="!registryCaContents[i]">{{ i18n.translate('vch.registry.selectX508CertPemFile') }}</span>
+            <span *ngIf="registryCaContents[i]">
+            {{ registryCaContents[i].name }}, {{ i18n.translate('vch.registry.expires') }}: {{ registryCaContents[i].expires | date : 'mediumDate'}}
+          </span>
+            <input id="registry-ca-{{i}}"
+                   class="form-control hidden-xs-up"
+                   type="file"
+                   (change)="addFileContent($event, 'registryCas', i, isLast)">
+            <input type="hidden" formControlName="registryCa">
+          </div>
+          <div class="col-xs px-0 add-remove-actions">
+            <label class="btn btn-link my-0" for="registry-ca-{{i}}">
+              {{ registryCaContents[i] ? i18n.translate('vch.registry.replace') : i18n.translate('vch.registry.select') }}
+            </label>
+            <clr-icon class="is-solid mt-0"
+                      shape="times-circle"
+                      *ngIf="registryCaContents[i]"
+                      (click)="removeFormArrayEntry('registryCas', i)">
+            </clr-icon>
+          </div>
+        </div>
+      </div>
+    </section>
+  </form>
+</ng-template>

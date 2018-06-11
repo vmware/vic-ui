@@ -1,12 +1,12 @@
 <ng-container *ngIf="vchInfo | async as vchUIModel; else loadingContent">
-  <vic-configure-vch-modal-container [title]="'Compute Capacity'"
+  <vic-configure-vch-modal-container [title]="i18n.translate('vch.registry.registryAccess')"
                                      [helpLink]="helpLink"
                                      [modelChangedPayload]="currentModelEmitter.asObservable()"
                                      [vchId]="vchId">
-    <vic-vch-compute #configureContent
-                     [model]="vchUIModel.computeCapacity"
+    <vic-vch-registry #configureContent
+                     [model]="vchUIModel.registry"
                      (modelChanged)="modelChange($event)">
-    </vic-vch-compute>
+    </vic-vch-registry>
   </vic-configure-vch-modal-container>
 </ng-container>
 <ng-template #loadingContent>

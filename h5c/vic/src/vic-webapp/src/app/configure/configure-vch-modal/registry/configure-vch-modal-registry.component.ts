@@ -16,18 +16,21 @@
 
 import {Component} from '@angular/core';
 import {ConfigureVchService} from '../../configure-vch.service';
-import {ActivatedRoute} from '@angular/router';
 import {GlobalsService} from '../../../shared/globals.service';
 import {ConfigureVchBase} from '../../configure-vch-base';
+import {ActivatedRoute} from '@angular/router';
+import {globalProperties} from '../../../../environments/properties';
 import {I18nService} from '../../../shared/i18n.service';
 
 @Component({
-  selector: 'vic-configure-vch-view-registry',
-  styleUrls: ['./configure-vch-view-registry.component.scss'],
-  templateUrl: './configure-vch-view-registry.component.html'
+  selector: 'vic-configure-vch-modal-registry',
+  styleUrls: ['./configure-vch-modal-registry.component.scss'],
+  templateUrl: './configure-vch-modal-registry.component.html'
 })
 
-export class ConfigureVchViewRegistryComponent extends ConfigureVchBase {
+export class ConfigureVchModalRegistryComponent extends ConfigureVchBase {
+
+  public helpLink = globalProperties.vhcDocsGeneral;
 
   constructor(protected globalsService: GlobalsService,
               protected configureVchService: ConfigureVchService,
@@ -35,4 +38,5 @@ export class ConfigureVchViewRegistryComponent extends ConfigureVchBase {
               public i18n: I18nService) {
     super(globalsService, configureVchService, activatedRoute);
   }
+
 }
