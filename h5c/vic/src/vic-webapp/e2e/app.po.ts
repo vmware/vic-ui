@@ -22,7 +22,7 @@ export class VicWebappPage {
   private buttonComputeResource = 'button.cc-resource';
   private datacenterTreenodeCaret = 'button.clr-treenode-caret';
   private firstDcTreenodeCaretXpath = `(//button[contains(@class,'clr-treenode-caret')])[1]/clr-icon[contains(@dir, 'right')]`;
-  private basicAdvanceButton = 'a.btn.btn-link.pl-0';
+  private buttonBasicAdvance = 'a.btn.btn-link.pl-0';
   private buttonHostAffinity = 'label.text-nowrap';
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
@@ -100,12 +100,6 @@ export class VicWebappPage {
     this.clickByCSS(this.iconVicShortcut);
   }
 
-  navigateToHostAndClusters() {
-    // click host and cluster shortcut icon
-    this.waitForElementToBePresent(this.iconHostAndClustersShortcut);
-    this.clickByCSS(this.iconHostAndClustersShortcut);
-  }
-
   navigateToSummaryTab() {
     // click vic link
     browser.sleep(this.defaultTimeout);
@@ -154,7 +148,7 @@ export class VicWebappPage {
       }
     });
     this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
-    this.clickByCSS(this.basicAdvanceButton);
+    this.clickByCSS(this.buttonBasicAdvance);
     this.waitForElementToBePresent(this.buttonHostAffinity);
     this.clickByCSS(this.buttonHostAffinity);
   }

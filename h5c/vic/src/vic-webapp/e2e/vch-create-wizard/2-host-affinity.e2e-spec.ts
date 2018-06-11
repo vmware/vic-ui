@@ -195,7 +195,7 @@ describe('VCH Create Wizard - Basic', () => {
     });
   });
 
-  it('should redirect to VCH VM and display Create Wizard menu items', () => {
+  it('should redirect to VCH VM and select Cluster from VCH realted objects', () => {
     page.navigateToVchVm(namePrefix + specRunId);
     browser.switchTo().defaultContent();
     browser.sleep(defaultTimeout);
@@ -221,7 +221,7 @@ describe('VCH Create Wizard - Basic', () => {
     });
   });
 
-  it('should should validate the additions of the vch to the group', () => {
+  it('should validate the additions of the vch to the host/virtual machines group', () => {
     page.waitForElementToBePresentXpath('//div[2]/ul/li[3]/a');
     page.clickByXpath('//div[2]/ul/li[3]/a');
     const vch = new RegExp(namePrefix + specRunId);
