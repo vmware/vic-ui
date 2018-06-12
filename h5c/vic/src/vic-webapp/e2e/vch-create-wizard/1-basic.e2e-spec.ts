@@ -30,7 +30,10 @@ import {
   modalWizard,
   dataGridCell,
   iframeTabs,
-  namePrefix
+  namePrefix,
+  menuContainer,
+  menuLabel,
+  tabSummary
 } from './common';
 
 describe('VCH Create Wizard - Basic', () => {
@@ -84,7 +87,7 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should open create vch wizard', () => {
     page.openVchWizard();
-    page.waitForElementToBePresent(modalWizard, 'css');
+    page.waitForElementToBePresent(modalWizard);
     expect(element(by.css(modalWizard)).isPresent()).toBe(true);
   });
 
@@ -96,7 +99,7 @@ describe('VCH Create Wizard - Basic', () => {
   it('should complete general step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to compute capacity section
-    page.waitForElementToBePresent(sectionCompute, 'css');
+    page.waitForElementToBePresent(sectionCompute);
     expect(element(by.css(sectionCompute)).isPresent()).toBe(true);
   });
 
@@ -107,7 +110,7 @@ describe('VCH Create Wizard - Basic', () => {
   it('should complete compute capacity step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to storage capacity section
-    page.waitForElementToBePresent(sectionStorage, 'css');
+    page.waitForElementToBePresent(sectionStorage);
     expect(element(by.css(sectionStorage)).isPresent()).toBe(true);
   });
 
@@ -118,7 +121,7 @@ describe('VCH Create Wizard - Basic', () => {
   it('should complete storage capacity step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to networks section
-    page.waitForElementToBePresent(sectionNetworks, 'css');
+    page.waitForElementToBePresent(sectionNetworks);
     expect(element(by.css(sectionNetworks)).isPresent()).toBe(true);
   });
 
@@ -133,7 +136,7 @@ describe('VCH Create Wizard - Basic', () => {
   it('should complete networks step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to security section
-    page.waitForElementToBePresent(sectionSecurity, 'css');
+    page.waitForElementToBePresent(sectionSecurity);
     expect(element(by.css(sectionSecurity)).isPresent()).toBe(true);
   });
 
@@ -141,14 +144,14 @@ describe('VCH Create Wizard - Basic', () => {
     page.disableSecureAccess();
     page.clickByText('Button', 'Next');
     // check if we made it to registry access section
-    page.waitForElementToBePresent(sectionRegistry, 'css');
+    page.waitForElementToBePresent(sectionRegistry);
     expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
   });
 
   it('should complete registry access step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to ops user section
-    page.waitForElementToBePresent(sectionOpsUser, 'css');
+    page.waitForElementToBePresent(sectionOpsUser);
     expect(element(by.css(sectionOpsUser)).isPresent()).toBe(true);
   });
 
@@ -159,7 +162,7 @@ describe('VCH Create Wizard - Basic', () => {
   it('should complete ops user step', () => {
     page.clickByText('Button', 'Next');
     // check if we made it to summary section
-    page.waitForElementToBePresent(sectionSummary, 'css');
+    page.waitForElementToBePresent(sectionSummary);
     expect(element(by.css(sectionSummary)).isPresent()).toBe(true);
   });
 
@@ -169,9 +172,9 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should find the new vch in datagrid', () => {
     let vchFound = false;
-    page.waitForElementToBePresent(dataGridCell, 'css');
+    page.waitForElementToBePresent(dataGridCell);
     page.clickByCSS('.pagination-next');
-    page.waitForElementToBePresent(dataGridCell, 'css');
+    page.waitForElementToBePresent(dataGridCell);
     browser.sleep(defaultTimeout);
     const newVch = new RegExp(namePrefix + specRunId);
     element.all(by.css(dataGridCell)).each(function(el, index) {
@@ -202,23 +205,23 @@ describe('VCH Create Wizard - Basic', () => {
       browser.switchTo().defaultContent();
       browser.sleep(defaultTimeout);
       const vch = new RegExp(namePrefix + specRunId);
-      page.waitForElementToBePresent('a[title=Cluster]', 'css');
+      page.waitForElementToBePresent('a[title=Cluster]');
       page.clickByCSS('a[title=Cluster]');
       });
 
     it('should navigate to clusters actions and settings', () => {
       browser.switchTo().defaultContent();
       browser.sleep(defaultTimeout);
-      page.waitForElementToBePresent('a.summary-action-link', 'css');
-      page.clickByCSS('a.summary-action-link');
+      page.waitForElementToBePresent(tabSummary);
+      page.clickByCSS(tabSummary);
       browser.sleep(defaultTimeout);
-      const clustersActions = element(by.cssContainingText('#applicationMenuContainer .k-item .k-link', 'Settings'));
+      const clustersActions = element(by.cssContainingText(menuContainer, 'Settings'));
       browser.driver.getCapabilities().then(caps => {
         browser.browserName = caps.get('browserName');
         if (browser.browserName.toLowerCase() === 'chrome') {
           browser.actions().mouseMove(clustersActions).click().perform();
         } else {
-          page.clickByText('#applicationMenuContainer .k-item .k-link', 'Settings');
+          page.clickByText(menuContainer, 'Settings');
         }
       });
     });
@@ -235,23 +238,23 @@ describe('VCH Create Wizard - Basic', () => {
       page.navigateToVchVm(namePrefix + specRunId);
       browser.switchTo().defaultContent();
       browser.sleep(defaultTimeout);
-      page.waitForElementToBePresent('a.summary-action-link', 'css');
-      page.clickByCSS('a.summary-action-link');
+      page.waitForElementToBePresent(tabSummary);
+      page.clickByCSS(tabSummary);
       // wait for menu items to be calculated
       browser.sleep(defaultTimeout);
-      const allVicActions = element(by.cssContainingText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions'));
+      const allVicActions = element(by.cssContainingText(menuContainer, 'All VIC Actions'));
 
       browser.driver.getCapabilities().then(caps => {
         browser.browserName = caps.get('browserName');
         if (browser.browserName.toLowerCase() === 'chrome') {
           browser.actions().mouseMove(allVicActions).click().perform();
         } else {
-          page.clickByText('#applicationMenuContainer .k-item .k-link', 'All VIC Actions');
+          page.clickByText(menuContainer, 'All VIC Actions');
         }
       });
       browser.sleep(defaultTimeout);
-      expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'New Virtual Container Host...'))).toBeTruthy();
-      expect(browser.isElementPresent(by.cssContainingText('.vui-menuitem-label-text', 'Delete Virtual Container Host'))).toBeTruthy();
+      expect(browser.isElementPresent(by.cssContainingText(menuLabel, 'New Virtual Container Host...'))).toBeTruthy();
+      expect(browser.isElementPresent(by.cssContainingText(menuLabel, 'Delete Virtual Container Host'))).toBeTruthy();
     });
  }
 

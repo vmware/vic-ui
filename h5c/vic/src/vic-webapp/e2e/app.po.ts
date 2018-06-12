@@ -29,6 +29,7 @@ export class VicWebappPage {
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
   private iconHostAndClustersShortcut = '.controlcenter-shortcut-icon';
   private iconVicRoot = 'span[title="vSphere Integrated Containers"]:last-of-type';
+  private menuContainerItem = '#applicationMenuContainer .k-item .k-link';
   private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
@@ -57,7 +58,7 @@ export class VicWebappPage {
   login() {
     browser.waitForAngularEnabled(false);
     // username
-    this.waitForElementToBePresent(this.inputUsername, 'css');
+    this.waitForElementToBePresent(this.inputUsername);
     this.clickByCSS(this.inputUsername);
     this.clear(this.inputUsername);
     this.sendKeys(this.inputUsername, this.username);
@@ -71,7 +72,7 @@ export class VicWebappPage {
 
   logOut() {
     this.clickByCSS(this.h5cActionMenuToggle);
-    this.waitForElementToBePresent(this.h5cActionMenuLogOut, 'css');
+    this.waitForElementToBePresent(this.h5cActionMenuLogOut);
     this.clickByCSS(this.h5cActionMenuLogOut);
   }
 
@@ -90,27 +91,27 @@ export class VicWebappPage {
   navigateToHome() {
     // click top left vmware logo
     browser.sleep(this.defaultTimeout);
-    this.waitForElementToBePresent(this.iconVsphereHome, 'css');
+    this.waitForElementToBePresent(this.iconVsphereHome);
     this.clickByCSS(this.iconVsphereHome);
   }
 
   navigateToVicPlugin() {
     // click vic shortcut icon
-    this.waitForElementToBePresent(this.iconVicShortcut, 'css');
+    this.waitForElementToBePresent(this.iconVicShortcut);
     this.clickByCSS(this.iconVicShortcut);
   }
 
   navigateToSummaryTab() {
     // click vic link
     browser.sleep(this.defaultTimeout);
-    this.waitForElementToBePresent(this.iconVicRoot, 'css');
+    this.waitForElementToBePresent(this.iconVicRoot);
     this.clickByCSS(this.iconVicRoot);
   }
 
   navigateToVchTab() {
     // click vch tab
-    this.waitForElementToBePresent('.tabbed-object-view', 'css');
-    this.waitForElementToBePresent(this.tabBtnVchs, 'css');
+    this.waitForElementToBePresent('.tabbed-object-view');
+    this.waitForElementToBePresent(this.tabBtnVchs);
     this.clickByCSS(this.tabBtnVchs);
     browser.wait(() => {
       return browser.getCurrentUrl().then(v => {
@@ -122,7 +123,7 @@ export class VicWebappPage {
 
   openVchWizard() {
     this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.buttonNewVch, 'css');
+    this.waitForElementToBePresent(this.buttonNewVch);
     this.clickByCSS(this.buttonNewVch);
     browser.switchTo().defaultContent();
     this.switchFrame(this.iframeModal);
@@ -130,14 +131,13 @@ export class VicWebappPage {
 
   selectComputeResource(name: string = 'Cluster') {
     browser.sleep(defaultTimeout);
-    this.waitForElementToBePresent(this.datacenterTreenodeCaret, 'css');
+    this.waitForElementToBePresent(this.datacenterTreenodeCaret);
     element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
       if (collapsed) {
         this.clickByXpath(this.firstDcTreenodeCaretXpath);
       }
     });
     this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
-    console.log(browser.params.hostAffinity);
     if (browser.params.hostAffinity === 'true') {
       this.clickByCSS(this.buttonBasicAdvance);
       this.waitForElementToBePresent(this.buttonHostAffinity, 'css');
@@ -146,23 +146,23 @@ export class VicWebappPage {
   }
 
   selectDatastore(name: string = 'datastore1') {
-    this.waitForElementToBePresent(this.selectorImageStore, 'css');
+    this.waitForElementToBePresent(this.selectorImageStore);
     this.clickByText(this.selectorImageStore + ' option', name);
   }
 
   selectBridgeNetwork(name: string = 'bridge') {
     browser.sleep(defaultTimeout);
-    this.waitForElementToBePresent(this.selectorBridgeNetwork, 'css');
+    this.waitForElementToBePresent(this.selectorBridgeNetwork);
     this.clickByText(this.selectorBridgeNetwork + ' option', name);
   }
 
   selectPublicNetwork(name: string = 'network') {
-    this.waitForElementToBePresent(this.selectorPublicNetwork, 'css');
+    this.waitForElementToBePresent(this.selectorPublicNetwork);
     this.clickByText(this.selectorPublicNetwork + ' option', name);
   }
 
   disableSecureAccess() {
-    this.waitForElementToBePresent(this.labelEnableSecure, 'css');
+    this.waitForElementToBePresent(this.labelEnableSecure);
     this.clickByCSS(this.labelEnableSecure);
   }
 
@@ -184,15 +184,15 @@ export class VicWebappPage {
 
   deleteVch(vch) {
     this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.actionBar + vch, 'css');
+    this.waitForElementToBePresent(this.actionBar + vch);
     const vchActionMenu = this.actionBar + vch;
     this.clickByCSS(vchActionMenu);
     this.clickByCSS(vchActionMenu + ' button.action-item-delete');
     browser.switchTo().defaultContent();
-    this.waitForElementToBePresent(this.iframeModal, 'css');
+    this.waitForElementToBePresent(this.iframeModal);
     this.switchFrame(this.iframeModal);
     // wait for modal to set position
-    this.waitForElementToBePresent(this.labelDeleteVolumes, 'css');
+    this.waitForElementToBePresent(this.labelDeleteVolumes);
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
     browser.switchTo().defaultContent();
@@ -200,7 +200,7 @@ export class VicWebappPage {
 
   navigateToVchVm(vch) {
     this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.actionBar + vch, 'css');
+    this.waitForElementToBePresent(this.actionBar + vch);
     this.clickByText('.datagrid-cell a', vch);
   }
 
@@ -272,7 +272,7 @@ export class VicWebappPage {
     });
   }
 
-  waitForElementToBePresent(el, selectBy, timeout = this.opsTimeout) {
+  waitForElementToBePresent(el, selectBy = 'css', timeout = this.opsTimeout) {
     browser.wait(function () {
       return browser.isElementPresent(by[selectBy](el)).then((v) => {
         if (!v) {
