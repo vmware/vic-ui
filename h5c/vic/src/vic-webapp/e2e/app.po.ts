@@ -29,7 +29,6 @@ export class VicWebappPage {
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
   private iconHostAndClustersShortcut = '.controlcenter-shortcut-icon';
   private iconVicRoot = 'span[title="vSphere Integrated Containers"]:last-of-type';
-  private menuContainerItem = '#applicationMenuContainer .k-item .k-link';
   private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
