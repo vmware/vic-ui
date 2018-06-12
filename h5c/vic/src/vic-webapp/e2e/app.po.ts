@@ -43,7 +43,7 @@ export class VicWebappPage {
   private inputUsername = '#username';
   private username = 'administrator@vsphere.local';
   private inputPassword = '#password';
-  private password = 'Bl*ckwalnut0';
+  private password = 'Bl*ckwalnut0'; // 'Bl*ckwalnut0';
   private submit = '#submit';
   private defaultTimeout = 10000;
   private extendedTimeout = 10000;
@@ -57,7 +57,7 @@ export class VicWebappPage {
   login() {
     browser.waitForAngularEnabled(false);
     // username
-    this.waitForElementToBePresent(this.inputUsername);
+    this.waitForElementToBePresent(this.inputUsername, 'css');
     this.clickByCSS(this.inputUsername);
     this.clear(this.inputUsername);
     this.sendKeys(this.inputUsername, this.username);
@@ -71,7 +71,7 @@ export class VicWebappPage {
 
   logOut() {
     this.clickByCSS(this.h5cActionMenuToggle);
-    this.waitForElementToBePresent(this.h5cActionMenuLogOut);
+    this.waitForElementToBePresent(this.h5cActionMenuLogOut, 'css');
     this.clickByCSS(this.h5cActionMenuLogOut);
   }
 
@@ -90,27 +90,27 @@ export class VicWebappPage {
   navigateToHome() {
     // click top left vmware logo
     browser.sleep(this.defaultTimeout);
-    this.waitForElementToBePresent(this.iconVsphereHome);
+    this.waitForElementToBePresent(this.iconVsphereHome, 'css');
     this.clickByCSS(this.iconVsphereHome);
   }
 
   navigateToVicPlugin() {
     // click vic shortcut icon
-    this.waitForElementToBePresent(this.iconVicShortcut);
+    this.waitForElementToBePresent(this.iconVicShortcut, 'css');
     this.clickByCSS(this.iconVicShortcut);
   }
 
   navigateToSummaryTab() {
     // click vic link
     browser.sleep(this.defaultTimeout);
-    this.waitForElementToBePresent(this.iconVicRoot);
+    this.waitForElementToBePresent(this.iconVicRoot, 'css');
     this.clickByCSS(this.iconVicRoot);
   }
 
   navigateToVchTab() {
     // click vch tab
-    this.waitForElementToBePresent('.tabbed-object-view');
-    this.waitForElementToBePresent(this.tabBtnVchs);
+    this.waitForElementToBePresent('.tabbed-object-view', 'css');
+    this.waitForElementToBePresent(this.tabBtnVchs, 'css');
     this.clickByCSS(this.tabBtnVchs);
     browser.wait(() => {
       return browser.getCurrentUrl().then(v => {
@@ -122,7 +122,7 @@ export class VicWebappPage {
 
   openVchWizard() {
     this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.buttonNewVch);
+    this.waitForElementToBePresent(this.buttonNewVch, 'css');
     this.clickByCSS(this.buttonNewVch);
     browser.switchTo().defaultContent();
     this.switchFrame(this.iframeModal);
@@ -130,47 +130,39 @@ export class VicWebappPage {
 
   selectComputeResource(name: string = 'Cluster') {
     browser.sleep(defaultTimeout);
-    this.waitForElementToBePresent(this.datacenterTreenodeCaret);
+    this.waitForElementToBePresent(this.datacenterTreenodeCaret, 'css');
     element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
       if (collapsed) {
         this.clickByXpath(this.firstDcTreenodeCaretXpath);
       }
     });
     this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
-  }
-
-  selectComputeResourceHA(name: string = 'Cluster') {
-    browser.sleep(defaultTimeout);
-    this.waitForElementToBePresent(this.datacenterTreenodeCaret);
-    element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
-      if (collapsed) {
-        this.clickByXpath(this.firstDcTreenodeCaretXpath);
-      }
-    });
-    this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
-    this.clickByCSS(this.buttonBasicAdvance);
-    this.waitForElementToBePresent(this.buttonHostAffinity);
-    this.clickByCSS(this.buttonHostAffinity);
+    console.log(browser.params.hostAffinity);
+    if (browser.params.hostAffinity === 'true') {
+      this.clickByCSS(this.buttonBasicAdvance);
+      this.waitForElementToBePresent(this.buttonHostAffinity, 'css');
+      this.clickByCSS(this.buttonHostAffinity);
+    }
   }
 
   selectDatastore(name: string = 'datastore1') {
-    this.waitForElementToBePresent(this.selectorImageStore);
+    this.waitForElementToBePresent(this.selectorImageStore, 'css');
     this.clickByText(this.selectorImageStore + ' option', name);
   }
 
   selectBridgeNetwork(name: string = 'bridge') {
     browser.sleep(defaultTimeout);
-    this.waitForElementToBePresent(this.selectorBridgeNetwork);
+    this.waitForElementToBePresent(this.selectorBridgeNetwork, 'css');
     this.clickByText(this.selectorBridgeNetwork + ' option', name);
   }
 
   selectPublicNetwork(name: string = 'network') {
-    this.waitForElementToBePresent(this.selectorPublicNetwork);
+    this.waitForElementToBePresent(this.selectorPublicNetwork, 'css');
     this.clickByText(this.selectorPublicNetwork + ' option', name);
   }
 
   disableSecureAccess() {
-    this.waitForElementToBePresent(this.labelEnableSecure);
+    this.waitForElementToBePresent(this.labelEnableSecure, 'css');
     this.clickByCSS(this.labelEnableSecure);
   }
 
@@ -192,15 +184,15 @@ export class VicWebappPage {
 
   deleteVch(vch) {
     this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.actionBar + vch);
+    this.waitForElementToBePresent(this.actionBar + vch, 'css');
     const vchActionMenu = this.actionBar + vch;
     this.clickByCSS(vchActionMenu);
     this.clickByCSS(vchActionMenu + ' button.action-item-delete');
     browser.switchTo().defaultContent();
-    this.waitForElementToBePresent(this.iframeModal);
+    this.waitForElementToBePresent(this.iframeModal, 'css');
     this.switchFrame(this.iframeModal);
     // wait for modal to set position
-    this.waitForElementToBePresent(this.labelDeleteVolumes);
+    this.waitForElementToBePresent(this.labelDeleteVolumes, 'css');
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
     browser.switchTo().defaultContent();
@@ -208,7 +200,7 @@ export class VicWebappPage {
 
   navigateToVchVm(vch) {
     this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.actionBar + vch);
+    this.waitForElementToBePresent(this.actionBar + vch, 'css');
     this.clickByText('.datagrid-cell a', vch);
   }
 
@@ -280,20 +272,7 @@ export class VicWebappPage {
     });
   }
 
-  waitForElementToBePresent(el, timeout = this.opsTimeout, selectBy = 'css') {
-    browser.wait(function () {
-      return browser.isElementPresent(by[selectBy](el)).then((v) => {
-        if (!v) {
-          console.log(el, 'not found yet');
-          browser.sleep(100);
-          return v;
-        }
-        return element(by[selectBy](el)).isDisplayed();
-      });
-    }, timeout);
-  };
-
-  waitForElementToBePresentXpath(el, timeout = this.opsTimeout, selectBy = 'xpath') {
+  waitForElementToBePresent(el, selectBy, timeout = this.opsTimeout) {
     browser.wait(function () {
       return browser.isElementPresent(by[selectBy](el)).then((v) => {
         if (!v) {
