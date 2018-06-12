@@ -22,10 +22,14 @@ export class VicWebappPage {
   private buttonComputeResource = 'button.cc-resource';
   private datacenterTreenodeCaret = 'button.clr-treenode-caret';
   private firstDcTreenodeCaretXpath = `(//button[contains(@class,'clr-treenode-caret')])[1]/clr-icon[contains(@dir, 'right')]`;
+  private buttonBasicAdvance = 'a.btn.btn-link.pl-0';
+  private buttonHostAffinity = 'label.text-nowrap';
   private buttonNewVch = 'button.new-vch';
   private iconVsphereHome = '.clr-vmw-logo';
   private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
+  private iconHostAndClustersShortcut = '.controlcenter-shortcut-icon';
   private iconVicRoot = 'span[title="vSphere Integrated Containers"]:last-of-type';
+  private menuContainerItem = '#applicationMenuContainer .k-item .k-link';
   private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
   private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
@@ -133,8 +137,12 @@ export class VicWebappPage {
         this.clickByXpath(this.firstDcTreenodeCaretXpath);
       }
     });
-
     this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
+    if (browser.params.hostAffinity === 'true') {
+      this.clickByCSS(this.buttonBasicAdvance);
+      this.waitForElementToBePresent(this.buttonHostAffinity, 'css');
+      this.clickByCSS(this.buttonHostAffinity);
+    }
   }
 
   selectDatastore(name: string = 'datastore1') {
@@ -264,7 +272,7 @@ export class VicWebappPage {
     });
   }
 
-  waitForElementToBePresent(el, timeout = this.opsTimeout, selectBy = 'css') {
+  waitForElementToBePresent(el, selectBy = 'css', timeout = this.opsTimeout) {
     browser.wait(function () {
       return browser.isElementPresent(by[selectBy](el)).then((v) => {
         if (!v) {

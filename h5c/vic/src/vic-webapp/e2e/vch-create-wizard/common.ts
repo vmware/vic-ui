@@ -26,3 +26,5 @@ export const modalWizard = '.clr-wizard-stepnav';
 export const dataGridCell = '.datagrid-cell';
 export const iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
 export const namePrefix = 'virtual-container-host-';
+export const menuContainerItem = '#applicationMenuContainer .k-item .k-link';
+export const labelMenuItem = '.vui-menuitem-label-text';
