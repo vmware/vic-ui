@@ -39,7 +39,7 @@ export class VchRegistryComponent extends VchComponentBase implements OnInit {
     public i18n: I18nService
   ) {
     super(formBuilder, createWzService, globalsService, configureService);
-    this.updateCurrentForm(this.initialModel);
+    this.initCurrentForm(this.initialModel);
   }
 
   ngOnInit() {
@@ -49,7 +49,7 @@ export class VchRegistryComponent extends VchComponentBase implements OnInit {
   /**
    * Updates the current form based on the input model in case of configure flow and/or based on the initial model in case of creation flow.
    */
-  protected updateCurrentForm(model: VchRegistryView) {
+  protected initCurrentForm(model: VchRegistryView) {
     this.form = this.formBuilder.group({
       useWhitelistRegistry: model.useWhitelistRegistry,
       insecureRegistries: this.formBuilder.array(model.insecureRegistry && model.insecureRegistry.length > 0 ? [

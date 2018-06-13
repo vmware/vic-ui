@@ -481,6 +481,11 @@ export function vchToVchView (vch: Vch): VchView {
           thumbprint: getThumbprintFromCertificate(cert.pem)
         })
       })
+    },
+    operations: {
+      opsUser: vch.endpoint.operations_credentials ? vch.endpoint.operations_credentials.user : '',
+      opsPassword: vch.endpoint.operations_credentials ? vch.endpoint.operations_credentials.password : '',
+      opsGrantPerms: vch.endpoint.operations_credentials ? vch.endpoint.operations_credentials.grant_permissions : false,
     }
   };
   return uiModel;

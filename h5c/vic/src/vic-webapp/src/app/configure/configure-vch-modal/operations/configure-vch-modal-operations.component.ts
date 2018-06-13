@@ -16,17 +16,20 @@
 
 import {Component} from '@angular/core';
 import {ConfigureVchService} from '../../configure-vch.service';
-import {ActivatedRoute} from '@angular/router';
 import {GlobalsService} from '../../../shared/globals.service';
 import {ConfigureVchBase} from '../../configure-vch-base';
+import {ActivatedRoute} from '@angular/router';
+import {globalProperties} from '../../../../environments/properties';
 import {I18nService} from '../../../shared/i18n.service';
 
 @Component({
-  selector: 'vic-configure-vch-view-operations',
-  styleUrls: ['./configure-vch-view-operations.component.scss'],
-  templateUrl: './configure-vch-view-operations.component.html'
+  selector: 'vic-configure-vch-modal-operations',
+  styleUrls: ['./configure-vch-modal-operations.component.scss'],
+  templateUrl: './configure-vch-modal-operations.component.html'
 })
-export class ConfigureVchViewOperationsComponent extends ConfigureVchBase {
+export class ConfigureVchModalOperationsComponent extends ConfigureVchBase {
+
+  public helpLink = globalProperties.vhcDocsGeneral;
 
   constructor(protected globalsService: GlobalsService,
               protected configureVchService: ConfigureVchService,
@@ -34,4 +37,5 @@ export class ConfigureVchViewOperationsComponent extends ConfigureVchBase {
               public i18n: I18nService) {
     super(globalsService, configureVchService, activatedRoute);
   }
+
 }

@@ -25,7 +25,6 @@ import { AppAlertService, GlobalsService, I18nService } from 'app/shared';
 import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { Observable } from 'rxjs/Observable';
-import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { RefreshService } from '../shared/refresh.service';
 import { SummaryComponent } from './summary/summary.component';
 import {VchGeneralComponent} from '../shared/components/vch-general/vch-general.component';
@@ -39,6 +38,7 @@ import {VchStorageComponent} from '../shared/components/vch-storage/vch-storage.
 import {VchNetworkComponent} from '../shared/components/vch-network/vch-network.component';
 import {VchSecurityComponent} from '../shared/components/vch-security/vch-security.component';
 import {VchRegistryComponent} from '../shared/components/vch-registry/vch-registry.component';
+import {VchOperationsComponent} from '../shared/components/vch-operations/vch-operations.component';
 
 describe('CreateVchWizardComponent', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -106,7 +106,7 @@ describe('CreateVchWizardComponent', () => {
         VchNetworkComponent,
         VchSecurityComponent,
         VchRegistryComponent,
-        OperationsUserComponent,
+        VchOperationsComponent,
         SummaryComponent,
         CapitalizePipe,
         CliCommandComponent

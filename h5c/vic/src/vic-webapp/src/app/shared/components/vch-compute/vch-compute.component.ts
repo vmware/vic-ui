@@ -73,7 +73,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     protected configureService: ConfigureVchService
   ) {
     super(formBuilder, createWzService, globalsService, configureService);
-    this.updateCurrentForm(this.initialModel);
+    this.initCurrentForm(this.initialModel);
   }
 
   // TODO: add units selectors to compute fields
@@ -112,7 +112,7 @@ export class VchComputeComponent extends VchComponentBase implements OnInit {
     super.ngOnInit();
   }
 
-  updateCurrentForm(model: VchComputeView) {
+  initCurrentForm(model: VchComputeView) {
     // create a FormGroup instance
     this.form = this.formBuilder.group({
       cpuLimit: [model.cpuLimit || this.initialModel.cpuLimit,
