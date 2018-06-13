@@ -68,7 +68,7 @@ export class VchSecurityComponent extends VchComponentBase implements OnInit {
     public i18n: I18nService
   ) {
     super(formBuilder, createWzService, globalsService, configureService);
-    this.updateCurrentForm(this.initialModel);
+    this.initCurrentForm(this.initialModel);
   }
 
   ngOnInit() {
@@ -76,7 +76,7 @@ export class VchSecurityComponent extends VchComponentBase implements OnInit {
     this.ensureFirstTlsCaIsRequired();
   }
 
-  protected updateCurrentForm(model: VchSecurityView) {
+  protected initCurrentForm(model: VchSecurityView) {
     this.form = this.formBuilder.group({
       serverCertSource: model.serverCertSource,
       organization: model.organization,

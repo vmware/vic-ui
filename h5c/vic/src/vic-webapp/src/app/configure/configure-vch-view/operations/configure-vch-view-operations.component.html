@@ -1,1 +1,16 @@
-Operations
+<ng-container *ngIf="vchInfo | async as vchUIModel; else loadingContent">
+  <vic-configure-vch-view-container [title]="i18n.translate('vch.operations.title')"
+                                    [vchUiModelKey]="'operations'"
+                                    [vchId]="vchId">
+    <vic-vch-operations [readOnly]="true"
+                      [model]="vchUIModel.operations">
+    </vic-vch-operations>
+  </vic-configure-vch-view-container>
+</ng-container>
+<ng-template #loadingContent>
+  <div class="vic-configure-container-view-spinner-container">
+    <span class="spinner spinner-md">
+      Loading...
+    </span>
+  </div>
+</ng-template>

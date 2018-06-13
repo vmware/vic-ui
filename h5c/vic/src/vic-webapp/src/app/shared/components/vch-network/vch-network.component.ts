@@ -81,7 +81,7 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
     public i18n: I18nService
   ) {
     super(formBuilder, createWzService, globalsService, configureService);
-    this.updateCurrentForm(this.initialModel);
+    this.initCurrentForm(this.initialModel);
   }
 
   ngOnInit() {
@@ -95,7 +95,7 @@ export class VchNetworkComponent extends VchComponentBase implements OnInit {
     super.ngOnInit();
   }
 
-  protected updateCurrentForm(model: VchNetworkView) {
+  protected initCurrentForm(model: VchNetworkView) {
     this.form = this.formBuilder.group({
       bridgeNetwork: [model.bridgeNetwork, Validators.required],
       bridgeNetworkRange: [model.bridgeNetworkRange, Validators.required],

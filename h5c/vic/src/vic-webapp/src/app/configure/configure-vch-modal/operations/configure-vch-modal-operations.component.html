@@ -1,0 +1,18 @@
+<ng-container *ngIf="vchInfo | async as vchUIModel; else loadingContent">
+  <vic-configure-vch-modal-container [title]="i18n.translate('vch.operations.title')"
+                                     [helpLink]="helpLink"
+                                     [modelChangedPayload]="currentModelEmitter.asObservable()"
+                                     [vchId]="vchId">
+    <vic-vch-operations #configureContent
+                      [model]="vchUIModel.operations"
+                      (modelChanged)="modelChange($event)">
+    </vic-vch-operations>
+  </vic-configure-vch-modal-container>
+</ng-container>
+<ng-template #loadingContent>
+  <div class="vic-configure-container-modal-spinner-container">
+    <span class="spinner">
+      Loading...
+    </span>
+  </div>
+</ng-template>

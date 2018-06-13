@@ -49,14 +49,14 @@ export class VchStorageComponent extends VchComponentBase implements OnInit {
     public i18n: I18nService
   ) {
     super(formBuilder, createWzService, globalsService, configureService);
-    this.updateCurrentForm(this.initialModel);
+    this.initCurrentForm(this.initialModel);
   }
 
   ngOnInit() {
     super.ngOnInit();
   }
 
-  protected updateCurrentForm(model: VchStorageView) {
+  protected initCurrentForm(model: VchStorageView) {
     this.form = this.formBuilder.group({
       imageStore: [model.imageStore, Validators.required],
       fileFolder: model.fileFolder,

@@ -21,10 +21,9 @@ import { CommonModule } from '@angular/common';
 import { CreateVchWizardComponent } from './create-vch-wizard.component';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { NgModule } from '@angular/core';
-import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { SummaryComponent } from './summary/summary.component';
 import { SharedModule } from '../shared/shared.module';
-import {ConfigureVchService} from '../configure/configure-vch.service';
+import { ConfigureVchService } from '../configure/configure-vch.service';
 
 const routes: Routes = [
   { path: '**', component: CreateVchWizardComponent }
@@ -32,7 +31,6 @@ const routes: Routes = [
 
 const declarations = [
   CreateVchWizardComponent,
-  OperationsUserComponent,
   SummaryComponent
 ];
 

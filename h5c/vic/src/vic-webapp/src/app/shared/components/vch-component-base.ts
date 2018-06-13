@@ -56,7 +56,7 @@ export abstract class VchComponentBase implements OnInit, OnDestroy {
    * the current model.
    */
   protected updateFormAndModel(model: VchViewTypes) {
-    this.updateCurrentForm(model);
+    this.initCurrentForm(model);
     this.updateCurrentModel();
     if (!this.readOnly) {
       this.emitCurrentModel();
@@ -64,9 +64,9 @@ export abstract class VchComponentBase implements OnInit, OnDestroy {
   }
 
   /**
-   * Updates the current form. This should be implemented on each componente based on component form/model logic
+   * Inits the current form. This should be implemented on each componente based on component form/model logic
    */
-  protected abstract updateCurrentForm(model: VchViewTypes);
+  protected abstract initCurrentForm(model: VchViewTypes);
 
   /**
    * Updates the current model. This should be implemented on each componente based on component form/model logic

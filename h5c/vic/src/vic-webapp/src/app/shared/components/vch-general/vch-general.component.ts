@@ -36,14 +36,14 @@ export class VchGeneralComponent extends VchComponentBase implements OnInit {
   constructor(protected formBuilder: FormBuilder,
               protected createWzService: CreateVchWizardService) {
     super(formBuilder, createWzService);
-    this.updateCurrentForm(this.initialModel);
+    this.initCurrentForm(this.initialModel);
   }
 
   ngOnInit() {
     super.ngOnInit();
   }
 
-  protected updateCurrentForm(model: VchGeneralView) {
+  protected initCurrentForm(model: VchGeneralView) {
     const [,
       containerNameConventionPrefix = '',
       containerNameConvention = '{name}',

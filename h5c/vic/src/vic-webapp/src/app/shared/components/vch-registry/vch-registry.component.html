@@ -6,7 +6,7 @@
     <clr-stack-block>
       <clr-stack-label>{{ i18n.translate('vch.registry.whiteRegistryMode') }}</clr-stack-label>
       <clr-stack-content>{{ model.useWhitelistRegistry ?
-        i18n.translate('vch.registry.yes') : i18n.translate('vch.registry.no') }}</clr-stack-content>
+        i18n.translate('vch.common.label.yes') : i18n.translate('vch.common.label.no') }}</clr-stack-content>
     </clr-stack-block>
   </clr-stack-view>
 
@@ -176,7 +176,7 @@
           </div>
           <div class="col-xs px-0 add-remove-actions">
             <label class="btn btn-link my-0" for="registry-ca-{{i}}">
-              {{ registryCaContents[i] ? i18n.translate('vch.registry.replace') : i18n.translate('vch.registry.select') }}
+              {{ registryCaContents[i] ? i18n.translate('vch.common.label.replace') : i18n.translate('vch.common.label.select') }}
             </label>
             <clr-icon class="is-solid mt-0"
                       shape="times-circle"

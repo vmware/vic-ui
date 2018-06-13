@@ -77,10 +77,14 @@ const appRoutes: Routes = [
       path: 'configure-vch-modal-security',
       loadChildren: './configure/configure-vch-modal/security/configure-vch-modal-security.module#ConfigureVchModalSecurityModule'
     },
-  {
-    path: 'configure-vch-modal-registry',
-    loadChildren: './configure/configure-vch-modal/registry/configure-vch-modal-registry.module#ConfigureVchModalRegistryModule'
-  }
+    {
+      path: 'configure-vch-modal-registry',
+      loadChildren: './configure/configure-vch-modal/registry/configure-vch-modal-registry.module#ConfigureVchModalRegistryModule'
+    },
+    {
+      path: 'configure-vch-modal-operations',
+      loadChildren: './configure/configure-vch-modal/operations/configure-vch-modal-operations.module#ConfigureVchModalOperationsModule'
+    }
 ];
 
 export const extensionToRoutes = {};

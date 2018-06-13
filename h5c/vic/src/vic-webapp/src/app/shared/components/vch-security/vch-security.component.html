@@ -5,7 +5,7 @@
     <clr-stack-header></clr-stack-header>
     <clr-stack-block>
       <clr-stack-label>{{ i18n.translate('vch.security.secureAccessToVCH') }}</clr-stack-label>
-      <clr-stack-content>{{ model.noTlsverify ? i18n.translate('vch.security.no') : i18n.translate('vch.security.yes') }}</clr-stack-content>
+      <clr-stack-content>{{ model.noTlsverify ? i18n.translate('vch.common.label.no') : i18n.translate('vch.common.label.yes') }}</clr-stack-content>
     </clr-stack-block>
   </clr-stack-view>
 
@@ -208,7 +208,7 @@
           </div>
           <div class="col-xs px-0 add-remove-actions">
             <label class="btn btn-link my-0" for="tls-server-cert">
-              {{ tlsServerCertContents ? i18n.translate('vch.security.replace') : i18n.translate('vch.security.select') }}
+              {{ tlsServerCertContents ? i18n.translate('vch.common.label.replace') : i18n.translate('vch.common.label.select') }}
             </label>
           </div>
         </div>
@@ -229,7 +229,7 @@
           </div>
           <div class="col-xs px-0 add-remove-actions">
             <label class="btn btn-link my-0" for="tls-server-key">
-              {{ tlsServerKeyContents ? i18n.translate('vch.security.replace') : i18n.translate('vch.security.select') }}
+              {{ tlsServerKeyContents ? i18n.translate('vch.common.label.replace') : i18n.translate('vch.common.label.select') }}
             </label>
           </div>
         </div>

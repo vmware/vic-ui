@@ -177,7 +177,7 @@ describe('SecurityComponent', () => {
       useClientAuth: false
     };
 
-    component['updateCurrentForm'](tmpModel);
+    component['initCurrentForm'](tmpModel);
     component['updateCurrentModel']();
 
     component.onCommit().subscribe(results => {
@@ -205,7 +205,7 @@ describe('SecurityComponent', () => {
       }
     };
 
-    component['updateCurrentForm'](tmpModel);
+    component['initCurrentForm'](tmpModel);
     component['updateCurrentModel']();
 
     component.onCommit().subscribe(results => {
