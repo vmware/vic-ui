@@ -60,7 +60,7 @@ Prepare Testbed For Protractor Tests And Install Plugin
     Prepare Protractor  ${TEST_VC_IP}  ${WINDOWS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/2-host-affinity.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && protractor --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts --params.hostAffinity=true
     Log  ${out}
     Log To Console  ${out}
 
@@ -72,7 +72,7 @@ Prepare Testbed For Protractor Tests And Install Plugin
     Prepare Protractor  ${TEST_VC_IP}  ${WINDOWS_HOST_IP}  firefox
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/2-host-affinity.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && protractor --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts --params.hostAffinity=true
     Log  ${out}
     Log To Console  ${out}
 
@@ -84,7 +84,7 @@ Prepare Testbed For Protractor Tests And Install Plugin
     Prepare Protractor  ${TEST_VC_IP}  ${WINDOWS_HOST_IP}  internet explorer
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/2-host-affinity.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && protractor --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts --params.hostAffinity=true
     Log  ${out}
     Log To Console  ${out}
 
@@ -96,7 +96,7 @@ Prepare Testbed For Protractor Tests And Install Plugin
     Prepare Protractor  ${TEST_VC_IP}  ${MACOS_HOST_IP}  chrome
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/2-host-affinity.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && protractor --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts --params.hostAffinity=true
     Log  ${out}
     Log To Console  ${out}
 
@@ -108,7 +108,7 @@ Prepare Testbed For Protractor Tests And Install Plugin
     Prepare Protractor  ${TEST_VC_IP}  ${MACOS_HOST_IP}  firefox
 
     # run protractor
-    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && npm run e2e -- --specs=e2e/vch-create-wizard/2-host-affinity.e2e-spec.ts
+    ${rc}  ${out}=  Run And Return Rc And Output  cd h5c/vic/src/vic-webapp && yarn && protractor --specs=e2e/vch-create-wizard/1-basic.e2e-spec.ts --params.hostAffinity=true
     Log  ${out}
     Log To Console  ${out}
 
