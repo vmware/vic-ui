@@ -26,7 +26,7 @@ import {
   DOCKER_ENGINE_PORT_NOTLS,
   DOCKER_ENGINE_PORT_TLS,
   VIC_ROOT_OBJECT_ID_WITH_NAME,
-  VSPHERE_SERVEROBJ_VIEWEXT_KEY,
+  VSPHERE_SERVEROBJ_VIEWEXT_KEY, VSPHERE_VIC_CONFIGURE_GENERAL_KEY,
   VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY,
   VSPHERE_VM_SUMMARY_KEY,
   WIZARD_MODAL_HEIGHT,
@@ -64,6 +64,7 @@ import { getServerInfoByVchObjRef } from '../shared/utils/object-reference';
 })
 export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
   public readonly WS_VCH_CONSTANTS = WS_VCH;
+  public readonly VIC_CONFIGURE_GENERAL_KEY = VSPHERE_VIC_CONFIGURE_GENERAL_KEY;
   private refreshSubscription: Subscription;
   public isDgLoading = true;
   public vchs: VirtualContainerHost[] = [];
@@ -199,10 +200,10 @@ export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
    * Navigates to an object specified by objectId
    * @param objectId Full vSphere objectId which starts with urn:
    */
-  navigateToObject(objectId: string) {
+  navigateToObject(objectId: string, key: string = VSPHERE_VM_SUMMARY_KEY) {
     if (objectId.indexOf('VirtualMachine') > -1) {
       this.globalsService.getWebPlatform().sendNavigationRequest(
-        VSPHERE_VM_SUMMARY_KEY, objectId);
+        key, objectId);
     } else {
       window.parent.location.href = '/ui/#?extensionId=' +
         VSPHERE_SERVEROBJ_VIEWEXT_KEY + '&' +
