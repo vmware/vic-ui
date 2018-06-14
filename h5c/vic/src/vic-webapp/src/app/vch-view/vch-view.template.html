@@ -31,7 +31,7 @@
 <clr-datagrid (clrDgRefresh)="refreshGrid($event)" [clrDgLoading]="isDgLoading">
   <clr-dg-action-bar>
     <button class="btn btn-link btn-sm new-vch" (click)="launchCreateVchWizard()">
-      <clr-icon shape="add"></clr-icon> New Virtual Container Host
+      <clr-icon shape="add"></clr-icon> {{vicI18n.translate(this.WS_VCH_CONSTANTS.DG.MESSAGES, 'NEW')}}
     </button>
   </clr-dg-action-bar>
   <clr-dg-column [clrDgField]="'name'">
@@ -49,8 +49,9 @@
 
   <clr-dg-row *ngFor="let item of vchs">
     <clr-dg-action-overflow class="{{item.name}}">
-      <button class="action-item action-item-delete" (click)="launchDeleteVchModal(item.id)">Delete</button>
-      <button class="action-item action-item-cert" (click)="downloadVchCert(item)">Download VCH certificate</button>
+      <button class="action-item action-item-cert" (click)="downloadVchCert(item)">{{vicI18n.translate(this.WS_VCH_CONSTANTS.DG.ACTIONS, 'DOWNLOAD_CERT')}}</button>
+      <button class="action-item action-item-reconfigure" (click)="navigateToObject(item.id, VIC_CONFIGURE_GENERAL_KEY)">{{vicI18n.translate(this.WS_VCH_CONSTANTS.DG.ACTIONS, 'RECONFIGURE')}}</button>
+      <button class="action-item action-item-delete" (click)="launchDeleteVchModal(item.id)">{{vicI18n.translate(this.WS_VCH_CONSTANTS.DG.ACTIONS, 'DELETE')}}</button>
     </clr-dg-action-overflow>
     <clr-dg-row-detail>
       <clr-dg-cell>

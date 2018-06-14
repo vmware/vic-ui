@@ -16,6 +16,7 @@
 
 export const VIC_LOGO_100X100 = '/assets/vic-icons/100x100.png';
 export const VSPHERE_VM_SUMMARY_KEY = 'vsphere.core.vm.summary';
+export const VSPHERE_VIC_CONFIGURE_GENERAL_KEY = 'com.vmware.vic.vchConfigureGeneral';
 export const VSPHERE_SERVEROBJ_VIEWEXT_KEY =
     'vsphere.core.inventory.serverObjectViewsExtension';
 export const VSPHERE_VITREE_HOSTCLUSTERVIEW_KEY =
@@ -57,10 +58,24 @@ export const WS_VCH = {
         },
         MESSAGES: {
           keys: {
-            WAITING_FOR_IP: 'vic_workspace.vch.datagrid.msg.waitingForIp'
+            WAITING_FOR_IP: 'vic_workspace.vch.datagrid.msg.waitingForIp',
+            NEW: 'vic_workspace.vch.datagrid.msg.newVch'
           },
           defaults: {
-            'vic_workspace.vch.datagrid.msg.waitingForIp': 'Waiting...'
+            'vic_workspace.vch.datagrid.msg.waitingForIp': 'Waiting...',
+            'vic_workspace.vch.datagrid.msg.newVch': 'New Virtual Container Host'
+          }
+        },
+        ACTIONS: {
+          keys: {
+            DOWNLOAD_CERT: 'vic_workspace.vch.datagrid.actionMenu.downloadCert',
+            RECONFIGURE: 'vic_workspace.vch.datagrid.actionMenu.reconfigureLink',
+            DELETE: 'vic_workspace.vch.datagrid.actionMenu.delete'
+          },
+          defaults: {
+            'vic_workspace.vch.datagrid.actionMenu.downloadCert': 'Download VCH certificate',
+            'vic_workspace.vch.datagrid.actionMenu.reconfigureLink': 'Reconfigure Virtual Container Host',
+            'vic_workspace.vch.datagrid.actionMenu.delete': 'Delete Virtual Container Host'
           }
         }
     }
