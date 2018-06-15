@@ -314,7 +314,7 @@ Download VIC Engine Tarball From OVA
     OperatingSystem.File Should Exist  ${filename}
     Set Suite Variable  ${buildNumber}  ${tarball_file}
     Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${tarball_file}
-    Append To File  testbed-information-%{BUILD_NUMBER}  VIC_VERSION=${tarball_file}\n
+    Append To File  testbed-information-%{BUILD_NUMBER}  VIC_TARBALL_FILE=${tarball_file}\n
     [Return]  ${rc} == 0
 
 Prepare VIC Engine Binaries
