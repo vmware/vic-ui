@@ -328,7 +328,7 @@ Prepare VIC Engine Binaries
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
-    ${vic_ui_version}=  Run cat ui-nightly-run-bin/ui/plugin-manifest | grep version | cut -d "=" -f 2
+    ${vic_ui_version}=  Run  cat ui-nightly-run-bin/ui/plugin-manifest | grep version | cut -d "=" -f 2
     Append To File  testbed-information-%{BUILD_NUMBER}  VIC_UI_VERSION=${vic_ui_version}\n
 
 Open SSH Connection
