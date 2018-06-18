@@ -12,7 +12,7 @@
 */
 
 import { browser, by, element, ElementFinder } from 'protractor';
-import {defaultTimeout} from './vch-create-wizard/common';
+import {defaultTimeout} from '../e2e/pages/common';
 
 export class VicWebappPage {
 
@@ -20,19 +20,10 @@ export class VicWebappPage {
   private h5cActionMenuLogOut = 'vc-action-menu-item:nth-of-type(3)';
   private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
-  private datacenterTreenodeCaret = 'button.clr-treenode-caret';
-  private firstDcTreenodeCaretXpath = `(//button[contains(@class,'clr-treenode-caret')])[1]/clr-icon[contains(@dir, 'right')]`;
   private buttonBasicAdvance = 'a.btn.btn-link.pl-0';
   private buttonHostAffinity = 'label.text-nowrap';
-  private buttonNewVch = 'button.new-vch';
-  private iconVsphereHome = '.clr-vmw-logo';
-  private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
   private iconHostAndClustersShortcut = '.controlcenter-shortcut-icon';
-  private iconVicRoot = 'span[title="vSphere Integrated Containers"]:last-of-type';
-  private tabBtnVchs = 'li.tid-com-vmware-vic-customtab-vch-navi-tab-header a';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
-  private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
-  private iframeModal = 'div.modal-body iframe.sandbox-iframe';
   private inputOpsUser = 'input#ops-user';
   private inputOpsPassword = 'input#ops-password';
   private labelEnableSecure = 'label[for=use-client-auth]';
@@ -40,43 +31,14 @@ export class VicWebappPage {
   private selectorImageStore = 'select#image-store-selector';
   private selectorBridgeNetwork = 'select#bridge-network-selector';
   private selectorPublicNetwork = 'select#public-network-selector';
-  private inputUsername = '#username';
-  private username = 'administrator@vsphere.local';
-  private inputPassword = '#password';
-  private password = 'Bl*ckwalnut0';
-  private submit = '#submit';
   private defaultTimeout = 10000;
   private extendedTimeout = 10000;
   private opsTimeout = 80000;
-
-  navigateTo() {
-    browser.waitForAngularEnabled(false);
-    return browser.get('https://localhost:9443');
-  }
-
-  login() {
-    browser.waitForAngularEnabled(false);
-    // username
-    this.waitForElementToBePresent(this.inputUsername);
-    this.clickByCSS(this.inputUsername);
-    this.clear(this.inputUsername);
-    this.sendKeys(this.inputUsername, this.username);
-    // password
-    this.clickByCSS(this.inputPassword);
-    this.clear(this.inputPassword);
-    this.sendKeys(this.inputPassword, this.password);
-    // submit
-    this.clickByCSS(this.submit);
-  }
 
   logOut() {
     this.clickByCSS(this.h5cActionMenuToggle);
     this.waitForElementToBePresent(this.h5cActionMenuLogOut);
     this.clickByCSS(this.h5cActionMenuLogOut);
-  }
-
-  waitLoginFinish() {
-    this.waitUntilUrlContains('serverObjectViewsExtension');
   }
 
   waitUntilUrlContains(str: string) {
@@ -87,101 +49,7 @@ export class VicWebappPage {
     }, this.opsTimeout);
   }
 
-  navigateToHome() {
-    // click top left vmware logo
-    browser.sleep(this.defaultTimeout);
-    this.waitForElementToBePresent(this.iconVsphereHome);
-    this.clickByCSS(this.iconVsphereHome);
-  }
-
-  navigateToVicPlugin() {
-    // click vic shortcut icon
-    this.waitForElementToBePresent(this.iconVicShortcut);
-    this.clickByCSS(this.iconVicShortcut);
-  }
-
-  navigateToSummaryTab() {
-    // click vic link
-    browser.sleep(this.defaultTimeout);
-    this.waitForElementToBePresent(this.iconVicRoot);
-    this.clickByCSS(this.iconVicRoot);
-  }
-
-  navigateToVchTab() {
-    // click vch tab
-    this.waitForElementToBePresent('.tabbed-object-view');
-    this.waitForElementToBePresent(this.tabBtnVchs);
-    this.clickByCSS(this.tabBtnVchs);
-    browser.wait(() => {
-      return browser.getCurrentUrl().then(v => {
-        browser.sleep(6000);
-        return v.indexOf('customtab-vch') > -1;
-      });
-    }, this.opsTimeout);
-  }
-
-  openVchWizard() {
-    this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.buttonNewVch);
-    this.clickByCSS(this.buttonNewVch);
-    browser.switchTo().defaultContent();
-    this.switchFrame(this.iframeModal);
-  }
-
-  selectComputeResource(name: string = 'Cluster') {
-    browser.sleep(defaultTimeout);
-    this.waitForElementToBePresent(this.datacenterTreenodeCaret);
-    element(by.xpath(this.firstDcTreenodeCaretXpath)).isPresent().then(collapsed => {
-      if (collapsed) {
-        this.clickByXpath(this.firstDcTreenodeCaretXpath);
-      }
-    });
-    this.clickByXpath(`//button[text()[contains(.,'${name}')]]`);
-    if (browser.params.hostAffinity === 'true') {
-      this.clickByCSS(this.buttonBasicAdvance);
-      this.waitForElementToBePresent(this.buttonHostAffinity, 'css');
-      this.clickByCSS(this.buttonHostAffinity);
-    }
-  }
-
-  selectDatastore(name: string = 'datastore1') {
-    this.waitForElementToBePresent(this.selectorImageStore);
-    this.clickByText(this.selectorImageStore + ' option', name);
-  }
-
-  selectBridgeNetwork(name: string = 'bridge') {
-    browser.sleep(defaultTimeout);
-    this.waitForElementToBePresent(this.selectorBridgeNetwork);
-    this.clickByText(this.selectorBridgeNetwork + ' option', name);
-  }
-
-  selectPublicNetwork(name: string = 'network') {
-    this.waitForElementToBePresent(this.selectorPublicNetwork);
-    this.clickByText(this.selectorPublicNetwork + ' option', name);
-  }
-
-  disableSecureAccess() {
-    this.waitForElementToBePresent(this.labelEnableSecure);
-    this.clickByCSS(this.labelEnableSecure);
-  }
-
-  enterOpsUserCreds() {
-    // username
-    this.clickByCSS(this.inputOpsUser);
-    this.sendKeys(this.inputOpsUser, this.username);
-    // password
-    this.clickByCSS(this.inputOpsPassword);
-    this.sendKeys(this.inputOpsPassword, this.password);
-  }
-
-  createVch() {
-    this.clickByText('Button', 'Finish');
-    browser.switchTo().defaultContent();
-    this.waitForElementToBeGone(this.iframeModal, this.extendedTimeout * 8);
-    this.switchFrame(this.iframeTabs);
-  }
-
-  deleteVch(vch) {
+  /*deleteVch(vch) {
     this.switchFrame(this.iframeTabs);
     this.waitForElementToBePresent(this.actionBar + vch);
     const vchActionMenu = this.actionBar + vch;
@@ -195,13 +63,13 @@ export class VicWebappPage {
     this.clickByCSS(this.labelDeleteVolumes);
     this.clickByText('Button', 'Delete');
     browser.switchTo().defaultContent();
-  }
+  }*/
 
-  navigateToVchVm(vch) {
+  /*navigateToVchVm(vch) {
     this.switchFrame(this.iframeTabs);
     this.waitForElementToBePresent(this.actionBar + vch);
     this.clickByText('.datagrid-cell a', vch);
-  }
+  }*/
 
   /* Utility functions */
 
