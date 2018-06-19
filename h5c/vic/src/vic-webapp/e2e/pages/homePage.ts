@@ -4,25 +4,20 @@ import { VicWebappPage } from '../app.po';
 import { defaultTimeout } from './common';
 import { VicVchMain } from './vicVchMain';
 
-export class HomePage {
+export class HomePage extends VicWebappPage {
 
-private common: VicWebappPage;
 private iconVsphereHome = '.clr-vmw-logo';
 private iconVicShortcut = '.com_vmware_vic-home-shortcut-icon';
 
-constructor() {
-    this.common = new VicWebappPage();
-}
-
 navigateToHome() {
     browser.sleep(defaultTimeout);
-    this.common.waitForElementToBePresent(this.iconVsphereHome);
-    this.common.clickByCSS(this.iconVsphereHome);
+    this.waitForElementToBePresent(this.iconVsphereHome);
+    this.clickByCSS(this.iconVsphereHome);
 }
 
 navigateToVicPLugin() {
-    this.common.waitForElementToBePresent(this.iconVicShortcut);
-    this.common.clickByCSS(this.iconVicShortcut);
+    this.waitForElementToBePresent(this.iconVicShortcut);
+    this.clickByCSS(this.iconVicShortcut);
     return new VicVchMain();
 }
 

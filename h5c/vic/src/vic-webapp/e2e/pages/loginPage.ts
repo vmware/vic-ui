@@ -7,16 +7,11 @@ import {
     password
   } from './common';
 
-export class LoginPage {
+export class LoginPage extends VicWebappPage {
 
 private userInput = '#username';
 private passwordInput = '#password';
 private submitButton = '#submit';
-private common: VicWebappPage;
-
-constructor(common) {
-    this.common = common;
-}
 
 navigateToLoginPage(site) {
     console.log('Navego hasta login page');
@@ -24,17 +19,17 @@ navigateToLoginPage(site) {
     browser.get(site);
 }
 waitLoginFinish() {
-    this.common.waitUntilUrlContains('serverObjectViewsExtension');
+    this.waitUntilUrlContains('serverObjectViewsExtension');
   }
 
 submitLogin() {
     browser.waitForAngularEnabled(false);
-    this.common.waitForElementToBePresent(this.userInput);
-    this.common.clickByCSS(this.userInput);
-    this.common.sendKeys(this.userInput, username);
-    this.common.waitForElementToBePresent(this.passwordInput);
-    this.common.sendKeys(this.passwordInput, password);
-    this.common.clickByCSS(this.submitButton);
+    this.waitForElementToBePresent(this.userInput);
+    this.clickByCSS(this.userInput);
+    this.sendKeys(this.userInput, username);
+    this.waitForElementToBePresent(this.passwordInput);
+    this.sendKeys(this.passwordInput, password);
+    this.clickByCSS(this.submitButton);
     this.waitLoginFinish();
     return new HomePage();
 }

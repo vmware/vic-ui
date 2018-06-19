@@ -24,13 +24,7 @@ export class VicWebappPage {
   private buttonHostAffinity = 'label.text-nowrap';
   private iconHostAndClustersShortcut = '.controlcenter-shortcut-icon';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
-  private inputOpsUser = 'input#ops-user';
-  private inputOpsPassword = 'input#ops-password';
-  private labelEnableSecure = 'label[for=use-client-auth]';
   private labelDeleteVolumes = 'label[for=delete-volumes]';
-  private selectorImageStore = 'select#image-store-selector';
-  private selectorBridgeNetwork = 'select#bridge-network-selector';
-  private selectorPublicNetwork = 'select#public-network-selector';
   private defaultTimeout = 10000;
   private extendedTimeout = 10000;
   private opsTimeout = 80000;

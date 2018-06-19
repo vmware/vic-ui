@@ -15,13 +15,6 @@
 */
 
 export const defaultTimeout = 10000;
-export const sectionSummary = 'section#summary';
-export const sectionOpsUser = 'section#ops-user';
-export const sectionRegistry = 'section#registry';
-export const sectionSecurity = 'section#security';
-export const sectionNetworks = 'section#networks';
-export const sectionStorage = 'section#storage-capacity';
-export const sectionCompute = 'section#compute-capacity';
 export const modalWizard = '.clr-wizard-stepnav';
 export const dataGridCell = '.datagrid-cell';
 export const iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';

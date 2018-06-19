@@ -18,38 +18,39 @@ import {browser, by, element, protractor} from 'protractor';
 
 import { PROTRACTOR_JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
-import { LoginPage } from '../pages/login';
+import { LoginPage } from '../pages/loginPage';
 import { HomePage } from '../pages/homePage';
-import { VicVchMain, VchCreateGeneralComponent } from '../pages/vicVchMain';
+import { VicVchMain} from '../pages/vicVchMain';
 import {
   modalWizard,
 } from '../pages/common';
+import { VchCreateUpdate } from '../pages/vicVchCreateUpdateView';
 
 
 describe('VCH Create Wizard - Basic', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = PROTRACTOR_JASMINE_TIMEOUT;
-  let page: VicWebappPage;
+  let utility: VicWebappPage;
   let loginPage: LoginPage;
   let homePage: HomePage;
   let vicMain: VicVchMain;
-  let vicVchCreate: VchCreateGeneralComponent;
+  let vicVchCreate: VchCreateUpdate;
   let specRunId: number;
   specRunId = Math.floor(Math.random() * 1000) + 100;
 
   beforeAll(() => {
     specRunId = Math.floor(Math.random() * 1000) + 100;
+    utility = new VicWebappPage();
   });
 
   beforeEach(() => {
-    page = new VicWebappPage();
   });
 
   afterAll(() => {
-    page.logOut();
+    utility.logOut();
   });
 
   it('should redirect to login', () => {
-    loginPage = new LoginPage(page);
+    loginPage = new LoginPage();
     browser.driver.manage().window().maximize();
     loginPage.navigateToLoginPage('https://localhost:9443');
     expect(browser.getCurrentUrl()).toContain('SSO');
@@ -80,7 +81,7 @@ describe('VCH Create Wizard - Basic', () => {
   });
 
   it('should open create vch wizard', () => {
-    vicVchCreate = vicMain.navigateToVchWizard();
+    vicVchCreate = vicMain.navigateToCreateWizard();
     expect(element(by.css(modalWizard)).isPresent()).toBe(true);
   });
 
@@ -125,7 +126,6 @@ describe('VCH Create Wizard - Basic', () => {
 
   it('should enter ops user creds', () => {
     vicVchCreate.processOpsUserCreds();
-    expect(element(by.css(vicVchCreate.getSectionSummary())).isPresent()).toBe(true);
   });
 
   it('should create a vch', () => {
