@@ -31,12 +31,15 @@ import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { Globals, GlobalsService } from '../shared';
 import {
+  ClusterHostsChilds,
   computeResourcesRealName,
   dcClustersAndStandAloneHosts,
   dcDSwitchPorGroupsList, dcMockData, dvsHostsEntries,
   folderDSwitchList, folderDSwitchPorGroupsList,
   netWorkingResources
 } from './mocks/create-vch-wizard-mocked-data';
+import {ComputeResource} from '../interfaces/compute.resource';
+import {COMPUTE_RESOURCE_NODE_TYPES} from '../shared/constants';
 
 describe('CreateVchWizardService', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = JASMINE_TIMEOUT;
@@ -127,17 +130,33 @@ describe('CreateVchWizardService', () => {
       spyOn<any>(service, 'getDvsFromNetworkFolders').and.returnValue(Observable.of(folderDSwitchList));
       spyOn<any>(service, 'getDvsPortGroups').and.returnValue([...folderDSwitchPorGroupsList, ...dcDSwitchPorGroupsList]);
       spyOn<any>(service, 'getDvsHostsEntries').and.returnValue(dvsHostsEntries);
+      spyOn<any>(service, 'getHostsFromComputeResource').and.returnValue(ClusterHostsChilds);
 
-      service.getDistributedPortGroups(null, '10.192.109.234')
-        .subscribe(data => {
-            expect(data.length).toBe(8);
-          });
+      const selectedHostResource: ComputeResource = {
+        text: '10.192.109.234',
+        nodeTypeId: COMPUTE_RESOURCE_NODE_TYPES.host.dc_stand_alone,
+        objRef: 'urn:vmomi:ClusterComputeResource:host-276:d7c361cc-0a46-441e-8e21-ac22debf7003',
+        aliases: ['alias-id1'],
+        isEmpty: true
+      };
 
-      service.getDistributedPortGroups(null, 'New Cluster')
+      const selectedClusterResource: ComputeResource = {
+        text: 'New Cluster',
+        nodeTypeId: COMPUTE_RESOURCE_NODE_TYPES.cluster.dc_cluster,
+        objRef: 'urn:vmomi:ClusterComputeResource:domain-c270:d7c361cc-0a46-441e-8e21-ac22debf7003',
+        aliases: ['alias-id1'],
+        isEmpty: true
+      };
+
+      service.getDistributedPortGroups(null, selectedHostResource)
         .subscribe(data => {
           expect(data.length).toBe(3);
-          });
+        });
 
+      service.getDistributedPortGroups(null, selectedClusterResource)
+        .subscribe(data => {
+          expect(data.length).toBe(3);
+        });
     });
 
     it('should return a list of Compute Resources with a property called realName', async() => {

@@ -25,7 +25,6 @@ import {
   GET_CLONE_TICKET_URL,
   MEMORY_MIN_LIMIT_MB,
   VIC_APPLIANCES_LOOKUP_URL,
-  VIC_APPLIANCE_PORT
 } from '../shared/constants';
 import { Http, URLSearchParams } from '@angular/http';
 
@@ -35,7 +34,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
 import { flattenArray } from '../shared/utils/array-utils';
-import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
+import { getMorIdFromObjRef, getServerServiceGuidFromObj, resourceIsCluster } from '../shared/utils/object-reference';
+import { HostTypeInfo } from '../interfaces/api-responses';
+import { globalProperties } from '../../environments/global-properties';
 
 @Injectable()
 export class CreateVchWizardService {
@@ -349,24 +350,33 @@ export class CreateVchWizardService {
       });
     }
 
-  /**
-   * create an array of observables for DVS host entries
-   * @param {ComputeResource[]} dvsList
-   * @returns {Observable<ComputeResource>[]}
-   */
-    private getDvsHostsEntries(dvsList: ComputeResource[]): Observable<ComputeResource>[] {
-      return dvsList.map(dv => {
-        return this.http.get(`/ui/data/properties/${dv['objRef']}?properties=dvs:dvsHostsData`)
-          .map(response => response.json());
-      });
+    /**
+     * Creates an array of observables for DVS host entries
+     * @param {ComputeResource[]} dvsList
+     * @returns {Observable<ComputeResource>[]}
+     */
+    private getDvsHostsEntries(dvsList: ComputeResource[]): Observable<HostTypeInfo[]>[] {
+      return dvsList.map(dv => this.getHostsFromComputeResource(dv));
+    }
+
+    /**
+     * Returns all the host contained in a ComputeResource Object (eg: Cluster)
+     * @param {ComputeResource} obj
+     * @returns {Observable<ComputeResource[]>}
+     */
+    getHostsFromComputeResource(obj: ComputeResource): Observable<HostTypeInfo[]> {
+      return this.http.get(`${globalProperties.vicService.paths.properties}${obj.objRef}?properties=host`)
+        .map(response => response.json())
+        .map(data => data['host'] ? data['host'] : []);
     }
 
     /**
      * Get all available portgroups for the selected compute resource
      * @param dcObj selected datacenter object
-     * @param resourceObjName name of the selected compute resource
+     * @param resourceObj the selected compute resource
      */
-    getDistributedPortGroups(dcObj: ComputeResource, resourceObjName?: string): Observable<any> {
+    getDistributedPortGroups(dcObj: ComputeResource, resourceObj: ComputeResource): Observable<any> {
+      const resourceObjIsCluster = resourceIsCluster(resourceObj.nodeTypeId);
       return this.getNetworkingTree(dcObj)
         .switchMap((networkingResources: ComputeResource[]) => {
           // gets the list of Dvs from the dc and or any existing network folder
@@ -380,31 +390,37 @@ export class CreateVchWizardService {
           const dvsObs: Observable<ComputeResource>[] = this.getDvsPortGroups(dvsList);
 
           // create an array of observables for DVS host entries
-          const dvsHostsObs: Observable<ComputeResource>[] = this.getDvsHostsEntries(dvsList);
+          const dvsHostsObs: Observable<HostTypeInfo[]>[] = this.getDvsHostsEntries(dvsList);
 
           // zip all observables
           const allDvs = Observable.zip.apply(null, dvsObs);
-          const allDvsHosts = Observable.zip.apply(null, dvsHostsObs).map(arr => {
-            return arr.map(dvsHostsData => {
-              return dvsHostsData['dvs:dvsHostsData']['dvsHosts'];
-            });
-          });
+          const allDvsHosts = Observable.zip.apply(null, dvsHostsObs);
+
+          // if the selected resource is a Cluster we need to fetch it hosts in order to validate if some of them is connected to the vds.
+          const allClusterChilds: Observable<ComputeResource[]> = resourceObjIsCluster ?
+            this.getHostsFromComputeResource(resourceObj) : Observable.of([]);
 
           // process the results from the zipped observables wherein only DV port group entries
           // whose parent distributed virtual switch can be accessed by the specified compute resource should be taken
-          return Observable.combineLatest(allDvs, allDvsHosts).map(([dvs, dvsHosts]) => {
-            let results = [];
-            for (let index = 0; index < dvsHosts.length; index++) {
-              // if any of the array item's clusterName or hostName property matches resourceObjName,
-              // it means all portgroups under that switch can be accessed by this compute resource
-              if (dvsHosts[index].some(computeResource => {
-                return computeResource['clusterName'] === resourceObjName || computeResource['hostName'] === resourceObjName;
-              })) {
-                results = results.concat(dvs[index]);
+          return Observable.combineLatest(allClusterChilds, allDvs, allDvsHosts)
+            .map(([clusterChilds, dvs, dvsHosts]) => {
+              let results = [];
+              for (let index = 0; index < dvsHosts.length; index++) {
+                if (resourceObjIsCluster) {
+                  // if the selected resource is a Cluster we need to validate if any of it hosts is connected to the vds.
+                  const clusterChildsHosts = clusterChilds.map(host => host['value']);
+                  if (dvsHosts[index].some(host => clusterChildsHosts.indexOf(host['value']) !== -1 )) {
+                    results = results.concat(dvs[index]);
+                  }
+                } else {
+                  // if the selected resource is a not Cluster we validate if the selected host is connected to the vds.
+                  if (dvsHosts[index].some(host => host['value'] === getMorIdFromObjRef(resourceObj.objRef))) {
+                    results = results.concat(dvs[index]);
+                  }
+                }
               }
-            }
-            return flattenArray(results);
-          });
+              return flattenArray(results);
+            });
         });
     }
 
