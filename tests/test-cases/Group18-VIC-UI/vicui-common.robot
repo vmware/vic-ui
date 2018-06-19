@@ -314,6 +314,7 @@ Download VIC Engine Tarball From OVA
     OperatingSystem.File Should Exist  ${filename}
     Set Suite Variable  ${buildNumber}  ${tarball_file}
     Set Suite Variable  ${LATEST_VIC_ENGINE_TARBALL}  ${tarball_file}
+    Append To File  testbed-information-%{BUILD_NUMBER}  VIC_TARBALL_FILE=${tarball_file}\n
     [Return]  ${rc} == 0
 
 Prepare VIC Engine Binaries
@@ -327,6 +328,8 @@ Prepare VIC Engine Binaries
     # copy vic-ui-linux and plugin binaries to where test scripts will access them
     Run  cp -rf ui-nightly-run-bin/vic-ui-* ./
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
+    ${vic_ui_version}=  Run  cat ui-nightly-run-bin/ui/plugin-manifest | grep version | cut -d "=" -f 2
+    Append To File  testbed-information-%{BUILD_NUMBER}  VIC_UI_VERSION=${vic_ui_version}\n
 
 Open SSH Connection
   [Arguments]  ${host}  ${user}  ${pass}  ${port}=22  ${retry}=2 minutes  ${retry_interval}=5 seconds
