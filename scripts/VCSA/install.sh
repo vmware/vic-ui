@@ -261,7 +261,7 @@ verify_plugin_url() {
         exit 1
     fi
 
-    local RESPONSE_STATUS=$(echo $CURL_RESPONSE | grep -i "HTTP" | grep "4[[:digit:]][[:digit:]]\|500")
+    local RESPONSE_STATUS=$(curl -sko /dev/null -I -w "%{http_code}" ${VIC_UI_HOST_URL}files/$PLUGIN_BASENAME 2>&1)
     if [[ $(echo $RESPONSE_STATUS | grep -oi "404") ]] ; then
         echo "-------------------------------------------------------------"
         echo "Error! Plugin bundle was not found. Please make sure \"$PLUGIN_BASENAME\" is available at \"$VIC_UI_HOST_URL\", and retry installing the plugin"
