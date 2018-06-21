@@ -129,8 +129,9 @@ export class RegistryAccessComponent {
     if (!useWhitelistRegistryValue) {
       results['whitelistRegistry'] = [];
       results['insecureRegistry'] = insecureRegistriesValue.filter(val => {
-        return val['insecureRegistryIp'] && val['insecureRegistryPort'];
-      }).map(val => `${val['insecureRegistryIp']}:${val['insecureRegistryPort']}`);
+        return val['insecureRegistryIp'];
+      }).map(val => (val['insecureRegistryPort'] === '' ? `${val['insecureRegistryIp']}` :
+       `${val['insecureRegistryIp']}:${val['insecureRegistryPort']}`));
     } else {
       const white = [];
       const insecure = [];
