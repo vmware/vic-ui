@@ -59,7 +59,7 @@ export class ComputeCapacityComponent implements OnInit {
     cpu: { maxUsage: null, minUsage: null, unreservedForPool: null },
     memory: { maxUsage: null, minUsage: null, unreservedForPool: null }
   };
-  public selectedObjectName: string;
+  public selectedObject: ComputeResource;
   public selectedResourceObjRef: string;
   public serversInfo: ServerInfo[];
   public selectedResourceIsCluster = false;
@@ -184,7 +184,7 @@ export class ComputeCapacityComponent implements OnInit {
         `${computeResource}/${payload.obj.realName}`;
     }
     this.selectedResourceObjRef = resourceObj;
-    this.selectedObjectName = payload.obj.realName;
+    this.selectedObject = payload.obj;
     this._selectedComputeResource = computeResource;
 
     // set active class on the treenodecomponent whose datacenter object reference is
