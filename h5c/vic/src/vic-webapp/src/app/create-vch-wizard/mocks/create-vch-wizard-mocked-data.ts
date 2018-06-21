@@ -157,86 +157,48 @@ export const dcDSwitchPorGroupsList = [
 ];
 
 export const dvsHostsEntries = [
-  Observable.of({
-    id: 'urn:vmomi:VmwareDistributedVirtualSwitch:dvs-29:d7c361cc-0a46-441e-8e21-ac22debf7003',
-    'dvs:dvsHostsData': {
-      dvsHosts: [
-        {
-          hostName: '10.192.109.234',
-          clusterName: null,
-          connectionState: 'connected',
-          connectionStateLabel: 'Connected',
-          hostIconId: 'vsphere-icon-host-warning',
-          vdsState: 'Up',
-          vdsStateIcon: 'statusGreen',
-          hostRef: {value: 'host-94', type: 'HostSystem', serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003'},
-          compatibilityErrors: []
-        }
-      ]}
-  }),
-  Observable.of({
-    id: 'urn:vmomi:VmwareDistributedVirtualSwitch:dvs-25:d7c361cc-0a46-441e-8e21-ac22debf7003',
-    'dvs:dvsHostsData': {
-      dvsHosts: [
-        {
-          hostName: '10.161.251.202',
-          clusterName: 'New Cluster',
-          connectionState: 'connected',
-          connectionStateLabel: 'Connected',
-          hostIconId: 'vsphere-icon-host-warning',
-          vdsState: 'Up',
-          vdsStateIcon: 'statusGreen',
-          hostRef: {value: 'host-20', type: 'HostSystem', serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003'},
-          compatibilityErrors: []
-        },
-        {
-          hostName: '10.162.17.176',
-          clusterName: 'New Cluster',
-          connectionState: 'connected',
-          connectionStateLabel: 'Connected',
-          hostIconId: 'vsphere-icon-host-warning',
-          vdsState: 'Up',
-          vdsStateIcon: 'statusGreen',
-          hostRef: {value: 'host-9', type: 'HostSystem', serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003'},
-          compatibilityErrors: []
-        }
-      ]}
-  }),
-  Observable.of({
-    id: 'urn:vmomi:VmwareDistributedVirtualSwitch:dvs-82:d7c361cc-0a46-441e-8e21-ac22debf7003',
-    'dvs:dvsHostsData': {
-      dvsHosts: [
-        {
-          hostName: '10.192.109.234',
-          clusterName: null,
-          connectionState: 'connected',
-          connectionStateLabel: 'Connected',
-          hostIconId: 'vsphere-icon-host-warning',
-          vdsState: 'Up',
-          vdsStateIcon: 'statusGreen',
-          hostRef: {value: 'host-94', type: 'HostSystem', serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003'},
-          compatibilityErrors: []
-        }
-      ]}
-  }),
-  Observable.of({
-    id: 'urn:vmomi:VmwareDistributedVirtualSwitch:dvs-86:d7c361cc-0a46-441e-8e21-ac22debf7003',
-    'dvs:dvsHostsData': {
-      dvsHosts: [
-        {
-          hostName: '10.192.109.234',
-          clusterName: null,
-          connectionState: 'connected',
-          connectionStateLabel: 'Connected',
-          hostIconId: 'vsphere-icon-host-warning',
-          vdsState: 'Up',
-          vdsStateIcon: 'statusGreen',
-          hostRef: {value: 'host-94', type: 'HostSystem', serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003'},
-          compatibilityErrors: []
-        }
-      ]}
-  })
+  Observable.of([
+    {
+      serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003',
+      type: 'HostSystem',
+      value: 'host-276'
+    }
+  ]),
+  Observable.of([
+    {
+      serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003',
+      type: 'HostSystem',
+      value: 'host-277'
+    },
+    {
+      serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003',
+      type: 'HostSystem',
+      value: 'host-278'
+    }
+  ]),
+  Observable.of([
+    {
+      serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003',
+      type: 'HostSystem',
+      value: 'host-279'
+    }
+  ]),
+  Observable.of([
+    {
+      serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003',
+      type: 'HostSystem',
+      value: 'host-280'
+    }
+  ])
 ];
+
+export const clusterHostsChilds = Observable.of([
+    {
+      serverGuid: 'd7c361cc-0a46-441e-8e21-ac22debf7003',
+      type: 'HostSystem',
+      value: 'host-276'
+    }
+]);
 
 export const dcMockData = [
   {
