@@ -17,6 +17,7 @@ import { VirtualContainerHost } from './../../vch-view/vch.model';
 
 import { ComputeResource } from './../../interfaces/compute.resource';
 import { ServerInfo } from '../vSphereClientSdkTypes';
+import {COMPUTE_RESOURCE_NODE_TYPES} from '../constants';
 
 export function getServerServiceGuidFromObj (obj: ComputeResource): string {
   return obj.objRef.split(':')[4];
@@ -54,4 +55,15 @@ export function getServerInfoByVchObjRef (serversInfo: ServerInfo[], vch: Virtua
     return item.serviceGuid === vch.id.substr(idx + 1);
   });
   return filtered[0] || null;
+}
+
+export function isDesiredType(type: string, types: string[]): boolean {
+  return types.indexOf(type) !== -1;
+}
+
+export function resourceIsCluster(type: string): boolean {
+  return isDesiredType(type, [
+    COMPUTE_RESOURCE_NODE_TYPES.cluster.dc_cluster,
+    COMPUTE_RESOURCE_NODE_TYPES.cluster.folder_cluster
+  ]);
 }
