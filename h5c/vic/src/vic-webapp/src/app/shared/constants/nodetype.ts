@@ -16,3 +16,29 @@
 
 export const DC_CLUSTER = 'DcCluster';
 export const DC_STANDALONE_HOST = 'DcStandaloneHost';
+
+export const COMPUTE_RESOURCE_NODE_TYPES = {
+  dc: {
+    dc: 'Datacenter'
+  },
+  folder: {
+    dc_folder: 'DcCompResFolder',
+    comp_res_folder: 'CompResFolderCompResFolder'
+  },
+  host: {
+    dc_stand_alone: 'DcStandaloneHost',
+    cluster_host: 'ClusterHostSystem'
+  },
+  cluster: {
+    dc_cluster: 'DcCluster',
+    folder_cluster: 'CompResFolderCluster'
+  },
+  resource_pool: {
+    resource_pool: 'ResourcePool',
+    host_resource_pool: 'StandaloneHostResPool',
+    cluster_resource_pool: 'ClusterResPool',
+    resource_pool_resource_pool: 'ResPoolResPool',
+    vic_vch_resource_pool: 'VicVchResourcePool'
+  }
+};
+
