@@ -452,7 +452,7 @@ Configure Vcsa
 
     # create a distributed switch
     Log To Console  Create a distributed switch
-    ${out}=  Run  govc dvs.create -dc=Datacenter -product-version 6.5.0 test-ds
+    ${out}=  Run  govc dvs.create -dc=Datacenter -product-version 5.5.0 test-ds
     Should Contain  ${out}  OK
 
     # make four port groups
