@@ -101,17 +101,33 @@ pipeline:
       - 'h5c/vic/src/vic-webapp/coverage/lcov.info'
 
   trigger-downstream:
-    image: 'gcr.io/eminent-nation-87317/vic-downstream-trigger:1.1'
+    image: 'gcr.io/eminent-nation-87317/vic-downstream-trigger:1.3'
     environment:
       SHELL: /bin/bash
       DOWNSTREAM_REPO: vmware/vic
+      DOWNSTREAM_BRANCH: ${DRONE_BRANCH}
     secrets:
       - drone_server
       - drone_token
     when:
       repo: vmware/vic-ui
-      event: [push, tag]
-      branch: [master, develop, 'releases/*']
+      event: [push]
+      branch: [master]
+      status: success
+
+  trigger-downstream-tag:
+    image: 'gcr.io/eminent-nation-87317/vic-downstream-trigger:1.3'
+    environment:
+      SHELL: /bin/bash
+      DOWNSTREAM_REPO: vmware/vic
+      DOWNSTREAM_BRANCH: ${DRONE_BRANCH}
+    secrets:
+      - drone_server
+      - drone_token
+    when:
+      repo: vmware/vic-ui
+      event: [tag]
+      branch: [master, 'releases/*']
       status: success
 
   pass-rate:
