@@ -15,7 +15,7 @@ navigateToHome() {
     this.clickByCSS(this.iconVsphereHome);
 }
 
-navigateToVicPLugin() {
+navigateToVicPlugin() {
     this.waitForElementToBePresent(this.iconVicShortcut);
     this.clickByCSS(this.iconVicShortcut);
     return new VicVchMain();

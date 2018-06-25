@@ -16,14 +16,12 @@
 
 export const defaultTimeout = 10000;
 export const modalWizard = '.clr-wizard-stepnav';
-export const dataGridCell = '.datagrid-cell';
 export const iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
 export const namePrefix = 'virtual-container-host-';
-export const menuContainer = '#applicationMenuContainer .k-item .k-link';
 export const menuLabel = '.vui-menuitem-label-text';
 export const tabSummary = 'a.summary-action-link';
 export const extendedTimeout = 10000;
 export const opsTimeout = 80000;
 export const username = 'administrator@vsphere.local';
-export const password = 'Admin!23';
+export const password = 'Bl*ckwalnut0';
 

@@ -23,8 +23,10 @@ import { HomePage } from '../pages/homePage';
 import { VicVchMain} from '../pages/vicVchMain';
 import {
   modalWizard,
+  menuLabel
 } from '../pages/common';
 import { VchCreateUpdate } from '../pages/vicVchCreateUpdateView';
+import { VicVchDetails } from '../pages/vicVchDetails';
 
 
 describe('VCH Create Wizard - Basic', () => {
@@ -34,6 +36,7 @@ describe('VCH Create Wizard - Basic', () => {
   let homePage: HomePage;
   let vicMain: VicVchMain;
   let vicVchCreate: VchCreateUpdate;
+  let vicVchDetails: VicVchDetails;
   let specRunId: number;
   specRunId = Math.floor(Math.random() * 1000) + 100;
 
@@ -67,7 +70,7 @@ describe('VCH Create Wizard - Basic', () => {
   });
 
   it('should navigate to vic plugin', () => {
-    vicMain = homePage.navigateToVicPLugin();
+    vicMain = homePage.navigateToVicPlugin();
     expect(browser.getCurrentUrl()).toContain('vic');
   });
 
@@ -131,122 +134,40 @@ describe('VCH Create Wizard - Basic', () => {
   it('should create a vch', () => {
     vicVchCreate.createVch();
   });
-/*
+
   it('should find the new vch in datagrid', () => {
-    let vchFound = false;
-    page.waitForElementToBePresent(dataGridCell);
-    page.clickByCSS('.pagination-next');
-    page.waitForElementToBePresent(dataGridCell);
-    browser.sleep(defaultTimeout);
-    const newVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(el, index) {
-      el.isPresent().then(present => {
-        if (present) {
-          el.getText().then(function(text) {
-            if (newVch.test(text)) {
-              vchFound = true;
-            }
-          });
-        }
-      })
-    }).then(function() {
-      expect(vchFound).toBeTruthy();
-    });
+    expect(vicMain.checkVchOnDataGrid(specRunId)).toBeTruthy();
   });
 
   it('should verify the new vch has properly started', () => {
-    browser.switchTo().defaultContent();
-    page.waitForTaskDone(namePrefix + specRunId, 'Reconfigure virtual machine').then((status) => {
-      expect(status).toBeTruthy();
-    });
+    expect(vicMain.checkVchStarted(specRunId)).toBeTruthy();
   });
 
-  if (browser.params.hostAffinity === 'true') {
-    it('should redirect to VCH VM and select Cluster from VCH related objects', () => {
-      page.navigateToVchVm(namePrefix + specRunId);
-      browser.switchTo().defaultContent();
-      browser.sleep(defaultTimeout);
-      const vch = new RegExp(namePrefix + specRunId);
-      page.waitForElementToBePresent('a[title=Cluster]');
-      page.clickByCSS('a[title=Cluster]');
-      });
+  it('should redirect to VCH VM and display Create Wizard menu items', () => {
 
-    it('should navigate to clusters actions and settings', () => {
-      browser.switchTo().defaultContent();
-      browser.sleep(defaultTimeout);
-      page.waitForElementToBePresent(tabSummary);
-      page.clickByCSS(tabSummary);
-      browser.sleep(defaultTimeout);
-      const clustersActions = element(by.cssContainingText(menuContainer, 'Settings'));
-      browser.driver.getCapabilities().then(caps => {
-        browser.browserName = caps.get('browserName');
-        if (browser.browserName.toLowerCase() === 'chrome') {
-          browser.actions().mouseMove(clustersActions).click().perform();
-        } else {
-          page.clickByText(menuContainer, 'Settings');
-        }
-      });
-    });
-
-    it('should validate the additions of the vch to the host/virtual machines group', () => {
-      page.waitForElementToBePresent('//div[2]/ul/li[3]/a', 'xpath');
-      page.clickByXpath('//div[2]/ul/li[3]/a');
-      const vch = new RegExp(namePrefix + specRunId);
-      browser.switchTo().defaultContent();
-      expect(element(by.css('span[title=' + vch + ']')).isPresent).toBeTruthy();
-    });
-  } else {
-    it('should redirect to VCH VM and display Create Wizard menu items', () => {
-      page.navigateToVchVm(namePrefix + specRunId);
-      browser.switchTo().defaultContent();
-      browser.sleep(defaultTimeout);
-      page.waitForElementToBePresent(tabSummary);
-      page.clickByCSS(tabSummary);
-      // wait for menu items to be calculated
-      browser.sleep(defaultTimeout);
-      const allVicActions = element(by.cssContainingText(menuContainer, 'All VIC Actions'));
-
-      browser.driver.getCapabilities().then(caps => {
-        browser.browserName = caps.get('browserName');
-        if (browser.browserName.toLowerCase() === 'chrome') {
-          browser.actions().mouseMove(allVicActions).click().perform();
-        } else {
-          page.clickByText(menuContainer, 'All VIC Actions');
-        }
-      });
-      browser.sleep(defaultTimeout);
-      expect(browser.isElementPresent(by.cssContainingText(menuLabel, 'New Virtual Container Host...'))).toBeTruthy();
-      expect(browser.isElementPresent(by.cssContainingText(menuLabel, 'Delete Virtual Container Host'))).toBeTruthy();
-    });
- }
+    vicVchDetails = vicMain.navigateToVchVmDetails(specRunId);
+    vicVchDetails.navigateToVicActionsAllVicActions();
+    expect(vicVchDetails.getMenuLabelNewVch).toBeTruthy();
+    expect(vicVchDetails.getMenuLabelDeleteVch).toBeTruthy();
+  });
 
   it('should navigate to vch list', () => {
-    page.navigateToHome();
-    page.waitUntilUrlContains('controlcenter');
-    page.navigateToVicPlugin();
-    page.waitUntilUrlContains('vic.objectView_collection');
-    page.navigateToSummaryTab();
-    page.waitUntilUrlContains('vic.customtab-vch');
-    page.navigateToVchTab();
+    homePage.navigateToHome();
+    homePage.navigateToVicPlugin();
+    vicMain.waitUntilUrlContains('vic.objectView_collection');
+    vicMain.navigateToSummaryTab();
+    vicMain.waitUntilUrlContains('vic.customtab-vch');
+    vicMain.navigateToVchTab();
     expect(browser.getCurrentUrl()).toContain('customtab-vch');
   });
 
   it('should delete created vch', () => {
-    page.deleteVch(namePrefix + specRunId);
+    vicMain.deleteVch(specRunId);
   });
+
 
   it('should verify the created vch has been deleted', () => {
-    let vchFound = false;
-    page.switchFrame(iframeTabs);
-    const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
-    element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
-      vchFound = present;
-    });
-
-    browser.sleep(defaultTimeout);
-    browser.switchTo().defaultContent();
-    page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
-    expect(vchFound).toBeFalsy();
+    expect(vicMain.checkVchDeleted(specRunId)).toBeFalsy();
   });
-  */
+
 });

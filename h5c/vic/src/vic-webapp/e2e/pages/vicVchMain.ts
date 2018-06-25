@@ -10,6 +10,7 @@ import {
     iframeTabs
   } from './common';
 import { VchCreateUpdate } from './vicVchCreateUpdateView';
+import { VicVchDetails } from './vicVchDetails';
 
 export class VicVchMain extends VicWebappPage {
 
@@ -19,6 +20,9 @@ export class VicVchMain extends VicWebappPage {
     private iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
     private buttonNewVch = 'button.new-vch';
     private iframeModal = 'div.modal-body iframe.sandbox-iframe';
+    private dataGridCell = '.datagrid-cell';
+    private actionBar = 'clr-dg-action-overflow.';
+    private labelDeleteVolumes = 'label[for=delete-volumes]';
 
     navigateToSummaryTab() {
          browser.sleep(defaultTimeout);
@@ -47,4 +51,70 @@ export class VicVchMain extends VicWebappPage {
         this.waitForElementToBePresent(modalWizard);
         return new VchCreateUpdate();
     }
+
+    navigateToVchVmDetails(specRunId) {
+      browser.switchTo().defaultContent();
+      this.switchFrame(this.iframeTabs);
+      this.waitForElementToBePresent(this.actionBar + namePrefix + specRunId);
+      this.clickByText('.datagrid-cell a', namePrefix + specRunId);
+      return new VicVchDetails();
     }
+
+    checkVchOnDataGrid(specRunId) {
+      let vchFound = false;
+      this.waitForElementToBePresent(this.dataGridCell);
+      this.clickByCSS('.pagination-next');
+      this.waitForElementToBePresent(this.dataGridCell);
+      browser.sleep(defaultTimeout);
+      const newVch = new RegExp(namePrefix + specRunId);
+      console.log('antes de entrar en el if');
+      element.all(by.css(this.dataGridCell)).each(function(el, index) {
+        el.isPresent().then(present => {
+          if (present) {
+            el.getText().then(function(text) {
+              if (newVch.test(text)) {
+                console.log('aparentmemnte ntra en el if?');
+                vchFound = true;
+              }
+            });
+          }
+        })
+      });
+      console.log('al momento de retornar');
+      return vchFound;
+    }
+
+    checkVchStarted(specRunId) {
+      browser.switchTo().defaultContent();
+      return this.waitForTaskDone(namePrefix + specRunId, 'Reconfigure virtual machine');
+    }
+
+    deleteVch(specRunId) {
+      this.switchFrame(this.iframeTabs);
+      this.waitForElementToBePresent(this.actionBar + namePrefix + specRunId);
+      const vchActionMenu = this.actionBar + namePrefix + specRunId;
+      this.clickByCSS(vchActionMenu);
+      this.clickByCSS(vchActionMenu + ' button.action-item-delete');
+      browser.switchTo().defaultContent();
+      this.waitForElementToBePresent(this.iframeModal);
+      this.switchFrame(this.iframeModal);
+      // wait for modal to set position
+      this.waitForElementToBePresent(this.labelDeleteVolumes);
+      this.clickByCSS(this.labelDeleteVolumes);
+      this.clickByText('Button', 'Delete');
+      browser.switchTo().defaultContent();
+    }
+
+    checkVchDeleted(specRunId) {
+      let vchFound = false;
+      this.switchFrame(iframeTabs);
+      const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
+      element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
+        vchFound = present;
+      });
+
+      browser.sleep(defaultTimeout);
+      browser.switchTo().defaultContent();
+      this.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
+      }
+}

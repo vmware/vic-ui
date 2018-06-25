@@ -18,13 +18,11 @@ export class VicWebappPage {
 
   private h5cActionMenuToggle = 'vc-action-menu.tid-control-bar-user-menu';
   private h5cActionMenuLogOut = 'vc-action-menu-item:nth-of-type(3)';
-  private actionBar = 'clr-dg-action-overflow.';
   private buttonComputeResource = 'button.cc-resource';
   private buttonBasicAdvance = 'a.btn.btn-link.pl-0';
   private buttonHostAffinity = 'label.text-nowrap';
   private iconHostAndClustersShortcut = '.controlcenter-shortcut-icon';
   private latestTask = 'recent-tasks-view tbody tr:nth-of-type(1)';
-  private labelDeleteVolumes = 'label[for=delete-volumes]';
   private defaultTimeout = 10000;
   private extendedTimeout = 10000;
   private opsTimeout = 80000;
