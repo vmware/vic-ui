@@ -96,11 +96,11 @@ Deploy VICUI Testbed
     Run Keyword If  ${ti_exists}  Remove File  testbed-information-%{BUILD_NUMBER}
 
     &{testbed_config}=  Create Dictionary
-
+    
     Set To Dictionary  ${testbed_config}  esx_num  ${ESXIS_NUM}
-    Set To Dictionary  ${testbed_config}  esx_build  5969303
-    Set To Dictionary  ${testbed_config}  vc_build  7515524
-
+    Set To Dictionary  ${testbed_config}  esx_build  %{ESX_BUILD_NO} 
+    Set To Dictionary  ${testbed_config}  vc_build  %{VC_BUILD_NO} 
+    
     ${start_time}=  Get Time  epoch
     ${esxis}  ${vc}=  Prepare VIC UI Testbed  ${testbed_config}
     ${vc_fqdn}=  Get From Dictionary  ${vc}  ip
@@ -113,7 +113,7 @@ Deploy VICUI Testbed
     Set Global Variable  ${VCIP}  ${vc_fqdn}
 
     ${testbed-information-content}=  Catenate  SEPARATOR=\n
-    ...  TEST_VSPHERE_VER=65
+    ...  TEST_VSPHERE_VER=%{VC_VER_NO}
     ...  TEST_VC_IP=${vc_fqdn}
     ...  TEST_URL_ARRAY=${vc_fqdn}
     ...  TEST_USERNAME=Administrator@vsphere.local

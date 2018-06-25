@@ -98,35 +98,35 @@ Setup Test Matrix
     # skip matrix
     @{skip_test_config_matrix}=  Create List
     # There's currently a version clash between the Selenium standalone binary and HSUIA project
-    Append To List  ${skip_test_config_matrix}  65,5969303,7515524,Windows,Firefox,Firefox
+    Append To List  ${skip_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows,Firefox,Firefox
     # There's a H5C bug in IE11 that appears only when automatically tested
-    Append To List  ${skip_test_config_matrix}  65,5969303,7515524,Windows,IExplorer,IE11
+    Append To List  ${skip_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows,IExplorer,IE11
     Set Global Variable  ${SKIP_TEST_MATRIX}  ${skip_test_config_matrix}
 
     # installer test matrix
     @{installer_test_config_matrix}=  Create List
     &{installer_test_results_dict}=  Create Dictionary
-    Append To List  ${installer_test_config_matrix}  65,5969303,7515524,Ubuntu
-    Append To List  ${installer_test_config_matrix}  65,5969303,7515524,Mac
-    Append To List  ${installer_test_config_matrix}  65,5969303,7515524,Windows
+    Append To List  ${installer_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Ubuntu
+    Append To List  ${installer_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Mac
+    Append To List  ${installer_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows
     Set Global Variable  ${INSTALLER_TEST_MATRIX}        ${installer_test_config_matrix}
     Set Global Variable  ${INSTALLER_TEST_RESULTS_DICT}  ${installer_test_results_dict}
 
     # uninstaller test matrix
     @{uninstaller_test_config_matrix}=  Create List
     &{uninstaller_test_results_dict}=  Create Dictionary
-    Append To List  ${uninstaller_test_config_matrix}  65,5969303,7515524,Ubuntu
-    Append To List  ${uninstaller_test_config_matrix}  65,5969303,7515524,Mac
-    Append To List  ${uninstaller_test_config_matrix}  65,5969303,7515524,Windows
+    Append To List  ${uninstaller_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Ubuntu
+    Append To List  ${uninstaller_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Mac
+    Append To List  ${uninstaller_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows
     Set Global Variable  ${UNINSTALLER_TEST_MATRIX}        ${uninstaller_test_config_matrix}
     Set Global Variable  ${UNINSTALLER_TEST_RESULTS_DICT}  ${uninstaller_test_results_dict}
 
     # upgrader test matrix
     @{upgrader_test_config_matrix}=  Create List
     &{upgrader_test_results_dict}=  Create Dictionary
-    Append To List  ${upgrader_test_config_matrix}  65,5969303,7515524,Ubuntu
-    Append To List  ${upgrader_test_config_matrix}  65,5969303,7515524,Mac
-    Append To List  ${upgrader_test_config_matrix}  65,5969303,7515524,Windows
+    Append To List  ${upgrader_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Ubuntu
+    Append To List  ${upgrader_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Mac
+    Append To List  ${upgrader_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows
     Set Global Variable  ${UPGRADER_TEST_MATRIX}        ${upgrader_test_config_matrix}
     Set Global Variable  ${UPGRADER_TEST_RESULTS_DICT}  ${upgrader_test_results_dict}
 
@@ -135,11 +135,11 @@ Setup Test Matrix
     &{plugin_test_results_dict}=  Create Dictionary
     # vSphere H5C and Flex Client are not supported  on Linux
     # https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.upgrade.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
-    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Mac,Chrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Mac,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Windows,Chrome,Chrome
-    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Windows,Firefox,Firefox
-    Append To List  ${plugin_test_config_matrix}  65,5969303,7515524,Windows,IExplorer,IE11
+    Append To List  ${plugin_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Mac,Chrome,Chrome
+    Append To List  ${plugin_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Mac,Firefox,Firefox
+    Append To List  ${plugin_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows,Chrome,Chrome
+    Append To List  ${plugin_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows,Firefox,Firefox
+    Append To List  ${plugin_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Windows,IExplorer,IE11
     Set Global Variable  ${PLUGIN_TEST_MATRIX}        ${plugin_test_config_matrix}
     Set Global Variable  ${PLUGIN_TEST_RESULTS_DICT}  ${plugin_test_results_dict}
 
