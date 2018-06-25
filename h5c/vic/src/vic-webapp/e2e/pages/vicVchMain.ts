@@ -61,27 +61,7 @@ export class VicVchMain extends VicWebappPage {
     }
 
     checkVchOnDataGrid(specRunId) {
-      let vchFound = false;
-      this.waitForElementToBePresent(this.dataGridCell);
-      this.clickByCSS('.pagination-next');
-      this.waitForElementToBePresent(this.dataGridCell);
-      browser.sleep(defaultTimeout);
-      const newVch = new RegExp(namePrefix + specRunId);
-      console.log('antes de entrar en el if');
-      element.all(by.css(this.dataGridCell)).each(function(el, index) {
-        el.isPresent().then(present => {
-          if (present) {
-            el.getText().then(function(text) {
-              if (newVch.test(text)) {
-                console.log('aparentmemnte ntra en el if?');
-                vchFound = true;
-              }
-            });
-          }
-        })
-      });
-      console.log('al momento de retornar');
-      return vchFound;
+      return this.waitForElementToBePresent(this.actionBar + namePrefix + specRunId);
     }
 
     checkVchStarted(specRunId) {

@@ -55,7 +55,7 @@ describe('VCH Create Wizard - Basic', () => {
   it('should redirect to login', () => {
     loginPage = new LoginPage();
     browser.driver.manage().window().maximize();
-    loginPage.navigateToLoginPage('https://localhost:9443');
+    loginPage.navigateToLoginPage();
     expect(browser.getCurrentUrl()).toContain('SSO');
   });
 

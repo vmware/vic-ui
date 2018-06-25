@@ -132,7 +132,7 @@ export class VicWebappPage {
   }
 
   waitForElementToBePresent(el, selectBy = 'css', timeout = this.opsTimeout) {
-    browser.wait(function () {
+    return browser.wait(function () {
       return browser.isElementPresent(by[selectBy](el)).then((v) => {
         if (!v) {
           console.log(el, 'not found yet');
