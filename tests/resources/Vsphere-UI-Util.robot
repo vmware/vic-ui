@@ -101,13 +101,13 @@ Prepare Protractor
     Log  before sed: ${before_sed}
     Log  after sed: ${after_sed}
 
-    # update app.po.ts to set the correct baseUrl
-    ${app_po_ts}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/e2e/app.po.ts
-    Set Global Variable  ${original_app_po_ts}  ${app_po_ts}
-    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*return browser\.get\(.*|return browser\.get\('https:\/\/${VCSA_IP}\/ui'\);|" h5c/vic/src/vic-webapp/e2e/app.po.ts > /tmp/app.po.ts
+    # update loginPage.ts to set the correct baseUrl
+    ${login_page_ts}=  OperatingSystem.Get File  h5c/vic/src/vic-webapp/e2e/pages/loginPage.ts
+    Set Global Variable  ${original_login_page_ts}  ${login_page_ts}
+    ${rc}  ${out}=  Run And Return Rc And Output  sed -e "s|.*return browser\.get\(.*|return browser\.get\('https:\/\/${VCSA_IP}\/ui'\);|" h5c/vic/src/vic-webapp/e2e/pages/loginPage.ts > /tmp/loginPage.ts
     Should Be Equal As Integers  ${rc}  0
     Run Keyword Unless  ${rc} == 0  Log  ${out}
-    Run  cp /tmp/app.po.ts ./h5c/vic/src/vic-webapp/e2e/
+    Run  cp /tmp/loginPage.ts ./h5c/vic/src/vic-webapp/e2e/pages
 
 Reboot vSphere Client
     [Arguments]  ${VCSA_IP}

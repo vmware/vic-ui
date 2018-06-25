@@ -13,10 +13,10 @@ private userInput = '#username';
 private passwordInput = '#password';
 private submitButton = '#submit';
 
-navigateToLoginPage(site) {
+navigateToLoginPage() {
     console.log('Navego hasta login page');
     browser.waitForAngularEnabled(false);
-    browser.get(site);
+    return browser.get('https://localhost:9443');
 }
 waitLoginFinish() {
     this.waitUntilUrlContains('serverObjectViewsExtension');
