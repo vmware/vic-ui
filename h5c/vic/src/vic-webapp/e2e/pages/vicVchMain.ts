@@ -9,7 +9,7 @@ import {
     extendedTimeout,
     iframeTabs
   } from './common';
-import { VchCreateUpdate } from './vicVchCreateUpdateView';
+import { VchCreateUpdate } from './vicVchCreateUpdate';
 import { VicVchDetails } from './vicVchDetails';
 
 export class VicVchMain extends VicWebappPage {

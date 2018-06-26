@@ -41,30 +41,6 @@ export class VicWebappPage {
     }, this.opsTimeout);
   }
 
-  /*deleteVch(vch) {
-    this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.actionBar + vch);
-    const vchActionMenu = this.actionBar + vch;
-    this.clickByCSS(vchActionMenu);
-    this.clickByCSS(vchActionMenu + ' button.action-item-delete');
-    browser.switchTo().defaultContent();
-    this.waitForElementToBePresent(this.iframeModal);
-    this.switchFrame(this.iframeModal);
-    // wait for modal to set position
-    this.waitForElementToBePresent(this.labelDeleteVolumes);
-    this.clickByCSS(this.labelDeleteVolumes);
-    this.clickByText('Button', 'Delete');
-    browser.switchTo().defaultContent();
-  }*/
-
-  /*navigateToVchVm(vch) {
-    this.switchFrame(this.iframeTabs);
-    this.waitForElementToBePresent(this.actionBar + vch);
-    this.clickByText('.datagrid-cell a', vch);
-  }*/
-
-  /* Utility functions */
-
   clickByText(el, text) {
     element(by.cssContainingText(el, text)).isPresent().then(function(result) {
       if (result) {

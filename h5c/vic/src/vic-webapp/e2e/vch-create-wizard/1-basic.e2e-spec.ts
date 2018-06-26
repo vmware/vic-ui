@@ -25,7 +25,7 @@ import {
   modalWizard,
   menuLabel
 } from '../pages/common';
-import { VchCreateUpdate } from '../pages/vicVchCreateUpdateView';
+import { VchCreateUpdate } from '../pages/vicVchCreateUpdate';
 import { VicVchDetails } from '../pages/vicVchDetails';
 
 
@@ -38,7 +38,6 @@ describe('VCH Create Wizard - Basic', () => {
   let vicVchCreate: VchCreateUpdate;
   let vicVchDetails: VicVchDetails;
   let specRunId: number;
-  specRunId = Math.floor(Math.random() * 1000) + 100;
 
   beforeAll(() => {
     specRunId = Math.floor(Math.random() * 1000) + 100;
