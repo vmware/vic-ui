@@ -45,9 +45,10 @@ export class VicVchMain extends VicWebappPage {
 
     navigateToVchTab() {
         this.waitForElementToBePresent(this.objectTab);
-        // this.waitForElementToBePresent(this.buttonVchsTab);
-        this.clickByXpath('//li[2]/a');
-        // this.clickByCSS(this.buttonVchsTab);
+        browser.sleep(8000);
+        this.waitForElementToBePresent(this.buttonVchsTab);
+        browser.sleep(8000);
+        this.clickByCSS(this.buttonVchsTab);
         browser.wait(() => {
           return browser.getCurrentUrl().then(v => {
             browser.sleep(6000);
