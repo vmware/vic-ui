@@ -14,18 +14,14 @@
  limitations under the License.
 */
 
-export const defaultTimeout = 5000;
-export const sectionSummary = 'section#summary';
-export const sectionOpsUser = 'section#ops-user';
-export const sectionRegistry = 'section#registry';
-export const sectionSecurity = 'section#security';
-export const sectionNetworks = 'section#networks';
-export const sectionStorage = 'section#storage-capacity';
-export const sectionCompute = 'section#compute-capacity';
+export const defaultTimeout = 10000;
 export const modalWizard = '.clr-wizard-stepnav';
-export const dataGridCell = '.datagrid-cell';
 export const iframeTabs = 'div.outer-tab-content iframe.sandbox-iframe';
 export const namePrefix = 'virtual-container-host-';
-export const menuContainer = '#applicationMenuContainer .k-item .k-link';
 export const menuLabel = '.vui-menuitem-label-text';
 export const tabSummary = 'a.summary-action-link';
+export const extendedTimeout = 10000;
+export const opsTimeout = 80000;
+export const username = 'administrator@vsphere.local';
+export const password = 'Bl*ckwalnut0';
+
