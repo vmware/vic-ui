@@ -18,272 +18,156 @@ import {browser, by, element, protractor} from 'protractor';
 
 import { PROTRACTOR_JASMINE_TIMEOUT } from '../../src/app/testing/jasmine.constants';
 import { VicWebappPage } from '../app.po';
+import { LoginPage } from '../pages/loginPage';
+import { HomePage } from '../pages/homePage';
+import { VicVchMain} from '../pages/vicVchMain';
 import {
-  defaultTimeout,
-  sectionSummary,
-  sectionOpsUser,
-  sectionRegistry,
-  sectionSecurity,
-  sectionNetworks,
-  sectionStorage,
-  sectionCompute,
   modalWizard,
-  dataGridCell,
-  iframeTabs,
-  namePrefix,
-  menuContainer,
-  menuLabel,
-  tabSummary
-} from './common';
+  menuLabel
+} from '../pages/common';
+import { VchCreateUpdate } from '../pages/vicVchCreateUpdate';
+import { VicVchDetails } from '../pages/vicVchDetails';
+
 
 describe('VCH Create Wizard - Basic', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = PROTRACTOR_JASMINE_TIMEOUT;
-  let page: VicWebappPage;
+  let utility: VicWebappPage;
+  let loginPage: LoginPage;
+  let homePage: HomePage;
+  let vicMain: VicVchMain;
+  let vicVchCreate: VchCreateUpdate;
+  let vicVchDetails: VicVchDetails;
   let specRunId: number;
-  specRunId = Math.floor(Math.random() * 1000) + 100;
 
   beforeAll(() => {
     specRunId = Math.floor(Math.random() * 1000) + 100;
+    utility = new VicWebappPage();
   });
 
   beforeEach(() => {
-    page = new VicWebappPage();
   });
 
   afterAll(() => {
-    page.logOut();
+    utility.logOut();
   });
 
   it('should redirect to login', () => {
-    browser.driver.manage().window().maximize();
-    page.navigateTo();
+    loginPage = new LoginPage();
+    browser.driver.manage().window().setPosition(0, 0);
+    browser.driver.manage().window().setSize(1366, 880);
+    loginPage.navigateToLoginPage();
     expect(browser.getCurrentUrl()).toContain('SSO');
   });
 
   it('should login', () => {
-    page.login();
-    page.waitLoginFinish();
+    homePage = loginPage.submitLogin();
     expect(browser.getCurrentUrl()).toContain('/ui');
   });
 
   it('should navigate to vsphere home', () => {
-    page.navigateToHome();
+    homePage.navigateToHome();
     expect(browser.getCurrentUrl()).toContain('vsphere');
   });
 
   it('should navigate to vic plugin', () => {
-    page.navigateToVicPlugin();
+    vicMain = homePage.navigateToVicPlugin();
     expect(browser.getCurrentUrl()).toContain('vic');
   });
 
   it('should navigate to summary tab', () => {
-    page.navigateToSummaryTab();
+    vicMain.navigateToSummaryTab();
   });
 
   it('should navigate to vch tab', () => {
-    page.navigateToVchTab();
+    vicMain.navigateToVchTab();
     expect(browser.getCurrentUrl()).toContain('customtab-vch');
   });
 
   it('should open create vch wizard', () => {
-    page.openVchWizard();
-    page.waitForElementToBePresent(modalWizard);
+    vicVchCreate = vicMain.navigateToCreateWizard();
     expect(element(by.css(modalWizard)).isPresent()).toBe(true);
   });
 
   it('should input vch name', () => {
-    page.clear('#nameInput');
-    page.sendKeys('#nameInput', namePrefix + specRunId);
-  });
-
-  it('should complete general step', () => {
-    page.clickByText('Button', 'Next');
-    // check if we made it to compute capacity section
-    page.waitForElementToBePresent(sectionCompute);
-    expect(element(by.css(sectionCompute)).isPresent()).toBe(true);
+    vicVchCreate.processGeneralInfo(specRunId);
+    expect(element(by.css(vicVchCreate.getSectionCompute())).isPresent()).toBe(true);
   });
 
   it('should select a compute resource', () => {
-      page.selectComputeResource();
-  });
-
-  it('should complete compute capacity step', () => {
-    page.clickByText('Button', 'Next');
-    // check if we made it to storage capacity section
-    page.waitForElementToBePresent(sectionStorage);
-    expect(element(by.css(sectionStorage)).isPresent()).toBe(true);
+    vicVchCreate.processComputeResource();
+    expect(element(by.css(vicVchCreate.getSectionStorage())).isPresent()).toBe(true);
   });
 
   it('should select a datastore', () => {
-    page.selectDatastore();
-  });
-
-  it('should complete storage capacity step', () => {
-    page.clickByText('Button', 'Next');
-    // check if we made it to networks section
-    page.waitForElementToBePresent(sectionNetworks);
-    expect(element(by.css(sectionNetworks)).isPresent()).toBe(true);
+    vicVchCreate.processStorageResource();
+    expect(element(by.css(vicVchCreate.getSectionNetwork())).isPresent()).toBe(true);
   });
 
   it('should select a bridge network', () => {
-    page.selectBridgeNetwork();
+    vicVchCreate.selectBridgeNetwork();
   });
 
   it('should select a public network', () => {
-    page.selectPublicNetwork();
+    vicVchCreate.selectPublicNetwork();
   });
 
   it('should complete networks step', () => {
-    page.clickByText('Button', 'Next');
-    // check if we made it to security section
-    page.waitForElementToBePresent(sectionSecurity);
-    expect(element(by.css(sectionSecurity)).isPresent()).toBe(true);
+   vicVchCreate.processNetworkInfo();
+    expect(element(by.css(vicVchCreate.getSectionSecurity())).isPresent()).toBe(true);
   });
 
   it('should complete security step', () => {
-    page.disableSecureAccess();
-    page.clickByText('Button', 'Next');
-    // check if we made it to registry access section
-    page.waitForElementToBePresent(sectionRegistry);
-    expect(element(by.css(sectionRegistry)).isPresent()).toBe(true);
+    vicVchCreate.disableSecureAccess()
+    vicVchCreate.processSecureAccess();
+    expect(element(by.css(vicVchCreate.getSectionRegistry())).isPresent()).toBe(true);
   });
 
   it('should complete registry access step', () => {
-    page.clickByText('Button', 'Next');
-    // check if we made it to ops user section
-    page.waitForElementToBePresent(sectionOpsUser);
-    expect(element(by.css(sectionOpsUser)).isPresent()).toBe(true);
+    vicVchCreate.processSectionRegistry();
+    expect(element(by.css(vicVchCreate.getSectionOPsUser())).isPresent()).toBe(true);
   });
 
   it('should enter ops user creds', () => {
-    page.enterOpsUserCreds();
-  });
-
-  it('should complete ops user step', () => {
-    page.clickByText('Button', 'Next');
-    // check if we made it to summary section
-    page.waitForElementToBePresent(sectionSummary);
-    expect(element(by.css(sectionSummary)).isPresent()).toBe(true);
+    vicVchCreate.processOpsUserCreds();
   });
 
   it('should create a vch', () => {
-    page.createVch();
+    vicVchCreate.createVch();
   });
 
   it('should find the new vch in datagrid', () => {
-    let vchFound = false;
-    page.waitForElementToBePresent(dataGridCell);
-    page.clickByCSS('.pagination-next');
-    page.waitForElementToBePresent(dataGridCell);
-    browser.sleep(defaultTimeout);
-    const newVch = new RegExp(namePrefix + specRunId);
-    element.all(by.css(dataGridCell)).each(function(el, index) {
-      el.isPresent().then(present => {
-        if (present) {
-          el.getText().then(function(text) {
-            if (newVch.test(text)) {
-              vchFound = true;
-            }
-          });
-        }
-      })
-    }).then(function() {
-      expect(vchFound).toBeTruthy();
-    });
+    expect(vicMain.checkVchOnDataGrid(specRunId)).toBeTruthy();
   });
 
   it('should verify the new vch has properly started', () => {
-    browser.switchTo().defaultContent();
-    page.waitForTaskDone(namePrefix + specRunId, 'Reconfigure virtual machine').then((status) => {
-      expect(status).toBeTruthy();
-    });
+    expect(vicMain.checkVchStarted(specRunId)).toBeTruthy();
   });
 
-  if (browser.params.hostAffinity === 'true') {
-    it('should redirect to VCH VM and select Cluster from VCH related objects', () => {
-      page.navigateToVchVm(namePrefix + specRunId);
-      browser.switchTo().defaultContent();
-      browser.sleep(defaultTimeout);
-      const vch = new RegExp(namePrefix + specRunId);
-      page.waitForElementToBePresent('a[title=Cluster]');
-      page.clickByCSS('a[title=Cluster]');
-      });
+  it('should redirect to VCH VM and display Create Wizard menu items', () => {
 
-    it('should navigate to clusters actions and settings', () => {
-      browser.switchTo().defaultContent();
-      browser.sleep(defaultTimeout);
-      page.waitForElementToBePresent(tabSummary);
-      page.clickByCSS(tabSummary);
-      browser.sleep(defaultTimeout);
-      const clustersActions = element(by.cssContainingText(menuContainer, 'Settings'));
-      browser.driver.getCapabilities().then(caps => {
-        browser.browserName = caps.get('browserName');
-        if (browser.browserName.toLowerCase() === 'chrome') {
-          browser.actions().mouseMove(clustersActions).click().perform();
-        } else {
-          page.clickByText(menuContainer, 'Settings');
-        }
-      });
-    });
-
-    it('should validate the additions of the vch to the host/virtual machines group', () => {
-      page.waitForElementToBePresent('//div[2]/ul/li[3]/a', 'xpath');
-      page.clickByXpath('//div[2]/ul/li[3]/a');
-      const vch = new RegExp(namePrefix + specRunId);
-      browser.switchTo().defaultContent();
-      expect(element(by.css('span[title=' + vch + ']')).isPresent).toBeTruthy();
-    });
-  } else {
-    it('should redirect to VCH VM and display Create Wizard menu items', () => {
-      page.navigateToVchVm(namePrefix + specRunId);
-      browser.switchTo().defaultContent();
-      browser.sleep(defaultTimeout);
-      page.waitForElementToBePresent(tabSummary);
-      page.clickByCSS(tabSummary);
-      // wait for menu items to be calculated
-      browser.sleep(defaultTimeout);
-      const allVicActions = element(by.cssContainingText(menuContainer, 'All VIC Actions'));
-
-      browser.driver.getCapabilities().then(caps => {
-        browser.browserName = caps.get('browserName');
-        if (browser.browserName.toLowerCase() === 'chrome') {
-          browser.actions().mouseMove(allVicActions).click().perform();
-        } else {
-          page.clickByText(menuContainer, 'All VIC Actions');
-        }
-      });
-      browser.sleep(defaultTimeout);
-      expect(browser.isElementPresent(by.cssContainingText(menuLabel, 'New Virtual Container Host...'))).toBeTruthy();
-      expect(browser.isElementPresent(by.cssContainingText(menuLabel, 'Delete Virtual Container Host'))).toBeTruthy();
-    });
- }
+    vicVchDetails = vicMain.navigateToVchVmDetails(specRunId);
+    vicVchDetails.navigateToVicActionsAllVicActions();
+    expect(vicVchDetails.getMenuLabelNewVch).toBeTruthy();
+    expect(vicVchDetails.getMenuLabelDeleteVch).toBeTruthy();
+  });
 
   it('should navigate to vch list', () => {
-    page.navigateToHome();
-    page.waitUntilUrlContains('controlcenter');
-    page.navigateToVicPlugin();
-    page.waitUntilUrlContains('vic.objectView_collection');
-    page.navigateToSummaryTab();
-    page.waitUntilUrlContains('vic.customtab-vch');
-    page.navigateToVchTab();
+    homePage.navigateToHome();
+    homePage.navigateToVicPlugin();
+    vicMain.waitUntilUrlContains('vic.objectView_collection');
+    vicMain.navigateToSummaryTab();
+    vicMain.waitUntilUrlContains('vic.customtab-vch');
+    vicMain.navigateToVchTab();
     expect(browser.getCurrentUrl()).toContain('customtab-vch');
   });
 
   it('should delete created vch', () => {
-    page.deleteVch(namePrefix + specRunId);
+    vicMain.deleteVch(specRunId);
   });
+
 
   it('should verify the created vch has been deleted', () => {
-    let vchFound = false;
-    page.switchFrame(iframeTabs);
-    const vchClrDgActionXpath = `//clr-dg-action-overflow[contains(@class, '${namePrefix + specRunId}')]`;
-    element(by.xpath(vchClrDgActionXpath)).isPresent().then(present => {
-      vchFound = present;
-    });
-
-    browser.sleep(defaultTimeout);
-    browser.switchTo().defaultContent();
-    page.waitForTaskDone(namePrefix + specRunId, 'Delete resource pool');
-    expect(vchFound).toBeFalsy();
+    expect(vicMain.checkVchDeleted(specRunId)).toBeFalsy();
   });
+
 });
