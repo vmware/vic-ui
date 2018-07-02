@@ -27,7 +27,7 @@ read_vc_information () {
                 VCENTER_ADMIN_PASSWORD=$OPTARG
                 ;;
             *)
-                echo Usage: $0 [-i vc_ip] [-u vc admin_username] [-p vc_admin_password] >&2
+                echo "Usage: $0 [-i vc_ip] [-u vc admin_username] [-p vc_admin_password]" >&2
                 exit 1
                 ;;
         esac
@@ -41,17 +41,17 @@ read_vc_information () {
     echo "Please provide connection information to the vCenter Server."
     echo "-------------------------------------------------------------"
 
-    if [ -z $VCENTER_IP ] ; then
-        read -p "Enter FQDN or IP to target vCenter Server: " VCENTER_IP
+    if [ -z "$VCENTER_IP" ] ; then
+        IFS="" read -r -p "Enter FQDN or IP to target vCenter Server: " VCENTER_IP
     fi
 
-    if [ -z $VCENTER_ADMIN_USERNAME ] ; then
-        read -p "Enter your vCenter Administrator Username: " VCENTER_ADMIN_USERNAME
+    if [ -z "$VCENTER_ADMIN_USERNAME" ] ; then
+        IFS="" read -r -p "Enter your vCenter Administrator Username: " VCENTER_ADMIN_USERNAME
     fi
 
-    if [ -z $VCENTER_ADMIN_PASSWORD ] ; then
+    if [ -z "$VCENTER_ADMIN_PASSWORD" ] ; then
         echo -n "Enter your vCenter Administrator Password: "
-        read -s VCENTER_ADMIN_PASSWORD
+        IFS="" read -r -s VCENTER_ADMIN_PASSWORD
         echo ""
     fi
 }
@@ -71,56 +71,52 @@ fi
 
 # load configs variable into env
 while IFS='' read -r line; do
-    eval $line
+    eval "$line"
 done < ./configs
 
-read_vc_information $*
+read_vc_information "$@"
 
 # replace space delimiters with colon delimiters
-VIC_UI_HOST_THUMBPRINT=$(echo $VIC_UI_HOST_THUMBPRINT | sed -e 's/[[:space:]]/\:/g')
+VIC_UI_HOST_THUMBPRINT="${VIC_UI_HOST_THUMBPRINT//[[:space:]]/:}"
 
 # load plugin manifest into env
 while IFS='' read -r p_line; do
     eval "$p_line"
 done < ../plugin-manifest
 
-OS=$(uname)
 VCENTER_SDK_URL="https://${VCENTER_IP}/sdk/"
-COMMONFLAGS="--target $VCENTER_SDK_URL --user $VCENTER_ADMIN_USERNAME --password $VCENTER_ADMIN_PASSWORD"
+COMMONFLAGS=("--target" "$VCENTER_SDK_URL" "--user" "$VCENTER_ADMIN_USERNAME" "--password" "$VCENTER_ADMIN_PASSWORD")
 
-if [[ $(echo $OS | grep -i "darwin") ]] ; then
+if [[ "$(uname)" =~ "Darwin" ]] ; then
     PLUGIN_MANAGER_BIN="../../vic-ui-darwin"
 else
     PLUGIN_MANAGER_BIN="../../vic-ui-linux"
 fi
 
 prompt_thumbprint_verification() {
-    read -p "Are you sure you trust the authenticity of this host (yes/no)? " SHOULD_ACCEPT_VC_FINGERPRINT
-    if [[ ! $(echo $SHOULD_ACCEPT_VC_FINGERPRINT | grep -woi "yes\|no") ]] ; then
-        echo Please answer either \"yes\" or \"no\"
-        prompt_thumbprint_verification
-        return
-    fi
-
-    if [[ $SHOULD_ACCEPT_VC_FINGERPRINT = "no" ]] ; then
-        read -p "Enter SHA-1 thumbprint of target VC: " VC_THUMBPRINT
-    fi
+    while true; do
+        IFS="" read -r read -p "Are you sure you trust the authenticity of this host (yes/no)? " SHOULD_ACCEPT_VC_FINGERPRINT
+        case "${SHOULD_ACCEPT_VC_FINGERPRINT}" in
+            [Yy][Ee][Ss] ) return;;
+            [Nn][Oo] ) IFS="" read -r -p "Enter SHA-1 thumbprint of target VC: " VC_THUMBPRINT; return;;
+            * ) echo 'Please answer either "yes" or "no".';;
+        esac
+    done
 }
 
 check_prerequisite () {
     # check if the provided VCENTER_IP is a valid vCenter Server host
-    local CURL_RESPONSE=$(curl -sLk https://$VCENTER_IP)
-    if [[ ! $(echo $CURL_RESPONSE | grep -oi "vmware vsphere") ]] ; then
+    if [[ ! "$(curl -sLk "https://$VCENTER_IP")" =~ "VMware vSphere" ]] ; then
         echo "-------------------------------------------------------------"
         echo "Error! vCenter Server was not found at host $VCENTER_IP"
         exit 1
     fi
 
-    #retrieve VC thumbprint
-    if [ ! -z $VIC_MACHINE_THUMBPRINT ] ; then
-        VC_THUMBPRINT=$VIC_MACHINE_THUMBPRINT
+    # retrieve VC thumbprint
+    if [ ! -z "$VIC_MACHINE_THUMBPRINT" ] ; then
+        VC_THUMBPRINT="$VIC_MACHINE_THUMBPRINT"
     else
-        VC_THUMBPRINT=$($PLUGIN_MANAGER_BIN info $COMMONFLAGS --key com.vmware.vic.noop 2>&1 | grep -o "(thumbprint.*)" | cut -c13-71)
+        VC_THUMBPRINT=$("$PLUGIN_MANAGER_BIN" info "${COMMONFLAGS[@]}" --key com.vmware.vic.noop 2>&1 | grep -o "(thumbprint.*)" | cut -c13-71)
     fi
 
     # verify the thumbprint of VC
@@ -129,7 +125,7 @@ check_prerequisite () {
     prompt_thumbprint_verification
 
     # replace space delimiters with colon delimiters
-    VC_THUMBPRINT=$(echo $VC_THUMBPRINT | sed -e 's/[[:space:]]/\:/g')
+    VC_THUMBPRINT="${VC_THUMBPRINT//[[:space:]]/:}"
 }
 
 unregister_plugin() {
@@ -138,24 +134,24 @@ unregister_plugin() {
     echo "-------------------------------------------------------------"
     echo "Preparing to unregister vCenter Extension $plugin_name..."
     echo "-------------------------------------------------------------"
-    local plugin_check_results=$($PLUGIN_MANAGER_BIN info $COMMONFLAGS --key $plugin_key --thumbprint $VC_THUMBPRINT 2>&1)
-    if [[ $(echo $plugin_check_results | grep -oi "fail\|error") ]] ; then
-        echo $plugin_check_results
+    local plugin_check_results=$("$PLUGIN_MANAGER_BIN" info "${COMMONFLAGS[@]}" --key "$plugin_key" --thumbprint "$VC_THUMBPRINT" 2>&1)
+    if echo "$plugin_check_results" | grep -qi "fail\|error" ; then
+        echo "$plugin_check_results"
         echo "-------------------------------------------------------------"
         echo "Error! Failed to check the status of plugin. Please see the message above"
         exit 1
     fi
 
-    if [[ $(echo $plugin_check_results | grep -oi "is not registered") ]] ; then
+    if [[ "$plugin_check_results" =~ "is not registered" ]] ; then
         echo "Warning! Plugin with key '$plugin_key' is not registered with VC!"
         echo "Uninstallation was skipped"
         echo ""
         return
     fi
 
-    $PLUGIN_MANAGER_BIN remove --key $plugin_key $COMMONFLAGS --thumbprint $VC_THUMBPRINT
+    "$PLUGIN_MANAGER_BIN" remove --key "$plugin_key" "${COMMONFLAGS[@]}" --thumbprint "$VC_THUMBPRINT"
 
-    if [[ $? > 0 ]] ; then
+    if [[ $? -ne 0 ]] ; then
         echo "-------------------------------------------------------------"
         echo "Error! Could not unregister plugin with vCenter Server. Please see the message above"
         exit 1
@@ -165,8 +161,8 @@ unregister_plugin() {
 
 parse_and_unregister_plugins () {
     echo ""
-    unregister_plugin "$name-FlexClient" $key_flex
-    unregister_plugin "$name-H5Client" $key_h5c
+    unregister_plugin "$name-FlexClient" "$key_flex"
+    unregister_plugin "$name-H5Client" "$key_h5c"
 }
 
 check_prerequisite
