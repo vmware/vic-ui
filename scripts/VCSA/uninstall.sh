@@ -95,7 +95,7 @@ fi
 
 prompt_thumbprint_verification() {
     while true; do
-        IFS="" read -r read -p "Are you sure you trust the authenticity of this host (yes/no)? " SHOULD_ACCEPT_VC_FINGERPRINT
+        IFS="" read -r -p "Are you sure you trust the authenticity of this host (yes/no)? " SHOULD_ACCEPT_VC_FINGERPRINT
         case "${SHOULD_ACCEPT_VC_FINGERPRINT}" in
             [Yy][Ee][Ss] ) return;;
             [Nn][Oo] ) IFS="" read -r -p "Enter SHA-1 thumbprint of target VC: " VC_THUMBPRINT; return;;
