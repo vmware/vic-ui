@@ -1,32 +1,49 @@
 <!-- Copyright 2017-2018 VMware, Inc. All Rights Reserved. -->
+
+<!-- tree template -->
+<ng-template #recursiveList let-items>
+  <ng-template [clrIfExpanded]="true"
+               *ngIf="items && items.length > 0">
+    <clr-tree-node *ngFor="let item of items"
+                   class="form-control"
+                   [ngSwitch]="item.type">
+      <button #btnEl
+              class="clr-treenode-link cc-resource"
+              (click)="selectResource($event, item)">
+        <clr-icon shape="host" *ngSwitchCase="'HostSystem'"></clr-icon>
+        <clr-icon shape="resource-pool" *ngSwitchCase="'ResourcePool'"></clr-icon>
+        {{ item.text }}
+      </button>
+      <!-- childs -->
+      <ng-template [clrIfExpanded]="true">
+        <ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: item['childs'] }"></ng-container>
+      </ng-template>
+    </clr-tree-node>
+  </ng-template>
+</ng-template>
+
+
 <!-- cluster and clusterhostsystems -->
-  <ng-container *ngFor="let cluster of clusters">
-      <clr-tree-node *ngIf="!cluster.isEmpty" [clrLoading]="loading">
-        <button #btnEl
-                class="clr-treenode-link cc-resource"
-                (click)="selectResource($event, cluster)">
-          <clr-icon shape="cluster"></clr-icon>
-          {{ cluster['text'] }}
-        </button>
+<ng-container *ngFor="let cluster of clusters">
+    <clr-tree-node *ngIf="!cluster.isEmpty" [clrLoading]="loading">
+      <button #btnEl
+              class="clr-treenode-link cc-resource"
+              (click)="selectResource($event, cluster)">
+        <clr-icon shape="cluster"></clr-icon>
+        {{ cluster['text'] }}
+      </button>
 
-        <ng-template [clrIfExpanded]="false">
-          <ng-container>
-            <clr-tree-node *ngFor="let clHost of clusterHostSystemsMap[cluster.objRef]">
-              <button #btnEl class="clr-treenode-link cc-resource">
-                <clr-icon shape="host"></clr-icon>
-                {{ clHost['text'] }}
-              </button>
-            </clr-tree-node>
+      <ng-template [clrIfExpanded]="false">
+        <ng-container>
+          <ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: clusterHostSystemsMap[cluster.objRef] }"></ng-container>
           </ng-container>
-        </ng-template>
-      </clr-tree-node>
-  </ng-container>
+      </ng-template>
+    </clr-tree-node>
+</ng-container>
 
-  <!-- standalone hosts -->
-  <clr-tree-node *ngFor="let host of standaloneHosts">
-    <button #btnEl class="clr-treenode-link cc-resource"
-            (click)="selectResource($event, host)">
-      <clr-icon shape="host"></clr-icon>
-      {{ host['text'] }}
-    </button>
-  </clr-tree-node>
+<!-- standalone hosts -->
+<ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: standaloneHosts }"></ng-container>
+
+
+
+
