@@ -15,13 +15,22 @@
 */
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ClarityModule} from '@clr/angular';
-import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
+import {ComputeResourceTreenodeComponent} from './compute-resource-treenode.component';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
 import {Globals, GlobalsService} from '../../shared';
-import {ServerInfo} from '../../shared/vSphereClientSdkTypes';
+import {HttpClientModule} from '@angular/common/http';
+import {VicVmViewService} from '../../services/vm-view.service';
+import {
+  mockedClusterHostsList1,
+  mockedClusterHostsList2,
+  datacenter,
+  datacenter1,
+  mockedDcClustersAndStandAloneHostsList,
+  vicResourcePoolList
+} from '../mocks/create-vch-wizard-mocked-data';
 
 describe('ComputeResourceTreenodeComponent', () => {
 
@@ -29,104 +38,19 @@ describe('ComputeResourceTreenodeComponent', () => {
   let fixture: ComponentFixture<ComputeResourceTreenodeComponent>;
   let service: CreateVchWizardService;
 
-  const datacenter = {
-    text: 'Datacenter',
-    spriteCssClass: 'vsphere-icon-datacenter',
-    hasChildren: true,
-    objRef: 'urn:vmomi:Datacenter:datacenter-2:d7c361cc-0a46-441e-8e21-ac22debf7003',
-    nodeTypeId: 'Datacenter',
-    isEmpty: null,
-    aliases: [
-      'urn:vmomi:Folder:group-h4:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      'urn:vmomi:Folder:group-v3:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      'urn:vmomi:Folder:group-s5:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      'urn:vmomi:Folder:group-n6:d7c361cc-0a46-441e-8e21-ac22debf7003'
-    ]
-  };
-  const datacenter1 = {
-    text: 'Datacenter 1',
-    spriteCssClass: 'vsphere-icon-datacenter',
-    hasChildren: true,
-    objRef: 'urn:vmomi:Datacenter:datacenter-52:d7c361cc-0a46-441e-8e21-ac22debf7003',
-    nodeTypeId: 'Datacenter',
-    isEmpty: null,
-    aliases: [
-      'urn:vmomi:Folder:group-h54:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      'urn:vmomi:Folder:group-v53:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      'urn:vmomi:Folder:group-s55:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      'urn:vmomi:Folder:group-n56:d7c361cc-0a46-441e-8e21-ac22debf7003'
-    ]
-  };
-  const serverInfoServiceGui = ' d7c361cc-0a46-441e-8e21-ac22debf7003';
-  const mockedClustersList = [
-    {
-      text: 'New Cluster',
-      spriteCssClass: 'vsphere-icon-cluster',
-      hasChildren: true,
-      objRef: 'urn:vmomi:ClusterComputeResource:domain-c23:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      nodeTypeId: 'DcCluster',
-      aliases: ['urn:vmomi:ResourcePool:resgroup-24:d7c361cc-0a46-441e-8e21-ac22debf7003'],
-      datacenterObjRef: 'urn:vmomi:Datacenter:datacenter-2:d7c361cc-0a46-441e-8e21-ac22debf7003'
-    },
-    {
-      text: '10.192.109.234',
-      spriteCssClass: 'vsphere-icon-host-warning',
-      hasChildren: true,
-      objRef: 'urn:vmomi:HostSystem:host-94:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      nodeTypeId: 'DcStandaloneHost',
-      aliases: ['urn:vmomi:ResourcePool:resgroup-93:d7c361cc-0a46-441e-8e21-ac22debf7003'],
-      datacenterObjRef: 'urn:vmomi:Datacenter:datacenter-2:d7c361cc-0a46-441e-8e21-ac22debf7003'
-    },
-    {
-      text: 'New Cluster 1',
-      spriteCssClass: 'vsphere-icon-cluster',
-      hasChildren: true,
-      objRef: 'urn:vmomi:ClusterComputeResource:domain-c98:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      nodeTypeId: 'DcCluster',
-      aliases: ['urn:vmomi:ResourcePool:resgroup-99:d7c361cc-0a46-441e-8e21-ac22debf7003'],
-      datacenterObjRef: 'urn:vmomi:Datacenter:datacenter-52:d7c361cc-0a46-441e-8e21-ac22debf7003'
-    }
-  ];
-  const cluster1HostSystems = [
-    {
-      text: '10.161.251.202',
-      spriteCssClass: 'vsphere-icon-host-warning',
-      hasChildren: false,
-      objRef: 'urn:vmomi:HostSystem:host-20:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      nodeTypeId: 'ClusterHostSystem',
-      aliases: null
-    },
-    {
-      text: '10.162.17.176',
-      spriteCssClass: 'vsphere-icon-host-warning',
-      hasChildren: false,
-      objRef: 'urn:vmomi:HostSystem:host-9:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      nodeTypeId: 'ClusterHostSystem',
-      aliases: null
-    }
-  ];
-  const cluster2HostSystems = [
-    {
-      text: '10.192.115.9',
-      spriteCssClass: 'vsphere-icon-host-warning',
-      hasChildren: false,
-      objRef: 'urn:vmomi:HostSystem:host-101:d7c361cc-0a46-441e-8e21-ac22debf7003',
-      nodeTypeId: 'ClusterHostSystem',
-      aliases: null
-    }
-  ];
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         ReactiveFormsModule,
         HttpModule,
+        HttpClientModule,
         ClarityModule
       ],
       providers: [
         CreateVchWizardService,
         Globals,
         GlobalsService,
+        VicVmViewService
       ],
       declarations: [
         ComputeResourceTreenodeComponent
@@ -142,28 +66,29 @@ describe('ComputeResourceTreenodeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should retrieve hosts and clusters filtered by datacenter1', () => {
+  it('should retrieve a ComputeResource list filtered by type', () => {
     component.datacenter = datacenter1;
-    spyOn(service, 'getClustersList').and.returnValue(Observable.of(mockedClustersList));
-    spyOn(service, 'getAllClusterHostSystems').and.returnValue(Observable.of(cluster2HostSystems));
-    component.loadClusters(<ServerInfo>{serviceGuid: serverInfoServiceGui});
+    spyOn(service, 'getVicResourcePoolList').and.returnValue(Observable.of(vicResourcePoolList));
+    spyOn(service, 'getDcClustersAndStandAloneHosts').and.returnValue(Observable.of(mockedDcClustersAndStandAloneHostsList));
+    spyOn(service, 'getHostsAndResourcePoolsFromClusters').and.returnValue(Observable.of(mockedClusterHostsList2));
+    component.loadClustersAndStandAloneHosts();
 
-    expect(component.clusters.length).toBe(1);
-    expect(component.clusters[0].objRef).toBe(mockedClustersList[2].objRef);
-    expect(component.standaloneHosts.length).toBe(0);
-
+    expect(component.clusters.length).toBe(2);
+    expect(component.clusters[0].objRef).toBe(mockedDcClustersAndStandAloneHostsList[0].objRef);
+    expect(component.standaloneHosts.length).toBe(1);
   });
 
-  it('should retrieve hosts and clusters filtered by datacenter2', () => {
+  it('should retrieve a list of hosts belonging to a particular Cluster', () => {
     component.datacenter = datacenter;
-    spyOn(service, 'getClustersList').and.returnValue(Observable.of(mockedClustersList));
-    spyOn(service, 'getAllClusterHostSystems').and.returnValue(Observable.of(cluster1HostSystems));
-    component.loadClusters(<ServerInfo>{serviceGuid: serverInfoServiceGui});
+    spyOn(service, 'getVicResourcePoolList').and.returnValue(Observable.of(vicResourcePoolList));
+    spyOn(service, 'getDcClustersAndStandAloneHosts').and.returnValue(Observable.of(mockedDcClustersAndStandAloneHostsList));
+    spyOn(service, 'getHostsAndResourcePoolsFromClusters').and.returnValue(Observable.of(mockedClusterHostsList1));
+    component.loadClustersAndStandAloneHosts();
 
-    expect(component.clusters.length).toBe(1);
-    expect(component.clusters[0].objRef).toBe(mockedClustersList[0].objRef);
-    expect(component.standaloneHosts.length).toBe(1);
-
+    expect(component.clusterHostSystemsMap[mockedDcClustersAndStandAloneHostsList[0].objRef].length)
+      .toBe(mockedClusterHostsList1.length);
+    expect(component.clusterHostSystemsMap[mockedDcClustersAndStandAloneHostsList[0].objRef][0].objRef)
+      .toBe(mockedClusterHostsList1[0].objRef);
   });
 
 });
