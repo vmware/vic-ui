@@ -30,7 +30,7 @@ read_vc_information () {
                 FORCE_INSTALL=1
                 ;;
             *)
-                echo Usage: $0 [-i vc_ip] [-u vc admin_username] [-p vc_admin_password] >&2
+                echo "Usage: $0 [-i vc_ip] [-u vc admin_username] [-p vc_admin_password]" >&2
                 exit 1
                 ;;
         esac
@@ -44,17 +44,17 @@ read_vc_information () {
     echo "Please provide connection information to the vCenter Server."
     echo "-------------------------------------------------------------"
 
-    if [ -z $VCENTER_IP ] ; then
-        read -p "Enter FQDN or IP to target vCenter Server: " VCENTER_IP
+    if [ -z "$VCENTER_IP" ] ; then
+        IFS="" read -r -p "Enter FQDN or IP to target vCenter Server: " VCENTER_IP
     fi
 
-    if [ -z $VCENTER_ADMIN_USERNAME ] ; then
-        read -p "Enter your vCenter Administrator Username: " VCENTER_ADMIN_USERNAME
+    if [ -z "$VCENTER_ADMIN_USERNAME" ] ; then
+        IFS="" read -r -p "Enter your vCenter Administrator Username: " VCENTER_ADMIN_USERNAME
     fi
 
-    if [ -z $VCENTER_ADMIN_PASSWORD ] ; then
+    if [ -z "$VCENTER_ADMIN_PASSWORD" ] ; then
         echo -n "Enter your vCenter Administrator Password: "
-        read -s VCENTER_ADMIN_PASSWORD
+        IFS="" read -r -s VCENTER_ADMIN_PASSWORD
         echo ""
     fi
 }
@@ -74,62 +74,56 @@ fi
 
 # load configs variable into env
 while IFS='' read -r line; do
-    eval $line
+    eval "$line"
 done < ./configs
 
-read_vc_information $*
+read_vc_information "$@"
 
 # replace space delimiters with colon delimiters
-VIC_UI_HOST_THUMBPRINT=$(echo $VIC_UI_HOST_THUMBPRINT | sed -e 's/[[:space:]]/\:/g')
+VIC_UI_HOST_THUMBPRINT="${VIC_UI_HOST_THUMBPRINT//[[:space:]]/:}"
 
 # load plugin manifest into env
 while IFS='' read -r p_line; do
     eval "$p_line"
 done < ../plugin-manifest
 
-OS=$(uname)
 VCENTER_SDK_URL="https://${VCENTER_IP}/sdk/"
-COMMONFLAGS="--target $VCENTER_SDK_URL --user $VCENTER_ADMIN_USERNAME --password $VCENTER_ADMIN_PASSWORD"
+COMMONFLAGS=("--target" "$VCENTER_SDK_URL" "--user" "$VCENTER_ADMIN_USERNAME" "--password" "$VCENTER_ADMIN_PASSWORD")
 
 # set binary to call based on os
-if [[ $(echo $OS | grep -i "darwin") ]] ; then
+if [[ "$(uname)" =~ "Darwin" ]] ; then
     PLUGIN_MANAGER_BIN="../../vic-ui-darwin"
 else
     PLUGIN_MANAGER_BIN="../../vic-ui-linux"
 fi
 
 # add a forward slash to VIC_UI_HOST_URL in case it misses it
-if [[ ${VIC_UI_HOST_URL: -1: 1} != "/" ]] ; then
-    VIC_UI_HOST_URL="$VIC_UI_HOST_URL/"
-fi
+VIC_UI_HOST_URL="${VIC_UI_HOST_URL%/}/"
 
 prompt_thumbprint_verification() {
-    read -p "Are you sure you trust the authenticity of this host (yes/no)? " SHOULD_ACCEPT_VC_FINGERPRINT
-    if [[ ! $(echo $SHOULD_ACCEPT_VC_FINGERPRINT | grep -woi "yes\|no") ]] ; then
-        echo Please answer either \"yes\" or \"no\"
-        prompt_thumbprint_verification
-        return
-    fi
-
-    if [[ $SHOULD_ACCEPT_VC_FINGERPRINT = "no" ]] ; then
-        read -p "Enter SHA-1 thumbprint of target VC: " VC_THUMBPRINT
-    fi
+    while true; do
+        IFS="" read -r -p "Are you sure you trust the authenticity of this host (yes/no)? " SHOULD_ACCEPT_VC_FINGERPRINT
+        case "${SHOULD_ACCEPT_VC_FINGERPRINT}" in
+            [Yy][Ee][Ss] ) return;;
+            [Nn][Oo] ) IFS="" read -r -p "Enter SHA-1 thumbprint of target VC: " VC_THUMBPRINT; return;;
+            * ) echo 'Please answer either "yes" or "no".';;
+        esac
+    done
 }
 
 check_prerequisite () {
     # check if the provided VCENTER_IP is a valid vCenter Server host
-    local CURL_RESPONSE=$(curl -sLk https://$VCENTER_IP)
-    if [[ ! $(echo $CURL_RESPONSE | grep -oi "vmware vsphere") ]] ; then
+    if [[ ! "$(curl -sLk "https://$VCENTER_IP")" =~ "VMware vSphere" ]] ; then
         echo "-------------------------------------------------------------"
         echo "Error! vCenter Server was not found at host $VCENTER_IP"
         exit 1
     fi
 
     # retrieve VC thumbprint
-    if [ ! -z $VIC_MACHINE_THUMBPRINT ] ; then
-        VC_THUMBPRINT=$VIC_MACHINE_THUMBPRINT
+    if [ ! -z "$VIC_MACHINE_THUMBPRINT" ] ; then
+        VC_THUMBPRINT="$VIC_MACHINE_THUMBPRINT"
     else
-        VC_THUMBPRINT=$($PLUGIN_MANAGER_BIN info $COMMONFLAGS --key com.vmware.vic.noop 2>&1 | grep -o "(thumbprint.*)" | cut -c13-71)
+        VC_THUMBPRINT=$("$PLUGIN_MANAGER_BIN" info "${COMMONFLAGS[@]}" --key com.vmware.vic.noop 2>&1 | grep -o "(thumbprint.*)" | cut -c13-71)
     fi
 
     # verify the thumbprint of VC
@@ -138,40 +132,39 @@ check_prerequisite () {
     prompt_thumbprint_verification
 
     # replace space delimiters with colon delimiters
-    VC_THUMBPRINT=$(echo $VC_THUMBPRINT | sed -e 's/[[:space:]]/\:/g')
+    VC_THUMBPRINT="${VC_THUMBPRINT//[[:space:]]/:}"
 }
 
 # purpose of this function is to remove an outdated version of vic ui in case it's installed
 remove_old_key_installation () {
-    $PLUGIN_MANAGER_BIN remove $COMMONFLAGS --force --key com.vmware.vicui.Vicui > /dev/null 2> /dev/null
+    "$PLUGIN_MANAGER_BIN" remove "${COMMONFLAGS[@]}" --force --key com.vmware.vicui.Vicui > /dev/null 2> /dev/null
 }
 
 register_plugin() {
-    local plugin_name=$1
-    local plugin_key=$2
+    local plugin_name="$1"
+    local plugin_key="$2"
     local plugin_url="${VIC_UI_HOST_URL}files/"
-    local plugin_flags="--version $version --company $company --url $plugin_url$plugin_key-v$version.zip"
+    local plugin_flags=("--version" "$version" "--company" "$company" "--url" "$plugin_url$plugin_key-v$version.zip")
     if [[ $FORCE_INSTALL -eq 1 ]] ; then
-        plugin_flags="$plugin_flags --force"
+        plugin_flags+=("--force")
     fi
 
     echo "-------------------------------------------------------------"
     echo "Preparing to register vCenter Extension $1..."
     echo "-------------------------------------------------------------"
 
-    if [ $plugin_key == "com.vmware.vic" ]; then
-        CFLAGS="$COMMONFLAGS --configure-ova --type=VicApplianceVM"
-    else
-        CFLAGS=$COMMONFLAGS
+    CFLAGS=("${COMMONFLAGS[@]}")
+    if [ "$plugin_key" == "com.vmware.vic" ]; then
+        CFLAGS+=("--configure-ova" "--type=VicApplianceVM")
     fi
 
-    $PLUGIN_MANAGER_BIN install --key $plugin_key \
-                                $CFLAGS $plugin_flags \
-                                --thumbprint $VC_THUMBPRINT \
-                                --server-thumbprint $VIC_UI_HOST_THUMBPRINT \
+    "$PLUGIN_MANAGER_BIN" install --key "$plugin_key" \
+                                "${CFLAGS[@]}" "${plugin_flags[@]}" \
+                                --thumbprint "$VC_THUMBPRINT" \
+                                --server-thumbprint "$VIC_UI_HOST_THUMBPRINT" \
                                 --name "$plugin_name" \
                                 --summary "Plugin for $plugin_name"
-    if [[ $? > 0 ]] ; then
+    if [[ $? -ne 0 ]] ; then
         echo "-------------------------------------------------------------"
         echo "Error! Could not register plugin with vCenter Server. Please see the message above"
         exit 1
@@ -182,46 +175,45 @@ register_plugin() {
 parse_and_register_plugins () {
     echo ""
     if [[ $FORCE_INSTALL -eq 1 ]] ; then
-        register_plugin "$name-FlexClient" $key_flex
-        register_plugin "$name-H5Client" $key_h5c
+        register_plugin "$name-FlexClient" "$key_flex"
+        register_plugin "$name-H5Client" "$key_h5c"
         return
     fi
 
     echo "-------------------------------------------------------------"
     echo "Checking existing plugins..."
     echo "-------------------------------------------------------------"
-    local check_h5c=$($PLUGIN_MANAGER_BIN info $COMMONFLAGS --key $key_h5c --thumbprint $VC_THUMBPRINT 2>&1)
-    local check_flex=$($PLUGIN_MANAGER_BIN info $COMMONFLAGS --key $key_flex --thumbprint $VC_THUMBPRINT 2>&1)
+    local check_h5c=$("$PLUGIN_MANAGER_BIN" info "${COMMONFLAGS[@]}" --key "$key_h5c" --thumbprint "$VC_THUMBPRINT" 2>&1)
+    local check_flex=$("$PLUGIN_MANAGER_BIN" info "${COMMONFLAGS[@]}" --key "$key_flex" --thumbprint "$VC_THUMBPRINT" 2>&1)
 
-    if [[ $(echo $check_h5c | grep -oi "fail\|error") ]] ; then
-        echo $check_h5c
+    if echo "$check_h5c" | grep -qi "fail\|error" ; then
+        echo "$check_h5c"
         echo "Error! Failed to check the status of plugin. Please see the message above"
         exit 1
     fi
 
-    if [[ $(echo $check_flex | grep -oi "fail\|error") ]] ; then
-        echo $check_flex
+    if echo "$check_flex" | grep -qi "fail\|error" ; then
+        echo "$check_flex"
         echo "Error! Failed to check the status of plugin. Please see the message above"
         exit 1
     fi
 
     local pattern="\([[:digit:]]\.\)\{2\}[[:digit:]]\(\.[[:digit:]]\{1,\}\)\{0,1\}"
-    local h5c_plugin_version=$(echo $check_h5c | grep -oi "$pattern")
-    local flex_plugin_version=$(echo $check_flex | grep -oi "$pattern")
-    local existing_version=""
+    local h5c_plugin_version=$(echo "$check_h5c" | grep -oi "$pattern")
+    local flex_plugin_version=$(echo "$check_flex" | grep -oi "$pattern")
 
-    if [[ -z $(echo $h5c_plugin_version$flex_plugin_version) ]] ; then
+    if [[ -z "$h5c_plugin_version" && -z "$flex_plugin_version" ]] ; then
         echo "No VIC Engine UI plugin was detected. Continuing to install the plugins."
         echo ""
-        register_plugin "$name-FlexClient" $key_flex
-        register_plugin "$name-H5Client" $key_h5c
+        register_plugin "$name-FlexClient" "$key_flex"
+        register_plugin "$name-H5Client" "$key_h5c"
     else
         # assuming user always keeps the both plugins at the same version
-        if [[ $(echo $check_h5c | grep -oi "is registered") ]] ; then
+        if [[ "$check_h5c" =~ "is registered" ]] ; then
             echo "Plugin with key '$key_h5c' is already registered with VC. (Version: $h5c_plugin_version)"
         fi
 
-        if [[ $(echo $check_flex | grep -oi "is registered") ]] ; then
+        if [[ "$check_flex" =~ "is registered" ]] ; then
             echo "Plugin with key '$key_flex' is already registered with VC (Version: $flex_plugin_version)"
         fi
 
@@ -234,14 +226,14 @@ parse_and_register_plugins () {
 }
 
 verify_plugin_url() {
-    local plugin_key=$1
-    local PLUGIN_BASENAME=$plugin_key-v$version.zip
+    local plugin_key="$1"
+    local PLUGIN_BASENAME="$plugin_key-v$version.zip"
 
     if [[ $BYPASS_PLUGIN_VERIFICATION ]] ; then
         return
     fi
 
-    if [[ ! $(echo ${VIC_UI_HOST_URL:0:5} | grep -i "https") ]] ; then
+    if [[ ! "${VIC_UI_HOST_URL}" =~ ^https ]] ; then
         echo "-------------------------------------------------------------"
         echo "Error! VIC_UI_HOST_URL should always start with 'https' in the configs file"
         exit 1
@@ -253,16 +245,16 @@ verify_plugin_url() {
         exit 1
     fi
 
-    local CURL_RESPONSE=$(curl --head ${VIC_UI_HOST_URL}files/$PLUGIN_BASENAME -k 2>&1)
+    local CURL_RESPONSE=$(curl --head "${VIC_UI_HOST_URL}files/$PLUGIN_BASENAME" -k 2>&1)
 
-    if [[ $(echo $CURL_RESPONSE | grep -i "could not resolve\|fail") ]] ; then
+    if echo "$CURL_RESPONSE" | grep -qi "could not resolve\|fail" ; then
         echo "-------------------------------------------------------------"
         echo "Error! Could not resolve the host at $VIC_UI_HOST_URL. Please make vSphere Integrated Containers Appliance is powered on and reachable from where you are running the script"
         exit 1
     fi
 
-    local RESPONSE_STATUS=$(curl -sko /dev/null -I -w "%{http_code}" ${VIC_UI_HOST_URL}files/$PLUGIN_BASENAME 2>&1)
-    if [[ $(echo $RESPONSE_STATUS | grep -oi "404") ]] ; then
+    local RESPONSE_STATUS=$(curl -sko /dev/null -I -w "%{http_code}" "${VIC_UI_HOST_URL}files/$PLUGIN_BASENAME" 2>&1)
+    if [[ "$RESPONSE_STATUS" =~ [4|5][[:digit:]][[:digit:]] ]] ; then
         echo "-------------------------------------------------------------"
         echo "Error! Plugin bundle was not found. Please make sure \"$PLUGIN_BASENAME\" is available at \"$VIC_UI_HOST_URL\", and retry installing the plugin"
         exit 1
@@ -271,8 +263,8 @@ verify_plugin_url() {
 
 check_prerequisite
 remove_old_key_installation
-verify_plugin_url $key_flex
-verify_plugin_url $key_h5c
+verify_plugin_url "$key_flex"
+verify_plugin_url "$key_h5c"
 parse_and_register_plugins
 
 echo "--------------------------------------------------------------"
