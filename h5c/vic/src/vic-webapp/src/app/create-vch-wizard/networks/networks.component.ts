@@ -25,6 +25,7 @@ import {
   ipListPattern, cidrListPattern
 } from '../../shared/utils/validators';
 import { ComputeResource } from '../../interfaces/compute.resource';
+import { resourceIsResourcePool } from '../../shared/utils/object-reference';
 
 @Component({
   selector: 'vic-vch-creation-networks',
@@ -139,8 +140,11 @@ export class NetworksComponent implements OnInit {
   }
 
   loadPortgroups(computeResourceObj: ComputeResource) {
+    const selectedComputeResource: ComputeResource = !resourceIsResourcePool(computeResourceObj.type) ?
+      computeResourceObj : computeResourceObj.rootParentComputeResource;
+
     this.portgroupsLoading = true;
-    this.createWzService.getDistributedPortGroups(this.datacenter, computeResourceObj)
+    this.createWzService.getDistributedPortGroups(this.datacenter, selectedComputeResource)
       .subscribe(v => {
         this.portgroups = v;
         this.form.get('bridgeNetwork').setValue('');

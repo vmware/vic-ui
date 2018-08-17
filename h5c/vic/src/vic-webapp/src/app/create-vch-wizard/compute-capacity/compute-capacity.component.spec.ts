@@ -22,8 +22,8 @@ import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ReactiveFormsModule} from '@angular/forms';
-import {TestScheduler} from 'rxjs/Rx';
 import {AppAlertService, GlobalsService, I18nService} from '../../shared';
+import {mockedDcClustersAndStandAloneHostsList} from '../mocks/create-vch-wizard-mocked-data';
 
 describe('ComputeCapacityComponent', () => {
 
@@ -34,7 +34,7 @@ describe('ComputeCapacityComponent', () => {
   const MaxLimit = 4096;
 
   function setDefaultRequiredValues() {
-    component.loadResources(component.clusters[0].text);
+    component.resources = mockedDcClustersAndStandAloneHostsList;
     component.selectComputeResource({datacenterObj: component.datacenter, obj: component.resources[0]});
   }
 
@@ -56,7 +56,7 @@ describe('ComputeCapacityComponent', () => {
                 text: 'datacenter'
               }]);
             },
-            getClustersList(serviceGuid: string) {
+            getDcClustersAndStandAloneHosts(serviceGuid: string) {
               return Observable.of([{
                 text: 'cluster'
               }]);
@@ -130,9 +130,7 @@ describe('ComputeCapacityComponent', () => {
     service = fixture.debugElement.injector.get(CreateVchWizardService);
 
     spyOn(service, 'getDatacenter').and.callThrough();
-    spyOn(service, 'getClustersList').and.callThrough();
     spyOn(service, 'getResourceAllocationsInfo').and.callThrough();
-    spyOn(service, 'getHostsAndResourcePools').and.callThrough();
   });
 
   it('should be created', () => {
@@ -224,14 +222,9 @@ describe('ComputeCapacityComponent', () => {
     });
   });
 
-  it('should extract the datacenter moid from the object reference string', () => {
-    const dc = component.getDataCenterId('urn:vmomi:Datacenter:dc-test:00000000-0000-0000-0000-000000000000');
-    expect(dc).toEqual('dc-test');
-  });
-
   it('should validate advanced fields defaults values', () => {
     component.toggleAdvancedMode();
-    component.selectComputeResource({datacenterObj: component.datacenter, obj: {text: ''}});
+    component.selectComputeResource({datacenterObj: component.datacenter, obj: mockedDcClustersAndStandAloneHostsList[0]});
     component.onCommit();
     expect(component.form.valid).toBe(true);
 

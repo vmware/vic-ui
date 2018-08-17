@@ -35,6 +35,7 @@ import { AppRoutingModule, routedComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DisableCookieXSRFStrategy } from './shared/utils/disable-cookie-xsrf-strategy';
 import { HttpInterceptorService } from './services/http-interceptor.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { HttpInterceptorService } from './services/http-interceptor.service';
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpModule,
+    HttpClientModule,
     ClarityModule.forRoot()
   ],
   declarations: [

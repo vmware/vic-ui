@@ -23,6 +23,8 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { supportedCharsPattern, numberPattern } from '../../shared/utils/validators';
+import { ComputeResource } from '../../interfaces/compute.resource';
+import { resourceIsResourcePool } from '../../shared/utils/object-reference';
 
 @Component({
   selector: 'vic-vch-creation-storage-capacity',
@@ -35,9 +37,9 @@ export class StorageCapacityComponent implements OnInit {
   public datastores: any[] = [];
   public datastoresLoading = true;
   private _isSetup = false;
-  @Input() set resourceObjRef(value) {
-    if (typeof value !== 'undefined') {
-      this.loadDatastore(value);
+  @Input() set resourceObjRef(obj: ComputeResource) {
+    if (typeof obj !== 'undefined') {
+      this.loadDatastore(!resourceIsResourcePool(obj.type) ? obj.objRef : obj.rootParentComputeResource.objRef);
     }
   }
 
@@ -84,7 +86,7 @@ export class StorageCapacityComponent implements OnInit {
     });
   }
 
-  loadDatastore(resource) {
+  loadDatastore(resource: string) {
     this.datastoresLoading = true;
     this.createWzService.getDatastores(resource)
       .subscribe(v => {

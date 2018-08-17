@@ -27,11 +27,13 @@ export const COMPUTE_RESOURCE_NODE_TYPES = {
   },
   host: {
     dc_stand_alone: 'DcStandaloneHost',
-    cluster_host: 'ClusterHostSystem'
+    cluster_host: 'ClusterHostSystem',
+    host_system: 'HostSystem',
   },
   cluster: {
     dc_cluster: 'DcCluster',
-    folder_cluster: 'CompResFolderCluster'
+    folder_cluster: 'CompResFolderCluster',
+    cluster_compute_resource: 'ClusterComputeResource',
   },
   resource_pool: {
     resource_pool: 'ResourcePool',

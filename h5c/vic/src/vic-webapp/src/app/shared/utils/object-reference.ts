@@ -17,7 +17,8 @@ import { VirtualContainerHost } from './../../vch-view/vch.model';
 
 import { ComputeResource } from './../../interfaces/compute.resource';
 import { ServerInfo } from '../vSphereClientSdkTypes';
-import {COMPUTE_RESOURCE_NODE_TYPES} from '../constants';
+import { COMPUTE_RESOURCE_NODE_TYPES } from '../constants';
+import {globalProperties} from '../../../environments/global-properties';
 
 export function getServerServiceGuidFromObj (obj: ComputeResource): string {
   return obj.objRef.split(':')[4];
@@ -64,6 +65,27 @@ export function isDesiredType(type: string, types: string[]): boolean {
 export function resourceIsCluster(type: string): boolean {
   return isDesiredType(type, [
     COMPUTE_RESOURCE_NODE_TYPES.cluster.dc_cluster,
-    COMPUTE_RESOURCE_NODE_TYPES.cluster.folder_cluster
+    COMPUTE_RESOURCE_NODE_TYPES.cluster.folder_cluster,
+    COMPUTE_RESOURCE_NODE_TYPES.cluster.cluster_compute_resource
   ]);
 }
+
+export function resourceIsHost(type: string): boolean {
+  return isDesiredType(type, [
+    COMPUTE_RESOURCE_NODE_TYPES.host.dc_stand_alone,
+    COMPUTE_RESOURCE_NODE_TYPES.host.cluster_host,
+    COMPUTE_RESOURCE_NODE_TYPES.host.host_system
+  ]);
+}
+
+export function resourceIsResourcePool(type: string): boolean {
+  return isDesiredType(type, [
+    COMPUTE_RESOURCE_NODE_TYPES.resource_pool.vic_vch_resource_pool,
+    COMPUTE_RESOURCE_NODE_TYPES.resource_pool.resource_pool_resource_pool,
+    COMPUTE_RESOURCE_NODE_TYPES.resource_pool.resource_pool,
+    COMPUTE_RESOURCE_NODE_TYPES.resource_pool.cluster_resource_pool,
+    COMPUTE_RESOURCE_NODE_TYPES.resource_pool.host_resource_pool
+  ]);
+}
+
+
