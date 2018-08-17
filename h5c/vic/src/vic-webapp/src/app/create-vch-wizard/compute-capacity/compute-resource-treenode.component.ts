@@ -24,13 +24,13 @@ import {
   ElementRef,
   Renderer
 } from '@angular/core';
-import { DC_CLUSTER, DC_STANDALONE_HOST } from '../../shared/constants';
 
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { Observable } from 'rxjs/Observable';
 import { GlobalsService } from '../../shared';
 import { ComputeResource } from '../../interfaces/compute.resource';
 import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
+import { resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../../shared/utils/object-reference';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Component that renders a tree view of the inventory items on the selected Datacenter
@@ -43,11 +43,6 @@ import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
   templateUrl: './compute-resource-treenode.template.html'
 })
 export class ComputeResourceTreenodeComponent implements OnInit {
-  public loading = true;
-  public clusters: ComputeResource[];
-  public clusterHostSystemsMap: {[clusterRef: string]: ComputeResource[]} = {};
-  public standaloneHosts: ComputeResource[];
-  public selectedResourceObj: ComputeResource;
   @Input() serverInfo: ServerInfo;
   @Input() datacenter: ComputeResource;
   @Output() resourceSelected: EventEmitter<{
@@ -55,6 +50,13 @@ export class ComputeResourceTreenodeComponent implements OnInit {
     parentClusterObj?: ComputeResource,
     datacenterObj: ComputeResource
   }>;
+
+  public loading = true;
+  public clusters: ComputeResource[] = [];
+  public clusterHostSystemsMap: {[clusterRef: string]: ComputeResource[]} = {};
+  public standaloneHosts: ComputeResource[] = [];
+  public selectedResourceObj: ComputeResource;
+  private vicResourcePoolNamesList: string[];
 
   @ViewChildren('btnEl') computeResourceBtns: QueryList<any>;
 
@@ -71,17 +73,20 @@ export class ComputeResourceTreenodeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadClusters(this.serverInfo);
+    this.loadClustersAndStandAloneHosts();
   }
 
-  loadClusters(serverInfo: ServerInfo) {
+  loadClustersAndStandAloneHosts() {
     this.loading = true;
-    this.createWzService
-      .getClustersList(serverInfo.serviceGuid)
-      .subscribe(val => {
-        const filteredByDc = val.filter(v => v['datacenterObjRef'] === this.datacenter.objRef);
-        this.clusters = filteredByDc.filter(v => v.nodeTypeId === DC_CLUSTER);
-        this.standaloneHosts = filteredByDc.filter(v => v.nodeTypeId === DC_STANDALONE_HOST);
+    Observable.zip(
+      this.createWzService.getDcClustersAndStandAloneHosts(this.datacenter),
+      this.createWzService.getVicResourcePoolList())
+      .subscribe(data => {
+        this.vicResourcePoolNamesList = data[1];
+
+        const ClustersAndStandAloneHosts: ComputeResource[] = data[0];
+        this.clusters = ClustersAndStandAloneHosts.filter(v => resourceIsCluster(v.type));
+        this.standaloneHosts = ClustersAndStandAloneHosts.filter(v => resourceIsHost(v.type));
 
         if (!this.clusters.length) {
           this.loading = false;
@@ -90,8 +95,9 @@ export class ComputeResourceTreenodeComponent implements OnInit {
         // pointer to the current cluster object
         // since we use concatMap the order in which we get results is guaranteed
         let idx = 0;
-        this.createWzService.getAllClusterHostSystems(this.clusters)
+        this.createWzService.getHostsAndResourcePoolsFromClusters(this.clusters)
           .subscribe(clusterHostSystems => {
+
             // if this is the last emission set loading var to false
             if (idx === this.clusters.length - 1) {
               this.loading = false;
@@ -113,19 +119,21 @@ export class ComputeResourceTreenodeComponent implements OnInit {
   }
 
   selectResource(event: Event, obj: ComputeResource, clusterObj?: ComputeResource) {
-    this.selectedResourceObj = obj;
-    if (clusterObj) {
-      this.resourceSelected.emit({
-        obj: obj,
-        parentClusterObj: clusterObj,
-        datacenterObj: this.datacenter
-      });
-    } else {
-      this.resourceSelected.emit({ obj: obj, datacenterObj: this.datacenter });
-    }
+    if (this.isAllowedType(obj)) {
+      this.selectedResourceObj = obj;
+      if (clusterObj) {
+        this.resourceSelected.emit({
+          obj: obj,
+          parentClusterObj: clusterObj,
+          datacenterObj: this.datacenter
+        });
+      } else {
+        this.resourceSelected.emit({ obj: obj, datacenterObj: this.datacenter });
+      }
 
-    this.unselectComputeResource();
-    this.renderer.setElementClass(event.target, 'active', true);
+      this.unselectComputeResource();
+      this.renderer.setElementClass(event.target, 'active', true);
+    }
   }
 
   unselectComputeResource() {
@@ -133,4 +141,14 @@ export class ComputeResourceTreenodeComponent implements OnInit {
       this.renderer.setElementClass(elRef.nativeElement, 'active', false);
     })
   }
-}
+
+  private isAllowedType(obj: ComputeResource): boolean {
+    const allowedResourcePool: boolean = resourceIsResourcePool(obj.type) && this.vicResourcePoolNamesList.indexOf(obj.value) === -1;
+    const allowedCluster: boolean = resourceIsCluster(obj.type);
+    const allowedHost: boolean = resourceIsHost(obj.type) && !resourceIsCluster(obj.parent.type);
+
+    return allowedResourcePool || allowedCluster || allowedHost;
+  }
+
+
+  }

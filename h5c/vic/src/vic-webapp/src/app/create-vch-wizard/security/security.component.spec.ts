@@ -81,6 +81,12 @@ describe('SecurityComponent', () => {
     component.vchName = 'vch-example-name';
     component.onPageLoad();
     component.datacenter = {
+      serverGuid: 'aaaa-bbb-ccc',
+      value: 'dc-test',
+      type: 'Datacenter',
+      name: 'Test DC',
+      parent: null,
+      resourcePool: null,
       objRef: 'urn:vmomi:Datacenter:dc-test:aaaa-bbb-ccc',
       text: 'Test DC',
       nodeTypeId: 'test',
