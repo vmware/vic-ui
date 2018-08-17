@@ -241,7 +241,7 @@ export class CreateVchWizardComponent implements OnInit {
           }
         },
         'resource': {
-          'name': payload.computeCapacity.computeResource
+          'id': payload.computeCapacity.computeResource
         }
       },
       'storage': {

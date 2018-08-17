@@ -22,12 +22,10 @@ import {
 
 import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { DC_CLUSTER } from '../../shared/constants';
 import { Observable } from 'rxjs/Observable';
 import { GlobalsService } from './../../shared/globals.service';
 import { ComputeResource } from '../../interfaces/compute.resource';
-import { getMorIdFromObjRef } from '../../shared/utils/object-reference';
-import 'rxjs/add/observable/timer';
+import { getMorIdFromObjRef, resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../../shared/utils/object-reference';
 import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
 import { flattenArray } from '../../shared/utils/array-utils';
 import { I18nService } from '../../shared';
@@ -60,14 +58,14 @@ export class ComputeCapacityComponent implements OnInit {
     memory: { maxUsage: null, minUsage: null, unreservedForPool: null }
   };
   public selectedObject: ComputeResource;
-  public selectedResourceObjRef: string;
   public serversInfo: ServerInfo[];
   public selectedResourceIsCluster = false;
   public vmGroupNameIsValid = false;
   public isClusterDrsEnabled = false;
   public vmsGroups = [];
+  public selectedId: string;
+  public selectedName: string;
 
-  private _selectedComputeResource: string;
   private _currentVchName: string;
 
   @ViewChildren(ComputeResourceTreenodeComponent)
@@ -125,33 +123,7 @@ export class ComputeCapacityComponent implements OnInit {
       });
   }
 
-  /**
-   * Get the latest list of Hosts, VirtualApps and ResourcePools
-   * @param {string} clusterValue
-   */
-  loadResources(clusterValue: string) {
-    this.isTreeLoading = true;
-    this.createWzService
-      .getHostsAndResourcePools(clusterValue)
-      .subscribe(resources => {
-        this.resources = resources;
-        this.isTreeLoading = false;
-      });
-  }
-
-  /**
-   * extract the datacenter moid from the object reference string
-   *
-   */
-  getDataCenterId (dcObj: string) {
-      const dcIds = dcObj.split(':');
-      if (dcIds[2] === 'Datacenter') {
-        // e.g: urn:vmomi:Datacenter:dc-test:00000000-0000-0000-0000-000000000000
-        return dcIds[3];
-      }
-  }
-
-  get dcId () {
+  get dcId() {
     return getMorIdFromObjRef(this.dcObj.objRef);
   }
 
@@ -164,34 +136,27 @@ export class ComputeCapacityComponent implements OnInit {
     parentClusterObj?: ComputeResource | any;
     datacenterObj: ComputeResource | any
   }) {
-    const nodeTypeId = payload.obj.nodeTypeId;
-    const isCluster = nodeTypeId === DC_CLUSTER;
-    const resourceObj = payload.obj.objRef;
-    const dcObj = payload.datacenterObj.objRef;
+    const isCluster = resourceIsCluster(payload.obj.nodeTypeId);
+    const isHost = resourceIsHost(payload.obj.nodeTypeId);
+    const isResourcePool = resourceIsResourcePool(payload.obj.nodeTypeId);
+    const resourceObjForResourceAllocations =
+      ((isCluster || isResourcePool) && payload.obj.aliases[0]) ? payload.obj.aliases[0] : payload.obj.objRef;
+
     this.dcObj = payload.datacenterObj;
-    this.selectedResourceIsCluster = isCluster;
-
-    let computeResource = `/${this.dcObj.text}/host`;
-    let resourceObjForResourceAllocations = resourceObj;
-
-    if (isCluster) {
-      computeResource = `${computeResource}/${payload.obj.realName}`;
-      resourceObjForResourceAllocations = payload.obj.aliases[0];
-    } else {
-      this.form.controls['vmHostAffinity'].setValue(false);
-      computeResource = payload.parentClusterObj ?
-        `${computeResource}/${payload.parentClusterObj.text}/${payload.obj.realName}` :
-        `${computeResource}/${payload.obj.realName}`;
-    }
-    this.selectedResourceObjRef = resourceObj;
     this.selectedObject = payload.obj;
-    this._selectedComputeResource = computeResource;
+    this.selectedResourceIsCluster = isCluster;
+    this.selectedId = payload.obj.value;
+    this.selectedName = payload.obj.name;
+
+    if (!isCluster) {
+      this.form.controls['vmHostAffinity'].setValue(false);
+    }
 
     // set active class on the treenodecomponent whose datacenter object reference is
     // the same as datacenterObj.objRef
     if (this.treenodeComponents) {
       this.treenodeComponents
-        .filter(component => component.datacenter.objRef !== dcObj)
+        .filter(component => component.datacenter.objRef !== payload.datacenterObj.objRef)
         .forEach(component => {
           component.unselectComputeResource();
         });
@@ -199,13 +164,13 @@ export class ComputeCapacityComponent implements OnInit {
 
     // if it is a cluster, we get the cluster vm groups, otherwise set to empty array observable
     const vmGroupsObs: Observable<any[]> = isCluster ?
-      this.createWzService.getClusterVMGroups(this.selectedResourceObjRef) : Observable.of([]);
+      this.createWzService.getClusterVMGroups(this.selectedObject.objRef) : Observable.of([]);
 
     const isDrsEnabled: Observable<boolean> = isCluster ?
-      this.createWzService.getClusterDrsStatus(this.selectedResourceObjRef) : Observable.of(false);
+      this.createWzService.getClusterDrsStatus(this.selectedObject.objRef) : Observable.of(false);
 
     const allocationsObs: Observable<any[]> = this.createWzService
-      .getResourceAllocationsInfo(resourceObjForResourceAllocations, isCluster);
+      .getResourceAllocationsInfo(resourceObjForResourceAllocations, isHost);
 
     Observable.zip(allocationsObs, vmGroupsObs, isDrsEnabled)
       .subscribe(([allocationsInfo, groups, drsStatus]) => {
@@ -283,23 +248,14 @@ export class ComputeCapacityComponent implements OnInit {
     }
   }
 
-  get selectedComputeResource() {
-    return this._selectedComputeResource;
-  }
-
-  onPageLoad() {
-    // if compute resource is already selected return here
-    if (this.selectedComputeResource) {
-      return;
-    }
-  }
+  onPageLoad() {}
 
   onCommit(): Observable<any> {
     const errs: string[] = [];
     let formErrors = null;
     const results: any = {};
 
-    if (!this.selectedComputeResource) {
+    if (!this.selectedId) {
       errs.push('Please choose a valid compute resource');
       formErrors = { invalidComputeResource: true };
     }
@@ -312,7 +268,8 @@ export class ComputeCapacityComponent implements OnInit {
       const cpuLimitValue = this.form.get('cpuLimit').value;
       const memoryLimitValue = this.form.get('memoryLimit').value;
 
-      results['computeResource'] = this.selectedComputeResource;
+      results['computeResource'] = this.selectedId;
+      results['computeResourceName'] = this.selectedName;
       results['cpu'] = unlimitedPattern.test(cpuLimitValue) ? '0' : cpuLimitValue;
       results['memory'] = unlimitedPattern.test(memoryLimitValue) ? '0' : memoryLimitValue;
       if (this.inAdvancedMode) {
@@ -330,9 +287,5 @@ export class ComputeCapacityComponent implements OnInit {
 
   toggleAdvancedMode() {
     this.inAdvancedMode = !this.inAdvancedMode;
-  }
-
-  getDcs (serverInfo: ServerInfo): ComputeResource[] {
-    return this.datacenter.filter((item: ComputeResource) => item.objRef.indexOf(serverInfo.serviceGuid) > -1);
   }
 }
