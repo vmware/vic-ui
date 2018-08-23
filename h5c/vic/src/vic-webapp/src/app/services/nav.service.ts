@@ -48,10 +48,6 @@ export class NavService {
         private router: Router) {
     }
 
-    showMainView(): void {
-        this.navigate(APP_CONFIG.packageName + '.mainView');
-    }
-
     showSettingsView(): void {
         this.navigate(APP_CONFIG.packageName + '.settingsView');
     }
