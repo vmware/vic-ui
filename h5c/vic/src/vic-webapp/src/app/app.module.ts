@@ -36,6 +36,7 @@ import { AppComponent } from './app.component';
 import { DisableCookieXSRFStrategy } from './shared/utils/disable-cookie-xsrf-strategy';
 import { HttpInterceptorService } from './services/http-interceptor.service';
 import { HttpClientModule } from '@angular/common/http';
+import { VicVmViewService } from './services/vm-view.service';
 
 @NgModule({
   imports: [
@@ -52,6 +53,7 @@ import { HttpClientModule } from '@angular/common/http';
     routedComponents
   ],
   providers: [
+    VicVmViewService,
     ActionDevService,
     AppAlertService,
     AppErrorHandler,
