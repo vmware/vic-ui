@@ -68,14 +68,46 @@ pipeline:
     secrets:
       - google_key
     source: bundle
-    target: vic-ui-builds
+    target: vic-ui-builds/
     acl:
       - 'allUsers:READER'
     cache_control: 'public,max-age=3600'
     when:
       repo: vmware/vic-ui
       event: [push]
-      branch: [master, develop, 'releases/*']
+      branch: [master]
+      status: success
+
+  publish-gcs-develop-builds-on-pass:
+    image: 'victest/drone-gcs:1'
+    pull: true
+    secrets:
+      - google_key
+    source: bundle
+    target: vic-ui-builds/develop/
+    acl:
+      - 'allUsers:READER'
+    cache_control: 'public,max-age=3600'
+    when:
+      repo: vmware/vic-ui
+      event: [push]
+      branch: [develop]
+      status: success
+
+  publish-gcs-release-builds-on-pass:
+    image: 'victest/drone-gcs:1'
+    pull: true
+    secrets:
+      - google_key
+    source: bundle
+    target: vic-ui-builds/${DRONE_BRANCH}/
+    acl:
+      - 'allUsers:READER'
+    cache_control: 'public,max-age=3600'
+    when:
+      repo: vmware/vic-ui
+      event: [push]
+      branch: ['releases/*']
       status: success
 
   publish-gcs-releases:
