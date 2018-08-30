@@ -39,9 +39,6 @@
 
    <!-- OSGI references to your services used by the controllers -->
 
-   <osgi:reference id="echoService"
-         interface="com.vmware.vic.services.EchoService" />
-
    <osgi:reference id="rpService"
          interface="com.vmware.vic.services.ResourcePoolService" />
          
