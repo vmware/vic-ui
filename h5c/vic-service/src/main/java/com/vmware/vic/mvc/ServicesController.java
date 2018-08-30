@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.vmware.vic.services.CloneTicketService;
-import com.vmware.vic.services.EchoService;
 import com.vmware.vic.services.ResourcePoolService;
 import com.vmware.vic.services.VicApplianceService;
 import com.vmware.vic.services.VicUserSessionService;
@@ -52,7 +51,6 @@ import com.vmware.vic.services.VicUserSessionService;
 @Controller
 @RequestMapping(value = "/services")
 public class ServicesController {
-    private final EchoService _echoService;
     private final ResourcePoolService _resourcePoolService;
     private final VicUserSessionService _vicUserSessionService;
     private final VicApplianceService _vicApplianceService;
@@ -60,12 +58,10 @@ public class ServicesController {
 
     @Autowired
     public ServicesController(
-            @Qualifier("echoService") EchoService echoService,
             @Qualifier("rpService") ResourcePoolService resourcePoolService,
             @Qualifier("vicUserSessionService") VicUserSessionService vicUserSessionService,
             @Qualifier("vaService") VicApplianceService vicApplianceService,
             @Qualifier("cloneTicketService") CloneTicketService cloneTicketService) {
-        _echoService = echoService;
         _resourcePoolService = resourcePoolService;
         _vicApplianceService = vicApplianceService;
         _vicUserSessionService = vicUserSessionService;
@@ -75,21 +71,10 @@ public class ServicesController {
     // Empty controller to avoid compiler warnings in vic's bundle-context.xml
     // where the bean is declared
     public ServicesController() {
-        _echoService = null;
         _resourcePoolService = null;
         _vicUserSessionService = null;
         _vicApplianceService = null;
         _cloneTicketService = null;
-    }
-
-    /**
-     * Echo a message back to the client.
-     */
-    @RequestMapping(value = "/echo", method = RequestMethod.POST)
-    @ResponseBody
-    public String echo(@RequestParam(value = "message", required = true) String message)
-            throws Exception {
-        return _echoService.echo(message);
     }
 
     /**
