@@ -16,9 +16,6 @@
    <osgi:service id="vicUIDataAdapter" ref="vicUIDataAdapterImpl"
          interface="com.vmware.vise.data.query.DataProviderAdapter" />
 
-   <osgi:service id="EchoService" ref="EchoServiceImpl"
-         interface="com.vmware.vic.services.EchoService" />
-
    <osgi:service id="VicUserSessionService" ref="VicUserSessionServiceImpl"
          interface="com.vmware.vic.services.VicUserSessionService" />
 
