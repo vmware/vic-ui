@@ -20,6 +20,12 @@ import { getVchResponseStub } from '../../services/mocks/vch.response';
 
 describe('Object Reference utility functions', () => {
   const mor = {
+    serverGuid: 'aaaa-bbb-ccc',
+    value: 'dc-test',
+    type: 'Datacenter',
+    name: 'Test DC',
+    parent: null,
+    resourcePool: null,
     objRef: 'urn:vmomi:Datacenter:dc-test:aaaa-bbb-ccc',
     text: 'Test DC',
     nodeTypeId: 'test',

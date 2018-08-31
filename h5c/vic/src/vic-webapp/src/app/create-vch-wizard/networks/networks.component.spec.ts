@@ -20,6 +20,7 @@ import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {Observable} from 'rxjs/Observable';
 import {NetworksComponent} from './networks.component';
+import {mockedDcClustersAndStandAloneHostsList} from '../mocks/create-vch-wizard-mocked-data';
 
 describe('NetworksComponent', () => {
 
@@ -60,6 +61,7 @@ describe('NetworksComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(NetworksComponent);
     component = fixture.componentInstance;
+    component.resourceObj = mockedDcClustersAndStandAloneHostsList[0];
     component.onPageLoad();
 
     service = fixture.debugElement.injector.get(CreateVchWizardService);
