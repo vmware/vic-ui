@@ -27,9 +27,9 @@
       <p class="mt-0 mb-1">
         You can use one or more CA certificates you may have created using some other certificate authority.
       </p>
-      <div class="alert alert-danger mb-1" *ngIf="tlsCaError">
-        <div class="alert-item">
-          <span class="alert-text">{{ tlsCaError }}</span>
+      <div class="alert alert-danger"  *ngIf="tlsCaError">
+        <div class="alert-items">
+          <span>{{ tlsCaError }}</span>
         </div>
       </div>
       <div formArrayName="tlsCas" *ngFor="let tlsCa of form.controls.tlsCas.controls; index as i; last as isLast">
