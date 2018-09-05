@@ -93,10 +93,12 @@ describe('NetworksComponent', () => {
     const managementNetworkType = component.form.get('managementNetworkType');
     const publicNetworkIp = component.form.get('publicNetworkIp');
     const clientNetworkIp = component.form.get('clientNetworkIp');
+    const clientNetworkRouting = component.form.get('clientNetworkRouting');
     const managementNetworkIp = component.form.get('managementNetworkIp');
     const publicNetworkGateway = component.form.get('publicNetworkGateway');
     const clientNetworkGateway = component.form.get('clientNetworkGateway');
     const managementNetworkGateway = component.form.get('managementNetworkGateway');
+    const managementNetworkRouting = component.form.get('managementNetworkRouting');
     const dnsServer = component.form.get('dnsServer');
 
     setDefaultRequiredValues();
@@ -142,6 +144,8 @@ describe('NetworksComponent', () => {
     clientNetworkGateway.setValue('127.0.0.1');
     managementNetworkIp.setValue('127.0.0.1/24');
     managementNetworkGateway.setValue('127.0.0.1');
+    clientNetworkRouting.setValue('127.0.0.1/24');
+    managementNetworkRouting.setValue('127.0.0.1/24');
     dnsServer.setValue('127.0.0.1');
     component.onCommit();
     expect(component.form.valid).toBe(true);
