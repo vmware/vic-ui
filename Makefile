@@ -13,8 +13,8 @@
 # limitations under the License.
 
 REV :=$(shell git rev-parse --short=8 HEAD)
-TAG :=$(shell git for-each-ref --format="%(refname:short)" --sort=-authordate --count=1 refs/tags) # e.g. `v0.9.0`
-TAG_NUM :=$(shell git for-each-ref --format="%(refname:short)" --sort=-authordate --count=1 refs/tags | cut -c 2-) # e.g. `0.9.0`
+TAG :=$(shell git describe --tags --abbrev=0) # e.g. `v0.9.0`
+TAG_NUM :=$(shell git describe --tags --abbrev=0 | cut -c 2-) # e.g. `0.9.0`
 
 BIN ?= bin
 
