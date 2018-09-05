@@ -37,6 +37,8 @@ pipeline:
     commands:
       - 'export BUILD_NUMBER=${DRONE_BUILD_NUMBER}'
       - 'make vic-ui-plugins'
+    when:
+      status: success
 
   bundle:
     image: 'gcr.io/eminent-nation-87317/vic-integration-test:1.36'
@@ -56,8 +58,7 @@ pipeline:
       - 'ls -la bundle'
     when:
       repo: vmware/vic-ui
-      event: [push, tag]
-      branch: [master, develop, 'releases/*']
+      status: success
 
   publish-gcs-builds-on-pass:
     image: 'victest/drone-gcs:1'
