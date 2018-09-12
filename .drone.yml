@@ -120,6 +120,7 @@ pipeline:
     cache_control: 'public,max-age=3600'
     when:
       repo: vmware/vic-ui
+      branch: ['releases/*', 'refs/tags/*']
       event: tag
       status: success
 
@@ -141,23 +142,8 @@ pipeline:
       - drone_token
     when:
       repo: vmware/vic-ui
-      event: [push]
-      branch: [master]
-      status: success
-
-  trigger-downstream-tag:
-    image: 'gcr.io/eminent-nation-87317/vic-downstream-trigger:1.3'
-    environment:
-      SHELL: /bin/bash
-      DOWNSTREAM_REPO: vmware/vic-product
-      DOWNSTREAM_BRANCH: ${DRONE_BRANCH}
-    secrets:
-      - drone_server
-      - drone_token
-    when:
-      repo: vmware/vic-ui
-      event: [tag]
-      branch: [master, 'releases/*']
+      event: [push, tag]
+      branch: [master, 'releases/*', 'refs/tags/*']
       status: success
 
   pass-rate:
