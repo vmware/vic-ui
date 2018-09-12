@@ -70,6 +70,12 @@ export function resourceIsCluster(type: string): boolean {
   ]);
 }
 
+export function resourceIsDataCenter(type: string): boolean {
+  return isDesiredType(type, [
+    COMPUTE_RESOURCE_NODE_TYPES.dc.dc
+  ]);
+}
+
 export function resourceIsHost(type: string): boolean {
   return isDesiredType(type, [
     COMPUTE_RESOURCE_NODE_TYPES.host.dc_stand_alone,

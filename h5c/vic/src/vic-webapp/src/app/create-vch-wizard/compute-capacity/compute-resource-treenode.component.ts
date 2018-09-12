@@ -29,7 +29,7 @@ import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { GlobalsService } from '../../shared';
 import { ComputeResource } from '../../interfaces/compute.resource';
 import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
-import { resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../../shared/utils/object-reference';
+import { resourceIsCluster, resourceIsHost, resourceIsResourcePool, resourceIsDataCenter } from '../../shared/utils/object-reference';
 import { Observable } from 'rxjs/Observable';
 
 /**
@@ -145,9 +145,10 @@ export class ComputeResourceTreenodeComponent implements OnInit {
   private isAllowedType(obj: ComputeResource): boolean {
     const allowedResourcePool: boolean = resourceIsResourcePool(obj.type) && this.vicResourcePoolNamesList.indexOf(obj.value) === -1;
     const allowedCluster: boolean = resourceIsCluster(obj.type);
+    const allowedDataCenter: boolean = resourceIsDataCenter(obj.type);
     const allowedHost: boolean = resourceIsHost(obj.type) && !resourceIsCluster(obj.parent.type);
 
-    return allowedResourcePool || allowedCluster || allowedHost;
+    return allowedDataCenter || allowedResourcePool || allowedCluster || allowedHost;
   }
 
 
