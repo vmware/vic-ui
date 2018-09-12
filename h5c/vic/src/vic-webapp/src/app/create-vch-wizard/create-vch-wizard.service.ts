@@ -14,10 +14,6 @@
  limitations under the License.
 */
 
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/observable/zip';
-import 'rxjs/add/operator/mergeAll';
-import 'rxjs/add/operator/mergeMap';
 
 import {
   CHECK_RP_UNIQUENESS_URL,
@@ -31,6 +27,10 @@ import { Http, URLSearchParams } from '@angular/http';
 import { GlobalsService } from '../shared';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/timer';
+import 'rxjs/add/observable/zip';
+import 'rxjs/add/operator/mergeAll';
+import 'rxjs/add/operator/mergeMap';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
 import { flattenArray } from '../shared/utils/array-utils';
 import {
@@ -52,6 +52,7 @@ export class CreateVchWizardService {
     private _userId: string = null;
     private _serverGuid: string[] = [];
     private _userSession: any = null;
+    private  _appliance: Observable <string []>;
 
     constructor(
         private http: Http,
@@ -60,6 +61,20 @@ export class CreateVchWizardService {
         private vicVmViewService: VicVmViewService
     ) {
         this.getUserSession();
+        this._appliance = this.setAppliance();
+    }
+
+    setAppliance(): Observable <string []> {
+      return this.http.get(VIC_APPLIANCES_LOOKUP_URL)
+      .publishReplay(1, 2000)
+      .refCount()
+      .take(1)
+      .catch(err => Observable.throw(err))
+      .map(response => response.json());
+    }
+
+    getAppliance() {
+      return this._appliance;
     }
 
     getClusterConfiguration(objRef: string): Observable<any[]> {
@@ -540,21 +555,10 @@ export class CreateVchWizardService {
     }
 
     /**
-     * Look up and return from the vSphere inventory name, version and IP address
-     * for all VIC appliance VMs
-     * @returns {Observable<string[]>} array of VIC appliances info sorted by build #
-     */
-    private getVicAppliancesList(): Observable<string[]> {
-      return this.http.get(VIC_APPLIANCES_LOOKUP_URL)
-        .catch(err => Observable.throw(err))
-        .map(response => response.json());
-    }
-
-    /**
      * Get the IP address of the newest VIC appliance
      */
     public getVicApplianceIp(): Observable<string> {
-      return this.getVicAppliancesList()
+      return this.getAppliance()
         .catch(err => Observable.throw(err))
         .switchMap((list: string[]) => {
           if (!list || !list.length) {

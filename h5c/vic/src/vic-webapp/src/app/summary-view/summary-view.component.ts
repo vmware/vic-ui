@@ -24,7 +24,7 @@ import {
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { DataPropertyService } from '../services/data-property.service';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Rx';
+import { Subscription, Subject} from 'rxjs/Rx';
 import { Vic18nService } from '../shared/vic-i18n.service';
 
 @Component({
@@ -37,10 +37,13 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
     public vicLogoPath: string;
     public pluginVersion: string;
     public vchVmsLen: number;
+    public appliance = new Subject<string []>();
     public readonly WS_SUMMARY_CONSTANTS = WS_SUMMARY;
     private rootInfoSubscription: Subscription;
     private refreshSubscription: Subscription;
     public error: any;
+    public applianceIp: string;
+    public applianceVersion: string;
 
     constructor(
         private zone: NgZone,
@@ -87,9 +90,22 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.fetchRootInfo();
-
         // verify the appliance endpoint
+        this.getApplianceInfo();
         this.checkVicMachineServer();
+    }
+
+    getApplianceInfo() {
+        this.createWzService.getAppliance()
+        .subscribe(
+            (response) => {
+              if (response.length > 0) {
+                const splitByColon = response[0].split(':');
+                this.applianceVersion = splitByColon[0];
+                this.applianceIp = splitByColon[1].split(',')[1].trim();
+              }
+            }
+        )
     }
 
     checkVicMachineServer() {
