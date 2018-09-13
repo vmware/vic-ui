@@ -232,8 +232,18 @@ export class CreateVchWizardService {
      */
     getDcClustersAndStandAloneHosts(dcObj: ComputeResource): Observable<ComputeResource[]> {
       const props = 'host,cluster';
-      return this.getResourceProperties<{host: ResourceBasicInfo[]; cluster: ResourceBasicInfo[]}>(dcObj.objRef, props)
-        .map(data => ({childResources: data['cluster'].concat(data['host'])}))
+      return this.getResourceProperties<{ host: ResourceBasicInfo[]; cluster: ResourceBasicInfo[] }>(dcObj.objRef, props)
+        .map(data => {
+          if (data['cluster']) {
+            return {
+              childResources: data['cluster'].concat(data['host'])
+            }
+          } else {
+            return {
+              childResources: data['host']
+            }
+          }
+        })
         .switchMap(basicData => {
           return this.getResourcesCompleteInfo(basicData.childResources)
             .switchMap((completeData: ComputeResource[]) => {
