@@ -18,3 +18,16 @@
 .bridge-network-signpost {
   width: 480px;
 }
+
+.routing-conf {
+  display: flex;
+}
+
+.absolute-info {
+  position: absolute;
+  right: 12px;
+}
+
+.relative-po {
+  position: relative !important;
+}
