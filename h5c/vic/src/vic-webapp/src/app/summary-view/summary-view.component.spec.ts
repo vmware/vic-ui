@@ -69,6 +69,9 @@ describe('VIC object view: Summary tab', () => {
                 { provide: CreateVchWizardService, useValue: {
                   verifyVicMachineApiEndpoint() {
                     return Observable.of('10.10.10.10');
+                  },
+                  getAppliance() {
+                      return Observable.of(['vic-ova-2: v1.2.0-12000-bbbbbb, 10.20.250.255']);
                   }
                 }}
             ],
