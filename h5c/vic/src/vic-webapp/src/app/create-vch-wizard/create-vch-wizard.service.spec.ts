@@ -205,19 +205,17 @@ describe('CreateVchWizardService', () => {
         expect(response).toBe('10.20.250.255');
       });
 
-      connection.mockRespond(new Response(new ResponseOptions({
-        body: ['vic-ova-2: v1.2.0-12000-bbbbbb, 10.20.250.255', 'vic-ova-1: v1.1.0-11000-aaaaaa, 10.20.250.254']
-      })));
+      if (!connection.response) {
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: ['vic-ova-2: v1.2.0-12000-bbbbbb, 10.20.250.255', 'vic-ova-1: v1.1.0-11000-aaaaaa, 10.20.250.254']
+        })));
+      }
     });
 
-    it('should handle invalid response from VIC appliance lookup endpoint', async() => {
-      service.getVicApplianceIp().subscribe(response => {}, err => {
-        expect(err).toBeTruthy();
+    it('should get value from cache if invoke ip address api second time', async() => {
+      service.getVicApplianceIp().subscribe(response => {
+        expect(response).toBe('10.20.250.255');
       });
-
-      connection.mockRespond(new Response(new ResponseOptions({
-        body: 'not an array of string values'
-      })));
     });
 
     it('should retrieve a list of distributed port groups', async() => {

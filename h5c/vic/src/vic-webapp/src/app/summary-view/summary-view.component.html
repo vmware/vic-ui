@@ -7,34 +7,58 @@
       </div>
     </div>
   </div>
-  <div class="col-xs-12">
+  <div class="col-xs-12 summary-wrapper">
     <img class="vic-summary-view-logo" src="{{ vicLogoPath }}">
-    <ul class="summary-items-list">
-      <li id="vendor">
-        <span class="summary-label">
-          {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VENDOR') }}
-        </span>
-        <span class="summary-value">
-          VMware
-        </span>
-      </li>
-      <li id="version">
-        <span class="summary-label">
-          {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VERSION') }}
-        </span>
-        <span class="summary-value">
-          {{ pluginVersion }}
-        </span>
-      </li>
-      <li id="vch_len">
-        <span class="summary-label">
-          {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VCH') }}
-        </span>
-        <span class="summary-value">
-          {{ vchVmsLen }}
-        </span>
-      </li>
-    </ul>
+    <section class="summary-content">
+      <div class="summary-title">VIC PLUGIN INFORMATION</div>
+      <ul class="summary-items-list">
+        <li id="vendor">
+          <span class="summary-label">
+            {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VENDOR') }}
+          </span>
+          <span class="summary-value">
+            VMware
+          </span>
+        </li>
+        <li id="version">
+          <span class="summary-label">
+            {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VERSION') }}
+          </span>
+          <span class="summary-value">
+            {{ pluginVersion }}
+          </span>
+        </li>
+        <li id="vch_len">
+          <span class="summary-label">
+            {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VCH') }}
+          </span>
+          <span class="summary-value">
+            {{ vchVmsLen }}
+          </span>
+        </li>
+      </ul>
+    </section>
+    <section class="summary-content">
+      <div class="summary-title">VIC APPLIANCE INFORMATION</div>
+      <ul class="summary-items-list">
+          <li>
+              <span class="summary-label">
+                  {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VERSION') }}
+              </span>
+              <span class="summary-value">  
+                  {{applianceVersion}}
+              </span>
+           </li>
+          <li>
+             <span class="summary-label">
+                   IP Address
+             </span>
+             <span class="summary-value">
+                  {{applianceIp}}
+             </span>
+          </li>
+        </ul>
+    </section>
   </div>
   <div class="col-xs">
     <p class="summary-intro mt-3">

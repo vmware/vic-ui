@@ -18,6 +18,7 @@ div.summary-container {
   padding-top: 10px;
   font-size: 13px;
   img.vic-summary-view-logo {
+    height:100px;
     padding-right: 2em;
     vertical-align: top;
   }
@@ -29,7 +30,7 @@ ul.summary-items-list {
     display: table-row-group;
     span.summary-label {
       display: table-cell;
-      width: auto;
+      min-width: 145px;
     }
     span.summary-value {
       display: table-cell;
@@ -47,4 +48,18 @@ p.summary-intro {
 
 .mb-2 {
   margin-bottom: 2rem !important;
+}
+
+.summary-wrapper {
+  display: flex;
+
+  .summary-content {
+    margin-right: 80px;
+    min-width:340px;
+  }
+
+  .summary-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 }
