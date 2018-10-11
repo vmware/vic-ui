@@ -115,7 +115,7 @@
             </span>
 
             <span class="tooltip-content" *ngIf="form.get('publicNetworkIp').hasError('pattern')">
-              CIDR is not valid
+              Public network is not valid, please input it in CIDR format *.*.*.*/*. e.g. 172.28.64.0/22
             </span>
 
           </label>
@@ -252,7 +252,7 @@
             </span>
 
             <span class="tooltip-content" *ngIf="form.get('clientNetworkIp').hasError('pattern')">
-              CIDR is not valid
+              Client network is not valid, please input it in CIDR format *.*.*.*/*. e.g. 172.28.64.0/22
             </span>
 
           </label>
@@ -344,7 +344,7 @@
             </span>
 
             <span class="tooltip-content" *ngIf="form.get('managementNetworkIp').hasError('pattern')">
-              CIDR is not valid
+              Management network is not valid, please input it in CIDR format *.*.*.*/*. e.g. 172.28.64.0/22
             </span>
 
           </label>
@@ -559,14 +559,14 @@
             <label for="container-network-gateway" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left"
               [class.invalid]="form.get('containerNetworks').controls[i].controls.containerNetworkGateway.invalid && (form.get('containerNetworks').controls[i].controls.containerNetworkGateway.dirty || form.get('containerNetworks').controls[i].controls.containerNetworkGateway.touched)">
 
-              <input class="form-control" id="container-network-gateway" type="text" placeholder="IP address" formControlName="containerNetworkGateway">
+              <input class="form-control" id="container-network-gateway" type="text" placeholder="CIDR" formControlName="containerNetworkGateway">
 
               <span class="tooltip-content" *ngIf="form.get('containerNetworks').controls[i].controls.containerNetworkGateway.hasError('required')">
                 Container network gateway cannot be empty
               </span>
 
               <span class="tooltip-content" *ngIf="form.get('containerNetworks').controls[i].controls.containerNetworkGateway.hasError('pattern')">
-                Gateway address is not valid
+                Gateway address is not valid, please input it in CIDR format *.*.*.*/*. e.g. 172.28.64.0/22
               </span>
 
             </label>
