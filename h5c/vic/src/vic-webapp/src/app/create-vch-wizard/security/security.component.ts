@@ -303,8 +303,10 @@ export class SecurityComponent {
     } else if (targetField === 'tlsServerKey') {
       this.tlsServerError = fileInstance ? null : 'Failed to load server private key PEM file!';
     }
-    fr.onload = fileReaderOnLoadFactory(fileInstance.name);
-    fr.readAsText(fileInstance);
+    if (fileInstance) {
+      fr.onload = fileReaderOnLoadFactory(fileInstance.name);
+      fr.readAsText(fileInstance);
+    }
   }
 
   /**
