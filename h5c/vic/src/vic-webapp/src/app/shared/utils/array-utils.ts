@@ -19,3 +19,14 @@ export function flattenArray(list: Array<any>) {
     return a.concat(Array.isArray(b) ? flattenArray(b) : b);
   }, [])
 }
+
+export function compareFn(a: any, b: any) {
+  if (a.name < b.name) {
+    return -1;
+  }
+  if (a.name > b.name) {
+    return 1;
+  }
+  // names must be equal
+  return 0;
+}

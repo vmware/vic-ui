@@ -27,7 +27,7 @@ import { GlobalsService } from './../../shared/globals.service';
 import { ComputeResource } from '../../interfaces/compute.resource';
 import { getMorIdFromObjRef, resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../../shared/utils/object-reference';
 import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
-import { flattenArray } from '../../shared/utils/array-utils';
+import { flattenArray, compareFn } from '../../shared/utils/array-utils';
 import { I18nService } from '../../shared';
 
 const endpointMemoryDefaultValue = 2048;
@@ -119,7 +119,7 @@ export class ComputeCapacityComponent implements OnInit {
     const obsArr = this.serversInfo.map(serverInfo => this.createWzService.getDatacenter(serverInfo.serviceGuid));
     Observable.zip(...obsArr)
       .subscribe(results => {
-        this.datacenter = flattenArray(results);
+        this.datacenter = flattenArray(results).sort(compareFn);
       });
   }
 
