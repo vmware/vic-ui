@@ -129,7 +129,7 @@ export class NetworksComponent implements OnInit {
       ]],
       containerNetworkGateway: [{ value: '', disabled: true }, [
         Validators.required,
-        Validators.pattern(ipPattern)
+        Validators.pattern(cidrPattern)
       ]],
       containerNetworkLabel: [{ value: '', disabled: true }, [
         Validators.required,
