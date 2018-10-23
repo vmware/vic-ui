@@ -429,7 +429,8 @@ export class CreateVchWizardComponent implements OnInit {
           network['ip_ranges'] = [net.containerNetworkIpRange];
 
           network['gateway'] = {
-            address: net.containerNetworkGateway
+            address: net.containerNetworkGateway.split('/')[0],
+            routing_destinations: [net.containerNetworkGateway]
           };
         }
 
