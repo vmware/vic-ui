@@ -267,8 +267,8 @@ export class ComputeCapacityComponent implements OnInit {
     } else {
       const cpuLimitValue = this.form.get('cpuLimit').value;
       const memoryLimitValue = this.form.get('memoryLimit').value;
-
-      results['computeResource'] = this.selectedName;
+      results['computeResource'] = this.selectedId;
+      results['computeResourceName'] = this.selectedName;
       results['cpu'] = unlimitedPattern.test(cpuLimitValue) ? '0' : cpuLimitValue;
       results['memory'] = unlimitedPattern.test(memoryLimitValue) ? '0' : memoryLimitValue;
       if (this.inAdvancedMode) {
