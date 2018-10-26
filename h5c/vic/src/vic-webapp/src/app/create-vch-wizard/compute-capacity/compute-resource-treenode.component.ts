@@ -29,6 +29,7 @@ import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { GlobalsService } from '../../shared';
 import { ComputeResource } from '../../interfaces/compute.resource';
 import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
+import { compareFn } from '../../shared/utils/array-utils';
 import { resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../../shared/utils/object-reference';
 import { Observable } from 'rxjs/Observable';
 
@@ -85,8 +86,12 @@ export class ComputeResourceTreenodeComponent implements OnInit {
         this.vicResourcePoolNamesList = data[1];
 
         const ClustersAndStandAloneHosts: ComputeResource[] = data[0];
-        this.clusters = ClustersAndStandAloneHosts.filter(v => resourceIsCluster(v.type));
-        this.standaloneHosts = ClustersAndStandAloneHosts.filter(v => resourceIsHost(v.type));
+        this.clusters = ClustersAndStandAloneHosts
+        .filter(v => resourceIsCluster(v.type))
+        .sort(compareFn);
+        this.standaloneHosts = ClustersAndStandAloneHosts
+        .filter(v => resourceIsHost(v.type))
+        .sort(compareFn);
 
         if (!this.clusters.length) {
           this.loading = false;
@@ -149,6 +154,4 @@ export class ComputeResourceTreenodeComponent implements OnInit {
 
     return allowedResourcePool || allowedCluster || allowedHost;
   }
-
-
-  }
+}
