@@ -141,10 +141,16 @@ export class SummaryComponent implements OnInit {
       }
 
       for (const key in payload[section]) {
+        if (key === 'computeResource') {// computeResource is a id which is not needed in commandline.
+          continue;
+        }
         if (!(payload[section][key]) || payload[section][key] === '0') {
           continue;
         }
-        const newKey = key.replace(camelCasePattern, '$1-$2').toLowerCase();
+        let newKey = key.replace(camelCasePattern, '$1-$2').toLowerCase();
+        if (newKey === 'compute-resource-name') {
+          newKey = 'compute-resource';  // use computeResource in commandline.
+        }
         let value = payload[section][key];
         if (typeof value === 'string') {
           value = this.escapeSpecialCharsForCLI(value);

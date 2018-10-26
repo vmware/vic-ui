@@ -196,6 +196,9 @@ export class CreateVchWizardService {
      * @returns {Observable<ComputeResource[]>}
      */
     getResourcesCompleteInfo(basicInfoList: ResourceBasicInfo[]): Observable<ComputeResource[]> {
+      if (!basicInfoList) {
+        return Observable.of([]);
+      }
       const infoListObs: Observable<ComputeResource>[] = basicInfoList
         .map(resourceBasicInfo => {
           return this.getResourceCompleteInfo(resourceBasicInfo)
