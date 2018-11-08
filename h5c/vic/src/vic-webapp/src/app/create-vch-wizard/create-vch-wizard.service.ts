@@ -45,6 +45,7 @@ import { globalProperties } from '../../environments/global-properties';
 import { HttpClient } from '@angular/common/http';
 import { VirtualContainerHost } from '../vch-view/vch.model';
 import { VicVmViewService } from '../services/vm-view.service';
+import { concat } from '../../../node_modules/rxjs/operators';
 
 @Injectable()
 export class CreateVchWizardService {
@@ -521,10 +522,14 @@ export class CreateVchWizardService {
      */
     getDistributedPortGroups(dcObj: ComputeResource, resourceObj: ComputeResource): Observable<any> {
       const resourceObjIsCluster = resourceIsCluster(resourceObj.type);
+      let nsxtNetworks: ComputeResource[] = [];
+      let dcNetworks: ComputeResource[] = [];
       return this.getNetworkingTree(dcObj)
         .switchMap((networkingResources: ComputeResource[]) => {
           // gets the list of Dvs from the dc and or any existing network folder
           const dcDvsList: ComputeResource[] = networkingResources.filter(item => item['nodeTypeId'] === 'DcDvs');
+          nsxtNetworks = networkingResources.filter(item => item['nodeTypeId'] === 'DcOpaqueNetwork');
+          dcNetworks = networkingResources.filter(item => item['nodeTypeId'] === 'DcNetwork');
           const networkFolders: ComputeResource[] = networkingResources.filter(item => item['nodeTypeId'] === 'DcNetworkFolder');
           return this.getDvsFromNetworkFolders(networkFolders)
             .map((NetworkFolderDvsList: ComputeResource[]) => ([...dcDvsList, ...flattenArray(NetworkFolderDvsList)]));
@@ -535,10 +540,13 @@ export class CreateVchWizardService {
 
           // create an array of observables for DVS host entries
           const dvsHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(dvsList);
-
+          const nsxtHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(nsxtNetworks);
+          const dcHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(dcNetworks);
           // zip all observables
           const allDvs = Observable.zip.apply(null, dvsObs);
           const allDvsHosts = Observable.zip.apply(null, dvsHostsObs);
+          const allnsxtHosts = Observable.zip.apply(null, nsxtHostsObs);
+          const alldcHosts = Observable.zip.apply(null, dcHostsObs);
 
           // if the selected resource is a Cluster we need to fetch it hosts in order to validate if some of them is connected to the vds.
           const allClusterChilds: Observable<ComputeResource[]> = resourceObjIsCluster ?
@@ -546,24 +554,27 @@ export class CreateVchWizardService {
 
           // process the results from the zipped observables wherein only DV port group entries
           // whose parent distributed virtual switch can be accessed by the specified compute resource should be taken
-          return Observable.combineLatest(allClusterChilds, allDvs, allDvsHosts)
-            .map(([clusterChilds, dvs, dvsHosts]) => {
+          return Observable.combineLatest(allClusterChilds, allDvs, allDvsHosts, allnsxtHosts, alldcHosts)
+            .map(([clusterChilds, dvs, dvsHosts, nsxtHosts, dcHosts]) => {
               let results = [];
-              for (let index = 0; index < dvsHosts.length; index++) {
+              let portGroups = [], hosts = [];
+              portGroups = portGroups.concat(dvs, nsxtNetworks, dcNetworks);
+              hosts = hosts.concat(dvsHosts, nsxtHosts, dcHosts);
+              for (let index = 0; index < hosts.length; index++) {
                 if (resourceObjIsCluster) {
                   // if the selected resource is a Cluster we need to validate if any of it hosts is connected to the vds.
                   const clusterChildsHosts = clusterChilds.map(host => host['value']);
-                  if (dvsHosts[index].some(host => clusterChildsHosts.indexOf(host['value']) !== -1 )) {
-                    results = results.concat(dvs[index]);
+                  if (hosts[index].some(host => clusterChildsHosts.indexOf(host['value']) !== -1 )) {
+                    results = results.concat(portGroups[index]);
                   }
                 } else {
                   // if the selected resource is a not Cluster we validate if the selected host is connected to the vds.
-                  if (dvsHosts[index].some(host => host['value'] === getMorIdFromObjRef(resourceObj.objRef))) {
-                    results = results.concat(dvs[index]);
+                  if (hosts[index].some(host => host['value'] === getMorIdFromObjRef(resourceObj.objRef))) {
+                    results = results.concat(portGroups[index]);
                   }
                 }
               }
-              return flattenArray(results);
+              return flattenArray(results.filter(v => v.spriteCssClass !== 'vsphere-icon-uplink-port-group'));
             });
         });
     }
