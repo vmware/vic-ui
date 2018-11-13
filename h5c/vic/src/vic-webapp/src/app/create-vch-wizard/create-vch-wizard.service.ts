@@ -545,7 +545,10 @@ export class CreateVchWizardService {
           // zip all observables
           const allDvs = Observable.zip.apply(null, dvsObs);
           const allDvsHosts = Observable.zip.apply(null, dvsHostsObs);
-          const allnsxtHosts = Observable.zip.apply(null, nsxtHostsObs);
+          let allnsxtHosts = Observable.of([]);
+          if (nsxtHostsObs && nsxtHostsObs.length > 1) {
+            allnsxtHosts = Observable.zip.apply(null, nsxtHostsObs);
+          }
           const alldcHosts = Observable.zip.apply(null, dcHostsObs);
 
           // if the selected resource is a Cluster we need to fetch it hosts in order to validate if some of them is connected to the vds.
