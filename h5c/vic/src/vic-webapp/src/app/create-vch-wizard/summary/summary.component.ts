@@ -16,7 +16,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable, of, timer } from 'rxjs';
 import { camelCasePattern } from '../../shared/utils/validators';
 import { getClientOS } from '../../shared/utils/detection'
 import { isUploadableFileObject } from '../../shared/utils/model-checker';
@@ -88,7 +88,7 @@ export class SummaryComponent implements OnInit {
 
     try {
       this.copySucceeded = window.document.execCommand('copy');
-      Observable.timer(1500)
+      timer(1500)
         .subscribe(() => {
           this.copySucceeded = null;
         });
@@ -293,6 +293,6 @@ export class SummaryComponent implements OnInit {
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    return Observable.of(this.payload);
+    return of(this.payload);
   }
 }

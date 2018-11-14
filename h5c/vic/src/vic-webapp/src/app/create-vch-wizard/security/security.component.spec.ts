@@ -18,7 +18,7 @@ import {ReactiveFormsModule, FormArray} from '@angular/forms';
 import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
 import {SecurityComponent} from './security.component';
 import { GlobalsService } from '../../shared';
 
@@ -40,13 +40,13 @@ describe('SecurityComponent', () => {
           provide: CreateVchWizardService,
           useValue: {
             getUserId() {
-              return Observable.of('userId');
+              return of('userId');
             },
             getServerThumbprint() {
-              return Observable.of('serverThumbprint');
+              return of('serverThumbprint');
             },
             getVcHostname() {
-              return Observable.of('vcHostname');
+              return of('vcHostname');
             }
           }
         },

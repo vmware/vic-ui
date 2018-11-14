@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 /**
  * Service used to display top-level alerts, see app-alert.component.

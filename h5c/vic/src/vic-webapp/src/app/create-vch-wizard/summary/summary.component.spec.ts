@@ -20,10 +20,10 @@ import { ClarityModule } from '@clr/angular';
 import { CreateVchWizardService } from './../create-vch-wizard.service';
 import { HttpModule } from '@angular/http';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Observable } from 'rxjs/Observable';
+import { Observable, timer } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SummaryComponent } from './summary.component';
-import { TestScheduler } from 'rxjs/Rx';
+import { TestScheduler } from 'rxjs/testing';
 
 describe('SummaryComponent', () => {
 
@@ -47,11 +47,10 @@ describe('SummaryComponent', () => {
 
   beforeEach(() => {
     // Set up TestScheduler to be used with Jasmine assertion
-    scheduler = new TestScheduler((a, b) => expect(a).toEqual(b));
-    const originalTimer = Observable.timer;
-
-    // Monkey-patch Observable.timer to handle its async behavior using the TestScheduler
-    spyOn(Observable, 'timer').and.callFake(
+    scheduler = new TestScheduler((a, b) => {expect(a).toEqual(b)});
+    const originalTimer = timer;
+    const spyTimer = jasmine.createSpyObj('spyTimer', ['timer'] )
+    spyTimer.timer.and.callFake(
       (initialDelay, dueTime) => originalTimer.call(this, initialDelay, dueTime, scheduler)
     );
 

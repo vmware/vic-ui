@@ -20,7 +20,8 @@ import { By } from '@angular/platform-browser';
 import {ClarityModule} from '@clr/angular';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {ReactiveFormsModule} from '@angular/forms';
 import {VchCreationWizardGeneralComponent} from './general.component';
 
@@ -49,13 +50,13 @@ describe('VchCreationWizardGeneralComponent', () => {
             checkVchNameUniqueness(name) {
               // In test cases, use 'vm-container-host' to test for uniqueness.
               if (name === InvalidVCHName) {
-                return Observable.of(false);
+                return of(false);
               } else {
-                return Observable.of(true);
+                return of(true);
               }
             },
             getVicApplianceIp(): Observable<string> {
-              return Observable.of('10.20.250.255');
+              return of('10.20.250.255');
             }
           }
         }
@@ -123,9 +124,9 @@ describe('VchCreationWizardGeneralComponent', () => {
     // Using InvalidVCHName will make the mock return a false value.
     component.form.get('name').setValue(InvalidVCHName);
     // We need to catch the returned error here because it is handled in the parent component.
-    component.onCommit().catch((value) => {
-      return Observable.of(value);
-    }).subscribe(() => {
+    component.onCommit().pipe(catchError((value) => {
+      return of(value);
+    })).subscribe(() => {
       // And now we can test the form validity when an already defined name is entered.
       expect(component.form.invalid).toBe(true);
     })

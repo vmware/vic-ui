@@ -38,7 +38,7 @@ import {
 
 import { ContainerVm } from './container.model';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { VicVmViewService } from '../services/vm-view.service';
 
 class GuestMemoryUsageComparator implements Comparator<any> {

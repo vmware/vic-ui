@@ -23,8 +23,8 @@ import {
 
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { DataPropertyService } from '../services/data-property.service';
-import { Observable } from 'rxjs/Observable';
-import { Subscription, Subject} from 'rxjs/Rx';
+import { Observable } from 'rxjs';
+import { Subscription, Subject} from 'rxjs';
 import { Vic18nService } from '../shared/vic-i18n.service';
 
 @Component({

@@ -19,7 +19,7 @@ import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location, LocationStrategy } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { AppRoutingComponent } from './app-routing.component';
 import { Globals, GlobalsService } from './shared';
 import { ClarityModule } from '@clr/angular';
@@ -44,7 +44,7 @@ describe('VicAppRoutingComponent', () => {
             providers: [
                 {
                     provide: ActivatedRoute, useValue: {
-                        queryParams: Observable.of({
+                        queryParams: of({
                             view: 'abc',
                             objectId: 'ddd',
                             actionUid: 'ddd',

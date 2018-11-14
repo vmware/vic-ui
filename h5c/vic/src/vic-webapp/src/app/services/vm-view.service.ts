@@ -15,8 +15,8 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Http } from '@angular/http';
 
 import { VirtualContainerHost } from '../vch-view/vch.model';
@@ -80,7 +80,7 @@ export class VicVmViewService {
 
         // makes a GET request to vic-service and emits data fetched
         this.http.get(this.buildQueryString(ALL_VCHS_URL, params))
-            .map(response => response.json())
+            .pipe(map(response => response.json()))
             .subscribe(data => {
                 try {
                     for (const objectId in data.data) {
@@ -128,7 +128,7 @@ export class VicVmViewService {
 
         // makes a GET request to vic-service and emits data fetched
         this.http.get(this.buildQueryString(ALL_CONTAINERS_URL, params))
-            .map(response => response.json())
+            .pipe(map(response => response.json()))
             .subscribe(data => {
                 try {
                     for (const objectId in data.data) {
