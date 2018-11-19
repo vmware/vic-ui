@@ -577,10 +577,15 @@ export class CreateVchWizardService {
         const nsxtHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(nsxtNetworks);
         const dcHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(dcNetworks);
         // zip all observables
-        const allDvs = Observable.zip.apply(null, dvsObs);
-        const allDvsHosts = Observable.zip.apply(null, dvsHostsObs);
+        let allDvs = Observable.of([]);
+        let allDvsHosts = Observable.of([]);
+        if (dvsList && dvsList.length > 0) {
+          allDvs = Observable.zip.apply(null, dvsObs);
+          allDvsHosts = Observable.zip.apply(null, dvsHostsObs);
+        }
+
         let allnsxtHosts = Observable.of([]);
-        if (nsxtHostsObs && nsxtHostsObs.length > 1) {
+        if (nsxtHostsObs && nsxtHostsObs.length > 0) {
           allnsxtHosts = Observable.zip.apply(null, nsxtHostsObs);
         }
         const alldcHosts = Observable.zip.apply(null, dcHostsObs);
