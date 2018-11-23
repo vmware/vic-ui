@@ -15,7 +15,7 @@
 */
 
 import { ErrorHandler, Injectable, Inject, forwardRef } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable, throwError as observableThrowError } from 'rxjs';
 import { Response } from '@angular/http';
 
 import { GlobalsService } from '../shared/index';
@@ -64,7 +64,7 @@ export class AppErrorHandler implements ErrorHandler {
        * @returns {Promise<never>}
        */
       httpObservableError(error: any): Observable<any> {
-            return Observable.throw(
+            return observableThrowError(
                   this.formatHttpError(error, this.gs.isPluginMode(), this.gs.useLiveData()));
       }
 

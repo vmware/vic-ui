@@ -31,7 +31,7 @@ import { ComputeResource } from '../../interfaces/compute.resource';
 import { ServerInfo } from '../../shared/vSphereClientSdkTypes';
 import { compareFn } from '../../shared/utils/array-utils';
 import { resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../../shared/utils/object-reference';
-import { Observable } from 'rxjs/Observable';
+import { Observable, zip } from 'rxjs';
 
 /**
  * Component that renders a tree view of the inventory items on the selected Datacenter
@@ -79,7 +79,7 @@ export class ComputeResourceTreenodeComponent implements OnInit {
 
   loadClustersAndStandAloneHosts() {
     this.loading = true;
-    Observable.zip(
+    zip(
       this.createWzService.getDcClustersAndStandAloneHosts(this.datacenter),
       this.createWzService.getVicResourcePoolList())
       .subscribe(data => {

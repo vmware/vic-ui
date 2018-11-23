@@ -26,11 +26,9 @@ import { Http, URLSearchParams } from '@angular/http';
 
 import { GlobalsService } from '../shared';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/observable/zip';
-import 'rxjs/add/operator/mergeAll';
-import 'rxjs/add/operator/mergeMap';
+import { Observable, zip, timer, of, from, combineLatest, throwError, forkJoin} from 'rxjs';
+import { map, mergeAll, mergeMap, concat, catchError,
+  publishReplay, refCount, take, switchMap, concatMap, tap, toArray} from 'rxjs/operators';
 import { byteToLegibleUnit } from '../shared/utils/filesize';
 import { flattenArray } from '../shared/utils/array-utils';
 import {
@@ -45,7 +43,6 @@ import { globalProperties } from '../../environments/global-properties';
 import { HttpClient } from '@angular/common/http';
 import { VirtualContainerHost } from '../vch-view/vch.model';
 import { VicVmViewService } from '../services/vm-view.service';
-import { concat } from '../../../node_modules/rxjs/operators';
 
 @Injectable()
 export class CreateVchWizardService {
@@ -67,11 +64,11 @@ export class CreateVchWizardService {
 
   setAppliance(): Observable<string[]> {
     return this.http.get(VIC_APPLIANCES_LOOKUP_URL)
-      .publishReplay(1, 2000)
-      .refCount()
-      .take(1)
-      .catch(err => Observable.throw(err))
-      .map(response => response.json());
+      .pipe(publishReplay(1, 2000))
+      .pipe(refCount())
+      .pipe(take(1))
+      .pipe(catchError(err => throwError(err)))
+      .pipe(map(response => response.json()));
   }
 
   getAppliance() {
@@ -81,22 +78,22 @@ export class CreateVchWizardService {
   getClusterConfiguration(objRef: string): Observable<any[]> {
     const url = `/ui/data/properties/${objRef}?properties=configuration`;
     return this.http.get(url)
-      .catch(e => Observable.throw(e))
-      .map(response => response.json());
+      .pipe(catchError(e => throwError(e)))
+      .pipe(map(response => response.json()));
   }
 
   getClusterDrsStatus(objRef: string): Observable<boolean> {
     return this.getClusterConfiguration(objRef)
-      .map(response => {
+      .pipe(map(response => {
         return response['configuration']['drsConfig']['enabled'];
-      })
+      }))
   }
 
   getClusterVMGroups(objRef: string): Observable<any[]> {
     const url = `/ui/data/properties/${objRef}?properties=ClusterComputeResource/configurationEx/group`;
     return this.http.get(url)
-      .catch(e => Observable.throw(e))
-      .map(response => response.json());
+      .pipe(catchError(e => throwError(e)))
+      .pipe(map(response => response.json()));
   }
 
   getUserSession() {
@@ -116,9 +113,9 @@ export class CreateVchWizardService {
     const params = new URLSearchParams();
     params.set('name', name);
     return this.http.post(CHECK_RP_UNIQUENESS_URL, params)
-      .catch(e => Observable.throw(e))
-      .map(response => response.json())
-      .catch(e => Observable.throw(e));
+      .pipe(catchError(e => throwError(e)))
+      .pipe(map(response => response.json()))
+      .pipe(catchError(e => throwError(e)));
   }
 
   /**
@@ -129,9 +126,9 @@ export class CreateVchWizardService {
     const params = new URLSearchParams();
     params.set('serviceGuid', serviceGuid);
     return this.http.post(GET_CLONE_TICKET_URL, params)
-      .catch(e => Observable.throw(e))
-      .map(response => response.text())
-      .catch(e => Observable.throw(e));
+      .pipe(catchError(e => throwError(e)))
+      .pipe(map(response => response.text()))
+      .pipe(catchError(e => throwError(e)));
   }
 
   /**
@@ -163,7 +160,7 @@ export class CreateVchWizardService {
     const objRef = `urn:vmomi:${resourceBasicInfo.type}:${resourceBasicInfo.value}:${resourceBasicInfo.serverGuid}`;
     const props = 'name,parent,resourcePool';
     return this.getResourceProperties<{ name: string; parent: ResourceBasicInfo; resourcePool: ResourceBasicInfo }>(objRef, props)
-      .map(resourceCompleteInfo => {
+      .pipe(map(resourceCompleteInfo => {
         // element could have a single resourcePool or an Array of resourcePools
         const resPoolInfo: ResourceBasicInfo = resourceCompleteInfo.resourcePool;
         const resPoolObjRef: string[] = [];
@@ -188,7 +185,7 @@ export class CreateVchWizardService {
           objRef: objRef,
           aliases: resPoolObjRef
         })
-      })
+      }))
   }
 
   /**
@@ -202,9 +199,9 @@ export class CreateVchWizardService {
         .map(resourceBasicInfo => {
           return this.getResourceCompleteInfo(resourceBasicInfo)
         });
-      return infoListObs.length > 0 ? Observable.zip(...infoListObs) : Observable.of([]);
+      return infoListObs.length > 0 ? zip(...infoListObs) : of([]);
     } else {
-      return Observable.of([]);
+      return of([]);
     }
   }
 
@@ -228,42 +225,42 @@ export class CreateVchWizardService {
     const objRef = `urn:vmomi:Folder:group-d1:${serverGuid}`;
     const props = 'childEntity';
     return this.getResourceProperties<ResourceBasicInfo>(objRef, props)
-      .switchMap(data => {
+      .pipe(switchMap(data => {
           const results = data['childEntity'];
           const folderEntities = results.filter(result => result && result.type === 'Folder');
           const dcEntities = results.filter(result => result && result.type === 'Datacenter');
-          const nestedDcEntities = this.getDcUnderFolder(Observable.of(folderEntities));
-          return nestedDcEntities.switchMap( result => {
+          const nestedDcEntities = this.getDcUnderFolder(of(folderEntities));
+          return nestedDcEntities.pipe(switchMap( result => {
             let resultEntities;
             resultEntities = flattenArray(result);
             return this.getResourcesCompleteInfo(resultEntities.concat(dcEntities))
-          } )
-        });
+          } ))
+        }));
   }
 
   getDcUnderFolder(entitiesObs: Observable <any[]>): Observable<any[]> {
-    return entitiesObs.switchMap( entities => {
+    return entitiesObs.pipe(switchMap( entities => {
        if (entities && entities.length > 0) {
          const entitiObs = entities.map(data => {
           if (data && data.type === 'Folder') {
             const url = `${globalProperties.vicService.paths.properties}urn:vmomi:` +
             `${data.type}:${data.value}:${data.serverGuid}?properties=childEntity`;
             const childEntityObservable = this.http.get(url)
-              .catch(e => Observable.throw(e))
-              .map(response => response.json())
-              .map(response => response['childEntity']);
+              .pipe(catchError(e => throwError(e)))
+              .pipe(map(response => response.json()))
+              .pipe(map(response => response['childEntity']));
             return this.getDcUnderFolder(childEntityObservable);
           } else if (data && data.type === 'Datacenter') {
-            return Observable.of(data);
+            return of(data);
           } else {
-            return Observable.of([]);
+            return of([]);
           }
         });
-        return Observable.forkJoin(...entitiObs);
+        return forkJoin(...entitiObs);
        } else {
-         return Observable.of([]);
+         return of([]);
        }
-      })
+      }))
     }
 
   /**
@@ -272,7 +269,7 @@ export class CreateVchWizardService {
   getDcClustersAndStandAloneHosts(dcObj: ComputeResource): Observable<ComputeResource[]> {
     const props = 'host,cluster';
     return this.getResourceProperties<{ host: ResourceBasicInfo[]; cluster: ResourceBasicInfo[] }>(dcObj.objRef, props)
-      .map(data => {
+      .pipe(map(data => {
         if (data['cluster']) {
           return {
             childResources: data['cluster'].concat(data['host'])
@@ -282,10 +279,10 @@ export class CreateVchWizardService {
             childResources: data['host']
           }
         }
-      })
-      .switchMap(basicData => {
+      }))
+      .pipe(switchMap(basicData => {
         return this.getResourcesCompleteInfo(basicData.childResources)
-          .switchMap((completeData: ComputeResource[]) => {
+          .pipe(switchMap((completeData: ComputeResource[]) => {
 
             const clusters: ComputeResource[] = completeData
               .filter((rci: ComputeResource) => resourceIsCluster(rci.type));
@@ -297,27 +294,27 @@ export class CreateVchWizardService {
               // if we have stand alone Hosts, we want to fetch also its childs (resource pool tree)
               const standAloneHostsWithChilds: Observable<ComputeResource>[] = standAloneHosts.map(host => {
                 return this.getResourcePoolsTree(host.aliases[0], host)
-                  .map(resourcePoolTreeList => {
+                  .pipe(map(resourcePoolTreeList => {
                     host.childs = resourcePoolTreeList;
                     return host;
-                  })
+                  }))
               });
-              return Observable.zip(...standAloneHostsWithChilds)
-                .map(hostsWithChilds => {
+              return zip(...standAloneHostsWithChilds)
+                .pipe(map(hostsWithChilds => {
                   return clusters.concat(hostsWithChilds)
-                });
+                }));
 
             } else {
               // if we don't have stand alone Host, we only return Cluster list
-              return Observable.of(clusters);
+              return of(clusters);
             }
-          })
-      })
-      .map((list: ComputeResource[]) => {
+          }))
+      }))
+      .pipe(map((list: ComputeResource[]) => {
         // sets the reference to the DC object for each Cluster and stand alone Host
         list.forEach((obj: ComputeResource) => obj.rootParentComputeResource = dcObj);
         return list;
-      })
+      }))
   }
 
   /**
@@ -328,24 +325,24 @@ export class CreateVchWizardService {
    */
   getResourcePoolsTree(parentResourcePoolRef: string, rootParentComputeResource: ComputeResource = null): Observable<ComputeResource[]> {
     return this.getResourceProperties<{ resourcePool: ResourceBasicInfo[] }>(parentResourcePoolRef, 'resourcePool')
-      .map(data => data['resourcePool'] ? data['resourcePool'] : [])
-      .switchMap(data => data.length > 0 ? this.getResourcesCompleteInfo(data) : Observable.of([]))
-      .map((list: ComputeResource[]) => {
+      .pipe(map(data => data['resourcePool'] ? data['resourcePool'] : []))
+      .pipe(switchMap(data => data.length > 0 ? this.getResourcesCompleteInfo(data) : of([])))
+      .pipe(map((list: ComputeResource[]) => {
         // sets the reference to the Cluster object for each Host and ResourcePool
         list.forEach((obj: ComputeResource) => obj.rootParentComputeResource = rootParentComputeResource);
         return list;
-      })
-      .switchMap((resourcePoolList: ComputeResource[]) => {
+      }))
+      .pipe(switchMap((resourcePoolList: ComputeResource[]) => {
         const resourcePoolListObs = resourcePoolList.map((resPool: ComputeResource) => {
           return this.getResourcePoolsTree(resPool.objRef, rootParentComputeResource)
-            .map((childResPool: ComputeResource[]) => {
+            .pipe(map((childResPool: ComputeResource[]) => {
               resPool.childs = childResPool.length > 0 ? childResPool : [];
               return resPool;
-            })
+            }))
         });
 
-        return resourcePoolListObs.length > 0 ? Observable.zip(...resourcePoolListObs) : Observable.of([]);
-      })
+        return resourcePoolListObs.length > 0 ? zip(...resourcePoolListObs) : of([]);
+      }))
   }
 
   /**
@@ -354,21 +351,21 @@ export class CreateVchWizardService {
    */
   getHostsAndResourcePoolsFromCluster(cluster: ComputeResource): Observable<ComputeResource[]> {
     return this.getResourceProperties<{ host: ResourceBasicInfo[] }>(cluster.objRef, 'host')
-      .switchMap(hostAndRootResPool => {
+      .pipe(switchMap(hostAndRootResPool => {
         const hosts: ResourceBasicInfo[] = hostAndRootResPool['host'] ? hostAndRootResPool['host'] : [];
         // const rootResPool: ResourceBasicInfo = hostAndRootResPool['resourcePool'];
         // const rootResPoolRef: string = `urn:vmomi:ResourcePool:${rootResPool.value}:${rootResPool.serverGuid}`;
         return this.getResourcePoolsTree(cluster.aliases[0], cluster)
-          .map(resPoolList => {
+          .pipe(map(resPoolList => {
             return { childResources: hosts.concat(resPoolList) };
-          })
-      })
-      .switchMap(data => this.getResourcesCompleteInfo(data.childResources))
-      .map((list: ComputeResource[]) => {
+          }))
+      }))
+      .pipe(switchMap(data => this.getResourcesCompleteInfo(data.childResources)))
+      .pipe(map((list: ComputeResource[]) => {
         // sets the reference to the Cluster object for each Host and ResourcePool
         list.forEach((obj: ComputeResource) => obj.rootParentComputeResource = cluster);
         return list;
-      })
+      }))
   }
 
   /**
@@ -387,12 +384,12 @@ export class CreateVchWizardService {
    */
   getVicResourcePoolList(): Observable<string[]> {
     return this.getVicVchsInfo()
-      .map(vchsInfo => {
+      .pipe(map(vchsInfo => {
         const vchsRPNames: string[] = vchsInfo
           .filter(vch => resourceIsResourcePool(vch.parentType))
           .map(vch => vch.parentValue);
         return vchsRPNames;
-      })
+      }))
   }
 
   /**
@@ -400,10 +397,10 @@ export class CreateVchWizardService {
    * @param clusters
    */
   getHostsAndResourcePoolsFromClusters(clusters: ComputeResource[]): Observable<ComputeResource[]> {
-    return Observable.from(clusters)
-      .concatMap((cluster: ComputeResource) => {
+    return from(clusters)
+      .pipe(concatMap((cluster: ComputeResource) => {
         return this.getHostsAndResourcePoolsFromCluster(cluster);
-      });
+      }));
   }
 
   /**
@@ -415,8 +412,8 @@ export class CreateVchWizardService {
   getResourceAllocationsInfo(resourceObjId: string, isHost: boolean): Observable<any> {
     if (!isHost) {
       return this.getResourceProperties<{ runtime: any }>(resourceObjId, 'runtime')
-        .catch(e => Observable.throw(e))
-        .map(response => {
+        .pipe(catchError(e => throwError(e)))
+        .pipe(map(response => {
           const memory = response['runtime']['memory'];
           const cpu = response['runtime']['cpu'];
           memory['maxUsage'] = Math.round(memory['maxUsage'] / 1024 / 1024);
@@ -428,12 +425,12 @@ export class CreateVchWizardService {
             memory: memory
           };
 
-        });
+        }));
     } else {
       // host
       return this.getResourceProperties<{ systemResources: any }>(resourceObjId, 'systemResources')
-        .catch(e => Observable.throw(e))
-        .map(response => {
+        .pipe(catchError(e => throwError(e)))
+        .pipe(map(response => {
           const config = response['systemResources']['config'];
           return {
             cpu: {
@@ -449,7 +446,7 @@ export class CreateVchWizardService {
               shares: config['memoryAllocation']['shares']['shares']
             }
           };
-        });
+        }));
     }
 
   }
@@ -457,12 +454,12 @@ export class CreateVchWizardService {
   getDatastores(resourceObjRef: string): Observable<any[]> {
     return this.http.get('/ui/data/properties/' +
       `${resourceObjRef}?properties=datastore`)
-      .catch(e => Observable.throw(e))
-      .map(response => response.json())
-      .catch(e => Observable.throw(e))
-      .switchMap(response => {
+      .pipe(catchError(e => throwError(e)))
+      .pipe(map(response => response.json()))
+      .pipe(catchError(e => throwError(e)))
+      .pipe(switchMap(response => {
         if (!response.hasOwnProperty('datastore') || response['datastore'] === null) {
-          return Observable.of([]);
+          return of([]);
         }
 
         const refs = response['datastore'].map(ref => {
@@ -471,32 +468,32 @@ export class CreateVchWizardService {
         const obsArray = refs.map(objRef => {
           return this.http.get('/ui/data/properties/' +
             `${objRef}?properties=name,info,overallStatus`)
-            .catch(e => Observable.throw(e))
-            .map(rsp => rsp.json())
-            .do(rsp => {
+            .pipe(catchError(e => throwError(e)))
+            .pipe(map(rsp => rsp.json()))
+            .pipe(tap(rsp => {
               rsp['info']['freeSpace'] = byteToLegibleUnit(rsp['info']['freeSpace']);
-            })
-            .catch(e => Observable.throw(e));
+            }))
+            .pipe(catchError(e => throwError(e)));
         });
-        return Observable.zip.apply(null, obsArray);
-      });
+        return zip.apply(null, obsArray);
+      }));
   }
 
   getNetworkingTree(dcObj: ComputeResource): Observable<any[]> {
     const serviceGuid = getServerServiceGuidFromObj(dcObj);
     return this.getDatacenter(serviceGuid)
-      .switchMap(dcs => {
+      .pipe(switchMap(dcs => {
         const dcsObs = dcs.map(dc => {
           return this.http.get('/ui/tree/children?nodeTypeId=Datacenter' +
             `&objRef=${dc['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
-            .map(response => response.json())
+            .pipe(map(response => response.json()))
         });
 
-        return Observable.zip.apply(null, dcsObs);
-      })
-      .map((response: any[]) => {
+        return zip.apply(null, dcsObs);
+      }))
+      .pipe(map((response: any[]) => {
         return flattenArray(response);
-      });
+      }));
   }
 
   /**
@@ -506,15 +503,15 @@ export class CreateVchWizardService {
    */
   private getDvsFromNetworkFolders(networkFolders: ComputeResource[]): Observable<ComputeResource[]> {
     if (!networkFolders || networkFolders.length === 0) {
-      return Observable.of([]);
+      return of([]);
     }
-    return Observable.from(networkFolders)
-      .mergeMap((networkFolder: ComputeResource) => {
+    return from(networkFolders)
+      .pipe(mergeMap((networkFolder: ComputeResource) => {
         return this.http.get('/ui/tree/children?nodeTypeId=DcNetworkFolder' +
           `&objRef=${networkFolder['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
-          .map(response => response.json());
-      })
-      .toArray();
+          .pipe(map(response => response.json()));
+      }))
+      .pipe(toArray());
   }
 
   /**
@@ -526,7 +523,7 @@ export class CreateVchWizardService {
     return dvsList.map(dv => {
       return this.http.get('/ui/tree/children?nodeTypeId=DcDvs' +
         `&objRef=${dv['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
-        .map(response => response.json());
+        .pipe(map(response => response.json()));
     });
   }
 
@@ -546,7 +543,7 @@ export class CreateVchWizardService {
    */
   getHostsFromComputeResource(obj: ComputeResource): Observable<ResourceBasicInfo[]> {
     return this.getResourceProperties(obj.objRef, 'host')
-      .map(data => data['host'] ? data['host'] : []);
+      .pipe(map(data => data['host'] ? data['host'] : []));
   }
 
   /**
@@ -559,16 +556,16 @@ export class CreateVchWizardService {
     let nsxtNetworks: ComputeResource[] = [];
     let dcNetworks: ComputeResource[] = [];
     return this.getNetworkingTree(dcObj)
-      .switchMap((networkingResources: ComputeResource[]) => {
+      .pipe(switchMap((networkingResources: ComputeResource[]) => {
         // gets the list of Dvs from the dc and or any existing network folder
         const dcDvsList: ComputeResource[] = networkingResources.filter(item => item['nodeTypeId'] === 'DcDvs');
         nsxtNetworks = networkingResources.filter(item => item['nodeTypeId'] === 'DcOpaqueNetwork');
         dcNetworks = networkingResources.filter(item => item['nodeTypeId'] === 'DcNetwork');
         const networkFolders: ComputeResource[] = networkingResources.filter(item => item['nodeTypeId'] === 'DcNetworkFolder');
         return this.getDvsFromNetworkFolders(networkFolders)
-          .map((NetworkFolderDvsList: ComputeResource[]) => ([...dcDvsList, ...flattenArray(NetworkFolderDvsList)]));
-      })
-      .switchMap(dvsList => {
+          .pipe(map((NetworkFolderDvsList: ComputeResource[]) => ([...dcDvsList, ...flattenArray(NetworkFolderDvsList)])));
+      }))
+      .pipe(switchMap(dvsList => {
         // create an array of observables for DVS portgroup entries
         const dvsObs: Observable<ComputeResource>[] = this.getDvsPortGroups(dvsList);
 
@@ -577,27 +574,27 @@ export class CreateVchWizardService {
         const nsxtHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(nsxtNetworks);
         const dcHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(dcNetworks);
         // zip all observables
-        let allDvs = Observable.of([]);
-        let allDvsHosts = Observable.of([]);
+        let allDvs = of([]);
+        let allDvsHosts = of([]);
         if (dvsList && dvsList.length > 0) {
-          allDvs = Observable.zip.apply(null, dvsObs);
-          allDvsHosts = Observable.zip.apply(null, dvsHostsObs);
+          allDvs = zip.apply(null, dvsObs);
+          allDvsHosts = zip.apply(null, dvsHostsObs);
         }
 
-        let allnsxtHosts = Observable.of([]);
+        let allnsxtHosts = of([]);
         if (nsxtHostsObs && nsxtHostsObs.length > 0) {
-          allnsxtHosts = Observable.zip.apply(null, nsxtHostsObs);
+          allnsxtHosts = zip.apply(null, nsxtHostsObs);
         }
-        const alldcHosts = Observable.zip.apply(null, dcHostsObs);
+        const alldcHosts = zip.apply(null, dcHostsObs);
 
         // if the selected resource is a Cluster we need to fetch it hosts in order to validate if some of them is connected to the vds.
         const allClusterChilds: Observable<ComputeResource[]> = resourceObjIsCluster ?
-          this.getHostsFromComputeResource(resourceObj) : Observable.of([]);
+          this.getHostsFromComputeResource(resourceObj) : of([]);
 
         // process the results from the zipped observables wherein only DV port group entries
         // whose parent distributed virtual switch can be accessed by the specified compute resource should be taken
-        return Observable.combineLatest(allClusterChilds, allDvs, allDvsHosts, allnsxtHosts, alldcHosts)
-          .map(([clusterChilds, dvs, dvsHosts, nsxtHosts, dcHosts]) => {
+        return combineLatest(allClusterChilds, allDvs, allDvsHosts, allnsxtHosts, alldcHosts)
+          .pipe(map(([clusterChilds, dvs, dvsHosts, nsxtHosts, dcHosts]) => {
             let results = [];
             let portGroups = [], hosts = [];
             portGroups = portGroups.concat(dvs, nsxtNetworks, dcNetworks);
@@ -616,9 +613,9 @@ export class CreateVchWizardService {
                 }
               }
             }
-            return flattenArray(results.filter(v => v.spriteCssClass !== 'vsphere-icon-uplink-port-group'));
-          });
-      });
+            return flattenArray(results.filter(v => v && v.spriteCssClass !== 'vsphere-icon-uplink-port-group'));
+          }));
+      }));
   }
 
   /**
@@ -626,16 +623,16 @@ export class CreateVchWizardService {
    */
   public getVicApplianceIp(): Observable<string> {
     return this.getAppliance()
-      .catch(err => Observable.throw(err))
-      .switchMap((list: string[]) => {
+      .pipe(catchError(err => throwError(err)))
+      .pipe(switchMap((list: string[]) => {
         if (!list || !list.length) {
           throw new Error('No VIC appliance was detected');
         }
         const splitByColon = list[0].split(':');
         const ipAddress = splitByColon[1].split(',')[1].trim();
-        return Observable.of(ipAddress);
-      })
-      .catch(err => Observable.throw(err));
+        return of(ipAddress);
+      }))
+      .pipe(catchError(err => throwError(err)));
   }
 
   /**
@@ -643,32 +640,32 @@ export class CreateVchWizardService {
    */
   public verifyVicMachineApiEndpoint(): Observable<any | null> {
     return this.getVicApplianceIp()
-      .catch((err: Error) => {
-        return Observable.throw({
+      .pipe(catchError((err: Error) => {
+        return throwError({
           type: 'vm_not_found'
         });
-      })
-      .switchMap(ip => {
+      }))
+      .pipe(switchMap(ip => {
         return this.http.get(`https://${ip}:8443/container/hello`)
-          .catch((err: Response) => {
+          .pipe(catchError((err: Response) => {
             console.error(err);
             // network error. details are not visible in the browser level
             // however, we are fairly confident in most cases that this is caused by the
             // self-signed SSL certificate being blocked by the browser
             if (err.status === 0) {
-              return Observable.throw({
+              return throwError({
                 type: 'ssl_cert',
                 payload: ip
               });
             }
             // handle http response status codes such as 404, 500, etc.
-            return Observable.throw({
+            return throwError({
               type: 'other',
               payload: err
             });
-          })
-          .map(response => ip);
-      });
+          }))
+          .pipe(map(response => ip));
+      }));
   }
 
   /**
@@ -678,20 +675,20 @@ export class CreateVchWizardService {
   getDatacenterForResource(resourceObjRef: string) {
     if (resourceObjRef.split(':')[2] === 'Datacenter') {
       return this.http.get(`/ui/data/properties/${resourceObjRef}?properties=name`)
-        .catch(e => Observable.throw(e))
-        .map(response => response.json())
+        .pipe(catchError(e => throwError(e)))
+        .pipe(map(response => response.json()))
     } else {
       return this.http.get(`/ui/data/properties/${resourceObjRef}?properties=parent`)
-        .catch(e => Observable.throw(e))
-        .map(response => response.json())
-        .switchMap((response) => {
+        .pipe(catchError(e => throwError(e)))
+        .pipe(map(response => response.json()))
+        .pipe(switchMap((response) => {
           if (typeof response.parent === 'object') {
             return this.getDatacenterForResource(
               `urn:vmomi:${response.parent.type}:${response.parent.value}:${response.parent.serverGuid}`
             );
           }
-          return Observable.throw(`Error getting Datacenter for resource '${resourceObjRef}'`);
-        });
+          return throwError(`Error getting Datacenter for resource '${resourceObjRef}'`);
+        }));
     }
   }
 }

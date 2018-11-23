@@ -1,4 +1,3 @@
-import 'rxjs/add/observable/timer';
 
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
@@ -20,7 +19,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ipOrFqdnPattern, numberPattern, supportedCharsPattern } from '../../shared/utils/validators';
 
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable, zip, of, throwError as observableThrowError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { VIC_APPLIANCE_PORT } from '../../shared/constants/create-vch-wizard';
 
 @Component({
@@ -78,16 +78,16 @@ export class VchCreationWizardGeneralComponent implements OnInit {
    * @returns {Observable<any>}
    */
   onCommit(): Observable<any> {
-    return Observable.zip(
+    return zip(
       this.createWzService.getVicApplianceIp(),
       this.createWzService.checkVchNameUniqueness(this.form.get('name').value)
     )
-    .catch(err => {
+    .pipe(catchError(err => {
       // if any failure occurrs, unset the vicApplianceIp var
       this.vicApplianceIp = null;
-      return Observable.throw(err);
-    })
-    .switchMap((arr) => {
+      return observableThrowError(err);
+    }))
+    .pipe(switchMap((arr) => {
       this.vicApplianceIp = arr[0];
 
       const isUnique = arr[1];
@@ -95,7 +95,7 @@ export class VchCreationWizardGeneralComponent implements OnInit {
           this.form.get('name').setErrors({
             resourcePoolExists: true
           });
-          return Observable.throw(
+          return observableThrowError(
             ['There is already a VirtualApp or ResourcePool that exists with the same name']);
         }
 
@@ -123,7 +123,7 @@ export class VchCreationWizardGeneralComponent implements OnInit {
           results['general']['syslogAddress'] = `${syslogTransportValue}://${syslogHostValue}:${syslogPortValue}`;
         }
 
-        return Observable.of(results);
-    });
+        return of(results);
+    }));
   }
 }

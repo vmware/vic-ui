@@ -15,7 +15,7 @@
 */
 import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import {
   supportedCharsPattern,
@@ -341,7 +341,7 @@ export class NetworksComponent implements OnInit {
       results['containerNetworks'] = [];
     }
 
-    return Observable.of({ networks: results });
+    return of({ networks: results });
   }
 
   toggleAdvancedMode() {

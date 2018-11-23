@@ -22,7 +22,7 @@ import {
 
 import { ComputeResourceTreenodeComponent } from './compute-resource-treenode.component';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of, zip, throwError as observableThrowError } from 'rxjs';
 import { GlobalsService } from './../../shared/globals.service';
 import { ComputeResource } from '../../interfaces/compute.resource';
 import { getMorIdFromObjRef, resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../../shared/utils/object-reference';
@@ -117,7 +117,7 @@ export class ComputeCapacityComponent implements OnInit {
   ngOnInit() {
     this.serversInfo = this.globalsService.getWebPlatform().getUserSession().serversInfo;
     const obsArr = this.serversInfo.map(serverInfo => this.createWzService.getDatacenter(serverInfo.serviceGuid));
-    Observable.zip(...obsArr)
+    zip(...obsArr)
       .subscribe(results => {
         this.datacenter = flattenArray(results).sort(compareFn);
       });
@@ -164,15 +164,15 @@ export class ComputeCapacityComponent implements OnInit {
 
     // if it is a cluster, we get the cluster vm groups, otherwise set to empty array observable
     const vmGroupsObs: Observable<any[]> = isCluster ?
-      this.createWzService.getClusterVMGroups(this.selectedObject.objRef) : Observable.of([]);
+      this.createWzService.getClusterVMGroups(this.selectedObject.objRef) : of([]);
 
     const isDrsEnabled: Observable<boolean> = isCluster ?
-      this.createWzService.getClusterDrsStatus(this.selectedObject.objRef) : Observable.of(false);
+      this.createWzService.getClusterDrsStatus(this.selectedObject.objRef) : of(false);
 
     const allocationsObs: Observable<any[]> = this.createWzService
       .getResourceAllocationsInfo(resourceObjForResourceAllocations, isHost);
 
-    Observable.zip(allocationsObs, vmGroupsObs, isDrsEnabled)
+    zip(allocationsObs, vmGroupsObs, isDrsEnabled)
       .subscribe(([allocationsInfo, groups, drsStatus]) => {
         const cpu = allocationsInfo['cpu'];
         const memory = allocationsInfo['memory'];
@@ -263,7 +263,7 @@ export class ComputeCapacityComponent implements OnInit {
     this.form.setErrors(formErrors);
 
     if (this.form.invalid) {
-      return Observable.throw(errs);
+      return observableThrowError(errs);
     } else {
       const cpuLimitValue = this.form.get('cpuLimit').value;
       const memoryLimitValue = this.form.get('memoryLimit').value;
@@ -280,7 +280,7 @@ export class ComputeCapacityComponent implements OnInit {
         results['endpointMemory'] = this.form.get('endpointMemory').value;
         results['vmHostAffinity'] = this.form.get('vmHostAffinity').value;
       }
-      return Observable.of({ computeCapacity: results });
+      return of({ computeCapacity: results });
     }
   }
 

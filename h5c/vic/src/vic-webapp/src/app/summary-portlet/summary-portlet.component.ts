@@ -20,8 +20,7 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/switchMap';
+import { Subscription } from 'rxjs';
 
 import { DataPropertyService } from '../services/data-property.service';
 import { GlobalsService, RefreshService, AppAlertService } from '../shared/index';

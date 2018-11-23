@@ -24,7 +24,7 @@ import {
     Vic18nService,
 } from '../shared/index';
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable, Subject } from 'rxjs/Rx';
+import { Observable, Subject, of } from 'rxjs';
 
 import { AppErrorHandler } from '../shared/appErrorHandler';
 import { By } from '@angular/platform-browser';
@@ -68,10 +68,10 @@ describe('VIC object view: Summary tab', () => {
                 RefreshService,
                 { provide: CreateVchWizardService, useValue: {
                   verifyVicMachineApiEndpoint() {
-                    return Observable.of('10.10.10.10');
+                    return of('10.10.10.10');
                   },
                   getAppliance() {
-                      return Observable.of(['vic-ova-2: v1.2.0-12000-bbbbbb, 10.20.250.255']);
+                      return of(['vic-ova-2: v1.2.0-12000-bbbbbb, 10.20.250.255']);
                   }
                 }}
             ],

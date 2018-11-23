@@ -48,10 +48,11 @@ import {
 
 import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable, combineLatest, throwError as observableThrowError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { VIC_APPLIANCE_PORT } from '../shared/constants/create-vch-wizard';
 import {State} from '@clr/angular';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from './vch.model';
 import * as bus from 'framebus';
@@ -252,12 +253,12 @@ export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   downloadVchCert(vch: VirtualContainerHost) {
     this.isDgLoading = true;
-    Observable.combineLatest(
+    combineLatest(
       this.createWzService.getVicApplianceIp(),
       this.createWzService.acquireCloneTicket(vch.id.split(':')[4])
-    ).catch(err => {
-      return Observable.throw(err);
-    }).subscribe(([serviceHost, cloneTicket]) => {
+    ).pipe(catchError(err => {
+      return observableThrowError(err);
+    })).subscribe(([serviceHost, cloneTicket]) => {
       const vchId = vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
       const vc = getServerInfoByVchObjRef(
@@ -277,7 +278,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
 
       const options  = new RequestOptions({ headers: headers });
       this.http.get(url, options)
-        .map(response => response.text())
+        .pipe(map(response => response.text()))
         .subscribe(response => {
           const uriContent = 'data:application/octet-stream,' + encodeURIComponent(response);
           const link = document.createElement('a');

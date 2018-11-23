@@ -18,7 +18,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
 import {StorageCapacityComponent} from './storage-capacity.component';
 
 describe('StorageCapacityComponent', () => {
@@ -40,7 +40,7 @@ describe('StorageCapacityComponent', () => {
           provide: CreateVchWizardService,
           useValue: {
             getDatastores() {
-              return Observable.of([{
+              return of([{
                 text: datastoreName
               }]);
             }

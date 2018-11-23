@@ -19,7 +19,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Headers, Http, RequestOptions } from '@angular/http';
 
 import { CreateVchWizardService } from '../../create-vch-wizard/create-vch-wizard.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of, combineLatest, throwError as observableThrowError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { VIC_APPLIANCE_PORT } from '../../shared/constants/create-vch-wizard';
 import { VirtualContainerHost } from '../vch.model';
 import { getServerInfoByVchObjRef } from '../../shared/utils/object-reference';
@@ -49,13 +50,13 @@ export class VicVchLogViewComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    Observable.combineLatest(
+    combineLatest(
       this.createWzService.getVicApplianceIp(),
       this.createWzService.acquireCloneTicket(this.vch.id.split(':')[4]),
       this.createWzService.getDatacenterForResource(this.vch.id)
-  ).catch(err => {
-      return Observable.throw(err);
-    }).subscribe(([serviceHost, cloneTicket, datacenter]) => {
+  ).pipe(catchError(err => {
+      return observableThrowError(err);
+    })).subscribe(([serviceHost, cloneTicket, datacenter]) => {
       const vchId = this.vch.id.split(':')[3];
       const servicePort = VIC_APPLIANCE_PORT;
       const vc = getServerInfoByVchObjRef(
@@ -77,8 +78,8 @@ export class VicVchLogViewComponent implements OnInit {
 
       const options  = new RequestOptions({ headers: headers });
       this.http.get(url, options)
-        .catch(error => Observable.of(error))
-        .map(response => response.text())
+        .pipe(catchError(error => of(error)))
+        .pipe(map(response => response.text()))
         .subscribe(response => {
           this.log = response;
           this.loading = false;

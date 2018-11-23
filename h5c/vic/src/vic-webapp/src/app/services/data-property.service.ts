@@ -15,14 +15,12 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs/Rx';
+import { Observable, Subject, throwError as observableThrowError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { Http, Response } from '@angular/http';
 
 import { GlobalsService } from '../shared/globals.service';
 import { APP_CONFIG } from '../shared/app-config';
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
 
 import {
   CONTAINER_VM_IMAGE_NAME_KEY,
@@ -78,15 +76,15 @@ export class DataPropertyService {
     }
 
     this.http.get(this.buildDataUrl(this._objectId, props))
-      .map(res => {
+      .pipe(map(res => {
         const parsed = res.json();
         return parsed;
-      })
-      .map(processPowerState)
-      .map(processVmType)
-      .catch((err: Response | any) => {
-        return Observable.throw(err);
-      })
+      }),
+      map(processPowerState),
+      map(processVmType),
+      catchError((err: Response | any) => {
+        return observableThrowError(err);
+      }))
       .subscribe(
       res => {
         this.vmInfoSource.next(<VirtualMachine>res);
@@ -115,10 +113,10 @@ export class DataPropertyService {
         'urn:vic:vic:Root:vic%252Fvic-root',
         props)
     )
-      .map(res => res.json())
-      .catch((err: Response | any) => {
-        return Observable.throw(err);
-      })
+      .pipe(map(res => res.json()))
+      .pipe(catchError((err: Response | any) => {
+        return observableThrowError(err);
+      }))
       .subscribe(
       res => {
         this.vicObjectSource.next(res);

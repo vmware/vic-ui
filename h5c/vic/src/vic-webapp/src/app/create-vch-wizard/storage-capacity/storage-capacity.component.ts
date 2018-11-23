@@ -20,7 +20,7 @@ import {
   FormArray,
   Validators
 } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of, throwError as observableThrowError } from 'rxjs';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { supportedCharsPattern, numberPattern } from '../../shared/utils/validators';
 import { ComputeResource } from '../../interfaces/compute.resource';
@@ -149,7 +149,7 @@ export class StorageCapacityComponent implements OnInit {
     if (this.form.invalid) {
       if (this.form.get('imageStore').hasError('required')) {
         this.formErrMessage = 'Image store should be selected';
-        return Observable.throw(this.formErrMessage);
+        return observableThrowError(this.formErrMessage);
       }
     }
 
@@ -176,6 +176,6 @@ export class StorageCapacityComponent implements OnInit {
       }
     });
 
-    return Observable.of({ storageCapacity: results });
+    return of({ storageCapacity: results });
   }
 }

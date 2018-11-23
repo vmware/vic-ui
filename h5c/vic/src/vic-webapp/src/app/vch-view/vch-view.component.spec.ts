@@ -47,9 +47,7 @@ import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.s
 import { ExtendedUserSessionService } from '../services/extended-usersession.service';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Subject, Subscription, of } from 'rxjs';
 import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
 import { VicVchViewComponent } from './vch-view.component';
 import { VicVmViewService } from '../services/vm-view.service';
@@ -111,7 +109,7 @@ describe('VicVchViewComponent', () => {
                 { provide: RequestOptions, useClass: BaseRequestOptions },
                 { provide: CreateVchWizardService, useValue: {
                   verifyVicMachineApiEndpoint() {
-                    return Observable.of('10.10.10.10');
+                    return of('10.10.10.10');
                   }
                 }}
             ],

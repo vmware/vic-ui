@@ -16,7 +16,7 @@
 
 import { NavigationExtras } from '@angular/router';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 export class ActivatedRouteStub {
 

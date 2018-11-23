@@ -15,7 +15,7 @@
 */
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { numberPattern, whiteListRegistryPattern } from '../../shared/utils/validators';
 import {
   parseCertificatePEMFileContent,
@@ -151,7 +151,7 @@ export class RegistryAccessComponent {
 
     results['registryCa'] = this.registryCaContents;
 
-    return Observable.of({ registry: results });
+    return of({ registry: results });
   }
 
   /**

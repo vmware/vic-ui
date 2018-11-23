@@ -1,3 +1,4 @@
+import { fakeAsync, tick } from '@angular/core/testing';
 /*
  Copyright 2017 VMware, Inc. All Rights Reserved.
 
@@ -14,7 +15,7 @@
  limitations under the License.
 */
 import { TestBed, async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import {
   BaseRequestOptions,
   ConnectionBackend,
@@ -47,47 +48,47 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { VicVmViewService } from '../services/vm-view.service';
 import { getMorIdFromObjRef, resourceIsCluster, resourceIsHost, resourceIsResourcePool } from '../shared/utils/object-reference';
 
-const clusterHostsChilds = Observable.of([hostResourceBasicInfos[4]]);
+const clusterHostsChilds = of([hostResourceBasicInfos[4]]);
 const observableFolderDSwitchPorGroupsList = [
-  Observable.of([
+  of([
     folderDSwitchPorGroupsList[0],
     folderDSwitchPorGroupsList[1],
     folderDSwitchPorGroupsList[2]
   ]),
-  Observable.of([
+  of([
     folderDSwitchPorGroupsList[3],
     folderDSwitchPorGroupsList[4],
     folderDSwitchPorGroupsList[5]
   ])
 ];
 const observableDcDSwitchPorGroupsList = [
-  Observable.of([
+  of([
     dcDSwitchPorGroupsList[0],
     dcDSwitchPorGroupsList[1]
   ]),
-  Observable.of([
+  of([
     dcDSwitchPorGroupsList[2],
     dcDSwitchPorGroupsList[3],
     dcDSwitchPorGroupsList[4]
   ])
 ];
 const ObservableDvsHostsEntriesList = [
-  Observable.of([
+  of([
     dvsHostsEntriesList[0]
   ]),
-  Observable.of([
+  of([
     dvsHostsEntriesList[1],
     dvsHostsEntriesList[2]
   ]),
-  Observable.of([
+  of([
     dvsHostsEntriesList[3]
   ]),
-  Observable.of([
+  of([
     dvsHostsEntriesList[4]
   ])
 ];
-const ObservableFolderDSwitchList = Observable.of(folderDSwitchList);
-const ObservableNetWorkingResources = Observable.of(netWorkingResources);
+const ObservableFolderDSwitchList = of(folderDSwitchList);
+const ObservableNetWorkingResources = of(netWorkingResources);
 
 const resourceCompleteInfoProps = 'name,parent,resourcePool';
 const clustersAndStandaloneHostsProps = 'host,cluster';
@@ -128,7 +129,7 @@ function getResourcePropertiesResponse(objRef: string, requestedProps: string) {
       };
       break;
   }
-  return Observable.of(responseObject);
+  return of(responseObject);
 }
 
 describe('CreateVchWizardService', () => {
@@ -266,7 +267,7 @@ describe('CreateVchWizardService', () => {
         });
     });
 
-    it('should retrieve a ComputeResource from a ResourceBasicInfo', async() => {
+    it('should retrieve a ComputeResource from a ResourceBasicInfo', <any>fakeAsync((): void => {
       const basicResourceInfo = hostResourceBasicInfos[0];
       const expectedCompleteResourceInfo = hostComputeResources
         .find(resource => resource.value === basicResourceInfo.value);
@@ -280,7 +281,8 @@ describe('CreateVchWizardService', () => {
           expect(data.objRef).toBe(expectedCompleteResourceInfo.objRef);
           expect(data.text).toBe(expectedCompleteResourceInfo.text);
         })
-    });
+
+    }));
 
     it('should retrieve a ComputeResource list from a ResourceBasicInfo list', async() => {
       spyOn<any>(service, 'getResourceProperties').and.callFake(getResourcePropertiesResponse);
@@ -312,7 +314,7 @@ describe('CreateVchWizardService', () => {
 
     it('should return a list of Cluster and stand alone Hosts', async() => {
       spyOn<any>(service, 'getResourceProperties').and.callFake(getResourcePropertiesResponse);
-      spyOn<any>(service, 'getResourcePoolsTree').and.returnValue(Observable.of([]));
+      spyOn<any>(service, 'getResourcePoolsTree').and.returnValue(of([]));
 
       const clusters: ComputeResource[] = clusterComputeResources;
       const standAloneHosts: ComputeResource[] = hostComputeResources
@@ -332,7 +334,7 @@ describe('CreateVchWizardService', () => {
 
     it('should return a list of Hosts and ResourcePools from a Cluster', async() => {
       spyOn<any>(service, 'getResourceProperties').and.callFake(getResourcePropertiesResponse);
-      spyOn<any>(service, 'getResourcePoolsTree').and.returnValue(Observable.of(rpComputeResources));
+      spyOn<any>(service, 'getResourcePoolsTree').and.returnValue(of(rpComputeResources));
 
       service.getHostsAndResourcePoolsFromCluster(clusterComputeResources[0])
         .subscribe((data: ComputeResource[]) => {

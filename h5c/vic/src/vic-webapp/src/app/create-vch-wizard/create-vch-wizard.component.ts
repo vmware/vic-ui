@@ -19,7 +19,8 @@ import { Headers, Http, RequestOptions } from '@angular/http';
 
 import { CreateVchWizardService } from './create-vch-wizard.service';
 import { GlobalsService } from 'app/shared';
-import { Observable } from 'rxjs/Observable';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { RefreshService } from 'app/shared';
 import { VIC_APPLIANCE_PORT } from '../shared/constants';
 import { Wizard } from '@clr/angular';
@@ -146,8 +147,8 @@ export class CreateVchWizardComponent implements OnInit {
     if (!this.loading && payloadObs) {
 
         // Acquire a clone ticket from vsphere for auth
-        this.createWzService.acquireCloneTicket(getServerServiceGuidFromObj(this.computeCapacity.dcObj))
-        .combineLatest(
+        combineLatest(
+          this.createWzService.acquireCloneTicket(getServerServiceGuidFromObj(this.computeCapacity.dcObj)),
           // Subscribe to payload observable
           payloadObs,
           this.createWzService.getVicApplianceIp()
@@ -173,7 +174,7 @@ export class CreateVchWizardComponent implements OnInit {
               })});
 
               this.http.post(url, JSON.stringify(body), options)
-                  .map(response => response.json())
+                  .pipe(map(response => response.json()))
                   .subscribe(response => {
                     this.loading = false;
                     this.wizard.forceFinish();

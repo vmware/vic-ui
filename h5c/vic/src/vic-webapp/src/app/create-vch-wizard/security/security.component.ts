@@ -15,7 +15,7 @@
 */
 import { Component, Input } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
 import { numberPattern } from '../../shared/utils/validators';
 import {
@@ -202,7 +202,7 @@ export class SecurityComponent {
     results['target'] = getServerHostnameFromObj(serversInfo, this.datacenter) +
       (this.datacenter.text ? '/' + this.datacenter.text : '');
 
-    return Observable.of({ security: results });
+    return of({ security: results });
   }
 
   /**

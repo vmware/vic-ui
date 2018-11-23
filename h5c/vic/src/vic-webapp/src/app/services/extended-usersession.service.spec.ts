@@ -20,7 +20,7 @@ import { ExtendedUserSessionService } from './extended-usersession.service';
 import { GlobalsService } from '../shared';
 import { IExtendedServerInfo } from './extended-serverinfo.interface';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
-import { Subscription } from 'rxjs/Rx';
+import { Subscription } from 'rxjs';
 import {
   BaseRequestOptions,
   ConnectionBackend,

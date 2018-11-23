@@ -30,7 +30,7 @@ import {
 import { MockBackend, MockConnection } from '@angular/http/testing';
 import { VicVmViewService } from './vm-view.service';
 import { GlobalsService, Globals } from '../shared/globals.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import {
     getVchResponseStub,
     getMalformedVchResponseStub

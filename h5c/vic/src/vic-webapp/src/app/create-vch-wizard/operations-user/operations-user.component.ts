@@ -15,7 +15,7 @@
 */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'vic-vch-creation-operations-user',
@@ -53,6 +53,6 @@ export class OperationsUserComponent implements OnInit {
       result.operations['opsGrantPerms'] = opsGrantPermsValue;
     }
 
-    return Observable.of(result);
+    return of(result);
   }
 }
