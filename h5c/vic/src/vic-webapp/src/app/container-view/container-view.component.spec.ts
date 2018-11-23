@@ -34,8 +34,7 @@ import { ContainerVm } from './container.model';
 import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.service';
 import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject, of } from 'rxjs';
 import { VicContainerViewComponent } from './container-view.component';
 import { VicOvaVerificationComponent } from '../shared/vic-ova-verification.component';
 import { VicVmViewService } from '../services/vm-view.service';
@@ -93,7 +92,7 @@ describe('VicContainerViewComponent', () => {
                 Vic18nService,
                 { provide: CreateVchWizardService, useValue: {
                   verifyVicMachineApiEndpoint() {
-                    return Observable.of('10.10.10.10');
+                    return of('10.10.10.10');
                   }
                 }}
             ],

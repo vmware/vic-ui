@@ -71,12 +71,12 @@ describe('VIC UI Unit Tests', () => {
       .compileComponents();
     }));
 
-    beforeEach(() => {
+    beforeEach(async() => {
       fixture = TestBed.createComponent<AppComponent>(AppComponent);
       appInstance = fixture.componentInstance;
     });
 
-    it('should create the main app successfully', () => {
+    it('should create the main app successfully', async() => {
       expect(appInstance).toBeTruthy();
     });
 });

@@ -20,7 +20,7 @@ import {ComputeCapacityComponent} from './compute-capacity.component';
 import {ComputeResourceTreenodeComponent} from './compute-resource-treenode.component';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of } from 'rxjs';
 import {ReactiveFormsModule} from '@angular/forms';
 import {AppAlertService, GlobalsService, I18nService} from '../../shared';
 import {mockedDcClustersAndStandAloneHostsList} from '../mocks/create-vch-wizard-mocked-data';
@@ -52,17 +52,17 @@ describe('ComputeCapacityComponent', () => {
           provide: CreateVchWizardService,
           useValue: {
             getDatacenter() {
-              return Observable.of([{
+              return of([{
                 text: 'datacenter'
               }]);
             },
             getDcClustersAndStandAloneHosts(serviceGuid: string) {
-              return Observable.of([{
+              return of([{
                 text: 'cluster'
               }]);
             },
             getResourceAllocationsInfo() {
-              return Observable.of({
+              return of({
                 cpu: {
                   maxUsage: MaxLimit,
                   unreservedForPool: MaxLimit
@@ -74,17 +74,17 @@ describe('ComputeCapacityComponent', () => {
               });
             },
             getHostsAndResourcePools() {
-              return Observable.of([{
+              return of([{
                 text: 'cluster',
                 nodeTypeId: 'DcCluster',
                 aliases: ['cluster']
               }]);
             },
             getClusterVMGroups() {
-              return Observable.of([]);
+              return of([]);
             },
             getClusterDrsStatus() {
-              return Observable.of([]);
+              return of([]);
             }
           }
         },
@@ -252,13 +252,13 @@ describe('ComputeCapacityComponent', () => {
     spyOn(service, 'getClusterVMGroups').and.callThrough();
     const drsStatusSpy = spyOn(service, 'getClusterDrsStatus');
 
-    drsStatusSpy.and.returnValue(Observable.of(true));
+    drsStatusSpy.and.returnValue(of(true));
     component.toggleAdvancedMode();
     component.selectComputeResource(
       {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
     expect(component.isClusterDrsEnabled).toBeTruthy();
 
-    drsStatusSpy.and.returnValue(Observable.of(false));
+    drsStatusSpy.and.returnValue(of(false));
     component.toggleAdvancedMode();
     component.selectComputeResource(
       {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
@@ -268,16 +268,16 @@ describe('ComputeCapacityComponent', () => {
   it('should validate if Cluster VM Host Group Name already exists', () => {
     component.vchName = 'test';
 
-    spyOn(service, 'getClusterDrsStatus').and.returnValue(Observable.of(true));
+    spyOn(service, 'getClusterDrsStatus').and.returnValue(of(true));
     const clusterVMGroups = spyOn(service, 'getClusterVMGroups');
 
-    clusterVMGroups.and.returnValue(Observable.of({'ClusterComputeResource/configurationEx/group': []}));
+    clusterVMGroups.and.returnValue(of({'ClusterComputeResource/configurationEx/group': []}));
     component.toggleAdvancedMode();
     component.selectComputeResource(
       {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
     expect(component.vmGroupNameIsValid).toBeTruthy();
 
-    clusterVMGroups.and.returnValue(Observable.of({'ClusterComputeResource/configurationEx/group': [{name: 'test'}]}));
+    clusterVMGroups.and.returnValue(of({'ClusterComputeResource/configurationEx/group': [{name: 'test'}]}));
     component.toggleAdvancedMode();
     component.selectComputeResource(
       {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});

@@ -18,7 +18,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
 import {NetworksComponent} from './networks.component';
 import {mockedDcClustersAndStandAloneHostsList} from '../mocks/create-vch-wizard-mocked-data';
 
@@ -45,7 +45,7 @@ describe('NetworksComponent', () => {
           provide: CreateVchWizardService,
           useValue: {
             getDistributedPortGroups() {
-              return Observable.of([{
+              return of([{
                 text: 'portGroup'
               }]);
             }

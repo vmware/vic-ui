@@ -18,7 +18,7 @@ import {ClarityModule} from '@clr/angular';
 import {ComputeResourceTreenodeComponent} from './compute-resource-treenode.component';
 import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {HttpModule} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
 import {ReactiveFormsModule} from '@angular/forms';
 import {Globals, GlobalsService} from '../../shared';
 import {HttpClientModule} from '@angular/common/http';
@@ -68,9 +68,9 @@ describe('ComputeResourceTreenodeComponent', () => {
 
   it('should retrieve a ComputeResource list filtered by type', () => {
     component.datacenter = datacenter1;
-    spyOn(service, 'getVicResourcePoolList').and.returnValue(Observable.of(vicResourcePoolList));
-    spyOn(service, 'getDcClustersAndStandAloneHosts').and.returnValue(Observable.of(mockedDcClustersAndStandAloneHostsList));
-    spyOn(service, 'getHostsAndResourcePoolsFromClusters').and.returnValue(Observable.of(mockedClusterHostsList2));
+    spyOn(service, 'getVicResourcePoolList').and.returnValue(of(vicResourcePoolList));
+    spyOn(service, 'getDcClustersAndStandAloneHosts').and.returnValue(of(mockedDcClustersAndStandAloneHostsList));
+    spyOn(service, 'getHostsAndResourcePoolsFromClusters').and.returnValue(of(mockedClusterHostsList2));
     component.loadClustersAndStandAloneHosts();
 
     expect(component.clusters.length).toBe(2);
@@ -80,9 +80,9 @@ describe('ComputeResourceTreenodeComponent', () => {
 
   it('should retrieve a list of hosts belonging to a particular Cluster', () => {
     component.datacenter = datacenter;
-    spyOn(service, 'getVicResourcePoolList').and.returnValue(Observable.of(vicResourcePoolList));
-    spyOn(service, 'getDcClustersAndStandAloneHosts').and.returnValue(Observable.of(mockedDcClustersAndStandAloneHostsList));
-    spyOn(service, 'getHostsAndResourcePoolsFromClusters').and.returnValue(Observable.of(mockedClusterHostsList1));
+    spyOn(service, 'getVicResourcePoolList').and.returnValue(of(vicResourcePoolList));
+    spyOn(service, 'getDcClustersAndStandAloneHosts').and.returnValue(of(mockedDcClustersAndStandAloneHostsList));
+    spyOn(service, 'getHostsAndResourcePoolsFromClusters').and.returnValue(of(mockedClusterHostsList1));
     component.loadClustersAndStandAloneHosts();
 
     expect(component.clusterHostSystemsMap[mockedDcClustersAndStandAloneHostsList[0].objRef].length)

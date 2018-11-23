@@ -18,7 +18,7 @@ import {UiActionsComponent} from './ui-actions.component';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {GlobalsService} from '../shared';
 import {ActivatedRoute} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
 
 describe('UiActionsComponent', () => {
   let component: UiActionsComponent;
@@ -44,7 +44,7 @@ describe('UiActionsComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            params: Observable.of({})
+            params: of({})
           }
         }
       ],

@@ -27,7 +27,7 @@ import { AppAlertService, GlobalsService, I18nService } from 'app/shared';
 import { HttpModule } from '@angular/http';
 import { JASMINE_TIMEOUT } from '../testing/jasmine.constants';
 import { NetworksComponent } from './networks/networks.component';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { OperationsUserComponent } from './operations-user/operations-user.component';
 import { RefreshService } from '../shared/refresh.service';
 import { SecurityComponent } from './security/security.component';
@@ -72,14 +72,14 @@ describe('CreateVchWizardComponent', () => {
           provide: CreateVchWizardService, useValue: {
             checkVchNameUniqueness: (name) => {
               // TODO: check if this makes sense
-              return Observable.of(name === 'unique');
+              return of(name === 'unique');
             },
             getVicApplianceIp: (): Observable<string> => {
-              return Observable.of('10.20.250.255');
+              return of('10.20.250.255');
             },
-            getCloneTicket: () => Observable.of(''),
-            getClustersList: () => Observable.of([]),
-            getDatastores: () => Observable.of([])
+            getCloneTicket: () => of(''),
+            getClustersList: () => of([]),
+            getDatastores: () => of([])
           }
         },
         {

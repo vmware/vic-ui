@@ -24,7 +24,8 @@ import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.ser
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
 import {GlobalsService} from 'app/shared';
 import {Modal} from '@clr/angular';
-import {Observable} from 'rxjs/Observable';
+import {Observable, combineLatest} from 'rxjs';
+import { map } from 'rxjs/operators';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from '../vch-view/vch.model';
 import { getServerInfoByVchObjRef } from '../shared/utils/object-reference';
@@ -70,7 +71,7 @@ export class DeleteVchModalComponent implements OnInit {
       this.vmViewService.getContainersData({});
     });
 
-    const subscription = this.vmViewService.vchs$.combineLatest(this.vmViewService.containers$)
+    const subscription = combineLatest(this.vmViewService.vchs$, this.vmViewService.containers$)
       .subscribe(([vchs, containers]) => {
           this.vch = vchs.find(vch => {
             return vch.id === this.vchId;
@@ -167,7 +168,7 @@ export class DeleteVchModalComponent implements OnInit {
   onDelete() {
     this.modal.close();
     this.loading = true;
-    Observable.combineLatest(
+    combineLatest(
       this.createWzService.getVicApplianceIp(),
       this.createWzService.acquireCloneTicket(this.vch.id.split(':')[4]),
       this.createWzService.getDatacenterForResource(this.vch.id)
@@ -196,7 +197,7 @@ export class DeleteVchModalComponent implements OnInit {
         body: {volume_stores: this.form.get('deleteVolumes').value ? 'all' : 'none'}
       });
       this.http.delete(url, options)
-        .map(response => response.json())
+        .pipe(map(response => response.json()))
         .subscribe(response => {
           this.loading = false;
           this.onCancel();

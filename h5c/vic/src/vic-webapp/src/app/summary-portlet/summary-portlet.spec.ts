@@ -20,7 +20,7 @@ import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subject } from 'rxjs/Rx';
+import { Observable, Subject } from 'rxjs';
 
 import {
   AppAlertService,
