@@ -480,38 +480,10 @@ export class CreateVchWizardService {
   }
 
   getNetworkingTree(dcObj: ComputeResource): Observable<any[]> {
-    const serviceGuid = getServerServiceGuidFromObj(dcObj);
-    return this.getDatacenter(serviceGuid)
-      .pipe(switchMap(dcs => {
-        const dcsObs = dcs.map(dc => {
-          return this.http.get('/ui/tree/children?nodeTypeId=Datacenter' +
-            `&objRef=${dc['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
+   return this.http.get('/ui/data/properties/urn:vmomi:Datacenter:' +
+            `${dcObj['value']}:${dcObj['serverGuid']}?properties=network`)
             .pipe(map(response => response.json()))
-        });
-
-        return zip.apply(null, dcsObs);
-      }))
-      .pipe(map((response: any[]) => {
-        return flattenArray(response);
-      }));
-  }
-
-  /**
-   * Returns all the Dvs contained on each network folder
-   * @param {ComputeResource[]} networkFolders
-   * @returns {Observable<ComputeResource[]>}
-   */
-  private getDvsFromNetworkFolders(networkFolders: ComputeResource[]): Observable<ComputeResource[]> {
-    if (!networkFolders || networkFolders.length === 0) {
-      return of([]);
-    }
-    return from(networkFolders)
-      .pipe(mergeMap((networkFolder: ComputeResource) => {
-        return this.http.get('/ui/tree/children?nodeTypeId=DcNetworkFolder' +
-          `&objRef=${networkFolder['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
-          .pipe(map(response => response.json()));
-      }))
-      .pipe(toArray());
+            .pipe(map(response => response.network));
   }
 
   /**
@@ -525,15 +497,6 @@ export class CreateVchWizardService {
         `&objRef=${dv['objRef']}&treeId=vsphere.core.networkingInventorySpec`)
         .pipe(map(response => response.json()));
     });
-  }
-
-  /**
-   * Creates an array of observables for DVS host entries
-   * @param {ComputeResource[]} dvsList
-   * @returns {Observable<ResourceBasicInfo>[]}
-   */
-  private getDvsHostsEntries(dvsList: ComputeResource[]): Observable<ResourceBasicInfo[]>[] {
-    return dvsList.map(dv => this.getHostsFromComputeResource(dv));
   }
 
   /**
@@ -553,39 +516,15 @@ export class CreateVchWizardService {
    */
   getDistributedPortGroups(dcObj: ComputeResource, resourceObj: ComputeResource): Observable<any> {
     const resourceObjIsCluster = resourceIsCluster(resourceObj.type);
-    let nsxtNetworks: ComputeResource[] = [];
-    let dcNetworks: ComputeResource[] = [];
     return this.getNetworkingTree(dcObj)
-      .pipe(switchMap((networkingResources: ComputeResource[]) => {
-        // gets the list of Dvs from the dc and or any existing network folder
-        const dcDvsList: ComputeResource[] = networkingResources.filter(item => item['nodeTypeId'] === 'DcDvs');
-        nsxtNetworks = networkingResources.filter(item => item['nodeTypeId'] === 'DcOpaqueNetwork');
-        dcNetworks = networkingResources.filter(item => item['nodeTypeId'] === 'DcNetwork');
-        const networkFolders: ComputeResource[] = networkingResources.filter(item => item['nodeTypeId'] === 'DcNetworkFolder');
-        return this.getDvsFromNetworkFolders(networkFolders)
-          .pipe(map((NetworkFolderDvsList: ComputeResource[]) => ([...dcDvsList, ...flattenArray(NetworkFolderDvsList)])));
-      }))
-      .pipe(switchMap(dvsList => {
-        // create an array of observables for DVS portgroup entries
-        const dvsObs: Observable<ComputeResource>[] = this.getDvsPortGroups(dvsList);
-
-        // create an array of observables for DVS host entries
-        const dvsHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(dvsList);
-        const nsxtHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(nsxtNetworks);
-        const dcHostsObs: Observable<ResourceBasicInfo[]>[] = this.getDvsHostsEntries(dcNetworks);
-        // zip all observables
-        let allDvs = of([]);
-        let allDvsHosts = of([]);
-        if (dvsList && dvsList.length > 0) {
-          allDvs = zip.apply(null, dvsObs);
-          allDvsHosts = zip.apply(null, dvsHostsObs);
-        }
-
-        let allnsxtHosts = of([]);
-        if (nsxtHostsObs && nsxtHostsObs.length > 0) {
-          allnsxtHosts = zip.apply(null, nsxtHostsObs);
-        }
-        const alldcHosts = zip.apply(null, dcHostsObs);
+      .pipe(switchMap(networkList => {
+        const allNetworkHostsObs = networkList.map(network => {
+          return this.getNetworkingHosts(network)
+          .pipe(map(hostObj => {
+            network.text = hostObj.name;
+            return hostObj.host;
+          }));
+        });
 
         // if the selected resource is a Cluster we need to fetch it hosts in order to validate if some of them is connected to the vds.
         const allClusterChilds: Observable<ComputeResource[]> = resourceObjIsCluster ?
@@ -593,29 +532,34 @@ export class CreateVchWizardService {
 
         // process the results from the zipped observables wherein only DV port group entries
         // whose parent distributed virtual switch can be accessed by the specified compute resource should be taken
-        return combineLatest(allClusterChilds, allDvs, allDvsHosts, allnsxtHosts, alldcHosts)
-          .pipe(map(([clusterChilds, dvs, dvsHosts, nsxtHosts, dcHosts]) => {
+
+        return combineLatest(allClusterChilds, of(networkList),  forkJoin(...allNetworkHostsObs))
+          .pipe(map(([clusterChilds, networks, allNetworkHosts]) => {
             let results = [];
-            let portGroups = [], hosts = [];
-            portGroups = portGroups.concat(dvs, nsxtNetworks, dcNetworks);
-            hosts = hosts.concat(dvsHosts, nsxtHosts, dcHosts);
-            for (let index = 0; index < hosts.length; index++) {
+            allNetworkHosts.forEach((item, index) => {
               if (resourceObjIsCluster) {
                 // if the selected resource is a Cluster we need to validate if any of it hosts is connected to the vds.
                 const clusterChildsHosts = clusterChilds.map(host => host['value']);
-                if (hosts[index].some(host => clusterChildsHosts.indexOf(host['value']) !== -1)) {
-                  results = results.concat(portGroups[index]);
+                if (item.some(host => clusterChildsHosts.indexOf(host['value']) !== -1)) {
+                  results = results.concat(networks[index]);
                 }
               } else {
                 // if the selected resource is a not Cluster we validate if the selected host is connected to the vds.
-                if (hosts[index].some(host => host['value'] === getMorIdFromObjRef(resourceObj.objRef))) {
-                  results = results.concat(portGroups[index]);
+                if (item.some(host => host['value'] === getMorIdFromObjRef(resourceObj.objRef))) {
+                  results = results.concat(networks[index]);
                 }
               }
-            }
-            return flattenArray(results.filter(v => v && v.spriteCssClass !== 'vsphere-icon-uplink-port-group'));
+            });
+
+            return flattenArray(results);
           }));
       }));
+  }
+
+  getNetworkingHosts(network: any): Observable <any> {
+    return this.http.get(`/ui/data/properties/urn:vmomi:${network['type']}:${network['value']}:` +
+    `${network['serverGuid']}?properties=host,name`)
+    .pipe(map(response => response.json()));
   }
 
   /**
