@@ -221,8 +221,6 @@ describe('CreateVchWizardService', () => {
 
     it('should retrieve a list of distributed port groups', async() => {
       spyOn(service, 'getNetworkingTree').and.returnValue(ObservableNetWorkingResources);
-      spyOn<any>(service, 'getDvsFromNetworkFolders').and.returnValue(ObservableFolderDSwitchList);
-      spyOn<any>(service, 'getDvsHostsEntries').and.returnValue(ObservableDvsHostsEntriesList);
       spyOn<any>(service, 'getHostsFromComputeResource').and.returnValue(clusterHostsChilds);
       spyOn<any>(service, 'getDvsPortGroups').and
         .returnValue([...observableFolderDSwitchPorGroupsList, ...observableDcDSwitchPorGroupsList]);
