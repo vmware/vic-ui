@@ -44,6 +44,7 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
     public error: any;
     public applianceIp: string;
     public applianceVersion: string;
+    public pluginLinkVersion: string;
 
     constructor(
         private zone: NgZone,
@@ -71,6 +72,7 @@ export class VicSummaryViewComponent implements OnInit, OnDestroy {
                     this.fetchRootInfo();
                 });
             });
+        this.pluginLinkVersion = this.globalsService.getPluginLinkVersion();
     }
 
     /**

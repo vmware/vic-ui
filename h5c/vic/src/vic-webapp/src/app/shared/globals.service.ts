@@ -220,4 +220,8 @@ export class GlobalsService {
             }
             return { headers: new Headers({ 'webClientSessionId': this.getClientId() }) };
       }
+
+      getPluginLinkVersion(): string {
+            return '1.5';
+      }
 }

@@ -65,6 +65,9 @@ describe('CreateVchWizardComponent', () => {
                   };
                 }
               };
+            },
+            getPluginLinkVersion() {
+              return '1.5';
             }
           }
         },

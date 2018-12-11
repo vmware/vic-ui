@@ -41,34 +41,31 @@
     <section class="summary-content">
       <div class="summary-title">VIC APPLIANCE INFORMATION</div>
       <ul class="summary-items-list">
-          <li>
-              <span class="summary-label">
-                  {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VERSION') }}
-              </span>
-              <span class="summary-value">
-                  {{applianceVersion}}
-              </span>
-           </li>
-          <li>
-             <span class="summary-label">
-                   IP Address
-             </span>
-             <span class="summary-value">
-                  {{applianceIp}}
-             </span>
-          </li>
-        </ul>
+        <li>
+          <span class="summary-label">
+            {{ vicI18n.translate(WS_SUMMARY_CONSTANTS, 'VERSION') }}
+          </span>
+          <span class="summary-value">
+            {{applianceVersion}}
+          </span>
+        </li>
+        <li>
+          <span class="summary-label">
+            IP Address
+          </span>
+          <span class="summary-value">
+            {{applianceIp}}
+          </span>
+        </li>
+      </ul>
     </section>
   </div>
   <div class="col-xs">
     <p class="summary-intro mt-3">
-      vSphere Integrated Containers Engine is a container runtime for vSphere. It allows developers familiar with
-      Docker to develop in containers and deploy them alongside traditional VM-based workloads on vSphere clusters,
-      and allowing for these workloads to be managed through the vSphere UI in a way familiar to existing vSphere
-      admins.
+      vSphere Integrated Containers Engine is a container runtime for vSphere. It allows developers familiar with Docker to develop
+      in containers and deploy them alongside traditional VM-based workloads on vSphere clusters, and allowing for these
+      workloads to be managed through the vSphere UI in a way familiar to existing vSphere admins.
     </p>
-    <a href="https://vmware.github.io/vic-product/assets/files/html/1.4/index.html"
-       target="_blank"
-       class="btn btn-link btn-sm px-0">Read more...</a>
+    <a [href]="'https://vmware.github.io/vic-product/assets/files/html/'+ pluginLinkVersion + '/index.html'" target="_blank" class="btn btn-link btn-sm px-0">Read more...</a>
   </div>
 </div>
