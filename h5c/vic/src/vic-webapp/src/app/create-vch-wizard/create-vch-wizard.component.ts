@@ -39,6 +39,7 @@ export class CreateVchWizardComponent implements OnInit {
   public errorFlag = false;
   public errorMsgs: string[];
   private _cachedData: any = {};
+  public pluginLinkVersion: string;
 
   // TODO: remove the following
   public testVal = 0;
@@ -50,7 +51,9 @@ export class CreateVchWizardComponent implements OnInit {
     private refresher: RefreshService,
     private http: Http,
     private createWzService: CreateVchWizardService
-  ) { }
+  ) {
+    this.pluginLinkVersion = this.globalsService.getPluginLinkVersion();
+  }
 
   /**
    * Launch the wizard
