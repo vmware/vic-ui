@@ -17,6 +17,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { GlobalsService } from 'app/shared';
 import {
   supportedCharsPattern,
   ipPattern,
@@ -37,14 +38,17 @@ export class NetworksComponent implements OnInit {
   public inAdvancedMode = false;
   public portgroupsLoading = true;
   public portgroups: any[] = [];
+  public pluginLinkVersion: string;
 
   @Input() resourceObj: ComputeResource;
   @Input() datacenter: ComputeResource;
 
   constructor(
     private formBuilder: FormBuilder,
-    private createWzService: CreateVchWizardService
+    private createWzService: CreateVchWizardService,
+    private globalsService: GlobalsService
   ) {
+    this.pluginLinkVersion = this.globalsService.getPluginLinkVersion();
     this.form = formBuilder.group({
       bridgeNetwork: ['', Validators.required],
       bridgeNetworkRange: ['172.16.0.0/12', Validators.required],

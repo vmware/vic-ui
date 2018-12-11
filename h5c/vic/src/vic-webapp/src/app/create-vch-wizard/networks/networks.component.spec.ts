@@ -13,14 +13,15 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {ReactiveFormsModule} from '@angular/forms';
-import {ClarityModule} from '@clr/angular';
-import {HttpModule} from '@angular/http';
-import {CreateVchWizardService} from '../create-vch-wizard.service';
-import {Observable, of} from 'rxjs';
-import {NetworksComponent} from './networks.component';
-import {mockedDcClustersAndStandAloneHostsList} from '../mocks/create-vch-wizard-mocked-data';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ClarityModule } from '@clr/angular';
+import { HttpModule } from '@angular/http';
+import { GlobalsService } from 'app/shared';
+import { CreateVchWizardService } from '../create-vch-wizard.service';
+import { Observable, of } from 'rxjs';
+import { NetworksComponent } from './networks.component';
+import { mockedDcClustersAndStandAloneHostsList } from '../mocks/create-vch-wizard-mocked-data';
 
 describe('NetworksComponent', () => {
 
@@ -50,6 +51,14 @@ describe('NetworksComponent', () => {
               }]);
             }
           }
+        },
+        {
+          provide: GlobalsService,
+          useValue: {
+            getPluginLinkVersion() {
+              return '1.5';
+            }
+          }
         }
       ],
       declarations: [
@@ -76,7 +85,7 @@ describe('NetworksComponent', () => {
     expect(component.form.invalid).toBe(true);
   });
 
-  it('should end with an invalid form on step commit without selecting bridge and public network',  () => {
+  it('should end with an invalid form on step commit without selecting bridge and public network', () => {
     component.onCommit();
     expect(component.form.invalid).toBe(true);
   });
