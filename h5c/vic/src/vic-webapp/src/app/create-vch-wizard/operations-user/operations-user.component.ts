@@ -42,7 +42,7 @@ export class OperationsUserComponent implements OnInit {
   onCommit(): Observable<any> {
     const result = {
       'operations': {
-        opsUser: this.form.get('opsUser').value,
+        opsUser: this.form.get('opsUser').value.trim(),
         opsPassword: this.form.get('opsPassword').value,
       }
     };
