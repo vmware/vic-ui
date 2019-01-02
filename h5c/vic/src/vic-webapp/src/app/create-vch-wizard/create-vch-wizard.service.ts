@@ -540,12 +540,12 @@ export class CreateVchWizardService {
               if (resourceObjIsCluster) {
                 // if the selected resource is a Cluster we need to validate if any of it hosts is connected to the vds.
                 const clusterChildsHosts = clusterChilds.map(host => host['value']);
-                if (item.some(host => clusterChildsHosts.indexOf(host['value']) !== -1)) {
+                if (item && item.some(host => clusterChildsHosts.indexOf(host['value']) !== -1)) {
                   results = results.concat(networks[index]);
                 }
               } else {
                 // if the selected resource is a not Cluster we validate if the selected host is connected to the vds.
-                if (item.some(host => host['value'] === getMorIdFromObjRef(resourceObj.objRef))) {
+                if (item && item.some(host => host['value'] === getMorIdFromObjRef(resourceObj.objRef))) {
                   results = results.concat(networks[index]);
                 }
               }
