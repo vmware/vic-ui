@@ -26,12 +26,19 @@ public class ConfigLoader {
 	private final Properties prop;
 
 	public ConfigLoader(String configFile) throws IOException {
-		prop = new Properties();
-		InputStream is = getClass().getClassLoader().getResourceAsStream(configFile);
-		if (is != null) {
-			prop.load(is);
-		} else {
-			throw new FileNotFoundException("'" + configFile + "' was not found");
+		InputStream is = null;
+		try {
+			prop = new Properties();
+			is = getClass().getClassLoader().getResourceAsStream(configFile);
+			if (is != null) {
+				prop.load(is);
+			} else {
+				throw new FileNotFoundException("'" + configFile + "' was not found");
+			}
+		} finally {
+			if(is != null) {
+				is.close();
+			}
 		}
 	}
 
