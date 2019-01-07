@@ -115,15 +115,17 @@ public class PropFetcher implements ClientSessionEndListener {
             _logger.error(e);
         }
 
-        javax.net.ssl.SSLSessionContext sslsc = sc.getServerSessionContext();
-        sslsc.setSessionTimeout(0);
-        try {
-            sc.init(null, tms, null);
-        } catch (KeyManagementException e) {
-            _logger.error(e);
+        if (null != sc) {
+            javax.net.ssl.SSLSessionContext sslsc = sc.getServerSessionContext();
+            sslsc.setSessionTimeout(0);
+            try {
+                sc.init(null, tms, null);
+            } catch (KeyManagementException e) {
+                _logger.error(e);
+            } 
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
+                    sc.getSocketFactory());
         }
-        javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
-                sc.getSocketFactory());
     }
 
     public PropFetcher(
