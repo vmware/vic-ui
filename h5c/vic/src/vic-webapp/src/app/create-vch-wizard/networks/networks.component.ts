@@ -70,7 +70,6 @@ export class NetworksComponent implements OnInit {
       ]],
       clientNetworkType: 'dhcp',
       clientNetworkGateway: [{ value: '', disabled: true }, [
-        Validators.required,
         Validators.pattern(ipPattern)
       ]],
       clientNetworkRouting: [{ value: '', disabled: true }, [

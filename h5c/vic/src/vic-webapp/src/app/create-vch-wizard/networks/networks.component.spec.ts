@@ -135,7 +135,6 @@ describe('NetworksComponent', () => {
 
     // gateway fields are required
     expect(publicNetworkGateway.errors['required']).toBeTruthy();
-    expect(clientNetworkGateway.errors['required']).toBeTruthy();
     expect(managementNetworkGateway.errors['required']).toBeTruthy();
 
     // gateway fields to something incorrect
