@@ -20,18 +20,19 @@
       </div>
     </div>
     <p class="mt-0 mb-1">
-      Disabling client certificates means that Docker clients will have unrestricted access to this VCH<br>
+      Disabling client certificates means that Docker clients will have unrestricted access to this VCH
+      <br>
       <strong>Insecure access should be used only for POC or Lab environments</strong>
     </p>
     <div *ngIf="form.get('useClientAuth').value">
       <p class="mt-0 mb-1">
         You can use one or more CA certificates you may have created using some other certificate authority.
       </p>
-      <div class="alert alert-danger"  *ngIf="tlsCaError">
-        <div class="alert-items">
-          <span>{{ tlsCaError }}</span>
+      <clr-alert *ngIf="tlsCaError" [clrAlertType]="'alert-danger'" [(clrAlertClosed)]="!tlsCaError">
+        <div class="alert-item">
+          <span class="alert-text">{{ tlsCaError }}</span>
         </div>
-      </div>
+      </clr-alert>
       <div formArrayName="tlsCas" *ngFor="let tlsCa of form.controls.tlsCas.controls; index as i; last as isLast">
         <div [formGroupName]="i" class="form-group row mb-0">
           <div class="col-xs-6 text-truncate">
@@ -41,20 +42,14 @@
             <span *ngIf="tlsCaContents[i]">
               {{ tlsCaContents[i].name }}, expires: {{ tlsCaContents[i].expires | date : 'mediumDate'}}
             </span>
-            <input id="tls-ca-{{i}}"
-                   class="hidden-xs-up"
-                   type="file"
-                   (change)="addFileContent($event, 'tlsCas', i, isLast)">
+            <input id="tls-ca-{{i}}" class="hidden-xs-up" type="file" (change)="addFileContent($event, 'tlsCas', i, isLast)">
             <input type="hidden" formControlName="tlsCa">
           </div>
           <div class="col-xs px-0 add-remove-actions">
             <label class="btn btn-link my-0" for="tls-ca-{{i}}">
               {{ tlsCaContents[i] ? 'Replace' : 'Select' }}
             </label>
-            <clr-icon class="is-solid mt-0"
-                      shape="times-circle"
-                      *ngIf="tlsCaContents[i]"
-                      (click)="removeFormArrayEntry('tlsCas', i)">
+            <clr-icon class="is-solid mt-0" shape="times-circle" *ngIf="tlsCaContents[i]" (click)="removeFormArrayEntry('tlsCas', i)">
             </clr-icon>
           </div>
         </div>
@@ -84,11 +79,8 @@
           <label class="required" for="tls-cname">Common Name (CN)</label>
         </div>
         <div class="col-xs-4">
-          <label for="tls-cname"
-                 aria-haspopup="true"
-                 role="tooltip"
-                 class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
-                 [class.invalid]="form.get('tlsCname').invalid && (form.get('tlsCname').dirty || form.get('tlsCname').touched)">
+          <label for="tls-cname" aria-haspopup="true" role="tooltip" class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
+            [class.invalid]="form.get('tlsCname').invalid && (form.get('tlsCname').dirty || form.get('tlsCname').touched)">
             <input id="tls-cname" class="form-control" type="text" placeholder="*.local" formControlName="tlsCname">
             <span class="tooltip-content" *ngIf="form.get('tlsCname').hasError('required')">
               Common Name (CN) cannot be empty
@@ -114,11 +106,8 @@
           <label class="required" for="certificate-key-size">Certificate key size</label>
         </div>
         <div class="col-xs-2">
-          <label for="certificate-key-size"
-                 aria-haspopup="true"
-                 role="tooltip"
-                 class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
-                 [class.invalid]="form.get('certificateKeySize').invalid && (form.get('certificateKeySize').dirty || form.get('certificateKeySize').touched)">
+          <label for="certificate-key-size" aria-haspopup="true" role="tooltip" class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
+            [class.invalid]="form.get('certificateKeySize').invalid && (form.get('certificateKeySize').dirty || form.get('certificateKeySize').touched)">
             <input id="certificate-key-size" class="form-control" type="text" formControlName="certificateKeySize">
             <span class="tooltip-content" *ngIf="form.get('certificateKeySize').hasError('required')">
               Certificate key size cannot be empty
@@ -133,11 +122,11 @@
     </div>
     <div *ngIf="form.get('serverCertSource').value === 'existing'">
       <p class="mt-0 mb-1">Use a certificate and key you have created using some other certificate authority.</p>
-      <div class="alert alert-danger mb-1" *ngIf="tlsServerError">
+      <clr-alert *ngIf="tlsServerError" [clrAlertType]="'alert-danger'" [(clrAlertClosed)]="!tlsServerError">
         <div class="alert-item">
           <span class="alert-text">{{ tlsServerError }}</span>
         </div>
-      </div>
+      </clr-alert>
       <div class="form-group row mb-0">
         <div class="col-xs-3">
           <label class="required" for="tls-server-cert">Server certificate</label>
@@ -147,10 +136,7 @@
           <span *ngIf="tlsServerCertContents">
             {{ tlsServerCertContents.name }}, expires: {{ tlsServerCertContents.expires | date : 'mediumDate'}}
           </span>
-          <input id="tls-server-cert"
-                 class="hidden-xs-up"
-                 type="file"
-                 (change)="addFileContent($event, 'tlsServerCert')">
+          <input id="tls-server-cert" class="hidden-xs-up" type="file" (change)="addFileContent($event, 'tlsServerCert')">
           <input type="hidden" formControlName="tlsServerCert">
         </div>
         <div class="col-xs px-0 add-remove-actions">
@@ -168,10 +154,7 @@
           <span *ngIf="tlsServerKeyContents">
             {{ tlsServerKeyContents.name }}, algorithm: {{ tlsServerKeyContents.algorithm}}
           </span>
-          <input id="tls-server-key"
-                 class="hidden-xs-up"
-                 type="file"
-                 (change)="addFileContent($event, 'tlsServerKey')">
+          <input id="tls-server-key" class="hidden-xs-up" type="file" (change)="addFileContent($event, 'tlsServerKey')">
           <input type="hidden" formControlName="tlsServerKey">
         </div>
         <div class="col-xs px-0 add-remove-actions">
