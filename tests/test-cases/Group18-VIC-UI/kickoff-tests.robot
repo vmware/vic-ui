@@ -57,10 +57,9 @@ Check Govc
 Cleanup Previous Test Logs
     Log  Removing UI test result directories if present...
     Run  rm -rf ui-test-results* 2>/dev/null
-    Run  for f in $(find flex/vic-uia/ -name "\$*") ; do rm $f ; done
 
-Prepare Flex And H5 Plugins For Testing
-    Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build Flex And H5 Plugins
+Prepare H5 Plugins For Testing
+    Run Keyword Unless  ${IS_NIGHTLY_TEST}  Build H5 Plugins
     Run Keyword If  ${BUILD_VER_ISSUE_WORKAROUND} and not ${IS_NIGHTLY_TEST}  Sync Vic Ui Version With Vic Repo
     # scp plugin binaries to the test file server
     Run  sshpass -p "${MACOS_HOST_PASSWORD}" scp -o StrictHostKeyChecking\=no -r scripts/vsphere-client-serenity/*.zip ${MACOS_HOST_USER}@${MACOS_HOST_IP}:~/Documents/vc-plugin-store/public/vsphere-plugins/files/
@@ -71,7 +70,7 @@ Sync Vic Ui Version With Vic Repo
     Run Keyword Unless  ${rc} == 0  Log To Console  Failed to sync vic-ui version!: ${out}
     Run  cp -rf ui-nightly-run-bin/ui/* scripts/
 
-Build Flex And H5 Plugins
+Build H5 Plugins
     # ensure build tools are accessible
     ${rc}=  Run And Return Rc  ant -version
     Should Be Equal As Integers  ${rc}  0
@@ -84,13 +83,8 @@ Build Flex And H5 Plugins
 	${rc}  ${out}=  Run And Return Rc And Output  tar -xzf /tmp/${SDK_PACKAGE_ARCHIVE} -C /tmp/
     Run Keyword Unless  ${rc} == 0  Fatal Error  tar error!: ${out}
 
-    Log To Console  Building Flex Client plugin...
-    ${rc}  ${out}=  Run And Return Rc And Output  ant -f flex/vic-ui/build-deployable.xml -Denv.VSPHERE_SDK_HOME=${ENV_VSPHERE_SDK_HOME} -Denv.FLEX_HOME=${ENV_FLEX_SDK_HOME} 2>&1
-    Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build Flex Client plugin! ${out}
-    Log To Console  Successfully built Flex Client plugin.\n
-
     Log To Console  Building H5 Client plugin...
-    ${rc}  ${out}=  Run And Return Rc And Output  ant -f h5c/build-deployable.xml -Denv.VSPHERE_SDK_HOME=${ENV_VSPHERE_SDK_HOME} -Denv.FLEX_HOME=${ENV_FLEX_SDK_HOME} -Denv.VSPHERE_H5C_SDK_HOME=${ENV_HTML_SDK_HOME} -Denv.BUILD_MODE=prod 2>&1
+    ${rc}  ${out}=  Run And Return Rc And Output  ant -f h5c/build-deployable.xml -Denv.VSPHERE_SDK_HOME=${ENV_VSPHERE_SDK_HOME} -Denv.VSPHERE_H5C_SDK_HOME=${ENV_HTML_SDK_HOME} -Denv.BUILD_MODE=prod 2>&1
     Run Keyword Unless  ${rc} == 0  Fatal Error  Failed to build H5 Client plugin! ${out}
     Log To Console  Successfully built H5 Client plugin.\n
 
@@ -133,7 +127,7 @@ Setup Test Matrix
     # plugin test matrix
     @{plugin_test_config_matrix}=  Create List
     &{plugin_test_results_dict}=  Create Dictionary
-    # vSphere H5C and Flex Client are not supported  on Linux
+    # vSphere H5C is not supported  on Linux
     # https://docs.vmware.com/en/VMware-vSphere/6.5/com.vmware.vsphere.upgrade.doc/GUID-F6D456D7-C559-439D-8F34-4FCF533B7B42.html
     Append To List  ${plugin_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Mac,Chrome,Chrome
     Append To List  ${plugin_test_config_matrix}  %{VC_VER_NO},%{ESX_BUILD_NO},%{VC_BUILD_NO},Mac,Firefox,Firefox

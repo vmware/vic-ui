@@ -37,7 +37,6 @@ ${vic_macmini_fileserver_thumbprint}  BE:64:39:8B:BD:98:47:4D:E8:3B:2F:20:A5:21:
 ${GCP_DOWNLOAD_PATH}                  https://storage.googleapis.com/vic-engine-builds/
 ${SDK_PACKAGE_ARCHIVE}                vic-ui-sdk.tar.gz
 ${ENV_VSPHERE_SDK_HOME}               /tmp/sdk/vc_sdk_min
-${ENV_FLEX_SDK_HOME}                  /tmp/sdk/flex_sdk_min
 ${ENV_HTML_SDK_HOME}                  /tmp/sdk/html-client-sdk
 
 *** Keywords ***

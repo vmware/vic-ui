@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Vic UI" default="make-deployable">
    <!--
-      This build script inherits several properties such as PROJECT_NAME from its parent script: build-war.xml (HTML plugin) or build-flex.xml (Flex plugin)
+      This build script inherits several properties such as PROJECT_NAME from its parent script: build-war.xml (HTML plugin)
       If you need to make any change to name, vendor name or any other environment variable please refer to the parent script.
    -->
 
-   <!-- vSphere SDK and Flex SDK home folders should be set in environment variables -->
+   <!-- vSphere SDK folders should be set in environment variables -->
    <property environment="env"/>
-   <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
    <property name="VSPHERE_SDK_HOME" value="${env.VSPHERE_SDK_HOME}"/>
    <property name="VSPHERE_H5C_SDK_HOME" value="${env.VSPHERE_H5C_SDK_HOME}"/>
-   <property name="FLEX_PROJECT_UI_HOME" value="${basedir}/../vic-ui"/>
-   <property name="FLEX_PROJECT_SERVICE_HOME" value="${basedir}/../vic-ui-service"/>
    <property name="H5_PROJECT_UI_HOME" value="${basedir}/vic"/>
    <property name="H5_PROJECT_SERVICE_HOME" value="${basedir}/vic-service"/>
 
@@ -24,33 +21,14 @@
 
    <!-- Check if SDKs are found -->
    <target name="check-sdks">
-      <available file="${FLEX_HOME}" type="dir" property="sdk.flex.present"/>
       <available file="${VSPHERE_SDK_HOME}" type="dir" property="sdk.vsphere.present"/>
       <available file="${VSPHERE_H5C_SDK_HOME}" type="dir" property="sdk.vsphere_h5c.present"/>
-      <fail message="Flex SDK not found!" unless="${sdk.flex.present}"/>
       <fail message="vSphere Web Client SDK not found!" unless="${sdk.vsphere.present}"/>
       <fail message="vSphere HTML SDK not found!" unless="${sdk.vsphere_h5c.present}"/>
    </target>
 
-   <!-- Build Flex project -->
-   <target name="compile-flex-project">
-      <echo>Building Flex plugin...</echo>
-      <ant antfile="${FLEX_PROJECT_UI_HOME}/build-flex.xml" dir="${FLEX_PROJECT_UI_HOME}"/>
-      <ant antfile="${FLEX_PROJECT_SERVICE_HOME}/build-java.xml" dir="${FLEX_PROJECT_SERVICE_HOME}"/>
-      <copy file="${FLEX_PROJECT_UI_HOME}/war/target/vic-ui-war.war" tofile="${PLUGINS_DIR}/vic-ui-flex.war"/>
-      <copy file="${FLEX_PROJECT_SERVICE_HOME}/target/vic-ui-service.jar" tofile="${PLUGINS_DIR}/vic-ui-service-flex.war"/>
-   </target>
-
-   <target name="get-build-mode">
-      <condition property="BUILD_MODE" value="prod" else="dev">
-         <equals arg1="prod" arg2="${env.BUILD_MODE}" casesensitive="false"/>
-      </condition>
-      <replaceregexp file="${basedir}/vic/src/main/webapp/plugin.xml" match="(\/vsphere-client\/vic\/resources\/)(build\-dev|dist)" replace="\1dist" byline="true"/>
-      <echo>Build mode is ${BUILD_MODE}</echo>
-   </target>
-
    <!-- Build Angular app -->
-   <target name="compile-angular-app" depends="get-build-mode">
+   <target name="compile-angular-app">
       <exec executable="${basedir}/vic/src/vic-webapp/build.sh" dir="${basedir}/vic/src/vic-webapp" failonerror="true">
          <arg value="-s"/>
          <arg value="${VSPHERE_H5C_SDK_HOME}"/>

@@ -2,7 +2,7 @@
 
 ## Background
 
-VIC UI is a Flex and HTML5 Client Plugin for vSphere. It is written in Angular on the
+VIC UI is a HTML5 Client Plugin for vSphere. It is written in Angular on the
 client side and a Java service to interface with the vSphere web API. The current functionality
 includes the following:
 

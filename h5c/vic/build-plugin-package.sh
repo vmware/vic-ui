@@ -28,12 +28,6 @@ then
    exit 1
 fi
 
-if [ -z "$FLEX_HOME" ] || [ ! -f "$FLEX_HOME"/bin/mxmlc ]
- then
-   echo Using the Adobe Flex SDK files bundled with the vSphere Client SDK
-   export FLEX_HOME="${VSPHERE_SDK_HOME}"/resources/flex_sdk_4.6.0.23201_vmw
-fi
-
 "${ANT_HOME}"/bin/ant -f build-plugin-package.xml
 
 exit 0

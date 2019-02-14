@@ -57,8 +57,6 @@ test.secrets
 **/bin
 **/target/*
 **/unittest-results/*
-flex/vic-uia/screenshots
-flex/vic-uia/testResultReportFile
 
 # IDE configs files
 .idea/

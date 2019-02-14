@@ -34,8 +34,6 @@ ${SUITA_TESTS_ZIP_URL}           https://storage.googleapis.com/vic-engine-build
 ${SUITA_TESTS_EXTRACT_LOCATION}  /tmp/${SUITA_TESTS}
 ${VICUIA_H5C_LOCATION}           ../../../h5c/vic-uia
 ${VICUIA_H5C_BUILDFILE}          ${VICUIA_H5C_LOCATION}/build-java.xml
-${VICUIA_FLEX_LOCATION}          ../../../flex/vic-uia
-${VICUIA_FLEX_BUILDFILE}         ${VICUIA_FLEX_LOCATION}/pom.xml
 ${VICUIA_JAR}                    vic-uia.jar
 ${TESTBED_PREPARATION_SCRIPT}    ../../../h5c/vic-uia/prepare-testbed.sh
 
@@ -43,18 +41,10 @@ ${TESTBED_PREPARATION_SCRIPT}    ../../../h5c/vic-uia/prepare-testbed.sh
 Check Prerequisites
     Set Suite Variable  ${VCH_VM_NAME}  %{VCH_VM_NAME}
     ${pwd}=  Run  pwd
-    Run Keyword If  %{TEST_VSPHERE_VER} == 60  Should Exist  ${pwd}/${VICUIA_FLEX_LOCATION}
-    Run Keyword If  %{TEST_VSPHERE_VER} == 60  Set Suite Variable  ${NGC_TESTS_PATH}  ${pwd}/${VICUIA_FLEX_LOCATION}
     Set Suite Variable  ${use_existing_container_vm}  False
     Log To Console  Checking if Selenium Grid is reachable at %{SELENIUM_SERVER_IP}...
     ${ping_rc}=  Run And Return Rc  nc -zv %{SELENIUM_SERVER_IP} 4444 -w 3
     Run Keyword If  ${ping_rc} > 0  Fatal Error  Seleinum Grid %{SELENIUM_SERVER_IP} is not reachable!
-
-    # check if the files required by the ngc automation tests exist
-    Run Keyword If  %{TEST_VSPHERE_VER} == 60  Should Exist  ${NGC_TESTS_PATH}/resources/browservm.tpl.properties
-    Run Keyword If  %{TEST_VSPHERE_VER} == 60  Should Exist  ${NGC_TESTS_PATH}/resources/commonTestbedProvider.tpl.properties
-    Run Keyword If  %{TEST_VSPHERE_VER} == 60  Should Exist  ${NGC_TESTS_PATH}/resources/hostProvider.tpl.properties
-    Run Keyword If  %{TEST_VSPHERE_VER} == 60  Should Exist  ${NGC_TESTS_PATH}/resources/vicEnvProvider.tpl.properties
 
 Ensure Vicui Is Installed
     # ensure vicui is installed before running ngc automation tests
@@ -123,11 +113,6 @@ Set Up Testbed For NGCTESTS
     ${TEST_VC_PASSWORD}=   Set Variable  Bl*ckwalnut0
 
     Download And Unzip SUITA
-    # set up common testbed provider, host provider and vicenvprovider configurations here according to the content of vicui-common.robot
-    ${browservm}=  OperatingSystem.GetFile  ${NGC_TESTS_PATH}/resources/browservm.tpl.properties
-    ${commontestbed}=  OperatingSystem.GetFile  ${NGC_TESTS_PATH}/resources/commonTestbedProvider.tpl.properties
-    ${host}=  OperatingSystem.GetFile  ${NGC_TESTS_PATH}/resources/hostProvider.tpl.properties
-    ${vicenv}=  OperatingSystem.GetFile  ${NGC_TESTS_PATH}/resources/vicEnvProvider.tpl.properties
 
     # make original copies
     Set Suite Variable  ${browservm_original}  ${browser_vm}
@@ -167,20 +152,6 @@ Set Up Testbed For NGCTESTS
     ${vicenv}=  Replace String Using Regexp  ${vicenv}  (?<!\#)testbed\.user=.*  testbed\.user=${TEST_VC_USERNAME}
     ${vicenv}=  Replace String Using Regexp  ${vicenv}  (?<!\#)testbed\.pass=.*  testbed\.pass=${TEST_VC_PASSWORD}
     ${vicenv}=  Replace String Using Regexp  ${vicenv}  (?<!\#)testbed\.endpoint=.*  testbed\.endpoint=${TEST_VC_IP}
-
-    Create File  ${NGC_TESTS_PATH}/resources/browservm.properties  ${browservm}
-    Create File  ${NGC_TESTS_PATH}/resources/commonTestbedProvider.properties  ${commontestbed}
-    Create File  ${NGC_TESTS_PATH}/resources/hostProvider.properties  ${host}
-    Create File  ${NGC_TESTS_PATH}/resources/vicEnvProvider.properties  ${vicenv}
-    Remove Files  ${NGC_TESTS_PATH}/resources/*.tpl.properties
-
-Revert Config Files
-    # revert the properties files to their original template files
-    Remove Files  ${NGC_TESTS_PATH}/resources/*.properties
-    Create File  ${NGC_TESTS_PATH}/resources/browservm.tpl.properties  ${browservm_original}
-    Create File  ${NGC_TESTS_PATH}/resources/commonTestbedProvider.tpl.properties  ${commontestbed_original}
-    Create File  ${NGC_TESTS_PATH}/resources/hostProvider.tpl.properties  ${host_original}
-    Create File  ${NGC_TESTS_PATH}/resources/vicEnvProvider.tpl.properties  ${vicenv_original}
 
 Create And Run Test Container
     Log To Console  \nCreating a busybox container...
@@ -235,7 +206,6 @@ Skip Ngc Tests
 Clean Up Testbed Config Files
     @{files}=  Run Keyword If  %{TEST_VSPHERE_VER} == 60  OperatingSystem.List Directory  ${NGC_TESTS_PATH}/resources  *tpl.properties
     ${num_tpl_files}=  Get Length  ${files}
-    Run Keyword If  %{TEST_VSPHERE_VER} == 60 and ${num_tpl_files} == 0  Revert Config Files
 
 Download And Unzip HSUIA
     Run  rm -rf ${HSUIA_TESTS_EXTRACT_LOCATION} 2>/dev/null
