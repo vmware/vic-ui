@@ -365,9 +365,7 @@ export class CreateVchWizardComponent implements OnInit {
       };
 
       if (payload.networks.clientNetworkIp) {
-        processedPayload.network['client']['static'] = {
-          ip: payload.networks.clientNetworkIp
-        };
+        processedPayload.network['client']['static'] = payload.networks.clientNetworkIp;
 
         processedPayload.network['client']['gateway'] = {
           address: payload.networks.clientNetworkGateway
@@ -391,9 +389,7 @@ export class CreateVchWizardComponent implements OnInit {
       };
 
       if (payload.networks.managementNetworkIp) {
-        processedPayload.network['management']['static'] = {
-          ip: payload.networks.managementNetworkIp
-        };
+        processedPayload.network['management']['static'] = payload.networks.managementNetworkIp;
 
         processedPayload.network['management']['gateway'] = {
           address: payload.networks.managementNetworkGateway
