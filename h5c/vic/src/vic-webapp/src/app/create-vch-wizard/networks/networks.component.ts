@@ -82,7 +82,6 @@ export class NetworksComponent implements OnInit {
       ]],
       managementNetworkType: 'dhcp',
       managementNetworkGateway: [{ value: '', disabled: true }, [
-        Validators.required,
         Validators.pattern(ipPattern)
       ]],
       managementNetworkRouting: [{ value: '', disabled: true }, [
