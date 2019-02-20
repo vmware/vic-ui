@@ -360,18 +360,18 @@ export class CreateVchWizardComponent implements OnInit {
     if (payload.networks.clientNetwork) {
       processedPayload.network['client'] = {
         port_group: {
-          name: payload.networks.publicNetwork
+          name: payload.networks.clientNetwork
         }
       };
 
       if (payload.networks.clientNetworkIp) {
         processedPayload.network['client']['static'] = payload.networks.clientNetworkIp;
 
-        processedPayload.network['client']['gateway'] = {
-          address: payload.networks.clientNetworkGateway
-        };
-
-        if (payload.networks.clientNetworkRouting && payload.networks.clientNetworkRouting.length) {
+        if (payload.networks.clientNetworkGateway && payload.networks.clientNetworkRouting
+          && payload.networks.clientNetworkRouting.length) {
+          processedPayload.network['client']['gateway'] = {
+            address: payload.networks.clientNetworkGateway
+          };
           processedPayload.network['client']['gateway']['routing_destinations'] = payload.networks.clientNetworkRouting;
         }
 
@@ -391,11 +391,13 @@ export class CreateVchWizardComponent implements OnInit {
       if (payload.networks.managementNetworkIp) {
         processedPayload.network['management']['static'] = payload.networks.managementNetworkIp;
 
-        processedPayload.network['management']['gateway'] = {
-          address: payload.networks.managementNetworkGateway
-        };
 
-        if (payload.networks.managementNetworkRouting && payload.networks.managementNetworkRouting.length) {
+
+        if (payload.networks.managementNetworkGateway && payload.networks.managementNetworkRouting
+          && payload.networks.managementNetworkRouting.length) {
+          processedPayload.network['management']['gateway'] = {
+            address: payload.networks.managementNetworkGateway
+          };
           processedPayload.network['management']['gateway']['routing_destinations'] = payload.networks.managementNetworkRouting;
         }
 
