@@ -64,13 +64,14 @@ export function parseCertificatePEMFileContent(str: string): CertificateInfo {
 }
 
 export function parsePrivateKeyPEMFileContent(str: string): PrivateKeyInfo {
-
   // Remove headers
+  if (str.indexOf('RSA PRIVATE KEY') !== -1) {
+    str = str.replace(/(-----(BEGIN|END) RSA PRIVATE KEY-----|\n)/g, '');
+    return { algorithm: 'RSA' };
+  }
   str = str.replace(/(-----(BEGIN|END) PRIVATE KEY-----|\n)/g, '');
-
   // Decode Base64 string, convert to an ArrayBuffer and parse raw data
   const asn1 = fromBER(stringToArrayBuffer(fromBase64(str)));
-
   // Create Private Key model
   const privateKey = new InternalPrivateKeyInfo({ schema: asn1.result });
 
