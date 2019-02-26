@@ -270,6 +270,10 @@
 
             <input class="form-control" id="client-network-routing" type="text" placeholder="Comma delimited CIDRs" formControlName="clientNetworkRouting">
 
+            <span class="tooltip-content" *ngIf="form.get('clientNetworkRouting').hasError('clientNetworkRoutingRequired')">
+              Client network routing destination cannot be empty
+            </span>
+
             <span class="tooltip-content" *ngIf="form.get('clientNetworkRouting').hasError('pattern')">
               IP addresses are not valid, please input one or more routing destinations in a comma separated list, e.g. 10.1.0.0/16,10.2.0.0
             </span>
@@ -280,7 +284,7 @@
 
             <input class="form-control" id="client-network-gateway" type="text" placeholder="IP address" formControlName="clientNetworkGateway">
 
-            <span class="tooltip-content" *ngIf="form.get('clientNetworkGateway').hasError('required')">
+            <span class="tooltip-content" *ngIf="form.get('clientNetworkGateway').hasError('clientNetworkGatewayRequired')">
               Client network gateway cannot be empty
             </span>
 
@@ -360,6 +364,9 @@
           <label for="management-network-routing" aria-haspopup="true" role="tooltip" class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
             [class.invalid]="form.get('managementNetworkRouting').invalid && (form.get('managementNetworkRouting').dirty || form.get('managementNetworkRouting').touched)">
             <input class="form-control" id="management-network-routing" type="text" placeholder="Comma delimited CIDRs" formControlName="managementNetworkRouting">
+            <span class="tooltip-content" *ngIf="form.get('managementNetworkRouting').hasError('managementNetworkRoutingRequired')">
+              Management network routing destination cannot be empty
+            </span>
             <span class="tooltip-content" *ngIf="form.get('managementNetworkRouting').hasError('pattern')">
               IP addresses are not valid, please input one or more routing destinations in a comma separated list, e.g. 10.1.0.0/16,10.2.0.0
             </span>
@@ -368,7 +375,7 @@
           <label for="management-network-gateway" aria-haspopup="true" role="tooltip" class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
             [class.invalid]="form.get('managementNetworkGateway').invalid && (form.get('managementNetworkGateway').dirty || form.get('managementNetworkGateway').touched)">
             <input class="form-control" id="management-network-gateway" type="text" placeholder="IP address" formControlName="managementNetworkGateway">
-            <span class="tooltip-content" *ngIf="form.get('managementNetworkGateway').hasError('required')">
+            <span class="tooltip-content" *ngIf="form.get('managementNetworkGateway').hasError('managementNetworkGatewayRequired')">
               Management network gateway cannot be empty
             </span>
             <span class="tooltip-content" *ngIf="form.get('managementNetworkGateway').hasError('pattern')">
