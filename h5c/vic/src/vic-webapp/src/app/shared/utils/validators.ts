@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { Validators } from '@angular/forms';
+import { Validators, AbstractControl } from '@angular/forms';
 
 /* validation regex */
 export const camelCasePattern = new RegExp(/([a-z])([A-Z])/g);
@@ -53,4 +53,14 @@ export function getNumericValidatorsArray(allowUnlimited: boolean) {
   ];
 }
 
-
+export function removeError(control: AbstractControl, error: string) {
+  const err = control.errors;
+  if (err) {
+    delete err[error];
+    if (!Object.keys(err).length) {
+      control.setErrors(null);
+    } else {
+      control.setErrors(err);
+    }
+  }
+}

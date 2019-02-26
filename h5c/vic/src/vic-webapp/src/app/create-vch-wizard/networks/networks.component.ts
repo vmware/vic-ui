@@ -27,7 +27,7 @@ import {
 } from '../../shared/utils/validators';
 import { ComputeResource } from '../../interfaces/compute.resource';
 import { resourceIsResourcePool } from '../../shared/utils/object-reference';
-
+import { removeError } from '../../shared/utils/validators';
 @Component({
   selector: 'vic-vch-creation-networks',
   templateUrl: './networks.html',
@@ -104,10 +104,52 @@ export class NetworksComponent implements OnInit {
           Validators.pattern(numberPattern)
         ]
       ]
-    });
+    }, {validator: this.conditionalRequired});
   }
 
   ngOnInit() { }
+
+  conditionalRequired(control: FormGroup) {
+    if (control.controls['clientNetwork'].value !== '' && control.controls['clientNetworkType'].value === 'static') {
+      const clientNetworkGateway = control.get('clientNetworkGateway');
+      const clientNetworkRouting = control.get('clientNetworkRouting');
+      if ( clientNetworkGateway.value === '' && clientNetworkRouting.value !== '') {
+        clientNetworkGateway.setErrors({
+          clientNetworkGatewayRequired: true
+        });
+      } else {
+        removeError(clientNetworkGateway, 'clientNetworkGatewayRequired');
+      }
+
+      if (clientNetworkGateway.value !== '' && clientNetworkRouting.value === '') {
+        clientNetworkRouting.setErrors({
+          clientNetworkRoutingRequired: true
+        });
+      } else {
+        removeError(clientNetworkRouting, 'clientNetworkRoutingRequired');
+      }
+    }
+
+    if (control.controls['managementNetwork'].value !== '' && control.controls['managementNetworkType'].value === 'static') {
+      const managementNetworkGateway = control.get('managementNetworkGateway');
+      const managementNetworkRouting = control.get('managementNetworkRouting');
+      if ( managementNetworkGateway.value === '' && managementNetworkRouting.value !== '') {
+        managementNetworkGateway.setErrors({
+          'managementNetworkGatewayRequired': true
+        })
+      } else {
+        removeError(managementNetworkGateway, 'managementNetworkGatewayRequired');
+      }
+
+      if (managementNetworkGateway.value !== '' && managementNetworkRouting.value === '') {
+        managementNetworkRouting.setErrors({
+          'managementNetworkRoutingRequired': true
+        })
+      } else {
+        removeError(managementNetworkRouting, 'managementNetworkRoutingRequired');
+      }
+    }
+  }
 
   addNewContainerNetworkEntry() {
     const containerNetworks = this.form.get('containerNetworks') as FormArray;
