@@ -10,7 +10,7 @@ Import-Package: com.vmware.vic.mvc;version="1.0.0",
  com.vmware.vise.data.query;version=0,
  com.vmware.vise.security;version=0,
  org.eclipse.virgo.web.dm;version="[3.6.0,4)",
- org.springframework.web.servlet;version="[3.1.4,4.3.17.RELEASE_VMWARE]",
- org.springframework.web.servlet.config;version="[3.1.4,4.3.17.RELEASE_VMWARE]",
- org.springframework.web.servlet.view;version="[3.1.4,4.3.17.RELEASE_VMWARE]",
- org.springframework.web.servlet.view.json;version="[3.1.4,4.3.17.RELEASE_VMWARE]"
+ org.springframework.web.servlet,
+ org.springframework.web.servlet.config,
+ org.springframework.web.servlet.view,
+ org.springframework.web.servlet.view.json
