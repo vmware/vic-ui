@@ -188,7 +188,7 @@ public class PropFetcher implements ClientSessionEndListener {
      * @return ResultItem object containing either VCH VM(s) or Container VM(s)
      *         based on the isVch boolean value
      */
-    public ResultItem getVicVms(boolean isVch) {
+    synchronized public ResultItem getVicVms(boolean isVch) {
         List<PropertyValue> pvList = new ArrayList<PropertyValue>();
         ResultItem resultItem = new ResultItem();
 
@@ -390,7 +390,7 @@ public class PropFetcher implements ClientSessionEndListener {
      * @throws RuntimeFaultFaultMsg
      * @throws InvalidPropertyFaultMsg
      */
-    public List<String> getVicApplianceVms()
+    synchronized public List<String> getVicApplianceVms()
             throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         ArrayList<String> vicAppliancesList = new ArrayList<String>();
         UserSession userSession = _userSessionService.getUserSession();
