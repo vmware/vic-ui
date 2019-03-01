@@ -683,7 +683,7 @@ public class PropFetcher implements ClientSessionEndListener {
      * @param serverGuid
      * @return ServiceContent object corresponding to the specified serverGuid
      */
-    private ServiceContent getServiceContent(String serverGuid) {
+    synchronized private ServiceContent getServiceContent(String serverGuid) {
         ServerInfo serverInfoObject = getServerInfoObject(serverGuid);
         setThumbprint(serverInfoObject);
         String sessionCookie = serverInfoObject.sessionCookie;
@@ -722,7 +722,7 @@ public class PropFetcher implements ClientSessionEndListener {
      * Obtain a clone ticket from vSphere
      * @throws Exception
      */
-    public String acquireCloneTicket(String serviceGuid) throws Exception {
+    synchronized public String acquireCloneTicket(String serviceGuid) throws Exception {
 
         ServerInfo[] sInfos = _userSessionService.getUserSession().serversInfo;
 
