@@ -22,6 +22,7 @@ import {
   supportedCharsPattern,
   ipPattern,
   numberPattern,
+  positiveNumberPattern,
   cidrPattern,
   ipListPattern, cidrListPattern
 } from '../../shared/utils/validators';
@@ -52,6 +53,11 @@ export class NetworksComponent implements OnInit {
     this.form = formBuilder.group({
       bridgeNetwork: ['', Validators.required],
       bridgeNetworkRange: ['172.16.0.0/12', Validators.required],
+      bridgeNetworkWidth: [{ value: '', disabled: false }, [
+        Validators.max(30),
+        Validators.min(1),
+        Validators.pattern(positiveNumberPattern)
+      ]],
       publicNetwork: ['', Validators.required],
       publicNetworkIp: [{ value: '', disabled: true }, [
         Validators.required,
@@ -338,6 +344,9 @@ export class NetworksComponent implements OnInit {
     results['bridgeNetwork'] = this.form.get('bridgeNetwork').value;
     if (this.form.get('bridgeNetworkRange').value) {
       results['bridgeNetworkRange'] = this.form.get('bridgeNetworkRange').value;
+    }
+    if (this.form.get('bridgeNetworkWidth').value) {
+      results['bridgeNetworkWidth'] = +this.form.get('bridgeNetworkWidth').value;
     }
     results['publicNetwork'] = this.form.get('publicNetwork').value;
     if (this.form.get('publicNetworkType').value === 'static') {

@@ -129,7 +129,6 @@ export class SummaryComponent implements OnInit {
       if (!payload[section]) {
         continue;
       }
-
       // if there is only one entry in the section and it's of string type
       // add it to results array here
       if (typeof payload[section] === 'string') {
@@ -139,6 +138,7 @@ export class SummaryComponent implements OnInit {
         results.push(`--${section} ${payload[section]}`);
         continue;
       }
+
 
       for (const key in payload[section]) {
         if (key === 'computeResource') {// computeResource is a id which is not needed in commandline.
@@ -160,6 +160,9 @@ export class SummaryComponent implements OnInit {
           results.push(`--${newKey} ${value}`);
         } else if (typeof value === 'boolean') {
           results.push(`--${newKey}`);
+        } else if (typeof value === 'number') {
+          results.push(`--${newKey} ${value}`);
+          continue;
         } else {
           // repeat adding multiple, optional fields with the same key
           for (const i in value) {
