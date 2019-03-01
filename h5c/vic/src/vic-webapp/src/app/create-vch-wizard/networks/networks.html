@@ -67,6 +67,36 @@
 
         </div>
       </div>
+      <div class="row form-group mb-0">
+        <div class="col-xs offset-xs-3"></div>
+        <div class="col-xs text-right">
+
+          <label for="bridge-network-width">
+            Bridge network width
+          </label>
+
+        </div>
+        <div class="col-xs">
+
+          <label for="bridge-network-width" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+            [class.invalid]="form.get('bridgeNetworkWidth').invalid && (form.get('bridgeNetworkWidth').dirty || form.get('bridgeNetworkWidth').touched)">
+
+            <input class="form-control" id="bridge-network-width" type="text" formControlName="bridgeNetworkWidth">
+            <span class="tooltip-content" *ngIf="form.get('bridgeNetworkWidth').hasError('max')">
+              Bridge network width's maximum cannot exceed 30
+            </span>
+            <span class="tooltip-content" *ngIf="form.get('bridgeNetworkWidth').hasError('min')">
+              Bridge network width's minimum be less than 1
+            </span>
+            <span class="tooltip-content" *ngIf="form.get('bridgeNetworkWidth').hasError('pattern')">
+              Bridge network width is not valid
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
        <!-- end form control for bridge network -->
        <!-- start  form control for public network -->
       <div class="row form-group mb-0">
