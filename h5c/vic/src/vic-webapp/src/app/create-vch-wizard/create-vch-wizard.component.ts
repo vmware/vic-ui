@@ -356,7 +356,9 @@ export class CreateVchWizardComponent implements OnInit {
     if (payload.networks.dnsServer && payload.networks.dnsServer.length) {
       processedPayload.network.public['nameservers'] = payload.networks.dnsServer;
     }
-
+    if (payload.networks['bridgeNetworkWidth']) {
+      processedPayload.network.bridge['network_width'] = payload.networks['bridgeNetworkWidth'];
+    }
     if (payload.networks.clientNetwork) {
       processedPayload.network['client'] = {
         port_group: {
