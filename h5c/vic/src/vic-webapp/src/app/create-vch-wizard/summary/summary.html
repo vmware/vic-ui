@@ -149,7 +149,7 @@
           <clr-stack-block>
             <clr-stack-label>Bridge network</clr-stack-label>
             <clr-stack-content>
-              {{ payload?.networks?.bridgeNetwork }}, {{ payload?.networks?.bridgeNetworkRange }}
+              {{ payload?.networks?.bridgeNetwork }}, {{ payload?.networks?.bridgeNetworkRange }}{{ payload?.networks?.bridgeNetworkWidth?','+payload?.networks?.bridgeNetworkWidth:''}}
             </clr-stack-content>
             <clr-stack-block>
               <clr-stack-label>Portgroup name</clr-stack-label>
@@ -161,6 +161,12 @@
               <clr-stack-label>Range</clr-stack-label>
               <clr-stack-content>
                 {{ payload?.networks?.bridgeNetworkRange }}
+              </clr-stack-content>
+            </clr-stack-block>
+            <clr-stack-block *ngIf="payload?.networks?.hasOwnProperty('bridgeNetworkWidth')">
+              <clr-stack-label>Width</clr-stack-label>
+              <clr-stack-content>
+                {{ payload?.networks?.bridgeNetworkWidth}}
               </clr-stack-content>
             </clr-stack-block>
           </clr-stack-block>
