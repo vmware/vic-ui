@@ -50,7 +50,7 @@ const algorithmsMap = {
 export function parseCertificatePEMFileContent(str: string): CertificateInfo {
 
   // Remove headers
-  str = str.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, '');
+  str = str.replace(/(-----(BEGIN|END) CERTIFICATE-----|\r\n|\n)/g, '');
 
   // Decode Base64 string, convert to an ArrayBuffer and parse raw data
   const asn1 = fromBER(stringToArrayBuffer(fromBase64(str)));
@@ -66,10 +66,10 @@ export function parseCertificatePEMFileContent(str: string): CertificateInfo {
 export function parsePrivateKeyPEMFileContent(str: string): PrivateKeyInfo {
   // Remove headers
   if (str.indexOf('RSA PRIVATE KEY') !== -1) {
-    str = str.replace(/(-----(BEGIN|END) RSA PRIVATE KEY-----|\n)/g, '');
+    str = str.replace(/(-----(BEGIN|END) RSA PRIVATE KEY-----|\r\n|\n)/g, '');
     return { algorithm: 'RSA' };
   }
-  str = str.replace(/(-----(BEGIN|END) PRIVATE KEY-----|\n)/g, '');
+  str = str.replace(/(-----(BEGIN|END) PRIVATE KEY-----|\r\n|\n)/g, '');
   // Decode Base64 string, convert to an ArrayBuffer and parse raw data
   const asn1 = fromBER(stringToArrayBuffer(fromBase64(str)));
   // Create Private Key model
