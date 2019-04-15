@@ -17,6 +17,8 @@ limitations under the License.
  */
 package com.vmware.vic;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -441,8 +443,21 @@ public class PropFetcher implements ClientSessionEndListener {
                 if (props != null) {
                     for (ObjectContent objC : props.getObjects()) {
                         VicApplianceVm applianceVm = new VicApplianceVm(objC);
-                        vicAppliancesList.add(
-                                applianceVm.getName() + ": " + applianceVm.getVersionString() + "," + applianceVm.getIpAddress());
+                        String ip = applianceVm.getIpAddress();
+                        String hostnameCanonical = "";
+						try {
+							InetAddress address = InetAddress.getByName(ip);
+							hostnameCanonical = address.getCanonicalHostName();
+	                       
+						} catch (UnknownHostException e) {
+							hostnameCanonical = ip;
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+					    vicAppliancesList.add(
+	                                applianceVm.getName() + ": " + applianceVm.getVersionString() + "," + hostnameCanonical);
+                        
                     }
                 }
             } catch (RuntimeFaultFaultMsg | InvalidPropertyFaultMsg e) {
