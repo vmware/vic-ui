@@ -444,17 +444,18 @@ public class PropFetcher implements ClientSessionEndListener {
                     for (ObjectContent objC : props.getObjects()) {
                         VicApplianceVm applianceVm = new VicApplianceVm(objC);
                         String ip = applianceVm.getIpAddress();
-                        String hostnameCanonical = "";
-						try {
-							InetAddress address = InetAddress.getByName(ip);
-							hostnameCanonical = address.getCanonicalHostName();
-	                       
-						} catch (UnknownHostException e) {
-							hostnameCanonical = ip;
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
+                        String hostnameCanonical = ip;
+                        if (ip != null) {
+                            _logger.error("go inside the loop");
+                            try {
+                                InetAddress address = InetAddress.getByName(ip);
+                                hostnameCanonical = address.getCanonicalHostName();
+                               
+                            } catch (UnknownHostException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
 					    vicAppliancesList.add(
 	                                applianceVm.getName() + ": " + applianceVm.getVersionString() + "," + hostnameCanonical);
                         
@@ -468,11 +469,20 @@ public class PropFetcher implements ClientSessionEndListener {
         Collections.sort(vicAppliancesList, new Comparator<String>() {
             @Override
             public int compare(String a, String b) {
-                String[] aSplit = a.split("-");
-                String[] bSplit = b.split("-");
-                int aBuildNumber = Integer.parseInt(aSplit[aSplit.length - 2]);
-                int bBuildNumber = Integer.parseInt(bSplit[bSplit.length - 2]);
-                return aBuildNumber > bBuildNumber ? -1 : (aBuildNumber < bBuildNumber ? 1 : 0);
+                String[] aSplit = a.split(",");
+                String[] bSplit = b.split(",");
+                if (aSplit != null && aSplit.length > 1 && bSplit != null && bSplit.length > 1) {
+                    String versionA = aSplit[0];
+                    String versionB = bSplit[0];
+                    String[] aVersionArr = versionA.split("-");
+                    String[] bVersionArr = versionB.split("-");
+                    int aBuildNumber = Integer.parseInt(aVersionArr[aVersionArr.length - 2]);
+                    int bBuildNumber = Integer.parseInt(bVersionArr[bVersionArr.length - 2]);
+                    return aBuildNumber > bBuildNumber ? -1 : (aBuildNumber < bBuildNumber ? 1 : 0);
+                } else {
+                    return 0;
+                }
+                
             }
         });
 
