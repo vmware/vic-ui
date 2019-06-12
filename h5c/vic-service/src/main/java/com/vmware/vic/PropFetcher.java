@@ -72,23 +72,20 @@ import com.vmware.vise.usersession.ServerInfo;
 import com.vmware.vise.usersession.UserSession;
 import com.vmware.vise.usersession.UserSessionService;
 import com.vmware.vise.vim.data.VimObjectReferenceService;
+import com.vmware.vic.cache.LocalCache;
 
 public class PropFetcher implements ClientSessionEndListener {
     private static final Log _logger = LogFactory.getLog(PropFetcher.class);
     private static VimPortType _vimPort = initializeVimPort();
-    private static final String[] VIC_VM_TYPES = {"isVCH", "isContainer"};
+    private static final String[] VIC_VM_TYPES = { "isVCH", "isContainer" };
     private static final String SERVICE_INSTANCE = "ServiceInstance";
     private static final Set<String> _thumbprints = new HashSet<String>();
-    private static final String[] VM_PROPERTIES_TO_FETCH = new String[]{
-            BaseVm.VM_NAME, BaseVm.Config.VM_GUESTFULLNAME,
-            BaseVm.Config.VM_EXTRACONFIG, BaseVm.VM_OVERALL_STATUS,
-            BaseVm.VM_SUMMARY, BaseVm.VM_RESOURCECONFIG,
-            BaseVm.VM_RESOURCEPOOL, BaseVm.Runtime.VM_POWERSTATE_FULLPATH
-    };
+    private static final String[] VM_PROPERTIES_TO_FETCH = new String[] { BaseVm.VM_NAME,
+            BaseVm.Config.VM_GUESTFULLNAME, BaseVm.Config.VM_EXTRACONFIG, BaseVm.VM_OVERALL_STATUS, BaseVm.VM_SUMMARY,
+            BaseVm.VM_RESOURCECONFIG, BaseVm.VM_RESOURCEPOOL, BaseVm.Runtime.VM_POWERSTATE_FULLPATH };
     private static final String VM_GUESTNAME_VCH_IDENTIFIER = "Photon - VCH";
-    private static final String[] VM_GUESTNAME_CONTAINER_IDENTIFIER =
-            new String[]{
-                    "Photon - Container", "Redhat - Container", "Windows - Container"};
+    private static final String[] VM_GUESTNAME_CONTAINER_IDENTIFIER = new String[] { "Photon - Container",
+            "Redhat - Container", "Windows - Container" };
     private static final String GROUP_ADMINISTRATORS = "Administrators";
     private static final String VICUI_H5C_EXTENSION_KEY = "com.vmware.vic";
     private final UserSessionService _userSessionService;
@@ -124,17 +121,13 @@ public class PropFetcher implements ClientSessionEndListener {
                 sc.init(null, tms, null);
             } catch (KeyManagementException e) {
                 _logger.error(e);
-            } 
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
-                    sc.getSocketFactory());
+            }
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         }
     }
 
-    public PropFetcher(
-            UserSessionService userSessionService,
-            VimObjectReferenceService vimObjectReferenceService) {
-        if (userSessionService == null ||
-                vimObjectReferenceService == null) {
+    public PropFetcher(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService) {
+        if (userSessionService == null || vimObjectReferenceService == null) {
             throw new IllegalArgumentException("constructor argument cannot be null");
         }
         _userSessionService = userSessionService;
@@ -142,8 +135,9 @@ public class PropFetcher implements ClientSessionEndListener {
     }
 
     /**
-     * Look up the current session user in UserDirectory
-     * and check if the user belongs to the vSphere administrators group
+     * Look up the current session user in UserDirectory and check if the user
+     * belongs to the vSphere administrators group
+     * 
      * @return true if admin
      */
     public boolean isSessionUserVsphereAdmin() {
@@ -166,12 +160,8 @@ public class PropFetcher implements ClientSessionEndListener {
                 }
 
                 try {
-                    List<UserSearchResult> userSrchResults = _vimPort.retrieveUserGroups(
-                            service.getUserDirectory(),
-                            domain,
-                            userName,
-                            GROUP_ADMINISTRATORS,
-                            null, true, true, false);
+                    List<UserSearchResult> userSrchResults = _vimPort.retrieveUserGroups(service.getUserDirectory(),
+                            domain, userName, GROUP_ADMINISTRATORS, null, true, true, false);
 
                     return userSrchResults.size() == 1;
                 } catch (NotFoundFaultMsg e) {
@@ -186,11 +176,19 @@ public class PropFetcher implements ClientSessionEndListener {
 
     /**
      * Get VIC VMs
+     * 
      * @param isVch : true for VCHs and false for Container VMs
      * @return ResultItem object containing either VCH VM(s) or Container VM(s)
      *         based on the isVch boolean value
      */
     synchronized public ResultItem getVicVms(boolean isVch) {
+        LocalCache instance = LocalCache.getInstance();
+        if (isVch && instance.get("vch") != null) {
+            return (ResultItem) instance.get("vch");
+        } else if (!isVch && instance.get("containerVm") != null) {
+            return (ResultItem) instance.get("containerVm");
+        }
+
         List<PropertyValue> pvList = new ArrayList<PropertyValue>();
         ResultItem resultItem = new ResultItem();
 
@@ -209,11 +207,8 @@ public class PropFetcher implements ClientSessionEndListener {
                 List<String> vmList = new ArrayList<String>();
                 vmList.add(VsphereObjects.VirtualMachine);
                 try {
-                    ManagedObjectReference cViewRef = _vimPort.createContainerView(
-                            viewMgrRef,
-                            service.getRootFolder(),
-                            vmList,
-                            true);
+                    ManagedObjectReference cViewRef = _vimPort.createContainerView(viewMgrRef, service.getRootFolder(),
+                            vmList, true);
 
                     PropertySpec propertySpec = new PropertySpec();
                     propertySpec.setType(VsphereObjects.VirtualMachine);
@@ -265,13 +260,11 @@ public class PropFetcher implements ClientSessionEndListener {
                     propertyFilterSpecs.add(propertyFilterSpec);
                     RetrieveOptions ro = new RetrieveOptions();
 
-                    RetrieveResult props = _vimPort.retrievePropertiesEx(
-                            service.getPropertyCollector(),
-                            propertyFilterSpecs,
-                            ro);
+                    RetrieveResult props = _vimPort.retrievePropertiesEx(service.getPropertyCollector(),
+                            propertyFilterSpecs, ro);
                     if (props != null) {
                         // continue fetching all results
-                        while(true) {
+                        while (true) {
                             for (ObjectContent objC : props.getObjects()) {
                                 List<DynamicProperty> dpList = objC.getPropSet();
                                 String objType = objC.getObj().getType();
@@ -293,28 +286,23 @@ public class PropFetcher implements ClientSessionEndListener {
                                     String vmMorValue = objMorValue;
 
                                     for (DynamicProperty dp : dpList) {
-                                        if (dp.getName().equals(
-                                                BaseVm.Config.VM_GUESTFULLNAME)) {
-                                            String guestName = ((String)dp.getVal());
+                                        if (dp.getName().equals(BaseVm.Config.VM_GUESTFULLNAME)) {
+                                            String guestName = ((String) dp.getVal());
                                             if (isVch) {
-                                                isVicVm = guestName.contains(
-                                                        VM_GUESTNAME_VCH_IDENTIFIER);
+                                                isVicVm = guestName.contains(VM_GUESTNAME_VCH_IDENTIFIER);
                                                 isVchEndpoint = isVicVm;
                                             } else {
-                                                for (String contId :
-                                                    VM_GUESTNAME_CONTAINER_IDENTIFIER) {
+                                                for (String contId : VM_GUESTNAME_CONTAINER_IDENTIFIER) {
                                                     if (guestName.contains(contId)) {
                                                         isVicVm = true;
                                                         break;
                                                     }
                                                 }
                                             }
-                                        } else if (dp.getName().equals(
-                                                BaseVm.VM_NAME)) {
-                                            vmName = (String)dp.getVal();
-                                        } else if (dp.getName().equals(
-                                                BaseVm.VM_RESOURCEPOOL)) {
-                                            ManagedObjectReference mor = (ManagedObjectReference)dp.getVal();
+                                        } else if (dp.getName().equals(BaseVm.VM_NAME)) {
+                                            vmName = (String) dp.getVal();
+                                        } else if (dp.getName().equals(BaseVm.VM_RESOURCEPOOL)) {
+                                            ManagedObjectReference mor = (ManagedObjectReference) dp.getVal();
                                             resourcePoolMorValue = mor.getValue();
                                         }
                                     }
@@ -337,11 +325,9 @@ public class PropFetcher implements ClientSessionEndListener {
                                     PropertyValue pv = new PropertyValue();
                                     pv.propertyName = VsphereObjects.VmPropertyValueKey;
                                     if (isVch) {
-                                        pv.value = new VirtualContainerHostVm(
-                                                objC, serviceGuid);
+                                        pv.value = new VirtualContainerHostVm(objC, serviceGuid);
                                     } else {
-                                        pv.value = new ContainerVm(
-                                                objC, serviceGuid);
+                                        pv.value = new ContainerVm(objC, serviceGuid);
                                     }
                                     pvList.add(pv);
                                     continue;
@@ -354,10 +340,11 @@ public class PropFetcher implements ClientSessionEndListener {
                                 for (PropertyValue pv : pvList) {
                                     // for each container vm, get the parent object's
                                     // name from vcValueRpNameMap
-                                    ContainerVm cvm = (ContainerVm)pv.value;
-                                    ManagedObjectReference parentRpMor = (ManagedObjectReference)cvm.getResourcePool();
+                                    ContainerVm cvm = (ContainerVm) pv.value;
+                                    ManagedObjectReference parentRpMor = (ManagedObjectReference) cvm.getResourcePool();
                                     String nameOfParent = _rpMorValueVchEndpointNameMap.get(parentRpMor.getValue());
-                                    String morValueOfVchEndpointVm = _rpMorValueVchMorValueMap.get(parentRpMor.getValue());
+                                    String morValueOfVchEndpointVm = _rpMorValueVchMorValueMap
+                                            .get(parentRpMor.getValue());
                                     cvm.setVchEndpointVmMorValue(morValueOfVchEndpointVm);
                                     cvm.setParentName(nameOfParent);
                                 }
@@ -369,8 +356,8 @@ public class PropFetcher implements ClientSessionEndListener {
                             }
 
                             // otherwise continue loading data
-                            RetrieveResult propsContinued =
-                                    _vimPort.continueRetrievePropertiesEx(service.getPropertyCollector(), props.getToken());
+                            RetrieveResult propsContinued = _vimPort
+                                    .continueRetrievePropertiesEx(service.getPropertyCollector(), props.getToken());
                             props = propsContinued;
                         }
                     }
@@ -382,18 +369,23 @@ public class PropFetcher implements ClientSessionEndListener {
             }
         }
 
-        resultItem.properties = pvList.toArray(new PropertyValue[]{});
+        resultItem.properties = pvList.toArray(new PropertyValue[] {});
+        if (isVch) {
+            instance.set("vch", (Object) resultItem);
+        } else {
+            instance.set("containerVm", (Object) resultItem);
+        }
         return resultItem;
     }
 
     /**
      * Return an array of VIC appliances information
+     * 
      * @return List<String> containing all VIC appliance VMs
      * @throws RuntimeFaultFaultMsg
      * @throws InvalidPropertyFaultMsg
      */
-    synchronized public List<String> getVicApplianceVms()
-            throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+    synchronized public List<String> getVicApplianceVms() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         ArrayList<String> vicAppliancesList = new ArrayList<String>();
         UserSession userSession = _userSessionService.getUserSession();
 
@@ -414,8 +406,8 @@ public class PropFetcher implements ClientSessionEndListener {
                 pSpecPathSet.add(BaseVm.VM_NAME);
                 pSpecPathSet.add(BaseVm.VM_SUMMARY);
 
-                List<ManagedObjectReference> applianceVms =
-                        _vimPort.queryManagedBy(service.getExtensionManager(), VICUI_H5C_EXTENSION_KEY);
+                List<ManagedObjectReference> applianceVms = _vimPort.queryManagedBy(service.getExtensionManager(),
+                        VICUI_H5C_EXTENSION_KEY);
 
                 if (applianceVms.size() == 0) {
                     continue;
@@ -435,10 +427,8 @@ public class PropFetcher implements ClientSessionEndListener {
                 }
 
                 RetrieveOptions ro = new RetrieveOptions();
-                RetrieveResult props = _vimPort.retrievePropertiesEx(
-                        service.getPropertyCollector(),
-                        propertyFilterSpecs,
-                        ro);
+                RetrieveResult props = _vimPort.retrievePropertiesEx(service.getPropertyCollector(),
+                        propertyFilterSpecs, ro);
 
                 if (props != null) {
                     for (ObjectContent objC : props.getObjects()) {
@@ -446,19 +436,18 @@ public class PropFetcher implements ClientSessionEndListener {
                         String ip = applianceVm.getIpAddress();
                         String hostnameCanonical = ip;
                         if (ip != null) {
-                            _logger.error("go inside the loop");
                             try {
                                 InetAddress address = InetAddress.getByName(ip);
                                 hostnameCanonical = address.getCanonicalHostName();
-                               
+
                             } catch (UnknownHostException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
                         }
-					    vicAppliancesList.add(
-	                                applianceVm.getName() + ": " + applianceVm.getVersionString() + "," + hostnameCanonical);
-                        
+                        vicAppliancesList.add(applianceVm.getName() + ": " + applianceVm.getVersionString() + ","
+                                + hostnameCanonical);
+
                     }
                 }
             } catch (RuntimeFaultFaultMsg | InvalidPropertyFaultMsg e) {
@@ -482,7 +471,7 @@ public class PropFetcher implements ClientSessionEndListener {
                 } else {
                     return 0;
                 }
-                
+
             }
         });
 
@@ -491,6 +480,7 @@ public class PropFetcher implements ClientSessionEndListener {
 
     /**
      * Get VMs belonging to a given vApp object reference.
+     * 
      * @param objRef
      * @param isVch
      * @return ResultItem object containing either VCH VM(s) or Container VM(s)
@@ -521,11 +511,7 @@ public class PropFetcher implements ClientSessionEndListener {
         ManagedObjectReference viewMgrRef = service.getViewManager();
         List<String> vmList = new ArrayList<String>();
         vmList.add(VsphereObjects.VirtualMachine);
-        ManagedObjectReference cViewRef = _vimPort.createContainerView(
-                viewMgrRef,
-                mor,
-                vmList,
-                true);
+        ManagedObjectReference cViewRef = _vimPort.createContainerView(viewMgrRef, mor, vmList, true);
 
         PropertySpec propertySpec = new PropertySpec();
         propertySpec.setType(VsphereObjects.VirtualMachine);
@@ -564,10 +550,7 @@ public class PropFetcher implements ClientSessionEndListener {
         propertyFilterSpecs.add(propertyFilterSpec);
         RetrieveOptions ro = new RetrieveOptions();
 
-        RetrieveResult props = _vimPort.retrievePropertiesEx(
-                service.getPropertyCollector(),
-                propertyFilterSpecs,
-                ro);
+        RetrieveResult props = _vimPort.retrievePropertiesEx(service.getPropertyCollector(), propertyFilterSpecs, ro);
         if (props != null) {
             for (ObjectContent objC : props.getObjects()) {
                 // each managed object reference found will be added to resultItem.properties
@@ -582,21 +565,21 @@ public class PropFetcher implements ClientSessionEndListener {
                 pvList.add(pv);
             }
         }
-        resultItem.properties = pvList.toArray(new PropertyValue[]{});
+        resultItem.properties = pvList.toArray(new PropertyValue[] {});
 
         return resultItem;
     }
 
     /**
      * Compute custom VM properties isContainer and isVCH
+     * 
      * @param objRef
-     * @return ResultItem object containing PropertyValue[] for the
-     *         the custom VM properties
+     * @return ResultItem object containing PropertyValue[] for the the custom VM
+     *         properties
      * @throws InvalidPropertyFaultMsg
      * @throws RuntimeFaultFaultMsg
      */
-    public ResultItem getVmProperties(Object objRef) throws
-    InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+    public ResultItem getVmProperties(Object objRef) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         ResultItem resultItem = new ResultItem();
         resultItem.resourceObject = objRef;
         String entityType = _vimObjectReferenceService.getResourceObjectType(objRef);
@@ -642,7 +625,8 @@ public class PropFetcher implements ClientSessionEndListener {
         List<PropertyFilterSpec> propertyFilterSpecs = new ArrayList<PropertyFilterSpec>();
         propertyFilterSpecs.add(propertyFilterSpec);
 
-        List<ObjectContent> objectContents = _vimPort.retrieveProperties(service.getPropertyCollector(), propertyFilterSpecs);
+        List<ObjectContent> objectContents = _vimPort.retrieveProperties(service.getPropertyCollector(),
+                propertyFilterSpecs);
         if (objectContents != null) {
             for (ObjectContent content : objectContents) {
                 List<DynamicProperty> dps = content.getPropSet();
@@ -651,16 +635,14 @@ public class PropFetcher implements ClientSessionEndListener {
                         config = (VirtualMachineConfigInfo) dp.getVal();
 
                         List<OptionValue> extraConfigs = config.getExtraConfig();
-                        for(OptionValue option : extraConfigs) {
+                        for (OptionValue option : extraConfigs) {
 
-                            if(option.getKey().equals(
-                                    Container.VM_EXTRACONFIG_CONTAINER_KEY)) {
+                            if (option.getKey().equals(Container.VM_EXTRACONFIG_CONTAINER_KEY)) {
                                 pv_is_container.value = true;
                                 break;
                             }
 
-                            if(option.getKey().equals(
-                                    Vch.VM_EXTRACONFIG_VCH_KEY)) {
+                            if (option.getKey().equals(Vch.VM_EXTRACONFIG_VCH_KEY)) {
                                 pv_is_vch.value = true;
                                 break;
                             }
@@ -670,13 +652,14 @@ public class PropFetcher implements ClientSessionEndListener {
             }
         }
 
-        resultItem.properties = new PropertyValue[] {pv_is_vch, pv_is_container};
+        resultItem.properties = new PropertyValue[] { pv_is_vch, pv_is_container };
 
         return resultItem;
     }
 
     /**
      * Get ServerInfo with the given serverGuid
+     * 
      * @param serverGuid
      * @return ServerInfo object corresponding to the specified serverGuid
      */
@@ -693,6 +676,7 @@ public class PropFetcher implements ClientSessionEndListener {
 
     /**
      * Set thumbprint from the ServerInfo object
+     * 
      * @param sinfo
      */
     private void setThumbprint(ServerInfo sinfo) {
@@ -705,6 +689,7 @@ public class PropFetcher implements ClientSessionEndListener {
 
     /**
      * Get ServerContent object with the given serverGuid
+     * 
      * @param serverGuid
      * @return ServiceContent object corresponding to the specified serverGuid
      */
@@ -745,6 +730,7 @@ public class PropFetcher implements ClientSessionEndListener {
 
     /**
      * Obtain a clone ticket from vSphere
+     * 
      * @throws Exception
      */
     synchronized public String acquireCloneTicket(String serviceGuid) throws Exception {
@@ -764,7 +750,7 @@ public class PropFetcher implements ClientSessionEndListener {
                     ManagedObjectReference sessionMgrRef = service.getSessionManager();
                     return _vimPort.acquireCloneTicket(sessionMgrRef);
                 }
-            };
+            }
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (RuntimeFaultFaultMsg e) {
