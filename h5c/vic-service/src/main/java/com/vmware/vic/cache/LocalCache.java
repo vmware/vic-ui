@@ -62,7 +62,7 @@ public class LocalCache {
 
     public static void set(String key, Object value) {
         long currentTime = System.currentTimeMillis();
-        localCache.put(key, new ValueObject(value, currentTime + 50000));
+        localCache.put(key, new ValueObject(value, currentTime + 10000));
     }
 
     public static Object get(String key) {
