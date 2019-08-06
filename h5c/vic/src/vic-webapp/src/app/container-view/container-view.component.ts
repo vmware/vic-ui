@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { Comparator, State } from '@clr/angular';
+import { ClrDatagridComparatorInterface } from '@clr/angular';
 import {
     Component,
     NgZone,
@@ -41,7 +41,7 @@ import { CreateVchWizardService } from '../create-vch-wizard/create-vch-wizard.s
 import { Subscription } from 'rxjs';
 import { VicVmViewService } from '../services/vm-view.service';
 
-class GuestMemoryUsageComparator implements Comparator<any> {
+class GuestMemoryUsageComparator implements ClrDatagridComparatorInterface<any> {
     compare(a: any, b: any) {
         return a[VM_GUESTMEMORYUSAGE] - b[VM_GUESTMEMORYUSAGE];
     }
@@ -51,7 +51,7 @@ class GuestMemoryUsageComparator implements Comparator<any> {
     }
 }
 
-class OverallCpuUsageComparator implements Comparator<any> {
+class OverallCpuUsageComparator implements ClrDatagridComparatorInterface<any> {
     compare(a: any, b: any) {
         return a[VM_OVERALLCPUUSAGE] - b[VM_OVERALLCPUUSAGE];
     }
@@ -61,7 +61,7 @@ class OverallCpuUsageComparator implements Comparator<any> {
     }
 }
 
-class CommittedStorageComparator implements Comparator<any> {
+class CommittedStorageComparator implements ClrDatagridComparatorInterface<any> {
     compare(a: any, b: any) {
         return a[VM_COMMITTEDSTORAGE] - b[VM_COMMITTEDSTORAGE];
     }
@@ -150,7 +150,7 @@ export class VicContainerViewComponent implements OnInit, OnDestroy {
      * Queries vic-service with the current Datagrid state
      * @param state current Datagrid state
      */
-    refreshGrid(state: State) {
+    refreshGrid(state: any) {
         this.currentState.filter = state.filters ? state.filters
             .map(item => item['property'] + '=' + item['value'])
             .join(',') : '';
@@ -162,8 +162,9 @@ export class VicContainerViewComponent implements OnInit, OnDestroy {
             this.currentState.sorting =
                 `${sortBy},${state.sort.reverse ? 'desc' : 'asc'}`;
         }
-
-        this.currentState.offset = state.page.from;
+        if (state.page) {
+            this.currentState.offset = state.page.from;
+        }
         this.reloadContainers();
     }
 

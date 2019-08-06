@@ -77,7 +77,7 @@ describe('VIC object view: Summary tab', () => {
             ],
             imports: [
                 HttpModule,
-                ClarityModule.forRoot()
+                ClarityModule
             ],
             declarations: [
                 VicSummaryViewComponent,

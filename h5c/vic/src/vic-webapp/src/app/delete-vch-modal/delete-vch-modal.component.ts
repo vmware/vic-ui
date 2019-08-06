@@ -23,7 +23,6 @@ import {ActivatedRoute} from '@angular/router';
 import {CreateVchWizardService} from '../create-vch-wizard/create-vch-wizard.service';
 import {ExtendedUserSessionService} from '../services/extended-usersession.service';
 import {GlobalsService} from 'app/shared';
-import {Modal} from '@clr/angular';
 import {Observable, combineLatest} from 'rxjs';
 import { map } from 'rxjs/operators';
 import {VicVmViewService} from '../services/vm-view.service';
@@ -43,7 +42,7 @@ export class DeleteVchModalComponent implements OnInit {
   public suspendedContainersCount = 0;
   public loading = true;
   private vchId: string;
-  @ViewChild('modal') modal: Modal;
+  @ViewChild('modal') modal: any;
 
   constructor(private formBuilder: FormBuilder,
               private globalsService: GlobalsService,
