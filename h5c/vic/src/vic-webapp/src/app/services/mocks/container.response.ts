@@ -64,7 +64,7 @@ function generateRandomContainers(length: number) {
 }
 
 export const getContainerResponseStub = () => {
-    const randomContainersObj = generateRandomContainers(30);
+    const randomContainersObj = generateRandomContainers(10);
 
     return {
         id: 'something',

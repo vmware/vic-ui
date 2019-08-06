@@ -23,7 +23,6 @@ import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { RefreshService } from 'app/shared';
 import { VIC_APPLIANCE_PORT } from '../shared/constants';
-import { Wizard } from '@clr/angular';
 import { ComputeCapacityComponent } from './compute-capacity/compute-capacity.component';
 import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
 
@@ -33,7 +32,7 @@ import { getServerServiceGuidFromObj } from '../shared/utils/object-reference';
   styleUrls: ['./create-vch-wizard.component.scss']
 })
 export class CreateVchWizardComponent implements OnInit {
-  @ViewChild('wizardlg') wizard: Wizard;
+  @ViewChild('wizardlg') wizard: any;
   @ViewChild('computeCapacityStep') computeCapacity: ComputeCapacityComponent;
   public loading = false;
   public errorFlag = false;

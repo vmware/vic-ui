@@ -118,7 +118,7 @@ describe('VicVchViewComponent', () => {
                 VicOvaVerificationComponent
             ],
             imports: [
-                ClarityModule.forRoot(),
+                ClarityModule,
                 HttpModule
             ]
         }).compileComponents();

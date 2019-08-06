@@ -51,7 +51,6 @@ import {ExtendedUserSessionService} from '../services/extended-usersession.servi
 import { Observable, combineLatest, throwError as observableThrowError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { VIC_APPLIANCE_PORT } from '../shared/constants/create-vch-wizard';
-import {State} from '@clr/angular';
 import {Subscription} from 'rxjs';
 import {VicVmViewService} from '../services/vm-view.service';
 import {VirtualContainerHost} from './vch.model';
@@ -170,7 +169,7 @@ export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
    * Queries vic-service with the current Datagrid state
    * @param state current Datagrid state
    */
-  refreshGrid(state: State) {
+  refreshGrid(state: any) {
     this.currentState.filter = state.filters ? state.filters
       .map(item => item['property'] + '=' + item['value'])
       .join(',') : '';
@@ -179,7 +178,10 @@ export class VicVchViewComponent implements OnInit, OnDestroy, AfterViewInit {
       this.currentState.sorting = `${state.sort.by},${state.sort.reverse ? 'desc' : 'asc'}`;
     }
 
-    this.currentState.offset = state.page.from;
+    if (state.page) {
+       this.currentState.offset = state.page.from;
+    }
+
     this.reloadVchs();
   }
 

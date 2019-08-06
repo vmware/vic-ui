@@ -24,7 +24,7 @@ import { VicOvaVerificationComponent } from './vic-ova-verification.component';
 @NgModule({
   imports: [
     CommonModule,
-    ClarityModule.forChild(),
+    ClarityModule,
     FormsModule
   ],
   declarations: [
