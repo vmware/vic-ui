@@ -45,7 +45,7 @@ import { VicVmViewService } from './services/vm-view.service';
     AppRoutingModule,
     HttpModule,
     HttpClientModule,
-    ClarityModule.forRoot()
+    ClarityModule
   ],
   declarations: [
     AppComponent,

@@ -36,7 +36,7 @@
         {{vicI18n.translate(this.WS_CONTAINER_CONSTANTS.DG.COLUMNS, 'IMAGE_NAME')}}
     </clr-dg-column>
 
-    <clr-dg-row *clrDgItems="let item of containers">
+    <clr-dg-row *ngFor="let item of containers" [clrDgItem]="item">
         <clr-dg-cell>
             <span>{{item.containerName}}</span>
         </clr-dg-cell>
