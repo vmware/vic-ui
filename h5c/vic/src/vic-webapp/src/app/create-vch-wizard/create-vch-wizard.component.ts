@@ -72,14 +72,13 @@ export class CreateVchWizardComponent implements OnInit {
     // "context error" warning shows up during unit tests (but they still pass).
     // this can be avoided by running the logic a tick later
     setTimeout(() => {
-      const clrModalEl = p.document.querySelector('clr-modal');
+      const clrModalEl = p.document.querySelector('.modal-dialog');
       // resize only if the parent modal is there. this prevents the unit tests from failing
       if (clrModalEl === null) {
         return;
       }
       const pluginIframeEl = <HTMLElement>clrModalEl.querySelector('plugin-iframe');
       const targetIframeEl = <HTMLElement>clrModalEl.querySelector('iframe');
-      const modalContentEl = <HTMLElement>clrModalEl.querySelector('.modal-content');
       const modalHeaderEl = <HTMLElement>clrModalEl.querySelector('.modal-header');
       const modalBodyEl = <HTMLElement>clrModalEl.querySelector('.modal-body');
       const modalDialogEl = <HTMLElement>clrModalEl.querySelector('.modal-dialog');
@@ -88,21 +87,19 @@ export class CreateVchWizardComponent implements OnInit {
         modalHeaderEl.parentNode.removeChild(modalHeaderEl);
       }
 
-      this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
+      if (modalDialogEl) {
+        this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
+      }
+
       this.renderer.setElementStyle(modalBodyEl, 'height', '75vh');
-      this.renderer.setElementStyle(modalBodyEl, 'max-height', '75vh');
       this.renderer.setElementStyle(targetIframeEl, 'width', '100%');
       this.renderer.setElementStyle(targetIframeEl, 'height', '100%');
       // wrapper element that encapsulates iframe tag
       // available from 6.5u1
-      if (pluginIframeEl !== null) {
+      if (pluginIframeEl) {
         this.renderer.setElementStyle(pluginIframeEl, 'height', '100%');
       }
-      this.renderer.setElementStyle(
-        this.elRef.nativeElement.querySelector('clr-wizard'),
-        'height',
-        '100vh'
-      );
+
     });
   }
 
