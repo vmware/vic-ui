@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,15 +53,9 @@ public class ObjectStore {
 	private final static String CONTAINER_TYPE = VicUIDataAdapter.CONTAINER_TYPE;
 	private final static Log _logger = LogFactory.getLog(ObjectStore.class);
 
-	public ObjectStore(
-			DataService dataService,
-			ModelObjectUriResolver modelObjectUriResolver,
-			PropFetcher propFetcher,
+	public ObjectStore(DataService dataService, ModelObjectUriResolver modelObjectUriResolver, PropFetcher propFetcher,
 			VimObjectReferenceService objectRefService) throws IOException {
-		if (dataService == null ||
-			modelObjectUriResolver == null ||
-			propFetcher == null ||
-			objectRefService == null) {
+		if (dataService == null || modelObjectUriResolver == null || propFetcher == null || objectRefService == null) {
 			throw new IllegalArgumentException("constructor arg cannot be null");
 		}
 		_dataService = dataService;
@@ -73,12 +68,12 @@ public class ObjectStore {
 
 	/**
 	 * Initialize the ObjectStore
+	 * 
 	 * @throws IOException
 	 */
 	public void init() {
-		_currentRootObject = new Root(
-				new RootInfo(new String[]{
-						_configLoader.getProp(UI_VERSION_CONFIG_KEY)}), 0, 0);
+		_currentRootObject = new Root(new RootInfo(new String[] { _configLoader.getProp(UI_VERSION_CONFIG_KEY) }), 0,
+				0);
 	}
 
 	public void destroy() {
@@ -86,24 +81,22 @@ public class ObjectStore {
 	}
 
 	/**
-	 * @return the Root object that contains the # of VirtualContainerHostVms
-	 *         and # of ContainerVms
+	 * @return the Root object that contains the # of VirtualContainerHostVms and #
+	 *         of ContainerVms
 	 * @throws RuntimeFaultFaultMsg
 	 * @throws InvalidPropertyFaultMsg
 	 */
 	private Root getRootObject() {
-		synchronized(_currentRootObject) {
-			ResultItem vchsRi = _propFetcher.getVicVms(true);
-			ResultItem containersRi = _propFetcher.getVicVms(false);
+		synchronized (_currentRootObject) {
+			List<ResultItem> arr= _propFetcher.getVicVmsAll();
+			ResultItem vchsRi = arr.get(0);
+			ResultItem containersRi = arr.get(1);
 
 			int numberOfVchs = vchsRi.properties.length;
 			int numberOfContainers = containersRi.properties.length;
 
-			Root rootObj = new Root(
-					new RootInfo(new String[]{
-							_configLoader.getProp(UI_VERSION_CONFIG_KEY)}),
-					numberOfVchs,
-					numberOfContainers);
+			Root rootObj = new Root(new RootInfo(new String[] { _configLoader.getProp(UI_VERSION_CONFIG_KEY) }),
+					numberOfVchs, numberOfContainers);
 			_currentRootObject = rootObj;
 
 			return _currentRootObject;
@@ -112,11 +105,12 @@ public class ObjectStore {
 
 	/**
 	 * Get Root, VirtualContainerHostVm or ContainerVm based on URI
+	 * 
 	 * @param uri
 	 * @return All VCH VMs if uri relates to vic:VirtualContainerHostVm:vic/ALL.
-               Otherwise returns the specified VCH VM.
-               If the resourceType is vic:ContainerVm, returns all Container VMs.
-               Also returns parent vApp's information.
+	 *         Otherwise returns the specified VCH VM. If the resourceType is
+	 *         vic:ContainerVm, returns all Container VMs. Also returns parent
+	 *         vApp's information.
 	 */
 	public ModelObject getObj(URI uri) {
 		String resourceType = _modelObjectUriResolver.getResourceType(uri);
@@ -133,12 +127,12 @@ public class ObjectStore {
 
 	/**
 	 * Get Root model's URI. This is to be used with Simple Constraint
+	 * 
 	 * @return URI for Root model
 	 */
 	public URI getRootUri() {
 		try {
-			URI uri = new URI("urn", String.format("%s:%s:%s/%s",
-					"vic", ROOT_TYPE, "vic", "vic-root"), null);
+			URI uri = new URI("urn", String.format("%s:%s:%s/%s", "vic", ROOT_TYPE, "vic", "vic-root"), null);
 			return uri;
 		} catch (URISyntaxException e) {
 			_logger.error(e.getMessage());
@@ -148,6 +142,7 @@ public class ObjectStore {
 
 	/**
 	 * Get vApp(s) and return VMs
+	 * 
 	 * @param uri
 	 * @param isVch
 	 * @return VmQueryResult containing results for VCH VMs or Container VMs
@@ -156,15 +151,13 @@ public class ObjectStore {
 		ResultItem vmsRi = _propFetcher.getVicVms(isVch);
 		Map<String, ModelObject> resultsMap = new HashMap<String, ModelObject>();
 		for (PropertyValue pv : vmsRi.properties) {
-		    if (pv.propertyName == "vm") {
-		        ModelObject mo = (ModelObject)pv.value;
-		        resultsMap.put(mo.getId(), mo);
-		    }
+			if (pv.propertyName == "vm") {
+				ModelObject mo = (ModelObject) pv.value;
+				resultsMap.put(mo.getId(), mo);
+			}
 		}
 
-		VmQueryResult vmQueryResult = new VmQueryResult(
-				resultsMap,
-				_objectRefService);
+		VmQueryResult vmQueryResult = new VmQueryResult(resultsMap, _objectRefService);
 
 		return vmQueryResult;
 	}
