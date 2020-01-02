@@ -36,7 +36,7 @@ pipeline:
       - gs_project_id
     commands:
       - 'export BUILD_NUMBER=${DRONE_BUILD_NUMBER}'
-      - 'make vic-ui-plugins'
+      - 'npm config set registry https://build-artifactory.eng.vmware.com/artifactory/api/npm/npm && make vic-ui-plugins'
     when:
       status: success
 
