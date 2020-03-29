@@ -1,11 +1,10 @@
 open_source_licenses.txt
 
-Integrated containers UI for vSphere 1.5.0 GA
+Integrated containers UI for vSphere 1.5.5 GA
 
 ======================================================================
 
-
-Copyright 2017-2019 VMware, Inc.  All rights reserved.
+Copyright 2017-2020 VMware, Inc.  All rights reserved.
 
 This product is licensed to you under the Apache License version 2.0 (the License).  You may not use this product except in compliance with the License.
 
@@ -91,7 +90,7 @@ limitations under the License.
 
 =================================================================
 
-Integrated containers UI for vSphere 1.5.0 includes a number of components with separate copyright notices and license terms.  This product does not necessarily use all the open source components referred to below. 
+Integrated containers UI for vSphere 1.5.5 includes a number of components with separate copyright notices and license terms.  This product does not necessarily use all the open source components referred to below. 
 Your use of the source code for these components is subject to the terms and conditions of the following licenses.
 
 =============== TABLE OF CONTENTS =============================
@@ -104,7 +103,6 @@ of the license associated with each component.
 
 SECTION 1: Apache License, V2.0
 
-   >>> rxjs-5.5.6
    >>> rxjs-6.2.2
    >>> web-animations-js-2.3.1
 
@@ -124,16 +122,12 @@ SECTION 2: BSD-STYLE, MIT-STYLE, OR SIMILAR STYLE LICENSES
    >>> @clr/angular-0.12.10
    >>> @clr/icons-0.12.16
    >>> @clr/ui-0.12.16
-   >>> @webcomponents/custom-elements-1.0.0
    >>> @webcomponents/custom-elements-1.2.1
    >>> classlist.js-1.1.20150312
-   >>> core-js-2.5.3
    >>> core-js-2.5.7
    >>> framebus-2.0.8
    >>> mutationobserver-shim-0.3.2
-   >>> pkijs-2.1.24
    >>> pkijs-2.1.71
-   >>> zone.js-0.8.18
    >>> zone.js-0.8.26
 
 
@@ -147,22 +141,6 @@ APPENDIX. Standard License Files
 
 Apache License, V2.0 is applicable to the following component(s).
 
-
->>> rxjs-5.5.6
-
-Copyright (c) 2015-2017 Google, Inc., Netflix, Inc., Microsoft Corp. and contributors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 >>> rxjs-6.2.2
 
@@ -184,12 +162,36 @@ Copyright 2014 Google Inc. All rights reserved.
      See the License for the specific language governing permissions and
  limitations under the License.
 
- 
- 
 --------------- SECTION 2: BSD-STYLE, MIT-STYLE, OR SIMILAR STYLE LICENSES ----------
 
-
 BSD-STYLE, MIT-STYLE, OR SIMILAR STYLE LICENSES are applicable to the following component(s).
+
+
+>>> @angular/animations-6.1.10
+
+Copyright Google Inc. All Rights Reserved.
+
+Use of this source code is governed by an MIT-style license that can be
+found in the LICENSE file at https://angular.io/license
+
+ADDITIONAL LICENSE INFORMATION:
+
+> Apache2.0
+
+animations-6.1.10.tgz\animations-6.1.10.tar\package\bundles\ animations-browser.umd.js
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
 
 >>> @angular/common-6.1.10
 
@@ -428,28 +430,6 @@ Copyright (c) 2016-2018 VMware, Inc. All Rights Reserved.
 This software is released under MIT license.
 The full license information can be found in LICENSE in the root directory of this project.
 
->>> @webcomponents/custom-elements-1.0.0
-
-# License
-
-Everything in this repo is BSD style license unless otherwise specified.
-
-Copyright (c) 2015 The Polymer Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-* Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 >>> @webcomponents/custom-elements-1.2.1
 
 # License
@@ -498,28 +478,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
-
->>> core-js-2.5.3
-
-Copyright (c) 2014-2017 Denis Pushkarev
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
 
 >>> core-js-2.5.7
 
@@ -624,47 +582,6 @@ Released under the MIT, BSD, and GPL Licenses.
 
 Date: Wed Mar 21 12:46:34 2012 -0700
 
->>> pkijs-2.1.24
-
-Copyright (c) 2014, GlobalSign
-Copyright (c) 2015-2017, Peculiar Ventures
-All rights reserved.
-
-Author 2014-2017, Yury Strozhevsky
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-Neither the name of the {organization} nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-ADDITIONAL LICENSE INFORMATION:
-
-> MIT
-
-PKI.js-master.zip\PKI.js-master\examples\HowToUseES6DirectlyInBrowser\package.json
-
-License: MIT
-
 >>> pkijs-2.1.71
 
 Copyright (c) 2014, GlobalSign
@@ -706,30 +623,6 @@ PKI.js-master.zip\PKI.js-master\examples\HowToUseES6DirectlyInBrowser\package.js
 
 license": "MIT"
 
->>> zone.js-0.8.18
-
-The MIT License
-
-Copyright (c) 2016 Google, Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
 >>> zone.js-0.8.26
 
 Copyright (c) 2016-2018 Google, Inc.
@@ -753,8 +646,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-
 =============== APPENDIX. Standard License Files ============== 
+
 
 
 --------------- SECTION 1: Apache License, V2.0 -----------
@@ -934,7 +827,6 @@ warranty or additional liability.
 
 END OF TERMS AND CONDITIONS 
 
-
 ======================================================================
 
 To the extent any open source components are licensed under the GPL
@@ -952,4 +844,4 @@ to you ona CD or equivalent physical medium.This offer to obtain
 a copy of the Source Filesis valid for three years from the date 
 you acquired this Software product.
 
-[VICUI150GASJ010719]
+[VICUI155GASP032620]
