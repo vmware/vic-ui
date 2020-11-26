@@ -32,6 +32,8 @@ import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSessionContext;
+import javax.net.ssl.TrustManager;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.MessageContext;
 
@@ -103,26 +105,28 @@ public class PropFetcher implements ClientSessionEndListener {
         HostnameVerifier hostNameVerifier = new ThumbprintHostNameVerifier();
         HttpsURLConnection.setDefaultHostnameVerifier(hostNameVerifier);
 
-        javax.net.ssl.TrustManager[] tms = new javax.net.ssl.TrustManager[1];
-        javax.net.ssl.TrustManager tm = new ThumbprintTrustManager();
-        tms[0] = tm;
-        javax.net.ssl.SSLContext sc = null;
+        TrustManager[] trustManagers = new TrustManager[1];
+        TrustManager trustManager = new ThumbprintTrustManager();
+        trustManagers[0] = trustManager;
+        SSLContext sslContext = null;
 
         try {
-            sc = javax.net.ssl.SSLContext.getInstance("SSL");
+            sslContext = SSLContext.getInstance("TLS");
         } catch (NoSuchAlgorithmException e) {
             _logger.error(e);
         }
 
-        if (null != sc) {
-            javax.net.ssl.SSLSessionContext sslsc = sc.getServerSessionContext();
-            sslsc.setSessionTimeout(0);
+        if (null != sslContext) {
             try {
-                sc.init(null, tms, null);
+                sslContext.init(null, trustManagers, null);
             } catch (KeyManagementException e) {
                 _logger.error(e);
             }
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            SSLSessionContext sslSessionContext = sslContext.getServerSessionContext();
+            sslSessionContext.setSessionTimeout(0);
+
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
         }
     }
 
