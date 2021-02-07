@@ -22,14 +22,17 @@ import org.apache.commons.logging.LogFactory;
 
 import com.vmware.vic.model.constants.VsphereObjects;
 import com.vmware.vic.mvc.ServicesController;
+import com.vmware.vise.data.Constraint;
 import com.vmware.vise.data.query.CompositeConstraint;
+import com.vmware.vise.data.query.Comparator;
 import com.vmware.vise.data.query.Conjoiner;
 import com.vmware.vise.data.query.DataService;
 import com.vmware.vise.data.query.PropertyConstraint;
 import com.vmware.vise.data.query.QuerySpec;
-import com.vmware.vise.data.query.QueryUtil;
 import com.vmware.vise.data.query.RequestSpec;
 import com.vmware.vise.data.query.Response;
+import com.vmware.vise.data.ResourceSpec;
+import com.vmware.vise.data.PropertySpec;
 
 /**
  * Resource Pool Service implementation for checking the uniqueness of
@@ -53,28 +56,31 @@ public class ResourcePoolServiceImpl implements ResourcePoolService {
      * @throws Exception
      */
     public boolean isNameUnique(String name) throws Exception {
-        PropertyConstraint sameVappNameConstraint =
-                QueryUtil.createPropertyConstraint(
-                    VsphereObjects.VirtualApp,
-                    VsphereObjects.NamePropertyKey,
-                    com.vmware.vise.data.query.Comparator.EQUALS,
-                    name);
-        PropertyConstraint sameRpNameConstraint =
-                QueryUtil.createPropertyConstraint(
-                    VsphereObjects.ResourcePool,
-                    VsphereObjects.NamePropertyKey,
-                    com.vmware.vise.data.query.Comparator.EQUALS,
-                    name);
+        PropertyConstraint sameVappNameConstraint = createPropertyConstraint(
+                VsphereObjects.VirtualApp,
+                VsphereObjects.NamePropertyKey,
+                Comparator.EQUALS,
+                name);
+        
+        PropertyConstraint sameRpNameConstraint = createPropertyConstraint(
+                VsphereObjects.ResourcePool,
+                VsphereObjects.NamePropertyKey,
+                Comparator.EQUALS,
+                name);
+
         PropertyConstraint[] propConstraints = new PropertyConstraint[]{
                 sameVappNameConstraint,
                 sameRpNameConstraint
         };
 
         CompositeConstraint compConstraint =
-            QueryUtil.createCompositeConstraint(propConstraints, Conjoiner.OR);
+                createCompositeConstraint(propConstraints, Conjoiner.OR);
+
         QuerySpec querySpec = new QuerySpec();
         querySpec.name = "check-name-uniqueness";
-        querySpec.resourceSpec = QueryUtil.createEmptyResourceSpec();
+
+        querySpec.resourceSpec = createEmptyResourceSpec();
+
         querySpec.resourceSpec.constraint = compConstraint;
 
         RequestSpec requestSpec = new RequestSpec();
@@ -89,5 +95,75 @@ public class ResourcePoolServiceImpl implements ResourcePoolService {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Creates a PropertyConstraint
+     *
+     * @param objectType
+     *    Type of object to retrieve.
+     * @param propertyName
+     *    Name of the property to be matched.
+     * @param comparator
+     *    The operator to use for comparison
+     *    ('equals', 'unequals', etc.)
+     * @param comparableValue
+     *    The value to compare.
+     *
+     * @return
+     *    A PropertyConstraint.
+     */
+    private PropertyConstraint createPropertyConstraint(
+            String objectType,
+            String propertyName,
+            Comparator comparator,
+            Object comparableValue) {
+
+        PropertyConstraint constraint = new PropertyConstraint();
+        constraint.targetType = objectType;
+        constraint.propertyName = propertyName;
+        constraint.comparator = comparator;
+        constraint.comparableValue = comparableValue;
+
+        return constraint;
+    }
+
+    /**
+     * Creates a CompositeConstraint by given nested Constraints and
+     * conjoiner between them.
+     *
+     * @param constraints
+     *    Array of nested Constraints to add into the composite constraint.
+     * @param conjoiner
+     *    Conjoiner defining how to combine the nested Constraints.
+     *    Can be "AND" or "OR".
+     *
+     * @return
+     *    A CompositeConstraint.
+     */
+    private CompositeConstraint createCompositeConstraint(
+            Constraint[] nestedConstraints,
+            Conjoiner conjoiner) {
+
+        // create the result constraint and initialize it
+        CompositeConstraint compositeConstraint = new CompositeConstraint();
+        compositeConstraint.nestedConstraints = nestedConstraints;
+        compositeConstraint.conjoiner = conjoiner;
+
+        return compositeConstraint;
+    }
+
+    /**
+     * Creates an empty ResourceSpec without any additional
+     * properties of that object.
+     *
+     * @return an empty ResourceSpec
+     */
+    private ResourceSpec createEmptyResourceSpec() {
+        PropertySpec propSpec = new PropertySpec();
+        propSpec.propertyNames = new String[] {};
+        ResourceSpec resourceSpec = new ResourceSpec();
+        resourceSpec.propertySpecs = new PropertySpec[] { propSpec };
+        return resourceSpec;
     }
 }
