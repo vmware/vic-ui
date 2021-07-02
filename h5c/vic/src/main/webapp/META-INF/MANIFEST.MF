@@ -6,10 +6,13 @@ Bundle-Version: 1.0.0
 Bundle-Vendor: VMware
 Web-ContextPath: vsphere-client/vic
 Import-Package: com.vmware.vic.mvc;version="1.0.0",
+ com.vmware.vic.filters;version="1.0.0",
  com.vmware.vic.services;version="1.0.0",
  com.vmware.vise.data.query;version=0,
  com.vmware.vise.security;version=0,
+ com.vmware.vise.usersession;version="0",
  org.eclipse.virgo.web.dm;version="[3.6.0,4)",
+ org.springframework.web.context,
  org.springframework.web.servlet,
  org.springframework.web.servlet.config,
  org.springframework.web.servlet.view,
