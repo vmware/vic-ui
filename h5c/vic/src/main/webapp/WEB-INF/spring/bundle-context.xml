@@ -33,6 +33,10 @@
    <osgi:reference id="dataService"
          interface="com.vmware.vise.data.query.DataService" />
 
+   <!-- ... from SDK -->
+   <osgi:reference id="userSessionService"
+         interface="com.vmware.vise.usersession.UserSessionService" />
+
    <osgi:reference id="objectReferenceService"
          interface="com.vmware.vise.data.query.ObjectReferenceService" />
 
