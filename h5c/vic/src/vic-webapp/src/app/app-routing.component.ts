@@ -79,7 +79,7 @@ export class AppRoutingComponent implements OnInit, OnDestroy {
                 if (locale) {
                     this.gs.locale = locale;
                 }
-                const commands: [any] = ['/' + view];
+                const commands: any[] = ['/' + view];
                 if (objectId) {
                     commands[1] = objectId;
                 }
