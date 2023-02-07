@@ -1,4 +1,5 @@
 .idea/
+.angular/
 typings/
 build-dev/
 node_modules/
