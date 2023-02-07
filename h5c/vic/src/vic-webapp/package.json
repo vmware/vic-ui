@@ -55,9 +55,6 @@
     "pkijs": "^2.0.66",
     "web-animations-js": "^2.2.1"
   },
-  "peerDependencies": {
-    "loader-utils": "1.4.2"
-  },
   "devDependencies": {
     "@angular-devkit/build-angular": "~13.3.10",
     "@angular-eslint/builder": "13.5.0",
