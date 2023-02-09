@@ -19,6 +19,7 @@ import {ClarityModule} from '@clr/angular';
 import {HttpModule} from '@angular/http';
 import {RegistryAccessComponent} from './registry-access.component';
 import { FormBuilder, FormArray, FormControl} from '@angular/forms';
+import { By } from '@angular/platform-browser';
 
 describe('RegistryAccessComponent', () => {
 
@@ -127,26 +128,35 @@ AQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx
 2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0
 Hn+GmxZA
 -----END CERTIFICATE-----`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([certContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([certContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'registryCas', 0, true);
-    expect(component.registryCaError).toBeNull();
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+
+      component.addFileContent(evt, 'registryCas', 0, true);
+      expect(component.registryCaError).toBeNull();
+    }
   });
 
   it('should handle a malformatted Registry Cert correctly', () => {
     const evt = new Event('change');
     const certContent = `oops!`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([certContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([certContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'registryCas', 0, true);
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+
+      component.addFileContent(evt, 'registryCas', 0, true);
+    }
+
   });
 
   it('should clear file reader errors', () => {

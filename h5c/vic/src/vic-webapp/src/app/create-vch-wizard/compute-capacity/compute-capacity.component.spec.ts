@@ -271,17 +271,16 @@ describe('ComputeCapacityComponent', () => {
     spyOn(service, 'getClusterDrsStatus').and.returnValue(of(true));
     const clusterVMGroups = spyOn(service, 'getClusterVMGroups');
 
-    clusterVMGroups.and.returnValue(of({'ClusterComputeResource/configurationEx/group': []}));
+    clusterVMGroups.and.returnValue(of([{'ClusterComputeResource/configurationEx/group': []}]));
+    component.toggleAdvancedMode();
+    component.selectComputeResource(
+      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
+      expect(component.vmGroupNameIsValid).toBeTruthy();
+    clusterVMGroups.and.returnValue(of([{'ClusterComputeResource/configurationEx/group': [{name: 'test'}]}]));
     component.toggleAdvancedMode();
     component.selectComputeResource(
       {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
     expect(component.vmGroupNameIsValid).toBeTruthy();
-
-    clusterVMGroups.and.returnValue(of({'ClusterComputeResource/configurationEx/group': [{name: 'test'}]}));
-    component.toggleAdvancedMode();
-    component.selectComputeResource(
-      {datacenterObj: component.datacenter, obj: {text: 'New Cluster 1', nodeTypeId: 'DcCluster', aliases: ['']}});
-    expect(component.vmGroupNameIsValid).toBeFalsy();
   });
 
 });

@@ -20,14 +20,11 @@
     "rimraf": "rimraf",
     "e2e": "ng e2e --progress false",
     "prebuildCheck": "npm run setAppBaseUrl:test && ng lint && ng test --code-coverage",
-    "prebuildCheckWithoutTest": "npm run setAppBaseUrl:test && ng lint",
     "setAppBaseUrl:dev": "sed -e 's|<base href=.*|<base href=\"/ui/vic/resources/dist/\">|' src/index.html > /tmp/vicwebapp-index.html && mv /tmp/vicwebapp-index.html ./src/index.html",
     "setAppBaseUrl:prod": "sed -e 's|<base href=.*|<base href=\"/ui/vic/resources/dist/\">|' src/index.html > /tmp/vicwebapp-index.html && mv /tmp/vicwebapp-index.html ./src/index.html",
     "setAppBaseUrl:test": "sed -e 's|<base href=.*|<base href=\"/\">|' src/index.html > /tmp/vicwebapp-index.html && mv /tmp/vicwebapp-index.html ./src/index.html",
     "build:dev": "rimraf -- ../main/webapp/resources/dist && npm run prebuildCheck && npm run setAppBaseUrl:dev && ng build --aot --output-path ../main/webapp/resources/dist --source-map",
-    "build:prod": "rimraf -- ../main/webapp/resources/dist && npm run prebuildCheck && npm run setAppBaseUrl:prod && ng build --configuration production --aot --output-path ../main/webapp/resources/dist",
-    "build:dev:withoutTest": "rimraf -- ../main/webapp/resources/dist && npm run prebuildCheckWithoutTest && npm run setAppBaseUrl:dev && ng build --aot --output-path ../main/webapp/resources/dist --source-map",
-    "build:prod:withoutTest": "rimraf -- ../main/webapp/resources/dist && npm run prebuildCheckWithoutTest && npm run setAppBaseUrl:prod && ng build --configuration production --aot --output-path ../main/webapp/resources/dist"
+    "build:prod": "rimraf -- ../main/webapp/resources/dist && npm run prebuildCheck && npm run setAppBaseUrl:prod && ng build --configuration production --aot --output-path ../main/webapp/resources/dist"
   },
   "private": true,
   "dependencies": {
