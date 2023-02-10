@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import { Component, ElementRef, OnInit, Renderer, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Headers, Http, RequestOptions } from '@angular/http';
 
 import { CreateVchWizardService } from './create-vch-wizard.service';
@@ -45,7 +45,7 @@ export class CreateVchWizardComponent implements OnInit {
 
   constructor(
     private elRef: ElementRef,
-    private renderer: Renderer,
+    private renderer: Renderer2,
     private globalsService: GlobalsService,
     private refresher: RefreshService,
     private http: Http,
@@ -88,16 +88,16 @@ export class CreateVchWizardComponent implements OnInit {
       }
 
       if (modalDialogEl) {
-        this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
+        this.renderer.setStyle(modalDialogEl, 'height', '75vh');
       }
 
-      this.renderer.setElementStyle(modalBodyEl, 'height', '75vh');
-      this.renderer.setElementStyle(targetIframeEl, 'width', '100%');
-      this.renderer.setElementStyle(targetIframeEl, 'height', '100%');
+      this.renderer.setStyle(modalBodyEl, 'height', '75vh');
+      this.renderer.setStyle(targetIframeEl, 'width', '100%');
+      this.renderer.setStyle(targetIframeEl, 'height', '100%');
       // wrapper element that encapsulates iframe tag
       // available from 6.5u1
       if (pluginIframeEl) {
-        this.renderer.setElementStyle(pluginIframeEl, 'height', '100%');
+        this.renderer.setStyle(pluginIframeEl, 'height', '100%');
       }
 
     });
