@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-import {Component, ElementRef, OnInit, Renderer, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {DELETE_VCH_MODAL_ERROR_EVENT, DELETE_VCH_MODAL_HEIGHT, VIC_APPLIANCE_PORT} from '../shared/constants';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Headers, Http, RequestOptions} from '@angular/http';
@@ -46,7 +46,7 @@ export class DeleteVchModalComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder,
               private globalsService: GlobalsService,
-              private renderer: Renderer,
+              private renderer: Renderer2,
               private el: ElementRef,
               private router: ActivatedRoute,
               private vmViewService: VicVmViewService,
@@ -123,13 +123,13 @@ export class DeleteVchModalComponent implements OnInit {
         modalHeaderEl.parentNode.removeChild(modalHeaderEl);
       }
 
-      this.renderer.setElementStyle(modalContentEl, 'overflow', 'hidden');
-      this.renderer.setElementStyle(modalDialogEl, 'height', '75vh');
-      this.renderer.setElementStyle(modalBodyEl, 'height', `${DELETE_VCH_MODAL_HEIGHT}px`);
-      this.renderer.setElementStyle(modalBodyEl, 'min-height', `${DELETE_VCH_MODAL_HEIGHT}px`);
-      this.renderer.setElementStyle(targetIframeEl, 'width', '100%');
-      this.renderer.setElementStyle(targetIframeEl, 'height', '100%');
-      this.renderer.setElementStyle(
+      this.renderer.setStyle(modalContentEl, 'overflow', 'hidden');
+      this.renderer.setStyle(modalDialogEl, 'height', '75vh');
+      this.renderer.setStyle(modalBodyEl, 'height', `${DELETE_VCH_MODAL_HEIGHT}px`);
+      this.renderer.setStyle(modalBodyEl, 'min-height', `${DELETE_VCH_MODAL_HEIGHT}px`);
+      this.renderer.setStyle(targetIframeEl, 'width', '100%');
+      this.renderer.setStyle(targetIframeEl, 'height', '100%');
+      this.renderer.setStyle(
         this.el.nativeElement.querySelector('.clr-wizard'),
         'height',
         '100vh'

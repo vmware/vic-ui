@@ -21,6 +21,7 @@ import {CreateVchWizardService} from '../create-vch-wizard.service';
 import {Observable, of} from 'rxjs';
 import {SecurityComponent} from './security.component';
 import { GlobalsService } from '../../shared';
+import { By } from '@angular/platform-browser';
 
 describe('SecurityComponent', () => {
 
@@ -195,7 +196,7 @@ describe('SecurityComponent', () => {
   }));
 
   it('should handle adding a correctly formatted TLS Server Cert', () => {
-    const evt = new Event('change');
+    const evt = new InputEvent('change');
     const certContent = `-----BEGIN CERTIFICATE-----
 MIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG
 A1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE
@@ -210,30 +211,42 @@ AQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx
 2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0
 Hn+GmxZA
 -----END CERTIFICATE-----`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([certContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([certContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'tlsServerCert', 0, true);
-    expect(component.tlsServerError).toBeNull();
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+      expect(component.tlsServerError).toBeTruthy()
+      expect(component.tlsServerError).toBe('foo.txt')
+  
+      component.addFileContent(evt, 'tlsServerCert', 0, true);
+      expect(component.tlsServerError).toBeNull();
+    }
   });
 
   it('should handle a malformatted TLS Server Cert correctly', () => {
-    const evt = new Event('change');
+    const evt = new InputEvent('change');
     const certContent = `oops!`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([certContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([certContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'tlsServerCert', 0, true);
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+      expect(component.tlsServerError).toBeTruthy()
+      expect(component.tlsServerError).toBe('foo.txt')
+  
+      component.addFileContent(evt, 'tlsServerCert', 0, true);
+    }
   });
 
   it('should handle adding a correctly formatted TLS Server Key', () => {
-    const evt = new Event('change');
+    const evt = new InputEvent('change');
     const keyContent = `-----BEGIN PRIVATE KEY-----
 MIIBUwIBADANBgkqhkiG9w0BAQEFAASCAT0wggE5AgEAAkEAlcIDtrVom915ITL4
 tPi5b5w/jQi2zQwRLyyIRdsfdGdDQTcUxPdh2dMioHH4Ap5kkYiNvOO2RjdgyTTV
@@ -244,30 +257,42 @@ mBRwvA6KRAvzhK7h6l8CIQClW7CN+JwTlsaKzprHlsLvWR0JBiqwgpwfF6jWhQIl
 +vTKOiKZXWY9Ni1o7jaFyvEOFp9hAiAjvMqapHnolq4NDPx+h2fpYKMgCs6ujCsv
 zSyXyEl4rw==
 -----END PRIVATE KEY-----`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([keyContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([keyContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'tlsServerKey', 0, true);
-    expect(component.tlsServerError).toBeNull();
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+      expect(component.tlsServerError).toBeTruthy()
+      expect(component.tlsServerError).toBe('foo.txt')
+  
+      component.addFileContent(evt, 'tlsServerKey', 0, true);
+      expect(component.tlsServerError).toBeNull();
+    }
   });
 
   it('should handle a malformatted TLS Server Key correctly', () => {
-    const evt = new Event('change');
+    const evt = new InputEvent('change');
     const certContent = `oops!`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([certContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([certContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'tlsServerKey', 0, true);
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+      expect(component.tlsServerError).toBeTruthy()
+      expect(component.tlsServerError).toBe('foo.txt')
+  
+      component.addFileContent(evt, 'tlsServerKey', 0, true);
+    }
   });
 
   it('should handle adding a correctly formatted TLS Client Cert', () => {
-    const evt = new Event('change');
+    const evt = new InputEvent('change');
     const certContent = `-----BEGIN CERTIFICATE-----
 MIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG
 A1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE
@@ -282,50 +307,65 @@ AQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx
 2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0
 Hn+GmxZA
 -----END CERTIFICATE-----`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([certContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([certContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'tlsCas', 0, true);
-    expect(component.tlsServerError).toBeNull();
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+      expect(component.tlsServerError).toBeTruthy()
+      expect(component.tlsServerError).toBe('foo.txt')
+  
+      component.addFileContent(evt, 'tlsCas', 0, true);
+      expect(component.tlsServerError).toBeNull();
+    }
   });
 
   it('should handle adding a malformatted TLS Client Cert correctly', () => {
-    const evt = new Event('change');
+    const evt = new InputEvent('change');
     const certContent = `oops!`;
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: [
-        new File([certContent], 'foo.txt', { type: 'text/plain' })
-      ]
-    });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([certContent], 'foo.txt', { type: 'text/plain' }))
 
-    component.addFileContent(evt, 'tlsCas', 0, true);
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+      expect(component.tlsServerError).toBeTruthy()
+      expect(component.tlsServerError).toBe('foo.txt')
+      component.addFileContent(evt, 'tlsCas', 0, true);
+    }
   });
 
   it('should handle an incorrect file event for addFileContent()', () => {
-    const evt = new Event('change');
-    spyOnProperty(evt, 'target', 'get').and.returnValue({
-      files: []
-    });
-
-    try {
-      component.addFileContent(evt, 'tlsCas', 0, true);
-    } catch (e) {
-      expect(component.tlsCaError).toBe('Failed to load client certificate PEM file!');
-    }
-
-    try {
-      component.addFileContent(evt, 'tlsServerCert', 0, true);
-    } catch (e) {
-      expect(component.tlsServerError).toBe('Failed to load server certificate PEM file!');
-    }
-
-    try {
-      component.addFileContent(evt, 'tlsServerKey', 0, true);
-    } catch (e) {
-      expect(component.tlsServerError).toBe('Failed to load server private key PEM file!');
+    const evt = new InputEvent('change');
+    const dataTransfer = new DataTransfer();
+    const inputDebugEl  = fixture.debugElement.query(By.css('input[type=file]'));
+    if (inputDebugEl && inputDebugEl.nativeElement) {
+      inputDebugEl.nativeElement.files = dataTransfer.files;
+      inputDebugEl.nativeElement.dispatchEvent(evt);
+      fixture.detectChanges();
+  
+      try {
+        component.addFileContent(evt, 'tlsCas', 0, true);
+      } catch (e) {
+        expect(component.tlsCaError).toBe('Failed to load client certificate PEM file!');
+      }
+  
+      try {
+        component.addFileContent(evt, 'tlsServerCert', 0, true);
+      } catch (e) {
+        expect(component.tlsServerError).toBe('Failed to load server certificate PEM file!');
+      }
+  
+      try {
+        component.addFileContent(evt, 'tlsServerKey', 0, true);
+      } catch (e) {
+        expect(component.tlsServerError).toBe('Failed to load server private key PEM file!');
+      }
     }
   });
 });

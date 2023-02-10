@@ -18,6 +18,10 @@ import { NavigationExtras } from '@angular/router';
 
 import { BehaviorSubject } from 'rxjs';
 
+export interface TestEventTarget extends EventTarget {
+  files: any[]
+}
+
 export class ActivatedRouteStub {
 
     // ActivatedRoute.params is Observable

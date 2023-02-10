@@ -22,13 +22,13 @@ import { AppRoutingComponent } from './app-routing.component';
 
 const appRoutes: Routes = [
     { path: 'index.html', component: AppRoutingComponent },
-    { path: 'portlet', loadChildren: './summary-portlet/summary-portlet.module#VicSummaryPortletModule' },
-    { path: 'summary-view', loadChildren: './summary-view/summary-view.module#VicSummaryViewModule' },
-    { path: 'vch-view', loadChildren: './vch-view/vch-view.module#VicVchViewModule' },
-    { path: 'container-view', loadChildren: './container-view/container-view.module#VicContainerViewModule' },
-    { path: 'create-vch', loadChildren: './create-vch-wizard/create-vch-wizard.module#CreateVchWizardModule' },
-    { path: 'delete-vch', loadChildren: './delete-vch-modal/delete-vch-modal.module#DeleteVchModalModule' },
-    { path: 'ui-actions', loadChildren: './ui-actions/ui-actions.module#UiActionsModule' }
+    { path: 'portlet', loadChildren: () => import('./summary-portlet/summary-portlet.module').then(mod => mod.VicSummaryPortletModule) },
+    { path: 'summary-view', loadChildren: () => import('./summary-view/summary-view.module').then(mod => mod.VicSummaryViewModule) },
+    { path: 'vch-view', loadChildren: () => import('./vch-view/vch-view.module').then(mod => mod.VicVchViewModule) },
+    { path: 'container-view', loadChildren: () => import('./container-view/container-view.module').then(mod => mod.VicContainerViewModule) },
+    { path: 'create-vch', loadChildren: () => import('./create-vch-wizard/create-vch-wizard.module').then(mod => mod.CreateVchWizardModule) },
+    { path: 'delete-vch', loadChildren: () => import('./delete-vch-modal/delete-vch-modal.module').then(mod => mod.DeleteVchModalModule) },
+    { path: 'ui-actions', loadChildren: () => import('./ui-actions/ui-actions.module').then(mod => mod.UiActionsModule) }
 ];
 
 export const extensionToRoutes = {};

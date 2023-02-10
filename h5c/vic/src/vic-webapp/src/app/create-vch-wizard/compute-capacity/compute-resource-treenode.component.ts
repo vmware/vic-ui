@@ -22,7 +22,7 @@ import {
   ViewChildren,
   QueryList,
   ElementRef,
-  Renderer
+  Renderer2
 } from '@angular/core';
 
 import { CreateVchWizardService } from '../create-vch-wizard.service';
@@ -63,7 +63,7 @@ export class ComputeResourceTreenodeComponent implements OnInit {
 
   constructor(
     private createWzService: CreateVchWizardService,
-    private renderer: Renderer,
+    private renderer: Renderer2,
     private globalsService: GlobalsService
   ) {
     this.resourceSelected = new EventEmitter<{
@@ -137,13 +137,13 @@ export class ComputeResourceTreenodeComponent implements OnInit {
       }
 
       this.unselectComputeResource();
-      this.renderer.setElementClass(event.target, 'active', true);
+      this.renderer.addClass(event.target, 'active');
     }
   }
 
   unselectComputeResource() {
     this.computeResourceBtns.forEach((elRef: ElementRef) => {
-      this.renderer.setElementClass(elRef.nativeElement, 'active', false);
+      this.renderer.removeClass(elRef.nativeElement, 'active');
     })
   }
 

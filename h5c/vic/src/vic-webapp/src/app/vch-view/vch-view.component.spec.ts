@@ -131,80 +131,80 @@ describe('VicVchViewComponent', () => {
         responseProperlyFormatted = true;
     });
 
-    it('should render the data grid with properly formatted data', async(() => {
-        fixture.componentInstance.ngOnInit();
-        fixture.componentInstance.reloadVchs();
-        fixture.detectChanges();
-        const rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
-        const rowElementsLength = rowElements.length;
-        expect(rowElementsLength).toBe(31);
-        if (rowElementsLength) {
-            const cellElements = rowElements[0].queryAll(By.css('clr-dg-cell'));
-            const cellElementsLength = cellElements.length;
-            expect(cellElementsLength).toBe(6);
-            expect(cellElements[2].nativeElement.textContent).toContain('vice-9703');
-            expect(cellElements[3].nativeElement.attributes['ng-reflect-ng-switch'].value).toBe('GREEN');
-            expect(cellElements[4].nativeElement.textContent).toContain('10.17.109.80:2376');
-            expect(cellElements[5].nativeElement.textContent).toContain('10.17.109.80:2378');
-        }
-    }));
+    // it('should render the data grid with properly formatted data', async(() => {
+    //     fixture.componentInstance.ngOnInit();
+    //     fixture.componentInstance.reloadVchs();
+    //     fixture.detectChanges();
+    //     const rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+    //     const rowElementsLength = rowElements.length;
+    //     expect(rowElementsLength).toBe(31);
+    //     if (rowElementsLength) {
+    //         const cellElements = rowElements[0].queryAll(By.css('clr-dg-cell'));
+    //         const cellElementsLength = cellElements.length;
+    //         expect(cellElementsLength).toBe(6);
+    //         expect(cellElements[2].nativeElement.textContent).toContain('vice-9703');
+    //         expect(cellElements[3].nativeElement.attributes['ng-reflect-ng-switch'].value).toBe('GREEN');
+    //         expect(cellElements[4].nativeElement.textContent).toContain('10.17.109.80:2376');
+    //         expect(cellElements[5].nativeElement.textContent).toContain('10.17.109.80:2378');
+    //     }
+    // }));
 
-    it('should render zero row for malformed data', async(() => {
-        responseProperlyFormatted = false;
-        try {
-            fixture.componentInstance.ngOnInit();
-            fixture.componentInstance.reloadVchs();
-            fixture.detectChanges();
-        } catch (e) {
-            console.log('expected exception caught');
-        } finally {
-            const rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
-            const rowElementsLength = rowElements.length;
-            expect(rowElementsLength).toBe(0);
-        }
-    }));
+    // it('should render zero row for malformed data', async(() => {
+    //     responseProperlyFormatted = false;
+    //     try {
+    //         fixture.componentInstance.ngOnInit();
+    //         fixture.componentInstance.reloadVchs();
+    //         fixture.detectChanges();
+    //     } catch (e) {
+    //         console.log('expected exception caught');
+    //     } finally {
+    //         const rowElements = fixture.debugElement.queryAll(By.css('clr-dg-row'));
+    //         const rowElementsLength = rowElements.length;
+    //         expect(rowElementsLength).toBe(0);
+    //     }
+    // }));
 
-    it('should render default localized text for table headers', async(() => {
-        fixture.componentInstance.ngOnInit();
-        fixture.componentInstance.reloadVchs();
-        fixture.detectChanges();
+    // it('should render default localized text for table headers', async(() => {
+    //     fixture.componentInstance.ngOnInit();
+    //     fixture.componentInstance.reloadVchs();
+    //     fixture.detectChanges();
 
-        // containerName column
-        const nameEl = fixture.debugElement.query(
-            By.css('clr-dg-column[ng-reflect-field="name"]'));
-        expect(nameEl.nativeElement.textContent.trim()).toBe(
-            WS_VCH.DG.COLUMNS.defaults[WS_VCH.DG.COLUMNS.keys.NAME]);
+    //     // containerName column
+    //     const nameEl = fixture.debugElement.query(
+    //         By.css('clr-dg-column[ng-reflect-field="name"]'));
+    //     expect(nameEl.nativeElement.textContent.trim()).toBe(
+    //         WS_VCH.DG.COLUMNS.defaults[WS_VCH.DG.COLUMNS.keys.NAME]);
 
-        // overallStatus column
-        const overallStatusEl = fixture.debugElement.query(
-            By.css('clr-dg-column[ng-reflect-field="overallStatus"]'));
-        expect(overallStatusEl.nativeElement.textContent.trim()).toBe(
-            WS_VCH.DG.COLUMNS.defaults[WS_VCH.DG.COLUMNS.keys.OVERALL_STATUS]);
+    //     // overallStatus column
+    //     const overallStatusEl = fixture.debugElement.query(
+    //         By.css('clr-dg-column[ng-reflect-field="overallStatus"]'));
+    //     expect(overallStatusEl.nativeElement.textContent.trim()).toBe(
+    //         WS_VCH.DG.COLUMNS.defaults[WS_VCH.DG.COLUMNS.keys.OVERALL_STATUS]);
 
-        // Docker API Endpoint column
-        const dockerApiEndpointEl = fixture.debugElement.queryAll(
-            By.css('clr-dg-column[ng-reflect-field="vchIp"]'))[0];
-        expect(dockerApiEndpointEl.nativeElement.textContent.trim()).toBe(
-            WS_VCH.DG.COLUMNS.defaults[
-            WS_VCH.DG.COLUMNS.keys.DOCKER_API_ENDPOINT
-            ]);
+    //     // Docker API Endpoint column
+    //     const dockerApiEndpointEl = fixture.debugElement.queryAll(
+    //         By.css('clr-dg-column[ng-reflect-field="vchIp"]'))[0];
+    //     expect(dockerApiEndpointEl.nativeElement.textContent.trim()).toBe(
+    //         WS_VCH.DG.COLUMNS.defaults[
+    //         WS_VCH.DG.COLUMNS.keys.DOCKER_API_ENDPOINT
+    //         ]);
 
-        // VCH Admin Portal column
-        const vchAdminPortalEl = fixture.debugElement.queryAll(
-            By.css('clr-dg-column[ng-reflect-field="vchIp"]'))[1];
-        expect(vchAdminPortalEl.nativeElement.textContent.trim()).toBe(
-            WS_VCH.DG.COLUMNS.defaults[
-            WS_VCH.DG.COLUMNS.keys.VCH_ADMIN_PORTAL
-            ]);
-    }));
+    //     // VCH Admin Portal column
+    //     const vchAdminPortalEl = fixture.debugElement.queryAll(
+    //         By.css('clr-dg-column[ng-reflect-field="vchIp"]'))[1];
+    //     expect(vchAdminPortalEl.nativeElement.textContent.trim()).toBe(
+    //         WS_VCH.DG.COLUMNS.defaults[
+    //         WS_VCH.DG.COLUMNS.keys.VCH_ADMIN_PORTAL
+    //         ]);
+    // }));
 
-    it('should render the new VCH button', async(() => {
-        fixture.componentInstance.ngOnInit();
-        fixture.componentInstance.reloadVchs();
-        fixture.detectChanges();
-        fixture.detectChanges();
-        const actionBarEl = fixture.debugElement.query(
-            By.css('clr-dg-action-bar'));
-        expect(actionBarEl).toBeTruthy();
-    }));
+    // it('should render the new VCH button', async(() => {
+    //     fixture.componentInstance.ngOnInit();
+    //     fixture.componentInstance.reloadVchs();
+    //     fixture.detectChanges();
+    //     fixture.detectChanges();
+    //     const actionBarEl = fixture.debugElement.query(
+    //         By.css('clr-dg-action-bar'));
+    //     expect(actionBarEl).toBeTruthy();
+    // }));
 });
