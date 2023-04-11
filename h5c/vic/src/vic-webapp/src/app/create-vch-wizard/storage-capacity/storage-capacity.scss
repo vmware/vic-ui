@@ -1,7 +1,8 @@
 .vol-datastore {
   &-header {
-    position: absolute;
+    position: relative;
     top: -20px;
+    width: 0px;
     font-weight: bold;
   }
 
@@ -14,4 +15,16 @@
 .image-size-label {
   margin-top: 10px;
   line-height: 16px;
+}
+
+.mb-1 {
+  margin-bottom: 1rem!important;
+}
+
+.mb-2 {
+  margin-bottom: 1.5rem!important;
+}
+
+b {
+  color: #c92100;
 }

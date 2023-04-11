@@ -1,22 +1,22 @@
-<p>
-  Select a cluster or resource pool to run this virtual container host.
-  <br> Advanced options are available to specify additional requirements.
-</p>
 
-<form [formGroup]="form"
+
+<form [formGroup]="form" class="clr-form clr-form-compact"
       novalidate>
+      <p>
+        Select a cluster or resource pool to run this virtual container host.
+        <br> Advanced options are available to specify additional requirements.
+      </p>
   <section class="form-block mb-0" id='compute-capacity'>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label class="required">
+        <label class="clr-control-label clr-col-12 clr-col-md-4 required">
           Compute resource
+          <b>*</b>
         </label>
 
-      </div>
-      <div class="col-xs-6" id="compute-resource-selector">
-        <ng-container>
+      <div class="clr-control-container clr-col-12 clr-col-md-6" id="compute-resource-selector">
+        <clr-tree>
           <clr-tree-node class="form-control rootNode" *ngFor="let serverInfo of serversInfo">
             <button #btnEl class="clr-treenode-link cc-resource">
               <clr-icon shape="block"></clr-icon>
@@ -43,7 +43,7 @@
               </ng-container>
             </ng-template>
           </clr-tree-node>
-        </ng-container>
+        </clr-tree>
       </div>
     </div>
 
@@ -58,15 +58,13 @@
       </clr-signpost-content>
     </clr-signpost>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="cpu-limit-selector">
+        <label for="cpu-limit-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           CPU
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
         <label for="cpu-limit-selector"
                aria-haspopup="true"
@@ -74,11 +72,13 @@
                class="form-control tooltip tooltip-validation tooltip-lg tooltip-top-left"
                [class.invalid]="form.get('cpuLimit').invalid && (form.get('cpuLimit').dirty || form.get('cpuLimit').touched)">
 
-          <input id="cpu-limit-selector"
-                 class="form-control"
+            <div class="clr-input-wrapper">
+              <input id="cpu-limit-selector"
+                 class="clr-input"
                  type="text"
                  formControlName="cpuLimit">
-
+            </div>
+          
           <span class="tooltip-content" *ngIf="form.get('cpuLimit').hasError('required')">
             CPU limit cannot be empty
           </span>
@@ -95,9 +95,7 @@
             CPU limit cannot be bigger than {{ resourceLimits['cpu']['maxUsage'] }} MHz
           </span>
 
-          <small class="text-muted">
-            Max: {{ resourceLimits.cpu.maxUsage || '-' }} MHz, Min: {{ resourceLimits.cpu.minUsage || '-' }} MHz
-          </small>
+          <span class="clr-subtext">Max: {{ resourceLimits.cpu.maxUsage || '-' }} MHz, Min: {{ resourceLimits.cpu.minUsage || '-' }} MHz</span>
 
         </label>
 
@@ -107,15 +105,13 @@
 
     </div>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="memory-limit-selector">
+        <label for="memory-limit-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           Memory
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
         <label for="memory-limit-selector"
                aria-haspopup="true"
@@ -123,10 +119,12 @@
                class="form-control tooltip tooltip-validation tooltip-lg tooltip-top-left"
                [class.invalid]="form.get('memoryLimit').invalid && (form.get('memoryLimit').dirty || form.get('memoryLimit').touched)">
 
-          <input id="memory-limit-selector"
-                 class="form-control"
-                 type="text"
-                 formControlName="memoryLimit">
+            <div class="clr-input-wrapper">
+              <input id="memory-limit-selector"
+              class="clr-input"
+              type="text"
+              formControlName="memoryLimit">
+            </div>
 
           <span class="tooltip-content" *ngIf="form.get('memoryLimit').hasError('required')">
             Memory limit cannot be empty
@@ -144,9 +142,8 @@
             Memory limit cannot be bigger than {{ resourceLimits['memory']['maxUsage'] }} MB
           </span>
 
-          <small class="text-muted">
-            Max: {{ resourceLimits.memory.maxUsage || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB
-          </small>
+          <span class="clr-subtext">Max: {{ resourceLimits.memory.maxUsage || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB</span>
+
 
         </label>
 
@@ -158,7 +155,7 @@
 
   </section>
 
-  <a class="btn btn-link pl-0"
+  <a class="advanced btn btn-link pl-0"
      (click)="toggleAdvancedMode()">
     {{ inAdvancedMode ? 'Basic' : 'Advanced' }}
     <clr-icon [attr.shape]="inAdvancedMode ? 'caret up' : 'caret down'"></clr-icon>
@@ -180,15 +177,13 @@
       Virtual Container Host settings
     </label>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="cpu-reservation-selector">
+        <label for="cpu-reservation-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           CPU reservation
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
         <label for="cpu-reservation-selector"
                aria-haspopup="true"
@@ -196,10 +191,12 @@
                class="form-control tooltip tooltip-validation tooltip-lg tooltip-top-left"
                [class.invalid]="form.get('cpuReservation').invalid && (form.get('cpuReservation').dirty || form.get('cpuReservation').touched)">
 
-          <input id="cpu-reservation-selector"
-                 class="form-control"
-                 type="text"
-                 formControlName="cpuReservation">
+              <div class="clr-input-wrapper">
+                <input id="cpu-reservation-selector"
+                class="clr-input"
+                type="text"
+                formControlName="cpuReservation">
+              </div>
 
           <span class="tooltip-content" *ngIf="form.get('cpuReservation').hasError('required')">
             CPU reservation cannot be empty
@@ -217,9 +214,8 @@
             CPU reservation cannot be bigger than {{ resourceLimits['cpu']['unreservedForPool'] }} MHz
           </span>
 
-          <small class="text-muted">
-            Max: {{ resourceLimits.cpu.unreservedForPool || '-' }} MHz, Min: {{ resourceLimits.cpu.minUsage || '-' }} MHz
-          </small>
+          <span class="clr-subtext">Max: {{ resourceLimits.cpu.unreservedForPool || '-' }} MHz, Min: {{ resourceLimits.cpu.minUsage || '-' }} MHz</span>
+
 
         </label>
 
@@ -229,18 +225,17 @@
 
     </div>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="cpu-shares-selector">
+        <label for="cpu-shares-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           CPU shares
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
-        <div class="select form-control">
+        <div class="clr-select-wrapper">
           <select id="cpu-shares-selector"
+                  class="clr-select"
                   formControlName="cpuShares">
             <option value="low">Low</option>
             <option value="normal">Normal</option>
@@ -251,15 +246,13 @@
       </div>
     </div>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="memory-reservation-selector">
+        <label for="memory-reservation-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           Memory reservation
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
         <label for="memory-reservation-selector"
                aria-haspopup="true"
@@ -267,10 +260,12 @@
                class="form-control tooltip tooltip-validation tooltip-lg tooltip-top-left"
                [class.invalid]="form.get('memoryReservation').invalid && (form.get('memoryReservation').dirty || form.get('memoryReservation').touched)">
 
-          <input id="memory-reservation-selector"
-                 class="form-control"
-                 type="text"
-                 formControlName="memoryReservation">
+              <div class="clr-input-wrapper">
+                <input id="memory-reservation-selector"
+                class="clr-input"
+                type="text"
+                formControlName="memoryReservation">
+              </div>
 
           <span class="tooltip-content" *ngIf="form.get('memoryReservation').hasError('required')">
             Memory limit cannot be empty
@@ -288,9 +283,7 @@
             Memory limit cannot be bigger than {{ resourceLimits['memory']['unreservedForPool'] }} MB
           </span>
 
-          <small class="text-muted">
-            Max: {{ resourceLimits.memory.unreservedForPool || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB
-          </small>
+          <span class="clr-subtext">Max: {{ resourceLimits.memory.unreservedForPool || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB</span>
 
         </label>
 
@@ -300,18 +293,17 @@
 
     </div>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="memory-shares-selector">
+        <label for="memory-shares-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           Memory shares
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
-        <div class="select form-control">
+        <div class="clr-select-wrapper">
           <select id="memory-shares-selector"
+                  class="clr-select"
                   formControlName="memoryShares">
             <option value="low">Low</option>
             <option value="normal">Normal</option>
@@ -326,15 +318,13 @@
       VCH endpoint VM settings
     </label>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="vm-cpu-selector">
+        <label for="vm-cpu-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           CPUs
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
         <label for="vm-cpu-selector"
                aria-haspopup="true"
@@ -343,7 +333,7 @@
                [class.invalid]="form.get('endpointCpu').invalid && (form.get('endpointCpu').dirty || form.get('endpointCpu').touched)">
 
           <input id="vm-cpu-selector"
-                 class="form-control"
+                 class="clr-input"
                  type="text"
                  formControlName="endpointCpu">
 
@@ -365,15 +355,13 @@
 
     </div>
 
-    <div class="form-group row">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row">
 
-        <label for="vm-memory-selector">
+        <label for="vm-memory-selector" class="clr-control-label clr-col-12 clr-col-md-4">
           Memory
         </label>
 
-      </div>
-      <div class="col-xs-3">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
 
         <label for="vm-memory-selector"
                aria-haspopup="true"
@@ -381,11 +369,13 @@
                class="form-control tooltip tooltip-validation tooltip-lg tooltip-top-left"
                [class.invalid]="form.get('endpointMemory').invalid && (form.get('endpointMemory').dirty || form.get('endpointMemory').touched)">
 
-          <input id="vm-memory-selector"
-                 class="form-control"
-                 type="text"
-                 formControlName="endpointMemory">
-
+              <div class="clr-input-wrapper">
+                <input id="vm-memory-selector"
+                class="clr-input"
+                type="text"
+                formControlName="endpointMemory">
+              </div>
+          
           <span class="tooltip-content" *ngIf="form.get('endpointMemory').hasError('required')">
             Memory limit cannot be empty
           </span>
@@ -402,9 +392,7 @@
             Memory limit cannot be bigger than {{ resourceLimits['memory']['maxUsage'] }} MB
           </span>
 
-          <small class="text-muted">
-            Max: {{ resourceLimits.memory.maxUsage || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB
-          </small>
+          <span class="clr-subtext">Max: {{ resourceLimits.memory.maxUsage || '-' }} MB, Min: {{ resourceLimits.memory.minUsage || '-' }} MB</span>
 
         </label>
 
@@ -416,15 +404,13 @@
 
     <!-- VM-Host Affinity -->
     <ng-container *ngIf="selectedResourceIsCluster">
-      <div class="form-group row">
-        <div class="col-xs-4">
-          <label for="vm-host-affinity" class="affinity-label">
+      <div class="clr-form-control clr-row">
+          <label for="vm-host-affinity" class="affinity-label clr-control-label clr-col-12 clr-col-md-4">
             {{ i18n.translate('vch.computeCapacity.vmHostAffinity.title') }}
           </label>
-        </div>
-        <div class="col-xs-8">
+        <div class="clr-control-container clr-col-12 clr-col-md-8">
             <div class="checkbox">
-              <input type="checkbox" id="vm-host-affinity" formControlName="vmHostAffinity"
+              <input type="checkbox" class="clr-input" id="vm-host-affinity" formControlName="vmHostAffinity"
                    [attr.disabled]="(!vmGroupNameIsValid || !isClusterDrsEnabled) ? '' : null">
               <label class="text-nowrap"
                      [ngClass]="{'affinity-disabled': (!vmGroupNameIsValid || !isClusterDrsEnabled)}"
@@ -442,13 +428,13 @@
               </span>
 
               <div class="affinity-alerts" *ngIf="(!isClusterDrsEnabled || !vmGroupNameIsValid)">
-                <div class="row">
-                  <div class="col-xs-1">
+                <div class="clr-form-control clr-row">
+                  <div class="clr-control-container clr-col-12 clr-col-md-1">
                     <div class="alert-icon-wrapper">
                       <clr-icon class="alert-icon" shape="info-circle"></clr-icon>
                     </div>
                   </div>
-                  <div class="col-xs-11">
+                  <div class="clr-control-container clr-col-12 clr-col-md-11">
                     <div class="alert-items">
                       <div class="alert-item static" *ngIf="!vmGroupNameIsValid">
                         <div class="alert-text">

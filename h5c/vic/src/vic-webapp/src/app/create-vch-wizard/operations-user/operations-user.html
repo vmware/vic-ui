@@ -3,18 +3,19 @@
   Specify a non-administrative account to limit permissions for day-to-day VCH operations.
 </p>
 
-<form [formGroup]="form" novalidate>
+<form [formGroup]="form" class="clr-form clr-form-compact" novalidate>
   <section class="form-block" id='ops-user'>
 
-    <div class="form-group row mb-0">
-      <div class="col-xs-4">
+    <div class="clr-form-control clr-row mb-0">
+      <div class="clr-control-label clr-col-12 clr-col-md-4">
 
         <label class="required" for="ops-user">
           vSphere user credentials
+          <b>*</b>
         </label>
 
       </div>
-      <div class="col-xs-5">
+      <div class="clr-control-container clr-col-12 clr-col-md-5">
 
         <label for="ops-user"
                aria-haspopup="true"
@@ -23,7 +24,7 @@
                [class.invalid]="form.get('opsUser').invalid && (form.get('opsUser').dirty || form.get('opsUser').touched)">
 
           <input id="ops-user"
-                 class="form-control"
+                 class="clr-input"
                  type="text"
                  placeholder="username@domain.local"
                  formControlName="opsUser">
@@ -36,8 +37,9 @@
 
       </div>
     </div>
-    <div class="form-group row">
-      <div class="col-xs-5 offset-xs-4">
+    <div class="clr-form-control clr-row">
+      <div class="clr-control-container clr-col-12 clr-col-md-4"></div>
+      <div class="clr-control-container clr-col-12 clr-col-md-5">
 
         <label for="ops-password"
                aria-haspopup="true"
@@ -46,7 +48,7 @@
                [class.invalid]="form.get('opsPassword').invalid && (form.get('opsPassword').dirty || form.get('opsPassword').touched)">
 
           <input id="ops-password"
-                 class="form-control"
+                 class="clr-input"
                  type="password"
                  placeholder="Password"
                  formControlName="opsPassword">
@@ -59,10 +61,11 @@
 
       </div>
     </div>
-    <div class="form-group row">
-      <div class="col-xs-5 offset-xs-4">
+    <div class="clr-form-control clr-row">
+      <div class="clr-control-container clr-col-12 clr-col-md-4"></div>
+      <div class="clr-control-container clr-col-12 clr-col-md-5">
 
-        <div class="checkbox">
+        <div class="clr-checkbox-wrapper">
           <input type="checkbox" id="ops-grant-perms" formControlName="opsGrantPerms">
           <label class="text-nowrap" for="ops-grant-perms">Grant this user any necessary permissions</label>
         </div>
