@@ -18,6 +18,7 @@
     "test": "npm run prebuildCheck",
     "lint": "ng lint",
     "rimraf": "rimraf",
+    "postinstall": "npx npm-force-resolutions",
     "e2e": "npm install protractor@^7.0.0 && ng e2e --progress false",
     "prebuildCheck": "npm run setAppBaseUrl:test && ng lint && ng test --code-coverage",
     "setAppBaseUrl:dev": "sed -e 's|<base href=.*|<base href=\"/ui/vic/resources/dist/\">|' src/index.html > /tmp/vicwebapp-index.html && mv /tmp/vicwebapp-index.html ./src/index.html",
@@ -90,5 +91,11 @@
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-jsdoc": "39.8.0",
     "eslint-plugin-prefer-arrow": "1.2.3"
+  },
+  "resolutions": {
+    "socket.io-parser": ">=4.2.3"
+  },
+  "peerDependencies": {
+    "socket.io-parser": ">=4.2.3"
   }
 }
