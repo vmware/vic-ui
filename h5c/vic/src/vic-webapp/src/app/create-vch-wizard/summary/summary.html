@@ -1,7 +1,7 @@
-<form [formGroup]="form" novalidate>
+<form [formGroup]="form" class="clr-form clr-form-compact" novalidate>
   <section class="form-block" id='summary'>
-    <div class="form-group row">
-      <div class="col-xs-12">
+    <div class="clr-form-control clr-row">
+      <div class="clr-control-container clr-col-12 clr-col-md-12">
         <clr-stack-view id="vch-payload-stackview">
           <!-- name -->
           <clr-stack-block>
@@ -462,13 +462,14 @@
       </div>
     </div>
     <!-- Copy CLI -->
-    <div class="row p1 mb10">
-      <div class="col-xs-3">
+    <div class="clr-form-control clr-row p1 mb10">
+      <div class="clr-control-label clr-col-12 clr-col-md-3">
         <label for="target-os">Copy CLI command</label>
       </div>
-      <div class="col-xs-3">
-        <div class="select">
+      <div class="clr-control-container clr-col-12 clr-col-md-3">
+        <div class="clr-select-wrapper">
           <select id="target-os"
+                  class="clr-select"
                   formControlName="targetOS">
             <option value="">Select Platform</option>
             <option value="windows">Windows</option>
@@ -477,15 +478,15 @@
           </select>
         </div>
       </div>
-      <div class="col-xs-6">
+      <div class="clr-control-container clr-col-12 clr-col-md-6">
         <clr-icon class="cursor-pointer"
                   shape="clipboard"
                   (click)="copyCliCommandToClipboard()"></clr-icon>
       </div>
     </div>
-    <div class="row mb10"
+    <div class="clr-form-control clr-row mb10"
          *ngIf="copySucceeded !== null">
-      <div class="col-xs-12">
+      <div class="clr-control-container clr-col-12 clr-col-md-12">
         <div class="alert"
              [class.alert-success]="copySucceeded === true"
              [class.alert-danger]="copySucceeded === false">
@@ -502,9 +503,10 @@
         </div>
       </div>
     </div>
-    <div class="form-group row">
-      <div class="col-xs-12">
+    <div class="clr-form-control clr-row">
+      <div class="clr-control-container clr-col-12 clr-col-md-12">
         <textarea id="cliCommand"
+                  class="clr-textarea"
                   readonly
                   formControlName="cliCommand"></textarea>
       </div>

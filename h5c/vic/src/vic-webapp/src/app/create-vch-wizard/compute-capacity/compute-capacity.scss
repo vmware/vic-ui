@@ -53,3 +53,28 @@
 .affinity-alerts .alert-item {
   margin-bottom: 0px;
 }
+
+.advanced {
+  margin-left: -0.5rem;
+}
+
+#cpu-shares-selector {
+  width: 6.95rem;
+}
+
+#memory-shares-selector {
+  width: 6.95rem;
+}
+
+b {
+  color: #c92100;
+}
+
+.form .form-block>label, form .form-block>label {
+  font-size: .666667rem;
+  letter-spacing: .01em;
+  font-weight: 400;
+  color: #000;
+  margin-bottom: 0.25rem;
+  margin-top: 0.25rem;
+}
