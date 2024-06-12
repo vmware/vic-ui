@@ -15,3 +15,31 @@
     }
   }
 }
+
+.mt-0 {
+  margin-top: 0!important;
+}
+
+.mb-1 {
+  margin-bottom: 1rem!important;
+}
+
+.mb-2 {
+  margin-bottom: 1.5rem!important;
+}
+
+.hidden-xs-up {
+  display: none!important;
+}
+
+b {
+  color: #c92100;
+}
+
+.form .form-block>label, form .form-block>label {
+  font-size: .666667rem;
+  letter-spacing: .01em;
+  font-weight: 400;
+  color: #000;
+  margin-bottom: 0.25rem;
+}

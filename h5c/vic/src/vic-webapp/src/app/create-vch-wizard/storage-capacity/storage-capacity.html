@@ -1,6 +1,6 @@
 <div class="spinner" *ngIf="datastoresLoading"></div>
 
-<form class="pt-0" [formGroup]="form" novalidate *ngIf="!datastoresLoading">
+<form class="clr-form clr-form-compact" [formGroup]="form" novalidate *ngIf="!datastoresLoading">
   <section class="form-block my-0"  id='storage-capacity'>
 
     <label>
@@ -11,18 +11,17 @@
       Select the image datastore to be used to hold container images and an optional folder.
     </p>
 
-    <div class="form-group row">
-      <div class="col-xs-3">
+    <div class="clr-form-control clr-row">
 
-        <label class="required" for="image-store-selector">
+        <label class="required" for="image-store-selector" class="clr-control-label  clr-col-12 clr-col-md-3">
           Datastore
+          <b>*</b>
         </label>
 
-      </div>
-      <div class="col-xs-4">
+      <div class="clr-control-container clr-col-12 clr-col-md-4">
 
-        <div class="select form-control">
-          <select id="image-store-selector" formControlName="imageStore">
+        <div class="clr-select-wrapper">
+          <select id="image-store-selector" class="clr-select" formControlName="imageStore">
             <option value="">Not selected</option>
             <option [value]="datastore.name" *ngFor="let datastore of datastores; trackBy: datastoreTrackByFn">
               {{ datastore.name }} ({{ datastore?.info?.freeSpace }} free)
@@ -33,18 +32,16 @@
       </div>
     </div>
 
-    <div class="form-group row">
-      <div class="col-xs-3">
+    <div class="clr-form-control clr-row">
 
-        <label for="file-folder-selector">
+        <label for="file-folder-selector" class="clr-control-label clr-col-12 clr-col-md-3">
           File folder
         </label>
 
-      </div>
-      <div class="col-xs-4">
+      <div class="clr-control-container clr-col-12 clr-col-md-4">
 
         <input id="file-folder-selector"
-               class="form-control"
+               class="clr-input"
                type="text"
                placeholder="Existing or new folder name"
                formControlName="fileFolder">
@@ -52,16 +49,14 @@
       </div>
     </div>
 
-    <div class="form-group row">
-      <div class="col-xs-3">
+    <div class="clr-form-control clr-row">
 
-        <label class="image-size-label">
+        <label class="image-size-label clr-control-label clr-col-12 clr-col-md-3">
           Max Container VM<br>
           image size
         </label>
 
-      </div>
-      <div class="col-xs-2">
+      <div class="clr-control-container clr-col-12 clr-col-md-2">
 
         <label for="base-image-size"
                aria-haspopup="true"
@@ -69,10 +64,12 @@
                class="form-control tooltip tooltip-validation tooltip-md tooltip-top-right"
                [class.invalid]="form.get('baseImageSize').invalid && (form.get('baseImageSize').dirty || form.get('baseImageSize').touched)">
 
-          <input type="text"
-                 id="base-image-size"
-                 formControlName="baseImageSize"
-                 class="form-control">
+               <div class="clr-input-wrapper">
+                  <input type="text"
+                  id="base-image-size"
+                  formControlName="baseImageSize"
+                  class="clr-input">
+               </div>
 
           <span class="tooltip-content" *ngIf="form.get('baseImageSize').hasError('required')">
             Base image size cannot be empty
@@ -82,17 +79,15 @@
             Base image size should be numeric
           </span>
 
-          <small class="text-muted text-nowrap">
-            This limit cannot be changed after deploying the VCH
-          </small>
+          <span class="clr-subtext">This limit cannot be changed after deploying the VCH</span>
 
         </label>
 
       </div>
-      <div class="col-xs-2">
+      <div class="clr-control-container clr-col-12 clr-col-md-2">
 
-        <div class="select form-control">
-          <select formControlName="baseImageSizeUnit">
+        <div class="clr-select-wrapper">
+          <select formControlName="baseImageSizeUnit" class="clr-select">
             <option value="MiB">MB</option>
             <option selected value="GiB">GB</option>
           </select>
@@ -123,32 +118,31 @@
       Make selected datastores available for docker volumes
     </p>
 
-    <div class="form-group row mb-2">
-      <div class="col-xs">
-        <div class="toggle-switch">
-          <input type="checkbox" id="enable-anonymous-volumes" formControlName="enableAnonymousVolumes">
-          <label for="enable-anonymous-volumes">Enable anonymous volumes</label>
-        </div>
+    <div class="mb-2 clr-form-control clr-row">
+      <div class="clr-toggle-wrapper">
+        <input type="checkbox" id="enable-anonymous-volumes" class="clr-toggle" formControlName="enableAnonymousVolumes">
+        <label for="enable-anonymous-volumes">Enable anonymous volumes</label>
       </div>
     </div>
 
     <div class="mb-1" formArrayName="volumeStores">
 
-      <div class="form-group row mb-0"
+      <div class="clr-form-control clr-row"
            [formGroupName]="i"
            *ngFor="let volumeStore of form.controls.volumeStores.controls; let i=index">
-        <div class="col-xs-3">
+        <div class="clr-control-label clr-col-12 clr-col-md-3">
 
           <label [ngClass]="{'required': form.get('enableAnonymousVolumes').value && i === 0}">
             Volume datastore
+            <b *ngIf="form.get('enableAnonymousVolumes').value && i === 0">*</b>
           </label>
 
         </div>
-        <div class="col-xs-3">
+        <div class="clr-control-container clr-col-12 clr-col-md-3">
 
           <small class="vol-datastore-header" *ngIf="i === 0">Datastore</small>
-          <div class="select form-control">
-            <select formControlName="volDatastore">
+          <div class="clr-select-wrapper">
+            <select formControlName="volDatastore" class="clr-select">
               <option value="">Not selected</option>
               <option [value]="datastore.name" *ngFor="let datastore of datastores">
                 {{ datastore.name }} ({{ datastore?.info?.freeSpace }} free)
@@ -157,18 +151,18 @@
           </div>
 
         </div>
-        <div class="col-xs-3">
+        <div class="clr-control-container clr-col-12 clr-col-md-3">
 
           <small class="vol-datastore-header" *ngIf="i === 0">Folder</small>
-          <input class="form-control"
+          <input class="clr-input"
                  type="text"
                  placeholder="Optional folder name"
                  formControlName="volFileFolder">
 
         </div>
-        <div class="col-xs">
+        <div class="clr-control-container clr-col-12 clr-col-md-2">
 
-          <small class="vol-datastore-header" *ngIf="i === 0">Volume store name</small>
+          <small class="vol-datastore-header" *ngIf="i === 0">Name</small>
           <label class="form-control tooltip tooltip-validation tooltip-md tooltip-top-left"
                  for="docker-volname-selector"
                  aria-haspopup="true"
@@ -177,7 +171,7 @@
                  *ngIf="(form.get('enableAnonymousVolumes').value && i > 0) || (!form.get('enableAnonymousVolumes').value)">
 
             <input id="docker-volname-selector"
-                   class="form-control"
+                   class="clr-input"
                    type="text"
                    placeholder="Volume name"
                    formControlName="dockerVolName">
@@ -195,7 +189,7 @@
           <span *ngIf="form.get('enableAnonymousVolumes').value && i === 0">Default</span>
 
         </div>
-        <div class="col-xs-1 px-0 vol-datastore-actions">
+        <div class="clr-control-container clr-col-12 clr-col-md-1 px-0 vol-datastore-actions">
 
           <clr-icon class="is-solid"
                     shape="times-circle"

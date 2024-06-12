@@ -31,3 +31,23 @@
 .relative-po {
   position: relative !important;
 }
+
+.text-muted {
+  color: #818a91!important;
+}
+
+.text-nowrap {
+  white-space: nowrap!important;
+}
+
+b {
+  color: #c92100;
+}
+
+.form .form-block>label, form .form-block>label {
+  font-size: .666667rem;
+  letter-spacing: .01em;
+  font-weight: 400;
+  color: #000;
+  margin-bottom: 0.25rem;
+}

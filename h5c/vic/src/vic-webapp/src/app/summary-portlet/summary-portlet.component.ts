@@ -31,7 +31,7 @@ import { VM_PROPERTIES_TO_EXTRACT } from '../shared/constants/vm.constants';
   selector: 'vic-summary-portlet',
   template: `
     <div *ngIf="!gs.isPluginMode()">
-        <button (click)="toggleVmType()">Toggle VM Type</button>
+        <button class="btn btn-link" (click)="toggleVmType()">Toggle VM Type</button>
     </div>
     <vic-vch-portlet [activeVm]="activeVm" *ngIf="activeVm && activeVm.isVCH"></vic-vch-portlet>
     <vic-container-portlet [activeVm]="activeVm" *ngIf="activeVm && activeVm.isContainer"></vic-container-portlet>
